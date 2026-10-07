@@ -2,11 +2,11 @@
 
 ## Project Idea
 
-We want to develop an MVP of a web application called **Comunidad Musical**, a community platform and basic sheet-music manager for music students and hobbyist musicians.
+We want to develop an academic MVP of a web application called **Notara**, a community platform and basic sheet-music manager for music students and hobbyist musicians.
 
-Currently there is no simple, accessible space where music students and hobbyists can create, share, and listen to short pieces of sheet music without relying on complex professional notation software (MuseScore, Finale, Sibelius), which has a steep learning curve for someone who just wants to jot down a quick musical idea.
+Currently there is no simple, accessible space where music students and hobbyists can create, share, and view short pieces of sheet music without relying on complex professional notation software (MuseScore, Finale, Sibelius), which has a steep learning curve for someone who just wants to jot down a quick musical idea.
 
-Users would be able to build short sheet music manually (entering notes by hand, as an image upload in this first version), publish it to a shared community feed, and have other musicians listen to it, comment on it, and react to it.
+Users would be able to build short sheet music manually by entering or submitting text in this first version. The MVP accepts both ABC notation files (`.abc`) and plain text. Each score must contain a non-empty textual content of no more than 1,000 characters. ABC content must pass basic ABC syntax validation; plain text uses a free format. Published content is displayed as readable text while preserving line breaks, with its format distinguishable as `.abc` or plain text. Users could publish the content to a shared community feed, where other musicians could view it, comment on it, and react to it.
 
 The main idea is to centralize this kind of content in one platform and build the first module (traditional/manual method) of a larger product that, in later phases, will also let users create content through voice (humming a melody) and through image recognition of physical sheet music (OMR), without implementing those methods yet in this MVP.
 
@@ -16,7 +16,8 @@ Some features we have considered for this MVP (MVP 1 — traditional method) are
 
 * User registration and authentication (login / logout).
 * User profile, showing instrument and published scores.
-* Uploading a short sheet music image (jpg or png) and publishing it to the community.
+* Creating or submitting a short text-based score and publishing it to the community. Both `.abc` files and plain text are supported; image uploads are not part of this MVP.
+* A published score requires a title, instrument, textual content, and description.
 * A dashboard showing the user's own recent scores and the community's recent scores, with the option to filter the feed by instrument.
 * Commenting on and reacting ("like") to scores published by others.
 * Editing a publication the user owns.

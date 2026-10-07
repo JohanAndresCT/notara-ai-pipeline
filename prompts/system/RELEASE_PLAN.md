@@ -7,7 +7,7 @@
 
 | Release | Duración | Sprints | Objetivo funcional |
 |---|---|---:|---|
-| MVP 1 — Notara | 2 semanas (30 de septiembre–13 de octubre de 2026) | 1 sprint | Habilitar registro, autenticación, creación y gestión de partituras en imagen, además de exploración e interacción comunitaria básica. |
+| MVP 1 — Notara | 2 semanas (30 de septiembre–13 de octubre de 2026) | 1 sprint | Habilitar registro, autenticación, creación y gestión de partituras textuales, además de exploración e interacción comunitaria básica. |
 
 ## 2. Detalle de épicas
 
@@ -20,7 +20,7 @@
 ### E02 — CONTENT
 
 **Descripción:** Agrupa las funcionalidades de creación, publicación y gestión del contenido musical propio.  
-**Objetivo de negocio:** Permitir que el usuario publique, edite y elimine sus partituras en formato imagen dentro de la comunidad.  
+**Objetivo de negocio:** Permitir que el usuario publique, edite y elimine sus partituras en formato textual dentro de la comunidad.
 **Historias asociadas:** HU04, HU05, HU06
 
 ### E03 — COMMUNITY
@@ -100,20 +100,21 @@
 **Épica:** ACCESS
 
 **Como** usuario autenticado  
-**Quiero** ver y actualizar la información de mi perfil (nombre, foto e instrumento principal)  
+**Quiero** ver y actualizar la información de mi perfil (nombre de usuario, nombre, descripción e instrumento principal), además de cambiar mi contraseña
 **Para** personalizar mi identidad dentro de la comunidad musical.
 
 #### Criterios de aceptación
 
-1. **Dado** que estoy autenticado, **cuando** accedo a “Mi perfil”, **entonces** veo mis datos actuales: nombre, foto e instrumento principal.
-2. **Dado** que estoy en mi perfil, **cuando** actualizo mi nombre o instrumento y guardo los cambios, **entonces** los cambios se reflejan inmediatamente.
-3. **Dado** que actualizo mi foto de perfil, **cuando** subo una imagen válida (JPG/PNG), **entonces** la nueva foto reemplaza la anterior en mi perfil.
+1. **Dado** que estoy autenticado, **cuando** accedo a “Mi perfil”, **entonces** veo mis datos actuales: nombre de usuario, nombre, descripción e instrumento principal.
+2. **Dado** que estoy en mi perfil, **cuando** actualizo mi nombre de usuario, nombre, descripción o instrumento y guardo los cambios, **entonces** los cambios se reflejan inmediatamente.
+3. **Dado** que estoy autenticado, **cuando** ingreso mi contraseña actual y una nueva contraseña válida, **entonces** el sistema actualiza mi contraseña y confirma el cambio.
+4. **Dado** que intento cambiar la contraseña usando una contraseña actual incorrecta o una nueva contraseña inválida, **entonces** el sistema rechaza el cambio y muestra un mensaje de validación claro.
 
 #### Definition of Done (DoD)
 
-- [ ] El usuario puede ver y editar nombre, foto e instrumento.
+- [ ] El usuario puede ver y editar nombre de usuario, nombre, descripción e instrumento.
+- [ ] El usuario puede cambiar su contraseña validando la contraseña actual.
 - [ ] Los cambios persisten y se reflejan en el perfil.
-- [ ] Solo se aceptan imágenes JPG/PNG para la foto.
 - [ ] El flujo fue validado en móvil y escritorio.
 - [ ] Aprobación del Product Owner.
 
@@ -129,20 +130,26 @@
 **Épica:** CONTENT
 
 **Como** usuario autenticado  
-**Quiero** subir una partitura en formato imagen (JPG o PNG), asignarle un título, instrumento y descripción, y publicarla en la comunidad  
+**Quiero** crear o enviar una partitura en formato `.abc` o texto plano, asignarle un título, instrumento y descripción, y publicarla en la comunidad
 **Para** compartir mi creación musical con otros usuarios.
 
 #### Criterios de aceptación
 
-1. **Dado** que estoy autenticado, **cuando** subo una imagen JPG o PNG, completo el título e instrumento y publico, **entonces** la partitura aparece en el feed de la comunidad.
-2. **Dado** que intento subir un PDF u otro formato no admitido, **entonces** el sistema rechaza el archivo e indica los formatos válidos.
-3. **Dado** que dejo el título o el instrumento en blanco, **entonces** el sistema no permite la publicación y muestra el error correspondiente.
+1. **Dado** que estoy autenticado, **cuando** ingreso o envío contenido en formato `.abc` o texto plano, completo el título, instrumento y descripción, y publico, **entonces** la partitura aparece en el feed de la comunidad.
+2. **Dado** que envío una partitura, **cuando** el contenido está vacío o supera los 1.000 caracteres, **entonces** el sistema rechaza la publicación y muestra un mensaje de validación.
+3. **Dado** que envío contenido `.abc`, **cuando** no cumple la validación básica de sintaxis ABC, **entonces** el sistema rechaza la publicación e indica el error correspondiente.
+4. **Dado** que intento enviar un formato distinto de `.abc` o texto plano, **entonces** el sistema rechaza la publicación e indica los formatos válidos.
+5. **Dado** que dejo vacío el título, instrumento, contenido textual o descripción, **entonces** el sistema no permite la publicación y muestra el error correspondiente.
 
 #### Definition of Done (DoD)
 
 - [ ] La partitura publicada aparece en el feed comunitario.
-- [ ] Solo se aceptan JPG/PNG; otros formatos son rechazados con un mensaje claro.
-- [ ] Los campos obligatorios (título e instrumento) se validan antes de publicar.
+- [ ] Se aceptan `.abc` y texto plano, y se rechazan otros formatos.
+- [ ] El contenido no está vacío y no supera los 1.000 caracteres.
+- [ ] El contenido `.abc` pasa una validación básica de sintaxis.
+- [ ] El texto plano se acepta con formato libre.
+- [ ] Los campos obligatorios (título, instrumento, contenido y descripción) se validan antes de publicar.
+- [ ] El contenido se muestra conservando los saltos de línea y distinguiendo su formato.
 - [ ] El flujo completo fue probado en móvil y escritorio.
 - [ ] Aprobación del Product Owner.
 
@@ -151,7 +158,7 @@
 | 5 | Must Have | 0/5 — Tradicional | MVP 1 / Sprint 1 | David Urrego | Alejandro Rodríguez |
 
 **Justificación MoSCoW:** Es la función central del MVP: sin publicación de partituras la plataforma no existe.  
-**Motivo del desarrollo de apoyo:** Almacenamiento y consulta de las imágenes y metadatos de las partituras.
+**Motivo del desarrollo de apoyo:** Almacenamiento y consulta del contenido textual y los metadatos de las partituras.
 
 ### HU05 — Edición de partitura propia
 
@@ -251,7 +258,7 @@
 #### Criterios de aceptación
 
 1. **Dado** que accedo al feed, **cuando** desplazo la lista, **entonces** veo las partituras de la comunidad ordenadas por fecha de publicación, de más recientes a más antiguas.
-2. **Dado** que selecciono una partitura del feed, **entonces** se abre una vista de detalle con la imagen, título, instrumento, descripción, autor y comentarios.
+2. **Dado** que selecciono una partitura del feed, **entonces** se abre una vista de detalle con el contenido textual legible, sus saltos de línea, formato (`.abc` o texto plano), título, instrumento, descripción, autor y comentarios.
 3. **Dado** que el feed está vacío, **entonces** el sistema muestra un mensaje indicando que aún no hay contenido publicado.
 
 #### Definition of Done (DoD)
@@ -368,7 +375,7 @@
 
 ## 8. Sugerencias
 
-1. **CONTENT — HU04:** Para el MVP 2, considerar habilitar la reproducción de audio directamente desde la partitura, aprovechando la infraestructura de imágenes establecida en este release.
+1. **CONTENT — HU04:** El MVP 1 permite visualizar el contenido textual, pero no incluye reproducción ni compartición de audio. Cualquier capacidad de audio requiere una decisión y alcance futuros.
 2. **COMMUNITY — HU07 (Dashboard):** En un próximo incremento se podría agregar ordenamiento del feed por popularidad (reacciones), además del orden actual por fecha.
 3. **ACCESS — HU01:** Considerar añadir verificación de correo electrónico en el MVP 2 para fortalecer la confianza de la comunidad.
 4. **General — Equipo:** Alejandro Zamorano (Tester / Despliegue) tiene una carga baja en asignaciones de historias; se sugiere que lidere las pruebas de aceptación end-to-end y el proceso de despliegue del MVP sin que esto se refleje en el release plan como una historia formal.
