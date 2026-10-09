@@ -2,10 +2,10 @@
 
 ## 1. Document Metadata
 
-- **Version:** 1.0
+- **Version:** 1.1
 - **Stage:** P01 — Product Discovery
-- **Status:** `PASS_WITH_WARNINGS`
-- **Generated From:** `artifacts/01_discovery/PRODUCT_VISION.md` (P01, status `READY_WITH_ASSUMPTIONS`)
+- **Status:** `PASS`
+- **Generated From:** `artifacts/01_discovery/PRODUCT_VISION.md` (P01 baseline, status `READY_WITH_ASSUMPTIONS`; downstream decisions reconciled in P02)
 - **Validation Dependency:** `artifacts/00_context/CONTEXT_VALIDATION.md` — result `PASS_WITH_WARNINGS` (0 critical, 0 high, 1 medium, 1 low)
 
 **Input note:** `PRODUCT_VISION.md` was validated against `PROJECT_CONTEXT.md`, `CONTEXT_VALIDATION.md`, `SYSTEM_PROMPT.md`, and the approved `RELEASE_PLAN.md` for HU01–HU10 traceability.
@@ -14,8 +14,8 @@
 
 | P00 Finding | Topic | Treatment in P01 Validation |
 |---|---|---|
-| VAL-001 | Exact ABC syntax subset | Carried forward as `DISC-VAL-001`; remains open for P02/P04. |
-| VAL-002 | Browser, feed, comment, and account-recovery details | Carried forward as open P02/P04 questions; non-blocking. |
+| VAL-001 | Exact ABC syntax subset | Resolved by approved P02 decision Q-001 and incorporated into Requirements v2.0. |
+| VAL-002 | Browser, feed, comment, and account-recovery details | Resolved by approved P02 decisions Q-002 through Q-006 and incorporated into Requirements v2.0. |
 
 **Project:** Notara  
 **Input Artifact:** `artifacts/01_discovery/PRODUCT_VISION.md`  
@@ -26,7 +26,7 @@
 ## 2. Overall Result
 
 ```text
-PASS_WITH_WARNINGS
+PASS
 ```
 
 ## 3. Executive Summary
@@ -35,7 +35,7 @@ PASS_WITH_WARNINGS
 
 The textual MVP 1 scope is preserved: `.abc` and plain text, non-empty content with a maximum of 1,000 characters, basic ABC syntax validation, free-format plain text, readable display preserving line breaks, and mandatory publication fields. The profile scope includes password change, and images, audio, voice input, OMR, and differentiated roles remain outside MVP 1.
 
-Traceability to `HU01`–`HU10` is consistent with P00 and the approved `RELEASE_PLAN.md`. The Product Vision traceability table includes the required `Status` column and explicit entries for `SUCCESS-001` through `SUCCESS-009`. One non-blocking warning remains: the exact ABC syntax subset is still undefined.
+Traceability to `HU01`–`HU10` is consistent with P00 and the approved `RELEASE_PLAN.md`. The Product Vision traceability table includes the required `Status` column and explicit entries for `SUCCESS-001` through `SUCCESS-009`. The P02 decision record resolved the inherited questions without expanding MVP scope.
 
 ## 4. Structural Validation
 
@@ -69,7 +69,9 @@ No required sections are missing, empty, duplicated, or misplaced.
 
 ### Discovery Status
 
-**PASS.** `READY_WITH_ASSUMPTIONS` is consistent with the P00 result `PASS_WITH_WARNINGS`. The remaining ABC, browser, feed, comments, account-recovery, and evaluation questions are explicitly identified as non-blocking.
+**PASS.** The baseline `READY_WITH_ASSUMPTIONS` was consistent with the P00
+result `PASS_WITH_WARNINGS`. The questions identified in that baseline were
+subsequently resolved through the approved P02 decision set.
 
 ### Product Definition and Core Problem
 
@@ -93,7 +95,7 @@ No required sections are missing, empty, duplicated, or misplaced.
 
 ### Textual Score Rules
 
-**PASS_WITH_WARNINGS.** All approved values are preserved:
+**PASS.** All approved values are preserved:
 
 | Rule | Required Value | Status |
 |---|---|---|
@@ -142,30 +144,37 @@ The Product Vision classification of `HU09` and `HU10` as `MVP Core` does not co
 
 | ID | Severity | Finding | Evidence | Recommendation |
 |---|---|---|---|---|
-| DISC-VAL-001 | MEDIUM | The exact subset of ABC syntax covered by “basic syntax validation” is not yet defined. | `PRODUCT_VISION.md`, `Q-001`, `ASM-002`; P00 `Q-001`. | Define the minimum valid headers, syntax rules, and validation errors in P02/P04. |
+| DISC-VAL-001 | RESOLVED | The exact subset of ABC syntax covered by “basic syntax validation” was undefined in the original P01 validation. | `PRODUCT_VISION.md`, `Q-001`, `ASM-002`; P00 `Q-001`. | Resolved in P02 by defining the minimum fields `X:`, `T:`, `M:`, `L:`, `K:` and a valid musical line. |
 
-No `CRITICAL` or `HIGH` findings were identified. The previous traceability finding concerning the `Status` column and `SUCCESS-*` entries is resolved.
+No active `CRITICAL`, `HIGH`, or `MEDIUM` findings remain. The previous
+traceability finding and the inherited P00/P01 questions are resolved through
+the approved P02 decisions.
 
 ## 8. Context and Discovery Status Assessment
 
 **P00 status:** `PASS_WITH_WARNINGS`
 
-**P01 status:** `READY_WITH_ASSUMPTIONS`
+**P01 status:** `READY_WITH_ASSUMPTIONS` (baseline)
 
-The Product Vision is coherent with P00, preserves its warnings, and contains no unsupported MVP functionality or scope conflict. `PASS_WITH_WARNINGS` is appropriate because the remaining ABC clarification is non-blocking for starting requirements work.
+The Product Vision is coherent with P00, preserves its warnings, and contains
+no unsupported MVP functionality or scope conflict. The baseline retained
+non-blocking assumptions, and the previously open questions were resolved
+downstream with decisions recorded in P02 Requirements v2.0.
 
 ## 9. P02 Readiness
 
 ```text
-READY_WITH_ASSUMPTIONS
+READY
 ```
 
-The Product Vision is sufficiently defined to begin P02 — Requirements. P02 must keep the unresolved ABC syntax, browser, feed, comment, account-recovery, and evaluation decisions visible and must not silently convert them into approved requirements.
+The Product Vision, together with the approved P02 decision record, is
+sufficiently defined for P03 — Planning. The resolved decisions remain visible
+in P02 and must continue to be treated as product decisions rather than
+implementation prescriptions.
 
 ## 10. Required Actions
 
-1. Define the exact ABC syntax subset for basic validation.
-2. Resolve browser, feed, comment, account-recovery, and MVP evaluation questions during P02/P04.
+1. Preserve the approved P02 decisions when creating downstream artifacts.
 
 ## 11. Validation Metadata
 
@@ -175,6 +184,6 @@ The Product Vision is sufficiently defined to begin P02 — Requirements. P02 mu
 | Prompt Version | 1.0 |
 | Input Artifacts | `PROJECT_CONTEXT.md`, `CONTEXT_VALIDATION.md`, `PRODUCT_VISION.md`, `SYSTEM_PROMPT.md`, approved `RELEASE_PLAN.md` |
 | Output Artifact | `artifacts/01_discovery/PRODUCT_VISION_VALIDATION.md` |
-| Overall Result | `PASS_WITH_WARNINGS` |
-| P02 Readiness | `READY_WITH_ASSUMPTIONS` |
-| Revision | Regenerated after traceability correction |
+| Overall Result | `PASS` |
+| P02 Readiness | `READY` |
+| Revision | 1.1 - Reconciled with approved P02 decisions |

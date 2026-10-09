@@ -1,0 +1,320 @@
+{
+  "backlog_metadata": {
+    "project": "Notara",
+    "version": "2.0",
+    "stage": "P02",
+    "status": "READY",
+    "source": "artifacts/01_discovery/PRODUCT_VISION.md",
+    "validation_source": "artifacts/01_discovery/PRODUCT_VISION_VALIDATION.md"
+  },
+  "epics": [
+    {
+      "id": "EPIC-001",
+      "name": "Identity and Profile",
+      "description": "Registration, authentication, profile data, and password change.",
+      "scope": "MVP_CORE / MVP_SUPPORTING",
+      "traceability": ["USER-001..003", "HU01..03"]
+    },
+    {
+      "id": "EPIC-002",
+      "name": "Score Publication and Ownership",
+      "description": "Create, validate, publish, edit, and delete textual scores.",
+      "scope": "MVP_CORE / MVP_SUPPORTING",
+      "traceability": ["NEED-001..002", "NEED-006", "HU04..06"]
+    },
+    {
+      "id": "EPIC-003",
+      "name": "Discovery and Score Viewing",
+      "description": "Dashboard, feed, filtering, and score detail.",
+      "scope": "MVP_CORE",
+      "traceability": ["NEED-003..004", "HU07..08"]
+    },
+    {
+      "id": "EPIC-004",
+      "name": "Community Interaction",
+      "description": "Comments and reactions on other users' scores.",
+      "scope": "MVP_CORE",
+      "traceability": ["NEED-005", "HU09..10"]
+    }
+  ],
+  "items": [
+    {
+      "id": "US-001",
+      "title": "Register an account",
+      "epic_id": "EPIC-001",
+      "requirement_ids": ["FR-001"],
+      "user_story": {
+        "as_a": "visitor",
+        "i_want": "to register an account",
+        "so_that": "I can participate in Notara"
+      },
+      "scope": "MVP_CORE",
+      "acceptance_criteria": [
+        {"id": "AC-001", "given": "a visitor provides the information required by the approved registration flow", "when": "they submit registration", "then": "an account is created or the user receives a clear validation result"},
+        {"id": "AC-002", "given": "registration data is invalid or incomplete", "when": "registration is submitted", "then": "the account is not created and the user can identify that correction is required"}
+      ],
+      "business_rule_ids": ["BR-001"],
+      "edge_case_ids": ["EDGE-001"],
+      "dependency_ids": ["DEP-001"],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {"p01_elements": ["USER-001..003", "SUCCESS-001"], "hu_ids": ["HU01"]}
+    },
+    {
+      "id": "US-002",
+      "title": "Authenticate and leave the account",
+      "epic_id": "EPIC-001",
+      "requirement_ids": ["FR-002", "FR-017"],
+      "user_story": {
+        "as_a": "registered user",
+        "i_want": "to log in and log out",
+        "so_that": "I can access or end access to protected functionality"
+      },
+      "scope": "MVP_CORE",
+      "acceptance_criteria": [
+        {"id": "AC-003", "given": "a registered user provides valid authentication information", "when": "they submit it", "then": "they can access protected functionality"},
+        {"id": "AC-004", "given": "an authenticated user chooses to log out", "when": "logout completes", "then": "protected functionality is no longer available without authenticating again"},
+        {"id": "AC-005", "given": "authentication information is invalid", "when": "login is submitted", "then": "access is not granted and the user receives a clear result"}
+      ],
+      "business_rule_ids": ["BR-002"],
+      "edge_case_ids": ["EDGE-002"],
+      "dependency_ids": ["DEP-001"],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {"p01_elements": ["SUCCESS-001"], "hu_ids": ["HU02"]}
+    },
+    {
+      "id": "US-003",
+      "title": "Manage profile information",
+      "epic_id": "EPIC-001",
+      "requirement_ids": ["FR-003", "FR-004"],
+      "user_story": {
+        "as_a": "authenticated user",
+        "i_want": "to manage my profile information and change my password",
+        "so_that": "my account information remains under my control"
+      },
+      "scope": "MVP_SUPPORTING",
+      "acceptance_criteria": [
+        {"id": "AC-006", "given": "an authenticated user opens their profile", "when": "the profile is displayed", "then": "the approved profile fields are available to view or edit"},
+        {"id": "AC-007", "given": "an authenticated user submits valid profile changes", "when": "the changes are saved", "then": "the updated information is shown"},
+        {"id": "AC-008", "given": "an authenticated user submits invalid or incomplete password-change information", "when": "it is processed", "then": "the password is not changed and correction is indicated"}
+      ],
+      "business_rule_ids": ["BR-002"],
+      "edge_case_ids": ["EDGE-003"],
+      "dependency_ids": ["DEP-001"],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {"p01_elements": ["NEED-006", "SUCCESS-002"], "hu_ids": ["HU03"]}
+    },
+    {
+      "id": "US-004",
+      "title": "Publish a textual score",
+      "epic_id": "EPIC-002",
+      "requirement_ids": ["FR-005", "FR-006", "FR-007", "FR-008", "FR-009", "FR-017"],
+      "user_story": {
+        "as_a": "authenticated musician",
+        "i_want": "to publish a short .abc or plain-text score with its context",
+        "so_that": "I can share a musical idea with the community"
+      },
+      "scope": "MVP_CORE",
+      "acceptance_criteria": [
+        {"id": "AC-009", "given": "an authenticated user provides a title, instrument, description, supported format, and non-empty content of at most 1,000 characters", "when": "they publish", "then": "the score is published and its metadata is available"},
+        {"id": "AC-010", "given": "the selected format is .abc and the content fails the defined basic syntax validation", "when": "the user publishes", "then": "publication is rejected with a clear validation result"},
+        {"id": "AC-011", "given": "the selected format is plain text and the content is non-empty and within the limit", "when": "the user publishes", "then": "the content is accepted without requiring ABC syntax"},
+        {"id": "AC-012", "given": "required publication information is missing, content is empty, content is longer than 1,000 characters, or the format is unsupported", "when": "publication is submitted", "then": "it is rejected and the correction is indicated"}
+      ],
+      "business_rule_ids": ["BR-003", "BR-004", "BR-005", "BR-006"],
+      "edge_case_ids": ["EDGE-004", "EDGE-005", "EDGE-006", "EDGE-007"],
+      "dependency_ids": ["DEP-002"],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {"p01_elements": ["NEED-001", "NEED-002", "SUCCESS-003..005"], "hu_ids": ["HU04"]}
+    },
+    {
+      "id": "US-005",
+      "title": "Edit an owned score",
+      "epic_id": "EPIC-002",
+      "requirement_ids": ["FR-010", "FR-017"],
+      "user_story": {
+        "as_a": "authenticated author",
+        "i_want": "to edit my publication",
+        "so_that": "I can keep my shared score information current"
+      },
+      "scope": "MVP_SUPPORTING",
+      "acceptance_criteria": [
+        {"id": "AC-013", "given": "an authenticated user owns a publication", "when": "they submit valid edits", "then": "the publication reflects the updated information and remains subject to all score rules"},
+        {"id": "AC-014", "given": "an authenticated user does not own a publication", "when": "they attempt to edit it", "then": "the edit is not applied"}
+      ],
+      "business_rule_ids": ["BR-007"],
+      "edge_case_ids": ["EDGE-008"],
+      "dependency_ids": ["DEP-002"],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {"p01_elements": ["SUCCESS-006"], "hu_ids": ["HU05"]}
+    },
+    {
+      "id": "US-006",
+      "title": "Delete an owned score",
+      "epic_id": "EPIC-002",
+      "requirement_ids": ["FR-011", "FR-017"],
+      "user_story": {
+        "as_a": "authenticated author",
+        "i_want": "to delete my publication",
+        "so_that": "I can control my shared content"
+      },
+      "scope": "MVP_SUPPORTING",
+      "acceptance_criteria": [
+        {"id": "AC-015", "given": "an authenticated user owns a publication", "when": "they confirm deletion", "then": "the publication is no longer available in the applicable product views"},
+        {"id": "AC-016", "given": "an authenticated user does not own a publication", "when": "they attempt to delete it", "then": "it is not deleted"}
+      ],
+      "business_rule_ids": ["BR-007"],
+      "edge_case_ids": ["EDGE-009"],
+      "dependency_ids": ["DEP-002"],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {"p01_elements": ["SUCCESS-006"], "hu_ids": ["HU06"]}
+    },
+    {
+      "id": "US-007",
+      "title": "Discover scores",
+      "epic_id": "EPIC-003",
+      "requirement_ids": ["FR-012", "FR-013"],
+      "user_story": {
+        "as_a": "user",
+        "i_want": "to view recent personal and community scores and filter them by instrument",
+        "so_that": "I can discover relevant musical content"
+      },
+      "scope": "MVP_CORE",
+      "acceptance_criteria": [
+        {"id": "AC-017", "given": "scores are available", "when": "a user opens the applicable discovery view", "then": "personal and community scores are displayed from newest to oldest, with 10 publications per page"},
+        {"id": "AC-018", "given": "a user selects an instrument filter", "when": "the filter is applied", "then": "the displayed scores correspond to that instrument"},
+        {"id": "AC-019", "given": "no score matches the selected filter", "when": "the filter is applied", "then": "the user receives an empty-result indication"}
+      ],
+      "business_rule_ids": ["BR-008"],
+      "edge_case_ids": ["EDGE-010"],
+      "dependency_ids": ["DEP-003"],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {"p01_elements": ["NEED-003", "NEED-004", "SUCCESS-007"], "hu_ids": ["HU07"]}
+    },
+    {
+      "id": "US-008",
+      "title": "Read score details",
+      "epic_id": "EPIC-003",
+      "requirement_ids": ["FR-014"],
+      "user_story": {
+        "as_a": "user",
+        "i_want": "to view a score's readable details",
+        "so_that": "I can understand and use its textual musical content"
+      },
+      "scope": "MVP_CORE",
+      "acceptance_criteria": [
+        {"id": "AC-020", "given": "a published score is available", "when": "a user opens its detail view", "then": "its title, instrument, description, format, and readable textual content are displayed"},
+        {"id": "AC-021", "given": "score content contains line breaks", "when": "the detail view is displayed", "then": "those line breaks remain distinguishable"},
+        {"id": "AC-022", "given": "a score is unavailable", "when": "its detail is requested", "then": "the user receives a clear unavailable-result indication"}
+      ],
+      "business_rule_ids": ["BR-009"],
+      "edge_case_ids": ["EDGE-011"],
+      "dependency_ids": ["DEP-003"],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {"p01_elements": ["NEED-003", "SUCCESS-005", "SUCCESS-008"], "hu_ids": ["HU08"]}
+    },
+    {
+      "id": "US-009",
+      "title": "React to another user's score",
+      "epic_id": "EPIC-004",
+      "requirement_ids": ["FR-015", "FR-017"],
+      "user_story": {
+        "as_a": "authenticated user",
+        "i_want": "to like another user's score and remove my like",
+        "so_that": "I can express lightweight feedback"
+      },
+      "scope": "MVP_CORE",
+      "acceptance_criteria": [
+        {"id": "AC-023", "given": "an authenticated user views another user's score", "when": "they choose to like it", "then": "their reaction is shown as applied"},
+        {"id": "AC-024", "given": "an authenticated user has liked another user's score", "when": "they remove the like", "then": "their reaction is no longer shown as applied"},
+        {"id": "AC-025", "given": "an unauthenticated user attempts to react", "when": "the action is submitted", "then": "the reaction is not applied and authentication is required"}
+      ],
+      "business_rule_ids": ["BR-010"],
+      "edge_case_ids": ["EDGE-012"],
+      "dependency_ids": ["DEP-003"],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {"p01_elements": ["NEED-005", "SUCCESS-008"], "hu_ids": ["HU09"]}
+    },
+    {
+      "id": "US-010",
+      "title": "Comment on another user's score",
+      "epic_id": "EPIC-004",
+      "requirement_ids": ["FR-016", "FR-017"],
+      "user_story": {
+        "as_a": "authenticated user",
+        "i_want": "to comment on another user's score",
+        "so_that": "I can provide community feedback"
+      },
+      "scope": "MVP_CORE",
+      "acceptance_criteria": [
+        {"id": "AC-026", "given": "an authenticated user views another user's score", "when": "they submit a valid comment", "then": "the comment is associated with that score and is visible in its detail context"},
+        {"id": "AC-027", "given": "an unauthenticated user attempts to comment", "when": "the action is submitted", "then": "the comment is not created and authentication is required"},
+        {"id": "AC-028", "given": "a user has submitted a comment", "when": "they attempt to edit or delete it", "then": "the action is not available in MVP 1"}
+      ],
+      "business_rule_ids": ["BR-011"],
+      "edge_case_ids": ["EDGE-013"],
+      "dependency_ids": ["DEP-003"],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {"p01_elements": ["NEED-005", "SUCCESS-008"], "hu_ids": ["HU10"]}
+    }
+  ]
+}
