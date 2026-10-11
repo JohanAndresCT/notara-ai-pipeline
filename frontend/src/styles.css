@@ -1,59 +1,167 @@
 :root {
   color-scheme: light;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: "Segoe UI", sans-serif;
   line-height: 1.5;
-  font-weight: 400;
-  color: #111827;
-  background: #f3f4f6;
+  color: #172b2a;
+  background: #f3f7f4;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --ink: #172b2a;
+  --muted: #526664;
+  --line: #cbd8d3;
+  --accent: #176b58;
+  --error: #a3342b;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
+  min-width: 320px;
   min-height: 100vh;
-  background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
+  background: radial-gradient(ellipse at top left, #e2efe7, transparent 48%), #f3f7f4;
 }
 
-#root {
-  min-height: 100vh;
-}
+#root { min-height: 100vh; }
 
-.app-shell {
+/* Replace this small US-001 presentation layer when the product UI system arrives. */
+.page-shell {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 2rem;
+  padding: 32px 16px;
 }
 
-.card {
-  max-width: 720px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid #dbe2f0;
-  border-radius: 18px;
-  padding: 2rem;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+.form-panel,
+.home-panel {
+  width: min(100%, 440px);
+  padding: 32px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--accent);
+  box-shadow: 0 18px 48px rgb(23 43 42 / 8%);
 }
 
 .eyebrow {
-  margin: 0 0 0.75rem;
-  font-size: 0.78rem;
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #4f46e5;
 }
 
-h1 {
-  margin: 0 0 0.75rem;
-  font-size: clamp(2rem, 4vw, 3rem);
-  line-height: 1.1;
-}
+h1 { margin: 0; font-size: 30px; line-height: 1.15; }
+.intro { margin: 12px 0 24px; color: var(--muted); }
 
-p {
-  margin: 0;
-  font-size: 1.05rem;
-  color: #374151;
+.registration-form { display: grid; gap: 8px; }
+.registration-form label { margin-top: 8px; font-weight: 650; }
+.registration-form input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #99aaa4;
+  border-radius: 4px;
+  font: inherit;
+}
+.registration-form input:focus-visible,
+.registration-form button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #6aa998;
+  outline-offset: 2px;
+}
+.registration-form input[aria-invalid="true"] { border-color: var(--error); }
+.field-error, .form-error { color: var(--error); font-size: 14px; }
+.form-error { margin: 8px 0; }
+
+.registration-form button,
+.primary-link,
+.home-panel button {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
+  padding: 10px 16px;
+  color: #fff;
+  background: var(--accent);
+  border: 0;
+  border-radius: 4px;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.registration-form button:disabled { opacity: 0.65; cursor: wait; }
+.home-panel button { margin-top: 20px; }
+.form-footer { margin: 20px 0 0; color: var(--muted); font-size: 14px; }
+.form-footer a { color: var(--accent); font-weight: 650; }
+.account-email { color: var(--muted); }
+
+.profile-layout {
+  display: grid;
+  width: min(100%, 760px);
+  gap: 20px;
+}
+.profile-header a { color: var(--accent); }
+.profile-section {
+  padding: 24px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+}
+.profile-section h2 { margin: 0 0 16px; font-size: 20px; }
+.photo-field { display: flex; align-items: center; gap: 18px; margin-bottom: 12px; }
+.photo-preview, .home-avatar {
+  display: grid;
+  width: 88px;
+  height: 88px;
+  flex: 0 0 88px;
+  place-items: center;
+  overflow: hidden;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 50%;
+  font-size: 28px;
+  font-weight: 700;
+}
+.photo-preview img, .home-avatar { object-fit: cover; }
+.photo-preview img { width: 100%; height: 100%; }
+.photo-controls { display: grid; min-width: 0; gap: 6px; }
+.photo-controls input { max-width: 100%; }
+.form-success { margin: 8px 0; color: var(--accent); font-size: 14px; }
+.home-avatar { margin: 4px 0 16px; }
+.field-hint { color: var(--muted); font-size: 13px; }
+.registration-form textarea,
+.registration-form select {
+  width: 100%;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #99aaa4;
+  border-radius: 4px;
+  font: inherit;
+}
+.registration-form textarea { resize: vertical; }
+.registration-form select:focus-visible,
+.registration-form textarea:focus-visible {
+  outline: 3px solid #6aa998;
+  outline-offset: 2px;
+}
+.score-feed { display: grid; gap: 14px; margin-top: 32px; }
+.score-feed h2 { margin: 0; font-size: 20px; }
+.score-item { padding: 16px; border: 1px solid var(--line); }
+.score-heading-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.score-heading-row h3 { margin: 0; font-size: 18px; }
+.score-heading-row span, .score-meta { color: var(--muted); font-size: 13px; }
+.score-meta { margin: 6px 0; }
+.score-item pre { overflow-wrap: anywhere; white-space: pre-wrap; font: inherit; }
+
+@media (max-width: 480px) {
+  .form-panel, .home-panel { padding: 24px 20px; }
+  .profile-section { padding: 20px 16px; }
+  .photo-field { align-items: flex-start; flex-direction: column; }
+  h1 { font-size: 26px; }
 }

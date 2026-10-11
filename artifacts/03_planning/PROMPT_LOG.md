@@ -98,6 +98,21 @@ supuestos, y no introduce decisiones técnicas o de implementación.
 El plan queda listo para P04 bajo las restricciones documentadas. No se
 identificaron hallazgos.
 
+### P03 - Prioritized Product Backlog
+
+Resultado: GENERADO
+
+Artefacto:
+`artifacts/03_planning/product_backlog.json`
+
+El backlog P03 conserva las diez historias canónicas de P02 por sus IDs
+estables y agrega prioridad, grupos/secuencia de entrega, dependencias,
+trazabilidad FR/HU/MVP y referencias a criterios de aceptación. Los textos
+canónicos de historias y criterios permanecen en
+`artifacts/02_requirements/product_backlog.json` para evitar duplicación y
+deriva. No se asignan Story Points, sprints, releases ni desarrolladores.
+La planificación validada P03 (`PASS`) es la fuente de prioridad y secuencia.
+
 **Entradas de validación disponibles:**
 
 - `artifacts/00_context/PROJECT_CONTEXT.md`
