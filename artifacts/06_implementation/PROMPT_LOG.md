@@ -111,3 +111,18 @@ implementation-log evidence requirements.
 - Photo upload expands P03 OOS-003/P05 scope; P02 username/description,
   configurable 5 MiB safeguard approval, Product Owner review, full browser
   matrix, PostgreSQL, and remote storage remain review gates.
+
+## P06.5 - US-004 Score Publication
+
+- Prompt: `prompts/06_implementation/P06.5_US-004_publish_a_score.md`
+- Validation prompt: `prompts/06_implementation/P06.5_US-004_publish_a_score_validation.md`
+- Story: `US-004` / `HU04` / `MVP-004`, P0 / `MVP_CORE`
+- Selected content mode: `TEXT_ONLY`, explicitly selected before implementation.
+- Implementation artifact: `artifacts/06_implementation/US-004_PUBLICATION_IMPLEMENTATION.md`
+- Validation report: `artifacts/06_implementation/US-004_PUBLICATION_VALIDATION.md`
+- Result: `READY_WITH_REVIEW_GATES` / `PASS_WITH_WARNINGS`.
+- 30 account/score tests, migration checks, and frontend production build passed.
+  Chrome checks at 360 and 1280 px verified publication, feed visibility, and
+  required metadata feedback.
+- JPG/PNG criteria are superseded by the text-only decision. Product Owner
+  approval, PostgreSQL, and the full browser matrix remain pending.

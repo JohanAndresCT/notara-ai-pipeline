@@ -246,3 +246,45 @@ The requested photo expands P03 OOS-003/P05 media scope. P02 username and
 description fields were not added because the supplied criteria specify
 name/photo/instrument; the 5 MiB technical cap is also unapproved. Product
 Owner approval and upstream alignment remain `PENDING`.
+
+## P06.5 - US-004 Score Publication
+
+### Metadata and Status
+
+- Execution date: `2026-10-11`
+- Story: `US-004` / `HU04` / `MVP-004` / `FR-005..FR-009` / `FR-017`
+- Priority: `P0` / `MVP_CORE`
+- Selected content mode: `TEXT_ONLY` (explicit user selection before code)
+- Implementation status: `READY_WITH_REVIEW_GATES`
+- Detailed artifact: `artifacts/06_implementation/US-004_PUBLICATION_IMPLEMENTATION.md`
+- Validation report: `artifacts/06_implementation/US-004_PUBLICATION_VALIDATION.md`
+
+### Implemented
+
+- Added a separate Django `scores` app, persistent score model, and migrations.
+- Added authenticated/CSRF-protected create and community-list API endpoints.
+- Enforced required fields, text formats, non-empty content, the 1,000-character
+  limit, and the minimal approved ABC headers/musical-line check.
+- Added a minimal React score-create form and persisted score list on the
+  authenticated home. Full US-007 pagination/filter/detail remains out of scope.
+- Preserved existing account/profile records and the repository's `/api/` route
+  convention.
+
+### Verification
+
+- `python backend/manage.py check`: PASSED.
+- `python backend/manage.py test accounts scores -v 1`: PASSED; 30 tests.
+- `python backend/manage.py makemigrations --check --dry-run`: PASSED.
+- `npm run build`: PASSED.
+- Integrated Chrome 150 checks passed at 360 px for plain-text publication and
+  feed visibility, and at 1280 px for required-field errors plus ABC
+  publication/feed visibility. No horizontal overflow was observed.
+- SQLite inspection confirmed two users and two browser-created scores.
+- PostgreSQL and the full browser matrix were not exercised.
+
+### Scope Decision and Review Gates
+
+The user selected `TEXT_ONLY` after P06.5 identified the content-format
+conflict. JPG/PNG publication is not implemented; the image AC is superseded
+for this run. Product Owner approval remains `PENDING`; PostgreSQL and full
+browser matrix checks remain outstanding.

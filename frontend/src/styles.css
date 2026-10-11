@@ -133,6 +133,31 @@ a:focus-visible {
 .photo-controls input { max-width: 100%; }
 .form-success { margin: 8px 0; color: var(--accent); font-size: 14px; }
 .home-avatar { margin: 4px 0 16px; }
+.field-hint { color: var(--muted); font-size: 13px; }
+.registration-form textarea,
+.registration-form select {
+  width: 100%;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #99aaa4;
+  border-radius: 4px;
+  font: inherit;
+}
+.registration-form textarea { resize: vertical; }
+.registration-form select:focus-visible,
+.registration-form textarea:focus-visible {
+  outline: 3px solid #6aa998;
+  outline-offset: 2px;
+}
+.score-feed { display: grid; gap: 14px; margin-top: 32px; }
+.score-feed h2 { margin: 0; font-size: 20px; }
+.score-item { padding: 16px; border: 1px solid var(--line); }
+.score-heading-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.score-heading-row h3 { margin: 0; font-size: 18px; }
+.score-heading-row span, .score-meta { color: var(--muted); font-size: 13px; }
+.score-meta { margin: 6px 0; }
+.score-item pre { overflow-wrap: anywhere; white-space: pre-wrap; font: inherit; }
 
 @media (max-width: 480px) {
   .form-panel, .home-panel { padding: 24px 20px; }

@@ -45,6 +45,9 @@ Open `http://localhost:5173/register` to create an account or
 database-backed account session; logout returns to the public home screen.
 Authenticated users can open `http://localhost:5173/profile` to update their
 name and main instrument, upload a JPG/PNG photo, or change their password.
+Authenticated users can publish `.abc` or plain-text scores at
+`http://localhost:5173/scores/new`; saved scores appear in the home community
+list.
 
 ## PostgreSQL / Docker
 

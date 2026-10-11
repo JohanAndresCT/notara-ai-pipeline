@@ -1,6 +1,6 @@
-import { useState } from "react";
-import type { NotaraUser } from "./lib/api";
-import { logoutAccount } from "./lib/api";
+import { useEffect, useState } from "react";
+import type { NotaraUser, PublishedScore } from "./lib/api";
+import { getCommunityScores, logoutAccount } from "./lib/api";
 
 export default function HomePage({
   user,
@@ -11,6 +11,15 @@ export default function HomePage({
 }) {
   const [logoutError, setLogoutError] = useState("");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [scores, setScores] = useState<PublishedScore[]>([]);
+  const [feedError, setFeedError] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+    getCommunityScores()
+      .then(setScores)
+      .catch((error: Error) => setFeedError(error.message));
+  }, [user]);
 
   async function handleLogout() {
     setLogoutError("");
@@ -36,10 +45,27 @@ export default function HomePage({
             {user.photo_url ? <img className="home-avatar" src={user.photo_url} alt={`${user.name} profile`} /> : null}
             <p className="account-email">{user.email}</p>
             <a className="primary-link" href="/profile">My profile</a>
+            <a className="primary-link" href="/scores/new">Publish a score</a>
             {logoutError ? <p className="form-error" role="alert">{logoutError}</p> : null}
             <button type="button" onClick={handleLogout} disabled={isLoggingOut}>
               {isLoggingOut ? "Logging out..." : "Log out"}
             </button>
+            <section className="score-feed" aria-labelledby="community-heading">
+              <h2 id="community-heading">Community scores</h2>
+              {feedError ? <p className="form-error" role="alert">{feedError}</p> : null}
+              {!feedError && scores.length === 0 ? <p className="intro">No scores published yet.</p> : null}
+              {scores.map((score) => (
+                <article className="score-item" key={score.id}>
+                  <div className="score-heading-row">
+                    <h3>{score.title}</h3>
+                    <span>{score.format === "ABC" ? "ABC notation" : "Plain text"}</span>
+                  </div>
+                  <p className="score-meta">{score.instrument} · {score.author}</p>
+                  <p>{score.description}</p>
+                  <pre>{score.content}</pre>
+                </article>
+              ))}
+            </section>
           </>
         ) : (
           <>

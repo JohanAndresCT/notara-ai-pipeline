@@ -6,6 +6,17 @@ export type NotaraUser = {
   photo_url?: string | null;
 };
 
+export type PublishedScore = {
+  id: number;
+  title: string;
+  instrument: string;
+  description: string;
+  format: "ABC" | "TEXT";
+  content: string;
+  author: string;
+  created_at: string;
+};
+
 type ApiError = {
   message?: string;
   errors?: Record<string, string[]>;
@@ -136,4 +147,39 @@ export async function changePassword(
       fieldErrors: body.errors ?? {},
     });
   }
+}
+
+export async function getCommunityScores(): Promise<PublishedScore[]> {
+  const response = await fetch("/api/scores/", { credentials: "include" });
+  if (!response.ok) throw new Error("Could not load community scores.");
+  const body = (await response.json()) as { scores: PublishedScore[] };
+  return body.scores;
+}
+
+export async function publishScore(values: {
+  title: string;
+  instrument: string;
+  description: string;
+  format: PublishedScore["format"];
+  content: string;
+}): Promise<PublishedScore> {
+  const csrfToken = await getCsrfToken();
+  const response = await fetch("/api/scores/", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
+    },
+    body: JSON.stringify(values),
+  });
+  const body = (await response.json()) as { score?: PublishedScore } & ApiError;
+  if (!response.ok) {
+    const fieldErrors = Object.values(body.errors ?? {}).flat();
+    throw Object.assign(new Error(body.message ?? fieldErrors[0] ?? "Publication failed."), {
+      fieldErrors: body.errors ?? {},
+    });
+  }
+  if (!body.score) throw new Error("The publication response was incomplete.");
+  return body.score;
 }
