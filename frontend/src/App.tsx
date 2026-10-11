@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import HomePage from "./HomePage";
 import LoginPage from "./LoginPage";
+import ProfilePage from "./ProfilePage";
 import RegistrationPage from "./RegistrationPage";
 import { getCurrentUser, type NotaraUser } from "./lib/api";
 
@@ -10,6 +11,7 @@ export default function App() {
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const isRegistrationRoute = window.location.pathname === "/register";
   const isLoginRoute = window.location.pathname === "/login";
+  const isProfileRoute = window.location.pathname === "/profile";
 
   useEffect(() => {
     getCurrentUser()
@@ -28,6 +30,14 @@ export default function App() {
 
   if (isLoginRoute && !user) {
     return <LoginPage onAuthenticated={() => window.location.assign("/")} />;
+  }
+
+  if (isProfileRoute && !user) {
+    return <LoginPage onAuthenticated={() => window.location.assign("/profile")} />;
+  }
+
+  if (isProfileRoute && user) {
+    return <ProfilePage user={user} onProfileUpdated={setUser} />;
   }
 
   return <HomePage user={user} onLoggedOut={() => window.location.assign("/")} />;

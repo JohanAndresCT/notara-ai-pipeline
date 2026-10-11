@@ -33,7 +33,9 @@ export default function HomePage({
           <>
             <h1>Welcome, {user.name}</h1>
             <p className="intro">Your session is active.</p>
+            {user.photo_url ? <img className="home-avatar" src={user.photo_url} alt={`${user.name} profile`} /> : null}
             <p className="account-email">{user.email}</p>
+            <a className="primary-link" href="/profile">My profile</a>
             {logoutError ? <p className="form-error" role="alert">{logoutError}</p> : null}
             <button type="button" onClick={handleLogout} disabled={isLoggingOut}>
               {isLoggingOut ? "Logging out..." : "Log out"}

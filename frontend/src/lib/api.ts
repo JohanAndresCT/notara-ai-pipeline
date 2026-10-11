@@ -2,6 +2,8 @@ export type NotaraUser = {
   id: number;
   name: string;
   email: string;
+  main_instrument?: string;
+  photo_url?: string | null;
 };
 
 type ApiError = {
@@ -82,5 +84,56 @@ export async function logoutAccount(): Promise<void> {
   if (!response.ok) {
     const body = (await response.json()) as ApiError;
     throw new Error(body.message ?? "Could not log out. Please try again.");
+  }
+}
+
+export async function updateProfile(values: {
+  name: string;
+  mainInstrument: string;
+  photo?: File;
+}): Promise<NotaraUser> {
+  const csrfToken = await getCsrfToken();
+  const formData = new FormData();
+  formData.set("name", values.name);
+  formData.set("main_instrument", values.mainInstrument);
+  if (values.photo) formData.set("photo", values.photo);
+
+  const response = await fetch("/api/me/", {
+    method: "PATCH",
+    credentials: "include",
+    headers: { "X-CSRFToken": csrfToken },
+    body: formData,
+  });
+  const body = (await response.json()) as { user?: NotaraUser } & ApiError;
+  if (!response.ok) {
+    const fieldErrors = Object.values(body.errors ?? {}).flat();
+    throw Object.assign(new Error(body.message ?? fieldErrors[0] ?? "Profile update failed."), {
+      fieldErrors: body.errors ?? {},
+    });
+  }
+  if (!body.user) throw new Error("The profile response was incomplete.");
+  return body.user;
+}
+
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string,
+): Promise<void> {
+  const csrfToken = await getCsrfToken();
+  const response = await fetch("/api/me/password/", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
+    },
+    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+  });
+  const body = (await response.json()) as ApiError;
+  if (!response.ok) {
+    const fieldErrors = Object.values(body.errors ?? {}).flat();
+    throw Object.assign(new Error(body.message ?? fieldErrors[0] ?? "Password change failed."), {
+      fieldErrors: body.errors ?? {},
+    });
   }
 }

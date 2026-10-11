@@ -78,6 +78,22 @@ elif DATABASE_ENGINE in {"postgres", "postgresql"}:
 else:
     raise ValueError("DJANGO_DB_ENGINE must be 'sqlite' or 'postgresql'.")
 
+MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", BASE_DIR.parent / "media"))
+if not MEDIA_ROOT.is_absolute():
+    MEDIA_ROOT = BASE_DIR.parent / MEDIA_ROOT
+PROFILE_PHOTO_MAX_BYTES = int(os.getenv("PROFILE_PHOTO_MAX_BYTES", 5 * 1024 * 1024))
+STORAGES = {
+    "default": {
+        "BACKEND": os.getenv(
+            "DJANGO_FILE_STORAGE_BACKEND",
+            "django.core.files.storage.FileSystemStorage",
+        )
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
+    },
+}
+
 AUTH_USER_MODEL = "accounts.User"
 CSRF_TRUSTED_ORIGINS = os.getenv(
     "DJANGO_CSRF_TRUSTED_ORIGINS",

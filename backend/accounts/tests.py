@@ -1,7 +1,13 @@
 import json
+from io import BytesIO
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
+from PIL import Image
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.sessions.models import Session
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
+from django.test.client import BOUNDARY, MULTIPART_CONTENT, encode_multipart
 
 from .models import User
 
@@ -176,3 +182,193 @@ class AuthenticationTests(TestCase):
         logout_response = client_without_csrf.post("/api/auth/logout/")
         self.assertEqual(logout_response.status_code, 403)
         self.assertEqual(client_without_csrf.get("/api/me/").status_code, 200)
+
+
+class ProfileManagementTests(TestCase):
+    def setUp(self):
+        self.media_dir = TemporaryDirectory()
+        self.addCleanup(self.media_dir.cleanup)
+        media_settings = override_settings(MEDIA_ROOT=self.media_dir.name)
+        media_settings.enable()
+        self.addCleanup(media_settings.disable)
+
+        self.client = Client(enforce_csrf_checks=True)
+        self.user = User.objects.create_user(
+            email="profile@example.com",
+            name="Profile User",
+            password="correct-horse",
+        )
+        self.client.force_login(self.user)
+        csrf_response = self.client.get("/api/csrf/")
+        self.csrf_token = csrf_response.json()["csrfToken"]
+
+    @staticmethod
+    def image_file(image_format="JPEG", name=None):
+        stream = BytesIO()
+        Image.new("RGB", (2, 2), color="green").save(stream, format=image_format)
+        suffix = ".png" if image_format == "PNG" else ".jpg"
+        content_type = "image/png" if image_format == "PNG" else "image/jpeg"
+        return SimpleUploadedFile(
+            name or f"profile{suffix}", stream.getvalue(), content_type=content_type
+        )
+
+    def patch_profile(self, data):
+        return self.client.generic(
+            "PATCH",
+            "/api/me/",
+            data=encode_multipart(BOUNDARY, data),
+            content_type=MULTIPART_CONTENT,
+            HTTP_X_CSRFTOKEN=self.csrf_token,
+        )
+
+    def test_profile_returns_current_name_instrument_and_photo_field(self):
+        response = self.client.get("/api/me/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["user"]["name"], "Profile User")
+        self.assertEqual(response.json()["user"]["main_instrument"], "")
+        self.assertIsNone(response.json()["user"]["photo_url"])
+
+    def test_profile_update_persists_name_instrument_and_jpeg(self):
+        response = self.patch_profile(
+            {
+                "name": "Updated Profile",
+                "main_instrument": "Violin",
+                "photo": self.image_file(),
+            }
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.name, "Updated Profile")
+        self.assertEqual(self.user.main_instrument, "Violin")
+        self.assertTrue(self.user.photo.name.endswith(".jpg"))
+        self.assertIn("/api/me/photo/", response.json()["user"]["photo_url"])
+        self.assertEqual(self.client.get("/api/me/").json()["user"]["name"], "Updated Profile")
+
+    def test_png_photo_is_retrievable_only_through_authenticated_endpoint(self):
+        response = self.patch_profile({"photo": self.image_file("PNG")})
+
+        self.assertEqual(response.status_code, 200)
+        photo_response = self.client.get("/api/me/photo/")
+        self.assertEqual(photo_response.status_code, 200)
+        self.assertEqual(photo_response["Content-Type"], "image/png")
+        self.assertEqual(photo_response["X-Content-Type-Options"], "nosniff")
+        photo_bytes = b"".join(photo_response.streaming_content)
+        photo_response.close()
+        self.assertTrue(photo_bytes)
+        self.assertEqual(Client().get("/api/me/photo/").status_code, 401)
+
+    def test_replacing_photo_removes_previous_file(self):
+        first_response = self.patch_profile({"photo": self.image_file()})
+        self.assertEqual(first_response.status_code, 200)
+        self.user.refresh_from_db()
+        previous_photo_path = self.user.photo.path
+        self.assertTrue(Path(previous_photo_path).exists())
+
+        replacement_response = self.patch_profile({"photo": self.image_file("PNG")})
+
+        self.assertEqual(replacement_response.status_code, 200)
+        self.assertFalse(Path(previous_photo_path).exists())
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.photo.name.endswith(".png"))
+
+    def test_invalid_photo_does_not_change_profile(self):
+        response = self.patch_profile(
+            {
+                "name": "Must Not Save",
+                "main_instrument": "Flute",
+                "photo": SimpleUploadedFile("bad.gif", b"not an image", content_type="image/gif"),
+            }
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.name, "Profile User")
+        self.assertEqual(self.user.main_instrument, "")
+
+    def test_malformed_image_bytes_are_rejected(self):
+        response = self.patch_profile({
+            "name": "Must Not Save",
+            "photo": SimpleUploadedFile("bad.png", b"not an image", content_type="image/png"),
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.name, "Profile User")
+
+    @override_settings(PROFILE_PHOTO_MAX_BYTES=10)
+    def test_over_limit_photo_is_rejected_without_profile_changes(self):
+        response = self.patch_profile({
+            "name": "Must Not Save",
+            "photo": self.image_file(),
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.name, "Profile User")
+
+    def test_profile_and_photo_require_authentication(self):
+        anonymous_client = Client()
+
+        self.assertEqual(anonymous_client.get("/api/me/").status_code, 401)
+        self.assertEqual(anonymous_client.get("/api/me/photo/").status_code, 401)
+        self.assertEqual(
+            anonymous_client.patch("/api/me/", {"name": "Unauthorized"}).status_code,
+            401,
+        )
+
+    def test_profile_and_password_mutations_require_csrf(self):
+        client_without_csrf = Client(enforce_csrf_checks=True)
+        client_without_csrf.force_login(self.user)
+        profile_response = client_without_csrf.generic(
+            "PATCH",
+            "/api/me/",
+            data=encode_multipart(BOUNDARY, {"name": "No CSRF"}),
+            content_type=MULTIPART_CONTENT,
+        )
+        password_response = client_without_csrf.post(
+            "/api/me/password/",
+            data=json.dumps({"current_password": "correct-horse", "new_password": "new-secret-8"}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(profile_response.status_code, 403)
+        self.assertEqual(password_response.status_code, 403)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.name, "Profile User")
+        self.assertTrue(self.user.check_password("correct-horse"))
+
+    def test_password_change_preserves_session_and_rejects_invalid_current_password(self):
+        invalid_response = self.client.post(
+            "/api/me/password/",
+            data=json.dumps({"current_password": "wrong", "new_password": "new-secret-8"}),
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=self.csrf_token,
+        )
+        self.assertEqual(invalid_response.status_code, 400)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("correct-horse"))
+
+        short_password_response = self.client.post(
+            "/api/me/password/",
+            data=json.dumps({"current_password": "correct-horse", "new_password": "short"}),
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=self.csrf_token,
+        )
+        self.assertEqual(short_password_response.status_code, 400)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("correct-horse"))
+
+        valid_response = self.client.post(
+            "/api/me/password/",
+            data=json.dumps(
+                {"current_password": "correct-horse", "new_password": "new-secret-8"}
+            ),
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=self.csrf_token,
+        )
+        self.assertEqual(valid_response.status_code, 200)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("new-secret-8"))
+        self.assertEqual(self.client.get("/api/me/").status_code, 200)

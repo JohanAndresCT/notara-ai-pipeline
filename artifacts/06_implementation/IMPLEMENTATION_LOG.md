@@ -206,3 +206,43 @@ Product Owner approval is `PENDING`; the story is not marked fully done.
 
 Product Owner approval is `PENDING`. The full supported browser matrix and
 PostgreSQL runtime check remain outstanding; the story is not marked fully done.
+
+## P06.4 - US-003 Profile Management
+
+### Metadata and Status
+
+- Execution date: `2026-10-11`
+- Story: `US-003` / `HU03` / `MVP-003` / `FR-003` / `FR-004`
+- Implementation status: `READY_WITH_REVIEW_GATES`
+- Detailed artifact: `artifacts/06_implementation/US-003_PROFILE_IMPLEMENTATION.md`
+- Validation report: `artifacts/06_implementation/US-003_PROFILE_VALIDATION.md`
+
+### Implemented
+
+- Added main-instrument and stored-photo fields through an additive account
+  migration; existing database users were preserved.
+- Added authenticated profile GET/PATCH, protected profile-photo streaming,
+  JPG/PNG content verification, replace-file cleanup, and canonical password
+  change with session preservation.
+- Added a replaceable React profile page, profile link, image preview, and
+  password-change form.
+- Configured storage backend/root and 5 MiB default upload guard through
+  environment variables; image bytes remain outside the database.
+
+### Verification
+
+- Pillow 11.3.0 installed; Django system check passed.
+- `python backend/manage.py test accounts -v 1`: PASSED; 22 tests.
+- `python backend/manage.py makemigrations --check --dry-run`: PASSED.
+- `npm run build`: PASSED.
+- Integrated Chrome 150 checks passed at 360 and 1280 px for profile edits;
+  PNG upload returned 200/image/png through authenticated photo retrieval. No
+  horizontal overflow was observed.
+- Edge/Firefox/768 px, PostgreSQL, and remote storage were not exercised.
+
+### Review Gates
+
+The requested photo expands P03 OOS-003/P05 media scope. P02 username and
+description fields were not added because the supplied criteria specify
+name/photo/instrument; the 5 MiB technical cap is also unapproved. Product
+Owner approval and upstream alignment remain `PENDING`.

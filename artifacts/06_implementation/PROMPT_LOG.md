@@ -91,3 +91,23 @@ implementation-log evidence requirements.
   protected access denial.
 - Product Owner approval, PostgreSQL/Docker, and complete browser matrix remain
   pending.
+
+## P06.4 - US-003 Profile Management
+
+### Prompts
+
+- Implementation: `prompts/06_implementation/P06.4_US-003_manage_profile.md`
+- Validation: `prompts/06_implementation/P06.4_US-003_manage_profile_validation.md`
+- Story: `US-003` / `HU03` / `MVP-003`, P1 / `MVP_SUPPORTING`
+
+### Implementation and Validation Results
+
+- Implementation artifact: `artifacts/06_implementation/US-003_PROFILE_IMPLEMENTATION.md`
+- Validation report: `artifacts/06_implementation/US-003_PROFILE_VALIDATION.md`
+- Result: `READY_WITH_REVIEW_GATES` / `PASS_WITH_WARNINGS`.
+- 22 account tests, Django migration/system checks, and frontend production
+  build passed. Integrated Chrome profile checks passed at 360 and 1280 px;
+  authenticated PNG retrieval returned 200.
+- Photo upload expands P03 OOS-003/P05 scope; P02 username/description,
+  configurable 5 MiB safeguard approval, Product Owner review, full browser
+  matrix, PostgreSQL, and remote storage remain review gates.

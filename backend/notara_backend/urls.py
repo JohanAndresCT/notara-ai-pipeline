@@ -7,6 +7,8 @@ from accounts.views import (
     csrf_token_view,
     login_view,
     logout_view,
+    profile_photo_view,
+    change_password_view,
     register_view,
 )
 
@@ -23,4 +25,6 @@ urlpatterns = [
     path("api/auth/login/", login_view, name="login"),
     path("api/auth/logout/", logout_view, name="logout"),
     path("api/me/", current_user_view, name="current-user"),
+    path("api/me/photo/", profile_photo_view, name="profile-photo"),
+    path("api/me/password/", change_password_view, name="change-password"),
 ]

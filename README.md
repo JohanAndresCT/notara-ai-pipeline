@@ -43,6 +43,8 @@ npm run dev
 Open `http://localhost:5173/register` to create an account or
 `http://localhost:5173/login` to sign in. Registration and login establish a
 database-backed account session; logout returns to the public home screen.
+Authenticated users can open `http://localhost:5173/profile` to update their
+name and main instrument, upload a JPG/PNG photo, or change their password.
 
 ## PostgreSQL / Docker
 
@@ -57,6 +59,12 @@ The backend selects its database in `backend/notara_backend/settings.py` using
 `DJANGO_DB_ENGINE`; both database choices use Django models and migrations.
 Use `SQLITE_DB_PATH` to move the local SQLite file. Do not commit `.env` or
 production credentials.
+
+Profile photos use Django's storage backend and are stored locally under
+`MEDIA_ROOT` by default (`media/`, ignored by Git). Set
+`DJANGO_FILE_STORAGE_BACKEND` and `MEDIA_ROOT` for deployment storage. The
+default upload safeguard is 5 MiB and can be changed with
+`PROFILE_PHOTO_MAX_BYTES`.
 
 ## Registration files
 

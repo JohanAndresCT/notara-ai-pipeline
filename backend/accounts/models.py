@@ -38,6 +38,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     # Keep this MVP account model small; extend fields through reviewed migrations.
     email = models.EmailField(max_length=254, unique=True)
     name = models.CharField(max_length=150)
+    main_instrument = models.CharField(max_length=100, blank=True)
+    photo = models.ImageField(upload_to="profile_photos/%Y/%m/", blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
