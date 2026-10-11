@@ -122,3 +122,46 @@ This implementation intentionally excludes:
 - deployment bootstrap beyond the app skeleton
 
 The work is limited to the technical foundation required for the next increment of development.
+
+## P06.2 - US-001 Registration
+
+### Metadata and Status
+
+- Execution date: `2026-10-11`
+- Story: `US-001` / `HU01` / `MVP-001` / `FR-001`
+- Implementation status: `READY_WITH_REVIEW_GATES`
+- Detailed artifact: `artifacts/06_implementation/US-001_REGISTRATION_IMPLEMENTATION.md`
+- Validation report: `artifacts/06_implementation/US-001_REGISTRATION_VALIDATION.md`
+
+### Implemented
+
+- Added the custom Django account model, unique normalized email, migration,
+  CSRF-protected registration endpoint, and session-aware current-user endpoint.
+- Added the editable React registration page and minimal home state, with
+  client-side feedback and the Vite API proxy.
+- Added switchable SQLite/PostgreSQL database configuration. The root
+  `db.sqlite3` is ignored by Git; PostgreSQL remains the default.
+- Updated backend setup documentation and the compatible PostgreSQL driver pin.
+
+### Verification
+
+- `python backend/manage.py check`: PASSED.
+- `python backend/manage.py makemigrations --check --dry-run`: PASSED; no
+  pending model changes.
+- `python backend/manage.py test accounts -v 2`: PASSED; 8 tests.
+- `npx tsc --noEmit --pretty false`: PASSED.
+- `npm run build`: PASSED.
+- Browser checks in VS Code integrated Chrome 150 passed at 360 px for
+  successful registration/session/home navigation and 1280 px for duplicate
+  email, short-password, and blank-field feedback. No horizontal overflow was
+  observed at either width.
+- The SQLite file exists and contains the browser-created test account.
+- PostgreSQL/Docker runtime and the full Chrome/Edge/Firefox 360/768/1280
+  matrix were not run.
+
+### Review Gates
+
+The supplied story criteria are more specific than P02/P04 on registration
+fields, duplicate emails, minimum password length, and post-registration
+navigation. Upstream artifacts remain unchanged pending Product Owner review.
+Product Owner approval is `PENDING`; the story is not marked fully done.

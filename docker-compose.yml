@@ -29,6 +29,7 @@ services:
     environment:
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-change-me-in-production}
       DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+      DJANGO_DB_ENGINE: ${DJANGO_DB_ENGINE:-postgresql}
       POSTGRES_DB: ${POSTGRES_DB:-notara}
       POSTGRES_USER: ${POSTGRES_USER:-notara}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-notara}

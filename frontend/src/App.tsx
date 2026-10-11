@@ -1,15 +1,28 @@
+import { useEffect, useState } from "react";
+import HomePage from "./HomePage";
+import RegistrationPage from "./RegistrationPage";
+import { getCurrentUser, type NotaraUser } from "./lib/api";
+
+// Keep route selection minimal for US-001; replace with the product router as flows grow.
 export default function App() {
-  return (
-    <main className="app-shell">
-      <section className="card">
-        <p className="eyebrow">Notara MVP</p>
-        <h1>Implementation foundation is ready.</h1>
-        <p>
-          This frontend shell is intentionally minimal and leaves business flows for
-          future stories while establishing the React + TypeScript application
-          baseline required by the approved architecture.
-        </p>
-      </section>
-    </main>
-  );
+  const [user, setUser] = useState<NotaraUser | null>(null);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const isRegistrationRoute = window.location.pathname === "/register";
+
+  useEffect(() => {
+    getCurrentUser()
+      .then(setUser)
+      .catch(() => setUser(null))
+      .finally(() => setIsCheckingSession(false));
+  }, []);
+
+  if (isCheckingSession) {
+    return <main className="page-shell"><p role="status">Checking your session...</p></main>;
+  }
+
+  if (isRegistrationRoute && !user) {
+    return <RegistrationPage onRegistered={() => window.location.assign("/")} />;
+  }
+
+  return <HomePage user={user} />;
 }
