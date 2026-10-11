@@ -49,22 +49,34 @@ implementation-log evidence requirements.
 
 ### Validation prompt and report
 
-- Validation prompt: `prompts/06_implementation/P06.2_US-001_register_an_account_validation.md`
-- Report: `artifacts/06_implementation/US-001_REGISTRATION_VALIDATION.md`
-- Current validation execution: `COMPLETED_WITH_WARNINGS`; backend tests,
   frontend build, and browser checks passed. Full browser-matrix and
   PostgreSQL/Docker checks remain unrun.
-- Known alignment gate: supplied criteria add registration fields, email
 	uniqueness, password minimum, and post-registration navigation/session
 	behavior beyond what P02/P04 fully specify. Product Owner review remains
 	pending until evidence is recorded.
 
 ### Implementation result
 
-- Artifact: `artifacts/06_implementation/US-001_REGISTRATION_IMPLEMENTATION.md`
-- Validation report: `artifacts/06_implementation/US-001_REGISTRATION_VALIDATION.md`
-- Result: `READY_WITH_REVIEW_GATES`
-- Eight Django tests, TypeScript validation, and the Vite production build
   passed. SQLite registration/session and browser feedback flows were exercised.
-- Product Owner approval and the complete supported-browser matrix remain
   pending; PostgreSQL/Docker was not exercised.
+
+## P06.3 - US-002 Login and Logout
+
+### Implementation prompt
+
+- Prompt: `prompts/06_implementation/P06.3_US-002_authenticate_and_leave_account.md`
+- Story: `US-002` / `HU02` / `MVP-002`, P0 / delivery group 1
+- Source traceability: `FR-002`, `FR-017`, `AC-003..AC-005`, `BR-002`,
+  `EDGE-002`, and `DEP-001`
+- The user-supplied `ACCESS` epic label is retained as descriptive context;
+  canonical backlog ownership remains `EPIC-001`.
+
+### Validation prompt and report
+
+- Validation prompt: `prompts/06_implementation/P06.3_US-002_authenticate_and_leave_account_validation.md`
+- Report: `artifacts/06_implementation/US-002_LOGIN_VALIDATION.md`
+- Current validation execution: `NOT_RUN`; US-002 login/logout has not yet
+  been implemented.
+- The prompts preserve the current session architecture, generic invalid-login
+  error requirement, CSRF-protected logout, protected-access verification,
+  and Product Owner approval gate.
