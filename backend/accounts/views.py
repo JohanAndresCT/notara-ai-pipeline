@@ -1,7 +1,7 @@
 import json
 from json import JSONDecodeError
 
-from django.contrib.auth import login
+from django.contrib.auth import authenticate, login, logout
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.db import IntegrityError, transaction
@@ -77,6 +77,45 @@ def register_view(request):
         {"user": {"id": user.pk, "name": user.name, "email": user.email}},
         status=201,
     )
+
+
+@require_POST
+def login_view(request):
+    try:
+        payload = json.loads(request.body or "{}")
+    except (JSONDecodeError, UnicodeDecodeError):
+        payload = {}
+
+    if not isinstance(payload, dict):
+        payload = {}
+
+    raw_email = payload.get("email")
+    password = payload.get("password")
+    email = User.objects.normalize_address(raw_email) if isinstance(raw_email, str) else ""
+
+    user = None
+    if email and isinstance(password, str) and password:
+        user = authenticate(request, username=email, password=password)
+
+    if user is None:
+        return JsonResponse(
+            {"message": "Email or password is incorrect."},
+            status=400,
+        )
+
+    login(request, user)
+    return JsonResponse(
+        {"user": {"id": user.pk, "name": user.name, "email": user.email}}
+    )
+
+
+@require_POST
+def logout_view(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"message": "Authentication is required."}, status=401)
+
+    logout(request)
+    return JsonResponse({"message": "Logged out."})
 
 
 @require_GET

@@ -75,8 +75,19 @@ implementation-log evidence requirements.
 
 - Validation prompt: `prompts/06_implementation/P06.3_US-002_authenticate_and_leave_account_validation.md`
 - Report: `artifacts/06_implementation/US-002_LOGIN_VALIDATION.md`
-- Current validation execution: `NOT_RUN`; US-002 login/logout has not yet
-  been implemented.
+- Current validation execution: `PARTIAL`; implementation and available
+  backend, build, and integrated-browser checks have been completed.
 - The prompts preserve the current session architecture, generic invalid-login
   error requirement, CSRF-protected logout, protected-access verification,
   and Product Owner approval gate.
+
+### Implementation result
+
+- Artifact: `artifacts/06_implementation/US-002_LOGIN_IMPLEMENTATION.md`
+- Validation report: `artifacts/06_implementation/US-002_LOGIN_VALIDATION.md`
+- Result: `READY_WITH_REVIEW_GATES` / `PASS_WITH_WARNINGS`.
+- All 12 account tests passed; frontend production build passed. Browser checks
+  verified login, generic invalid credentials, logout, public return, and
+  protected access denial.
+- Product Owner approval, PostgreSQL/Docker, and complete browser matrix remain
+  pending.

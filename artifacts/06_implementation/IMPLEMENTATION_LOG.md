@@ -165,3 +165,44 @@ The supplied story criteria are more specific than P02/P04 on registration
 fields, duplicate emails, minimum password length, and post-registration
 navigation. Upstream artifacts remain unchanged pending Product Owner review.
 Product Owner approval is `PENDING`; the story is not marked fully done.
+
+## P06.3 - US-002 Login and Logout
+
+### Metadata and Status
+
+- Execution date: `2026-10-11`
+- Story: `US-002` / `HU02` / `MVP-002` / `FR-002` / `FR-017`
+- Implementation status: `READY_WITH_REVIEW_GATES`
+- Detailed artifact: `artifacts/06_implementation/US-002_LOGIN_IMPLEMENTATION.md`
+- Validation report: `artifacts/06_implementation/US-002_LOGIN_VALIDATION.md`
+
+### Implemented
+
+- Added Django login/logout endpoints using the existing custom account and
+  session model. Invalid credentials return the same generic response for
+  unknown email and wrong password.
+- Added a dedicated React login form, authenticated home logout action, and
+  public login/register navigation. Login and logout mutations use CSRF and
+  same-origin session cookies.
+- No user model or migration changes were needed. Existing `/api/` route
+  convention was retained; the architecture's `/api/v1/` difference is logged.
+
+### Verification
+
+- `python backend/manage.py check`: PASSED.
+- `python backend/manage.py test accounts -v 2`: PASSED; 12 tests.
+- `python backend/manage.py test accounts.tests.AuthenticationTests -v 2`:
+  PASSED; 4 auth tests, including exact session-row deletion.
+- `python backend/manage.py makemigrations --check --dry-run`: PASSED; no
+  changes detected.
+- `npm run build`: PASSED.
+- Integrated Chrome 150 browser checks passed at 360 px for invalid/valid login,
+  logout, public redirect, and post-logout `/api/me/` denial; desktop checks at
+  1280 px confirmed generic invalid-login feedback and navigation. No horizontal
+  overflow was observed.
+- PostgreSQL/Docker and Edge/Firefox/768 px checks were not run.
+
+### Review Gates
+
+Product Owner approval is `PENDING`. The full supported browser matrix and
+PostgreSQL runtime check remain outstanding; the story is not marked fully done.

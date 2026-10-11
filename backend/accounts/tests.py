@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.sessions.models import Session
 from django.test import Client, TestCase
 
 from .models import User
@@ -104,3 +105,74 @@ class RegistrationTests(TestCase):
         response = client.get("/api/me/")
 
         self.assertEqual(response.status_code, 401)
+
+
+class AuthenticationTests(TestCase):
+    def setUp(self):
+        self.client = Client(enforce_csrf_checks=True)
+        self.user = User.objects.create_user(
+            email="login@example.com",
+            name="Login User",
+            password="correct-horse",
+        )
+        csrf_response = self.client.get("/api/csrf/")
+        self.csrf_token = csrf_response.json()["csrfToken"]
+
+    def post_json(self, path, payload=None, client=None):
+        return (client or self.client).post(
+            path,
+            data=json.dumps(payload or {}),
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=self.csrf_token,
+        )
+
+    def test_valid_login_establishes_session_for_existing_user(self):
+        response = self.post_json(
+            "/api/auth/login/",
+            {"email": "LOGIN@example.com", "password": "correct-horse"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["user"]["email"], self.user.email)
+        self.assertEqual(self.client.get("/api/me/").status_code, 200)
+
+    def test_wrong_password_and_unknown_email_have_same_generic_error(self):
+        wrong_password = self.post_json(
+            "/api/auth/login/",
+            {"email": self.user.email, "password": "incorrect-password"},
+        )
+        unknown_email = self.post_json(
+            "/api/auth/login/",
+            {"email": "unknown@example.com", "password": "incorrect-password"},
+        )
+
+        self.assertEqual(wrong_password.status_code, 400)
+        self.assertEqual(unknown_email.status_code, 400)
+        self.assertEqual(wrong_password.json(), unknown_email.json())
+        self.assertEqual(self.client.get("/api/me/").status_code, 401)
+
+    def test_logout_invalidates_session_and_protected_access(self):
+        self.client.force_login(self.user)
+        session_key = self.client.session.session_key
+        self.assertIsNotNone(session_key)
+
+        response = self.post_json("/api/auth/logout/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Session.objects.filter(session_key=session_key).exists())
+        self.assertEqual(self.client.get("/api/me/").status_code, 401)
+
+    def test_login_and_logout_require_csrf(self):
+        client_without_csrf = Client(enforce_csrf_checks=True)
+        login_response = client_without_csrf.post(
+            "/api/auth/login/",
+            data=json.dumps({"email": self.user.email, "password": "correct-horse"}),
+            content_type="application/json",
+        )
+        self.assertEqual(login_response.status_code, 403)
+        self.assertEqual(client_without_csrf.get("/api/me/").status_code, 401)
+
+        client_without_csrf.force_login(self.user)
+        logout_response = client_without_csrf.post("/api/auth/logout/")
+        self.assertEqual(logout_response.status_code, 403)
+        self.assertEqual(client_without_csrf.get("/api/me/").status_code, 200)

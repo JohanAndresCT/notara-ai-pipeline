@@ -45,3 +45,42 @@ export async function registerAccount(
   if (!body.user) throw new Error("The registration response was incomplete.");
   return body.user;
 }
+
+async function getCsrfToken(): Promise<string> {
+  const response = await fetch("/api/csrf/", { credentials: "include" });
+  if (!response.ok) throw new Error("Could not start a secure authentication request.");
+  const body = (await response.json()) as { csrfToken: string };
+  return body.csrfToken;
+}
+
+export async function loginAccount(email: string, password: string): Promise<NotaraUser> {
+  const csrfToken = await getCsrfToken();
+  const response = await fetch("/api/auth/login/", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
+    },
+    body: JSON.stringify({ email, password }),
+  });
+  const body = (await response.json()) as { user?: NotaraUser } & ApiError;
+  if (!response.ok) {
+    throw new Error(body.message ?? "Email or password is incorrect.");
+  }
+  if (!body.user) throw new Error("The login response was incomplete.");
+  return body.user;
+}
+
+export async function logoutAccount(): Promise<void> {
+  const csrfToken = await getCsrfToken();
+  const response = await fetch("/api/auth/logout/", {
+    method: "POST",
+    credentials: "include",
+    headers: { "X-CSRFToken": csrfToken },
+  });
+  if (!response.ok) {
+    const body = (await response.json()) as ApiError;
+    throw new Error(body.message ?? "Could not log out. Please try again.");
+  }
+}

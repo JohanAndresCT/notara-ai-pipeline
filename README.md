@@ -40,9 +40,9 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173/register`. Successful registration creates a
-database-backed account, establishes a Django session, and returns to the home
-screen.
+Open `http://localhost:5173/register` to create an account or
+`http://localhost:5173/login` to sign in. Registration and login establish a
+database-backed account session; logout returns to the public home screen.
 
 ## PostgreSQL / Docker
 

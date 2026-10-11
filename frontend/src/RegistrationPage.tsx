@@ -109,7 +109,7 @@ export default function RegistrationPage({ onRegistered }: { onRegistered: () =>
           </button>
         </form>
         <p className="form-footer">
-          Already registered? <a href="/">Return home</a>
+          Already registered? <a href="/login">Log in</a>
         </p>
       </section>
     </main>

@@ -77,7 +77,8 @@ a:focus-visible {
 .form-error { margin: 8px 0; }
 
 .registration-form button,
-.primary-link {
+.primary-link,
+.home-panel button {
   display: inline-flex;
   min-height: 46px;
   align-items: center;
@@ -94,6 +95,7 @@ a:focus-visible {
   cursor: pointer;
 }
 .registration-form button:disabled { opacity: 0.65; cursor: wait; }
+.home-panel button { margin-top: 20px; }
 .form-footer { margin: 20px 0 0; color: var(--muted); font-size: 14px; }
 .form-footer a { color: var(--accent); font-weight: 650; }
 .account-email { color: var(--muted); }

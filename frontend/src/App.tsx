@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import HomePage from "./HomePage";
+import LoginPage from "./LoginPage";
 import RegistrationPage from "./RegistrationPage";
 import { getCurrentUser, type NotaraUser } from "./lib/api";
 
@@ -8,6 +9,7 @@ export default function App() {
   const [user, setUser] = useState<NotaraUser | null>(null);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const isRegistrationRoute = window.location.pathname === "/register";
+  const isLoginRoute = window.location.pathname === "/login";
 
   useEffect(() => {
     getCurrentUser()
@@ -24,5 +26,9 @@ export default function App() {
     return <RegistrationPage onRegistered={() => window.location.assign("/")} />;
   }
 
-  return <HomePage user={user} />;
+  if (isLoginRoute && !user) {
+    return <LoginPage onAuthenticated={() => window.location.assign("/")} />;
+  }
+
+  return <HomePage user={user} onLoggedOut={() => window.location.assign("/")} />;
 }
