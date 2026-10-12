@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - despliegue-documentacion
+      - despliegue-documentación
   workflow_dispatch:
 
 permissions:
