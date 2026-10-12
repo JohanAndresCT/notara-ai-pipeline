@@ -3,7 +3,11 @@ import re
 from json import JSONDecodeError
 
 from django.http import JsonResponse
+from django.middleware.csrf import CsrfViewMiddleware
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+
+_csrf_middleware = CsrfViewMiddleware(lambda req: None)
 
 from .models import Score
 
@@ -101,6 +105,55 @@ def scores_view(request):
         content=normalized["content"],
     )
     return JsonResponse({"score": _score_data(score)}, status=201)
+
+
+@csrf_exempt
+@require_http_methods(["PATCH"])
+def score_detail_view(request, score_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({"message": "Authentication is required."}, status=401)
+
+    csrf_failure = _csrf_middleware.process_view(request, None, (), {})
+    if csrf_failure is not None:
+        return csrf_failure
+
+    try:
+        score = Score.objects.select_related("owner").get(pk=score_id)
+    except Score.DoesNotExist:
+        return JsonResponse({"message": "Score not found."}, status=404)
+
+    if score.owner != request.user:
+        return JsonResponse({"message": "You do not have permission to edit this score."}, status=403)
+
+    if request.content_type != "application/json":
+        return JsonResponse({"message": "Request body must be JSON."}, status=400)
+    try:
+        payload = json.loads(request.body or "{}")
+    except (JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({"message": "Request body must be valid JSON."}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"message": "Request body must be a JSON object."}, status=400)
+
+    errors = {}
+    if "title" in payload:
+        if not isinstance(payload["title"], str) or payload["title"].strip() == "":
+            errors["title"] = ["Title is required."]
+    if "instrument" in payload:
+        if not isinstance(payload["instrument"], str) or payload["instrument"].strip() == "":
+            errors["instrument"] = ["Instrument is required."]
+
+    if errors:
+        return JsonResponse({"errors": errors}, status=400)
+
+    if "title" in payload:
+        score.title = payload["title"].strip()
+    if "instrument" in payload:
+        score.instrument = payload["instrument"].strip()
+    if "description" in payload:
+        score.description = payload["description"] if isinstance(payload["description"], str) else ""
+
+    score.save()
+    return JsonResponse({"score": _score_data(score)})
 
 
 scores_view = require_http_methods(["GET", "POST"])(scores_view)

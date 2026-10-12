@@ -129,3 +129,112 @@ class ScorePublicationTests(TestCase):
 
         self.assertEqual(response.status_code, 403)
         self.assertEqual(Score.objects.count(), 0)
+
+
+class ScoreEditTests(TestCase):
+    def setUp(self):
+        self.client = Client(enforce_csrf_checks=True)
+        self.author = User.objects.create_user(
+            email="author@example.com", name="Author", password="pass1234"
+        )
+        self.other_user = User.objects.create_user(
+            email="other@example.com", name="Other", password="pass1234"
+        )
+        self.client.force_login(self.author)
+        self.csrf_token = self.client.get("/api/csrf/").json()["csrfToken"]
+        self.score = Score.objects.create(
+            owner=self.author,
+            title="Original Title",
+            instrument="Guitar",
+            description="Original desc",
+            score_format=Score.Format.TEXT,
+            content="C D E F",
+        )
+
+    def patch_score(self, score_id, payload, client=None):
+        c = client or self.client
+        return c.patch(
+            f"/api/scores/{score_id}/",
+            data=json.dumps(payload),
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=self.csrf_token,
+        )
+
+    def test_author_can_edit_title_instrument_description(self):
+        response = self.patch_score(
+            self.score.pk,
+            {"title": "New Title", "instrument": "Piano", "description": "New desc"},
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()["score"]
+        self.assertEqual(data["title"], "New Title")
+        self.assertEqual(data["instrument"], "Piano")
+        self.assertEqual(data["description"], "New desc")
+        self.score.refresh_from_db()
+        self.assertEqual(self.score.title, "New Title")
+        self.assertEqual(self.score.instrument, "Piano")
+        self.assertEqual(self.score.description, "New desc")
+
+    def test_edit_reflects_in_feed(self):
+        self.patch_score(self.score.pk, {"title": "Feed Title"})
+        feed = self.client.get("/api/scores/").json()["scores"]
+        self.assertEqual(feed[0]["title"], "Feed Title")
+
+    def test_non_author_cannot_edit(self):
+        other_client = Client(enforce_csrf_checks=True)
+        other_client.force_login(self.other_user)
+        other_csrf = other_client.get("/api/csrf/").json()["csrfToken"]
+        response = other_client.patch(
+            f"/api/scores/{self.score.pk}/",
+            data=json.dumps({"title": "Hijacked"}),
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=other_csrf,
+        )
+        self.assertEqual(response.status_code, 403)
+        self.score.refresh_from_db()
+        self.assertEqual(self.score.title, "Original Title")
+
+    def test_edit_requires_authentication(self):
+        anon = Client(enforce_csrf_checks=True)
+        response = anon.patch(
+            f"/api/scores/{self.score.pk}/",
+            data=json.dumps({"title": "Anon"}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_edit_requires_csrf(self):
+        client_no_csrf = Client(enforce_csrf_checks=True)
+        client_no_csrf.force_login(self.author)
+        response = client_no_csrf.patch(
+            f"/api/scores/{self.score.pk}/",
+            data=json.dumps({"title": "No CSRF"}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_empty_title_is_rejected(self):
+        response = self.patch_score(self.score.pk, {"title": ""})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("title", response.json()["errors"])
+        self.score.refresh_from_db()
+        self.assertEqual(self.score.title, "Original Title")
+
+    def test_empty_instrument_is_rejected(self):
+        response = self.patch_score(self.score.pk, {"instrument": ""})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("instrument", response.json()["errors"])
+        self.score.refresh_from_db()
+        self.assertEqual(self.score.instrument, "Guitar")
+
+    def test_nonexistent_score_returns_404(self):
+        response = self.patch_score(99999, {"title": "Ghost"})
+        self.assertEqual(response.status_code, 404)
+
+    def test_partial_patch_only_updates_sent_fields(self):
+        response = self.patch_score(self.score.pk, {"title": "Only Title Changed"})
+        self.assertEqual(response.status_code, 200)
+        self.score.refresh_from_db()
+        self.assertEqual(self.score.title, "Only Title Changed")
+        self.assertEqual(self.score.instrument, "Guitar")
+        self.assertEqual(self.score.description, "Original desc")
