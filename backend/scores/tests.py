@@ -3,7 +3,7 @@ import json
 from django.test import Client, TestCase
 
 from accounts.models import User
-from .models import Score, Reaction
+from .models import Score, Reaction, Comment
 
 
 class ScorePublicationTests(TestCase):
@@ -424,3 +424,141 @@ class ScoreReactionTests(TestCase):
         self.post_reaction()
         self.score.delete()
         self.assertEqual(Reaction.objects.count(), 0)
+
+
+class ScoreCommentTests(TestCase):
+    def setUp(self):
+        self.client = Client(enforce_csrf_checks=True)
+        self.score_author = User.objects.create_user(
+            email="comment_author@example.com", name="ScoreAuthor", password="pass1234"
+        )
+        self.commenter = User.objects.create_user(
+            email="comment_user@example.com", name="Commenter", password="pass1234"
+        )
+        self.other_commenter = User.objects.create_user(
+            email="comment_other@example.com", name="OtherCommenter", password="pass1234"
+        )
+        self.client.force_login(self.commenter)
+        self.csrf_token = self.client.get("/api/csrf/").json()["csrfToken"]
+        self.score = Score.objects.create(
+            owner=self.score_author,
+            title="Commented Score",
+            instrument="Trumpet",
+            description="Leave a comment.",
+            score_format=Score.Format.TEXT,
+            content="E F G A",
+        )
+
+    def post_comment(self, body="Great score!", score_id=None, client=None):
+        c = client or self.client
+        sid = score_id if score_id is not None else self.score.pk
+        return c.post(
+            f"/api/scores/{sid}/comments/",
+            data=json.dumps({"body": body}),
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=self.csrf_token,
+        )
+
+    def delete_comment(self, comment_id, score_id=None, client=None):
+        c = client or self.client
+        sid = score_id if score_id is not None else self.score.pk
+        return c.delete(
+            f"/api/scores/{sid}/comments/{comment_id}/",
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=self.csrf_token,
+        )
+
+    def test_authenticated_user_can_post_comment(self):
+        response = self.post_comment()
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Comment.objects.count(), 1)
+        data = response.json()["comment"]
+        self.assertEqual(data["body"], "Great score!")
+        self.assertEqual(data["author"], "Commenter")
+        self.assertIn("created_at", data)
+
+    def test_comment_appears_in_list(self):
+        self.post_comment()
+        response = self.client.get(f"/api/scores/{self.score.pk}/comments/")
+        self.assertEqual(response.status_code, 200)
+        comments = response.json()["comments"]
+        self.assertEqual(len(comments), 1)
+        self.assertEqual(comments[0]["body"], "Great score!")
+        self.assertEqual(comments[0]["author"], "Commenter")
+
+    def test_empty_comment_is_rejected(self):
+        response = self.post_comment(body="")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("body", response.json()["errors"])
+        self.assertEqual(Comment.objects.count(), 0)
+
+    def test_whitespace_only_comment_is_rejected(self):
+        response = self.post_comment(body="   ")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("body", response.json()["errors"])
+
+    def test_comment_over_500_chars_is_rejected(self):
+        response = self.post_comment(body="x" * 501)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("body", response.json()["errors"])
+
+    def test_comment_requires_authentication(self):
+        anon = Client()
+        response = anon.post(
+            f"/api/scores/{self.score.pk}/comments/",
+            data=json.dumps({"body": "Hello"}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_comment_requires_csrf(self):
+        client_no_csrf = Client(enforce_csrf_checks=True)
+        client_no_csrf.force_login(self.commenter)
+        response = client_no_csrf.post(
+            f"/api/scores/{self.score.pk}/comments/",
+            data=json.dumps({"body": "No token"}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_comment_on_nonexistent_score_returns_404(self):
+        response = self.post_comment(score_id=99999)
+        self.assertEqual(response.status_code, 404)
+
+    def test_author_can_delete_own_comment(self):
+        self.post_comment()
+        comment = Comment.objects.first()
+        response = self.delete_comment(comment.pk)
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Comment.objects.count(), 0)
+
+    def test_non_author_cannot_delete_comment(self):
+        self.post_comment()
+        comment = Comment.objects.first()
+        other_client = Client(enforce_csrf_checks=True)
+        other_client.force_login(self.other_commenter)
+        other_csrf = other_client.get("/api/csrf/").json()["csrfToken"]
+        response = other_client.delete(
+            f"/api/scores/{self.score.pk}/comments/{comment.pk}/",
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=other_csrf,
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Comment.objects.count(), 1)
+
+    def test_delete_requires_csrf(self):
+        self.post_comment()
+        comment = Comment.objects.first()
+        client_no_csrf = Client(enforce_csrf_checks=True)
+        client_no_csrf.force_login(self.commenter)
+        response = client_no_csrf.delete(
+            f"/api/scores/{self.score.pk}/comments/{comment.pk}/",
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Comment.objects.count(), 1)
+
+    def test_comment_cascade_delete_with_score(self):
+        self.post_comment()
+        self.score.delete()
+        self.assertEqual(Comment.objects.count(), 0)

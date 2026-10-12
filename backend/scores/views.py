@@ -10,7 +10,7 @@ from django.views.decorators.http import require_http_methods
 _csrf_middleware = CsrfViewMiddleware(lambda req: None)
 
 from django.db import IntegrityError
-from .models import Score, Reaction
+from .models import Score, Reaction, Comment
 
 ABC_REQUIRED_FIELDS = ("X", "T", "M", "L", "K")
 ABC_NOTE_PATTERN = re.compile(r"(?<![A-Za-z])[A-Ga-gzZ](?:[,']*)(?:\d+|/\d+)?")
@@ -32,6 +32,16 @@ def _score_data(score, user=None):
         "user_reacted": (
             score.reactions.filter(user=user).exists() if user else False
         ),
+    }
+
+
+def _comment_data(comment):
+    return {
+        "id": comment.pk,
+        "body": comment.body,
+        "author": comment.author.name,
+        "author_id": comment.author.pk,
+        "created_at": comment.created_at.isoformat(),
     }
 
 
@@ -207,6 +217,84 @@ def score_reaction_view(request, score_id):
         },
         status=201,
     )
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def score_comments_view(request, score_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({"message": "Authentication is required."}, status=401)
+
+    # CSRF only required on writes
+    if request.method == "POST":
+        csrf_failure = _csrf_middleware.process_view(request, None, (), {})
+        if csrf_failure is not None:
+            return csrf_failure
+
+    try:
+        score = Score.objects.get(pk=score_id)
+    except Score.DoesNotExist:
+        return JsonResponse({"message": "Score not found."}, status=404)
+
+    if request.method == "GET":
+        comments = score.comments.select_related("author").all()
+        return JsonResponse(
+            {"comments": [_comment_data(c) for c in comments]},
+            status=200,
+        )
+
+    # POST — create comment
+    if request.content_type != "application/json":
+        return JsonResponse({"message": "Request body must be JSON."}, status=400)
+    try:
+        payload = json.loads(request.body or "{}")
+    except (JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({"message": "Request body must be valid JSON."}, status=400)
+    if not isinstance(payload, dict):
+        return JsonResponse({"message": "Request body must be a JSON object."}, status=400)
+
+    body = payload.get("body", "")
+    if not isinstance(body, str) or not body.strip():
+        return JsonResponse({"errors": {"body": ["Comment body is required."]}}, status=400)
+    if len(body) > 500:
+        return JsonResponse(
+            {"errors": {"body": ["Comment must be 500 characters or fewer."]}},
+            status=400,
+        )
+
+    comment = Comment.objects.create(
+        score=score,
+        author=request.user,
+        body=body.strip(),
+    )
+    return JsonResponse({"comment": _comment_data(comment)}, status=201)
+
+
+@csrf_exempt
+@require_http_methods(["DELETE"])
+def score_comment_detail_view(request, score_id, comment_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({"message": "Authentication is required."}, status=401)
+
+    csrf_failure = _csrf_middleware.process_view(request, None, (), {})
+    if csrf_failure is not None:
+        return csrf_failure
+
+    try:
+        comment = Comment.objects.select_related("author", "score").get(
+            pk=comment_id, score_id=score_id
+        )
+    except Comment.DoesNotExist:
+        return JsonResponse({"message": "Comment not found."}, status=404)
+
+    if comment.author != request.user:
+        return JsonResponse(
+            {"message": "You do not have permission to delete this comment."},
+            status=403,
+        )
+
+    comment.delete()
+    return JsonResponse({}, status=204)
 
 
 scores_view = require_http_methods(["GET", "POST"])(scores_view)
