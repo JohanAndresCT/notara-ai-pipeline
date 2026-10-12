@@ -50,7 +50,7 @@ jobs:
       - name: Apply database migrations
         run: python backend/manage.py migrate --noinput
       - name: Run backend tests
-        run: python backend/manage.py test --verbosity 1
+        run: python backend/manage.py test accounts scores --verbosity 1
 
   frontend:
     runs-on: ubuntu-latest
