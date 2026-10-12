@@ -238,3 +238,77 @@ class ScoreEditTests(TestCase):
         self.assertEqual(self.score.title, "Only Title Changed")
         self.assertEqual(self.score.instrument, "Guitar")
         self.assertEqual(self.score.description, "Original desc")
+
+
+class ScoreDeleteTests(TestCase):
+    def setUp(self):
+        self.client = Client(enforce_csrf_checks=True)
+        self.author = User.objects.create_user(
+            email="deleter@example.com", name="Deleter", password="pass1234"
+        )
+        self.other_user = User.objects.create_user(
+            email="other2@example.com", name="Other2", password="pass1234"
+        )
+        self.client.force_login(self.author)
+        self.csrf_token = self.client.get("/api/csrf/").json()["csrfToken"]
+        self.score = Score.objects.create(
+            owner=self.author,
+            title="Score to Delete",
+            instrument="Violin",
+            description="Will be deleted.",
+            score_format=Score.Format.TEXT,
+            content="A B C D",
+        )
+
+    def delete_score(self, score_id, client=None):
+        c = client or self.client
+        return c.delete(
+            f"/api/scores/{score_id}/",
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=self.csrf_token,
+        )
+
+    def test_author_can_delete_own_score(self):
+        response = self.delete_score(self.score.pk)
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Score.objects.count(), 0)
+
+    def test_deleted_score_absent_from_feed(self):
+        self.delete_score(self.score.pk)
+        feed = self.client.get("/api/scores/").json()["scores"]
+        self.assertEqual(feed, [])
+
+    def test_non_author_cannot_delete(self):
+        other_client = Client(enforce_csrf_checks=True)
+        other_client.force_login(self.other_user)
+        other_csrf = other_client.get("/api/csrf/").json()["csrfToken"]
+        response = other_client.delete(
+            f"/api/scores/{self.score.pk}/",
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=other_csrf,
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Score.objects.count(), 1)
+
+    def test_delete_requires_authentication(self):
+        anon = Client(enforce_csrf_checks=True)
+        response = anon.delete(
+            f"/api/scores/{self.score.pk}/",
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(Score.objects.count(), 1)
+
+    def test_delete_requires_csrf(self):
+        client_no_csrf = Client(enforce_csrf_checks=True)
+        client_no_csrf.force_login(self.author)
+        response = client_no_csrf.delete(
+            f"/api/scores/{self.score.pk}/",
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Score.objects.count(), 1)
+
+    def test_delete_nonexistent_score_returns_404(self):
+        response = self.delete_score(99999)
+        self.assertEqual(response.status_code, 404)

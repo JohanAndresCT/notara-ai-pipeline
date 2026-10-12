@@ -108,7 +108,7 @@ def scores_view(request):
 
 
 @csrf_exempt
-@require_http_methods(["PATCH"])
+@require_http_methods(["PATCH", "DELETE"])
 def score_detail_view(request, score_id):
     if not request.user.is_authenticated:
         return JsonResponse({"message": "Authentication is required."}, status=401)
@@ -124,6 +124,10 @@ def score_detail_view(request, score_id):
 
     if score.owner != request.user:
         return JsonResponse({"message": "You do not have permission to edit this score."}, status=403)
+
+    if request.method == "DELETE":
+        score.delete()
+        return JsonResponse({}, status=204)
 
     if request.content_type != "application/json":
         return JsonResponse({"message": "Request body must be JSON."}, status=400)
