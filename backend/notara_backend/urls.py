@@ -11,7 +11,7 @@ from accounts.views import (
     change_password_view,
     register_view,
 )
-from scores.views import scores_view, score_detail_view
+from scores.views import scores_view, score_detail_view, score_reaction_view
 
 
 def health_check(request):
@@ -30,4 +30,5 @@ urlpatterns = [
     path("api/me/password/", change_password_view, name="change-password"),
     path("api/scores/", scores_view, name="scores"),
     path("api/scores/<int:score_id>/", score_detail_view, name="score-detail"),
+    path("api/scores/<int:score_id>/reactions/", score_reaction_view, name="score-reactions"),
 ]

@@ -3,7 +3,7 @@ import json
 from django.test import Client, TestCase
 
 from accounts.models import User
-from .models import Score
+from .models import Score, Reaction
 
 
 class ScorePublicationTests(TestCase):
@@ -312,3 +312,115 @@ class ScoreDeleteTests(TestCase):
     def test_delete_nonexistent_score_returns_404(self):
         response = self.delete_score(99999)
         self.assertEqual(response.status_code, 404)
+
+
+class ScoreReactionTests(TestCase):
+    def setUp(self):
+        self.client = Client(enforce_csrf_checks=True)
+        self.author = User.objects.create_user(
+            email="reactor_author@example.com", name="Author", password="pass1234"
+        )
+        self.reactor = User.objects.create_user(
+            email="reactor_user@example.com", name="Reactor", password="pass1234"
+        )
+        self.other_reactor = User.objects.create_user(
+            email="reactor_other@example.com", name="OtherReactor", password="pass1234"
+        )
+        self.client.force_login(self.reactor)
+        self.csrf_token = self.client.get("/api/csrf/").json()["csrfToken"]
+        self.score = Score.objects.create(
+            owner=self.author,
+            title="Reaction Target",
+            instrument="Cello",
+            description="React to this.",
+            score_format=Score.Format.TEXT,
+            content="G A B C",
+        )
+
+    def post_reaction(self, score_id=None, client=None):
+        c = client or self.client
+        sid = score_id if score_id is not None else self.score.pk
+        return c.post(
+            f"/api/scores/{sid}/reactions/",
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=self.csrf_token,
+        )
+
+    def test_authenticated_user_can_react_to_others_score(self):
+        response = self.post_reaction()
+        self.assertEqual(response.status_code, 201)
+        data = response.json()
+        self.assertTrue(data["reacted"])
+        self.assertEqual(data["reaction_count"], 1)
+        self.assertEqual(Reaction.objects.count(), 1)
+
+    def test_reaction_reflected_in_feed(self):
+        self.post_reaction()
+        feed = self.client.get("/api/scores/").json()["scores"]
+        self.assertEqual(feed[0]["reaction_count"], 1)
+        self.assertTrue(feed[0]["user_reacted"])
+
+    def test_toggle_removes_existing_reaction(self):
+        self.post_reaction()
+        response = self.post_reaction()
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertFalse(data["reacted"])
+        self.assertEqual(data["reaction_count"], 0)
+        self.assertEqual(Reaction.objects.count(), 0)
+
+    def test_author_cannot_react_to_own_score(self):
+        author_client = Client(enforce_csrf_checks=True)
+        author_client.force_login(self.author)
+        author_csrf = author_client.get("/api/csrf/").json()["csrfToken"]
+        response = author_client.post(
+            f"/api/scores/{self.score.pk}/reactions/",
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=author_csrf,
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Reaction.objects.count(), 0)
+
+    def test_reaction_requires_authentication(self):
+        anon = Client()
+        response = anon.post(
+            f"/api/scores/{self.score.pk}/reactions/",
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 401)
+
+    def test_reaction_requires_csrf(self):
+        client_no_csrf = Client(enforce_csrf_checks=True)
+        client_no_csrf.force_login(self.reactor)
+        response = client_no_csrf.post(
+            f"/api/scores/{self.score.pk}/reactions/",
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_reaction_on_nonexistent_score_returns_404(self):
+        response = self.post_reaction(score_id=99999)
+        self.assertEqual(response.status_code, 404)
+
+    def test_multiple_users_can_react_independently(self):
+        self.post_reaction()
+        other_client = Client(enforce_csrf_checks=True)
+        other_client.force_login(self.other_reactor)
+        other_csrf = other_client.get("/api/csrf/").json()["csrfToken"]
+        other_client.post(
+            f"/api/scores/{self.score.pk}/reactions/",
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=other_csrf,
+        )
+        feed = self.client.get("/api/scores/").json()["scores"]
+        self.assertEqual(feed[0]["reaction_count"], 2)
+
+    def test_reaction_count_zero_by_default(self):
+        feed = self.client.get("/api/scores/").json()["scores"]
+        self.assertEqual(feed[0]["reaction_count"], 0)
+        self.assertFalse(feed[0]["user_reacted"])
+
+    def test_reaction_cascade_delete_with_score(self):
+        self.post_reaction()
+        self.score.delete()
+        self.assertEqual(Reaction.objects.count(), 0)

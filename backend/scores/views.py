@@ -9,14 +9,15 @@ from django.views.decorators.http import require_http_methods
 
 _csrf_middleware = CsrfViewMiddleware(lambda req: None)
 
-from .models import Score
+from django.db import IntegrityError
+from .models import Score, Reaction
 
 ABC_REQUIRED_FIELDS = ("X", "T", "M", "L", "K")
 ABC_NOTE_PATTERN = re.compile(r"(?<![A-Za-z])[A-Ga-gzZ](?:[,']*)(?:\d+|/\d+)?")
 ABC_MUSIC_LINE_PATTERN = re.compile(r"^[A-Ga-gzZ0-9|:\[\](){}<>^_=,'/.\-\s]+$")
 
 
-def _score_data(score):
+def _score_data(score, user=None):
     return {
         "id": score.pk,
         "title": score.title,
@@ -25,7 +26,12 @@ def _score_data(score):
         "format": score.score_format,
         "content": score.content,
         "author": score.owner.name,
+        "author_id": score.owner.pk,
         "created_at": score.created_at.isoformat(),
+        "reaction_count": score.reactions.count(),
+        "user_reacted": (
+            score.reactions.filter(user=user).exists() if user else False
+        ),
     }
 
 
@@ -54,7 +60,7 @@ def scores_view(request):
 
     if request.method == "GET":
         scores = Score.objects.select_related("owner").all()
-        return JsonResponse({"scores": [_score_data(score) for score in scores]})
+        return JsonResponse({"scores": [_score_data(score, request.user) for score in scores]})
 
     if request.content_type != "application/json":
         return JsonResponse({"message": "Request body must be JSON."}, status=400)
@@ -104,7 +110,7 @@ def scores_view(request):
         score_format=score_format,
         content=normalized["content"],
     )
-    return JsonResponse({"score": _score_data(score)}, status=201)
+    return JsonResponse({"score": _score_data(score, request.user)}, status=201)
 
 
 @csrf_exempt
@@ -157,7 +163,50 @@ def score_detail_view(request, score_id):
         score.description = payload["description"] if isinstance(payload["description"], str) else ""
 
     score.save()
-    return JsonResponse({"score": _score_data(score)})
+    return JsonResponse({"score": _score_data(score, request.user)})
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def score_reaction_view(request, score_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({"message": "Authentication is required."}, status=401)
+
+    csrf_failure = _csrf_middleware.process_view(request, None, (), {})
+    if csrf_failure is not None:
+        return csrf_failure
+
+    try:
+        score = Score.objects.select_related("owner").get(pk=score_id)
+    except Score.DoesNotExist:
+        return JsonResponse({"message": "Score not found."}, status=404)
+
+    if score.owner == request.user:
+        return JsonResponse(
+            {"message": "You cannot react to your own score."}, status=403
+        )
+
+    deleted, _ = Reaction.objects.filter(
+        score=score, user=request.user
+    ).delete()
+
+    if deleted:
+        return JsonResponse(
+            {
+                "reacted": False,
+                "reaction_count": score.reactions.count(),
+            },
+            status=200,
+        )
+
+    Reaction.objects.create(score=score, user=request.user)
+    return JsonResponse(
+        {
+            "reacted": True,
+            "reaction_count": score.reactions.count(),
+        },
+        status=201,
+    )
 
 
 scores_view = require_http_methods(["GET", "POST"])(scores_view)
