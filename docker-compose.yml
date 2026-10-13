@@ -49,6 +49,8 @@ services:
     working_dir: /app
     command: >
       sh -lc "npm install && npm run dev -- --host 0.0.0.0"
+    environment:
+      VITE_API_PROXY_TARGET: http://backend:8000
     volumes:
       - ./frontend:/app
     ports:
