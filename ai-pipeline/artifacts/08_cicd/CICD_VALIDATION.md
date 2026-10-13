@@ -97,3 +97,12 @@ Se observó una ejecución de CI exitosa para c76b08c en pruebas-despliegue.
 Se configuraron los recursos de Railway y se habilitó RAILWAY_DEPLOY_ENABLED.
 El despliegue y la verificación pública siguen pendientes.
 Esta actualización es posterior a la auditoría anterior.
+## 13. Resultado del despliegue real
+
+- Ejecución: https://github.com/JohanAndresCT/notara-ai-pipeline/actions/runs/38481851856
+- Rama: pruebas-despliegue.
+- Resultado reportado: CI y despliegue exitosos.
+- URL: https://notara-production.up.railway.app
+- Verificación manual del usuario: registro, inicio de sesión,
+  publicación de partituras y foto de perfil funcionan.
+- Estado: DEPLOYED.
