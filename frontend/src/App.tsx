@@ -12,9 +12,9 @@ export default function App() {
   const [user, setUser] = useState<NotaraUser | null>(null);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const path = window.location.pathname;
-  const scoreMatch = path.match(/^\/scores\/(\d+)(?:\/(edit))?$/);
+  const scoreMatch = path.match(/^\/scores\/(\d+)(?:\/edit)?\/?$/);
   const scoreId = scoreMatch ? Number(scoreMatch[1]) : null;
-  const isEditScoreRoute = Boolean(scoreMatch?.[2]);
+  const isEditScoreRoute = /^\/scores\/\d+\/edit\/?$/.test(path);
 
   useEffect(() => {
     getCurrentUser()
@@ -64,7 +64,7 @@ export default function App() {
   }
 
   if (scoreId !== null && user) {
-    return <ScoreDetailPage scoreId={scoreId} user={user} />;
+    return <ScoreDetailPage scoreId={scoreId} currentUserId={user.id} />;
   }
 
   return <HomePage user={user} onLoggedOut={() => window.location.assign("/")} />;

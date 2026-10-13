@@ -99,6 +99,7 @@ export default function HomePage({
                   <p>{score.description}</p>
                   <pre>{score.content}</pre>
                   <a className="primary-link" href={`/scores/${score.id}`}>View score</a>
+                  <p className="score-meta">{score.like_count} likes · {score.comment_count} comments</p>
                 </article>
               ))}
               {!feedError && totalCount > 0 ? (

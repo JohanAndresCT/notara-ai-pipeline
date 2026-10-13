@@ -6,7 +6,7 @@ from tempfile import TemporaryDirectory
 from PIL import Image
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.sessions.models import Session
-from django.test import Client, TestCase, override_settings
+from django.test import Client, TestCase, TransactionTestCase, override_settings
 from django.test.client import BOUNDARY, MULTIPART_CONTENT, encode_multipart
 
 from .models import User
@@ -184,7 +184,7 @@ class AuthenticationTests(TestCase):
         self.assertEqual(client_without_csrf.get("/api/v1/me/").status_code, 200)
 
 
-class ProfileManagementTests(TestCase):
+class ProfileManagementTests(TransactionTestCase):
     def setUp(self):
         self.media_dir = TemporaryDirectory()
         self.addCleanup(self.media_dir.cleanup)

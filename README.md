@@ -1,13 +1,14 @@
 # Notara MVP Foundation
 
-This repository contains the Notara MVP implementation foundation and the first
-vertical story, account registration:
+This repository contains the Notara MVP implementation foundation and the
+community flow for textual scores:
 
 - Django + Django REST Framework backend
 - React + TypeScript + Vite frontend
 - PostgreSQL persistence via Docker Compose
 - switchable SQLite database for local registration testing
 - same-origin session authentication model for the MVP
+- PostgreSQL-backed scores, comments, and likes
 
 ## Repository layout
 
@@ -58,10 +59,37 @@ deployment-appropriate secrets and database values. Then run:
 docker compose up --build
 ```
 
-The backend selects its database in `backend/notara_backend/settings.py` using
-`DJANGO_DB_ENGINE`; both database choices use Django models and migrations.
-Use `SQLITE_DB_PATH` to move the local SQLite file. Do not commit `.env` or
-production credentials.
+Docker creates the `notara` PostgreSQL database and starts the backend and
+frontend. The backend selects PostgreSQL in `backend/notara_backend/settings.py`
+using `DJANGO_DB_ENGINE=postgresql`; migrations run automatically before the
+backend starts. SQLite remains available only as a lightweight local/test
+option. Do not commit `.env` or production credentials.
+
+The published local services are:
+
+- Frontend: `http://localhost:5173`
+- Backend health check: `http://localhost:8000/api/health/`
+- PostgreSQL: `localhost:5432` (database `notara`)
+
+To run the backend tests against PostgreSQL inside Docker:
+
+```bash
+docker compose exec -T backend python backend/manage.py check
+docker compose exec -T backend python backend/manage.py test accounts scores
+```
+
+The persistence layer includes `User`, `Score`, `Comment`, and `Like`. Scores
+are ordered and paginated by ten, can be filtered by instrument, and use
+database constraints to prevent duplicate likes. Deleting a score cascades to
+its comments and likes.
+
+Community API routes include:
+
+- `GET /api/scores/` with `page` and `instrument` query parameters
+- `GET|PATCH|DELETE /api/scores/<id>/`
+- `POST /api/scores/<id>/comments/`
+- `DELETE /api/comments/<id>/`
+- `PUT|DELETE /api/scores/<id>/like/`
 
 Profile photos use Django's storage backend and are stored locally under
 `MEDIA_ROOT` by default (`media/`, ignored by Git). Set
