@@ -9,6 +9,8 @@ from django.contrib.sessions.models import Session
 from django.test import Client, TestCase, TransactionTestCase, override_settings
 from django.test.client import BOUNDARY, MULTIPART_CONTENT, encode_multipart
 
+from scores.models import Reaction, Score
+
 from .models import User
 
 
@@ -41,9 +43,12 @@ class RegistrationTests(TestCase):
         self.assertEqual(response.status_code, 201)
         user = User.objects.get(email="ada@example.com")
         self.assertEqual(user.name, "Ada Lovelace")
+        self.assertEqual(user.username, "ada")
         self.assertTrue(user.check_password("correct-horse"))
         self.assertNotEqual(user.password, "correct-horse")
         self.assertNotIn("password", response.json())
+        self.assertEqual(response.json()["user"]["username"], "ada")
+        self.assertEqual(response.json()["user"]["description"], "")
 
         current_user = self.client.get("/api/v1/me/")
         self.assertEqual(current_user.status_code, 200)
@@ -221,19 +226,87 @@ class ProfileManagementTests(TransactionTestCase):
             HTTP_X_CSRFTOKEN=self.csrf_token,
         )
 
-    def test_profile_returns_current_name_instrument_and_photo_field(self):
+    def test_profile_returns_identity_fields_stats_and_legacy_photo_field(self):
         response = self.client.get("/api/v1/me/")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["user"]["name"], "Profile User")
         self.assertEqual(response.json()["user"]["main_instrument"], "")
+        self.assertEqual(response.json()["user"]["username"], "profile")
+        self.assertEqual(response.json()["user"]["description"], "")
+        self.assertEqual(response.json()["user"]["score_count"], 0)
+        self.assertEqual(response.json()["user"]["likes_received"], 0)
         self.assertIsNone(response.json()["user"]["photo_url"])
+
+    def test_profile_update_persists_username_description_and_allowed_instrument(self):
+        response = self.client.patch(
+            "/api/v1/me/",
+            data=json.dumps({
+                "username": "  Ada.Musica ",
+                "name": "Ada Lovelace",
+                "description": "Compositora y pianista.",
+                "main_instrument": "Piano",
+            }),
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=self.csrf_token,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, "ada.musica")
+        self.assertEqual(self.user.name, "Ada Lovelace")
+        self.assertEqual(self.user.description, "Compositora y pianista.")
+        self.assertEqual(self.user.main_instrument, "Piano")
+        self.assertEqual(response.json()["user"]["username"], "ada.musica")
+
+    def test_profile_stats_report_owned_scores_and_received_likes(self):
+        another_user = User.objects.create_user(
+            email="listener@example.com",
+            name="Listener",
+            password="correct-horse",
+        )
+        score = Score.objects.create(
+            owner=self.user,
+            title="A short melody",
+            instrument="Piano",
+            description="An idea",
+            score_format=Score.Format.TEXT,
+            content="C D E",
+        )
+        Reaction.objects.create(score=score, user=another_user)
+        Reaction.objects.create(score=score, user=self.user)
+
+        response = self.client.get("/api/v1/me/")
+
+        self.assertEqual(response.json()["user"]["score_count"], 1)
+        self.assertEqual(response.json()["user"]["likes_received"], 2)
+
+    def test_duplicate_username_and_unlisted_instrument_are_rejected(self):
+        User.objects.create_user(
+            email="another@example.com",
+            name="Another User",
+            password="correct-horse",
+            username="another",
+        )
+        response = self.client.patch(
+            "/api/v1/me/",
+            data=json.dumps({"username": "another", "main_instrument": "Cello"}),
+            content_type="application/json",
+            HTTP_X_CSRFTOKEN=self.csrf_token,
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("username", response.json()["errors"])
+        self.assertIn("main_instrument", response.json()["errors"])
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.username, "profile")
+        self.assertEqual(self.user.main_instrument, "")
 
     def test_profile_update_persists_name_instrument_and_jpeg(self):
         response = self.patch_profile(
             {
                 "name": "Updated Profile",
-                "main_instrument": "Violin",
+                "main_instrument": "Violín",
                 "photo": self.image_file(),
             }
         )
@@ -241,7 +314,7 @@ class ProfileManagementTests(TransactionTestCase):
         self.assertEqual(response.status_code, 200)
         self.user.refresh_from_db()
         self.assertEqual(self.user.name, "Updated Profile")
-        self.assertEqual(self.user.main_instrument, "Violin")
+        self.assertEqual(self.user.main_instrument, "Violín")
         self.assertTrue(self.user.photo.name.endswith(".jpg"))
         self.assertIn("/api/v1/me/photo/", response.json()["user"]["photo_url"])
         self.assertEqual(self.client.get("/api/v1/me/").json()["user"]["name"], "Updated Profile")
@@ -277,7 +350,7 @@ class ProfileManagementTests(TransactionTestCase):
         response = self.patch_profile(
             {
                 "name": "Must Not Save",
-                "main_instrument": "Flute",
+                "main_instrument": "Flauta",
                 "photo": SimpleUploadedFile("bad.gif", b"not an image", content_type="image/gif"),
             }
         )

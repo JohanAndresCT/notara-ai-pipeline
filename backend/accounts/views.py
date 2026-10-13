@@ -1,4 +1,5 @@
 import json
+import re
 import warnings
 from json import JSONDecodeError
 from pathlib import Path
@@ -12,11 +13,14 @@ from django.db import IntegrityError, transaction
 from django.core.files.storage import default_storage
 from django.http import FileResponse, JsonResponse
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
+from django.db.models import Count
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from .models import User
+
+PROFILE_INSTRUMENTS = {"Piano", "Guitarra", "Violín", "Flauta", "Voz", "Otro"}
 
 
 @ensure_csrf_cookie
@@ -79,10 +83,7 @@ def register_view(request):
         )
 
     login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-    return JsonResponse(
-        {"user": {"id": user.pk, "name": user.name, "email": user.email}},
-        status=201,
-    )
+    return JsonResponse({"user": _profile_data(user)}, status=201)
 
 
 @require_POST
@@ -110,9 +111,7 @@ def login_view(request):
         )
 
     login(request, user)
-    return JsonResponse(
-        {"user": {"id": user.pk, "name": user.name, "email": user.email}}
-    )
+    return JsonResponse({"user": _profile_data(user)})
 
 
 @require_POST
@@ -125,11 +124,22 @@ def logout_view(request):
 
 
 def _profile_data(user):
+    from scores.models import Score
+
+    score_stats = Score.objects.filter(owner=user).aggregate(
+        score_count=Count("id", distinct=True),
+        likes_received=Count("reactions", distinct=True),
+    )
     return {
         "id": user.pk,
+        "username": user.username,
         "name": user.name,
         "email": user.email,
+        "description": user.description,
         "main_instrument": user.main_instrument,
+        "date_joined": user.date_joined.isoformat(),
+        "score_count": score_stats["score_count"],
+        "likes_received": score_stats["likes_received"],
         "photo_url": "/api/v1/me/photo/" if user.photo else None,
     }
 
@@ -196,7 +206,8 @@ def current_user_view(request):
         return JsonResponse({"message": "Profile update must contain valid form data."}, status=400)
 
     if "name" in profile_data:
-        name = profile_data.get("name", "").strip()
+        raw_name = profile_data.get("name")
+        name = raw_name.strip() if isinstance(raw_name, str) else ""
         if not name:
             errors["name"] = ["Name is required."]
         elif len(name) > 150:
@@ -205,10 +216,35 @@ def current_user_view(request):
             user.name = name
             update_fields.append("name")
 
+    if "username" in profile_data:
+        raw_username = profile_data.get("username")
+        username = raw_username.strip().lower() if isinstance(raw_username, str) else ""
+        if not username:
+            errors["username"] = ["Username is required."]
+        elif len(username) > 30 or not re.fullmatch(r"[a-z0-9._-]+", username):
+            errors["username"] = [
+                "Use up to 30 lowercase letters, numbers, dots, underscores, or hyphens."
+            ]
+        elif User.objects.filter(username=username).exclude(pk=user.pk).exists():
+            errors["username"] = ["This username is already taken."]
+        else:
+            user.username = username
+            update_fields.append("username")
+
+    if "description" in profile_data:
+        raw_description = profile_data.get("description")
+        description = raw_description.strip() if isinstance(raw_description, str) else ""
+        if len(description) > 500:
+            errors["description"] = ["Description must be 500 characters or fewer."]
+        else:
+            user.description = description
+            update_fields.append("description")
+
     if "main_instrument" in profile_data:
-        instrument = profile_data.get("main_instrument", "").strip()
-        if len(instrument) > 100:
-            errors["main_instrument"] = ["Instrument must be 100 characters or fewer."]
+        raw_instrument = profile_data.get("main_instrument")
+        instrument = raw_instrument.strip() if isinstance(raw_instrument, str) else ""
+        if instrument and instrument not in PROFILE_INSTRUMENTS:
+            errors["main_instrument"] = ["Choose an instrument from the list."]
         else:
             user.main_instrument = instrument
             update_fields.append("main_instrument")

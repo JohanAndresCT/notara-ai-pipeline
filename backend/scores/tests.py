@@ -97,6 +97,37 @@ class ScorePublicationTests(TestCase):
             all(score["instrument"] == "Piano" for score in first_page.json()["scores"])
         )
 
+    def test_feed_can_filter_to_current_users_own_scores(self):
+        own_score = Score.objects.create(
+            owner=self.user,
+            title="My score",
+            instrument="Piano",
+            description="My recent score.",
+            score_format=Score.Format.TEXT,
+            content="C D E F",
+        )
+        other_user = User.objects.create_user(
+            email="other-composer@example.com",
+            name="Other Composer",
+            password="test-password",
+        )
+        Score.objects.create(
+            owner=other_user,
+            title="Other score",
+            instrument="Piano",
+            description="Another score.",
+            score_format=Score.Format.TEXT,
+            content="G A B C",
+        )
+
+        response = self.client.get("/api/v1/scores/?mine=1")
+        body = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(body["total_count"], 1)
+        self.assertEqual([score["id"] for score in body["scores"]], [own_score.pk])
+        self.assertTrue(body["scores"][0]["is_owner"])
+
     def test_feed_rejects_invalid_page(self):
         response = self.client.get("/api/v1/scores/?page=invalid")
 
@@ -458,7 +489,7 @@ class ScoreReactionTests(TestCase):
         self.assertEqual(data["reaction_count"], 0)
         self.assertEqual(Reaction.objects.count(), 0)
 
-    def test_author_cannot_react_to_own_score(self):
+    def test_author_can_react_to_own_score(self):
         author_client = Client(enforce_csrf_checks=True)
         author_client.force_login(self.author)
         author_csrf = author_client.get("/api/v1/csrf/").json()["csrfToken"]
@@ -467,8 +498,8 @@ class ScoreReactionTests(TestCase):
             content_type="application/json",
             HTTP_X_CSRFTOKEN=author_csrf,
         )
-        self.assertEqual(response.status_code, 403)
-        self.assertEqual(Reaction.objects.count(), 0)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Reaction.objects.count(), 1)
 
     def test_reaction_requires_authentication(self):
         anon = Client()
@@ -747,7 +778,7 @@ class ScoreCommunityApiTests(TestCase):
         self.assertEqual(body["comments"][0]["body"], "Great theme.")
         self.assertFalse(body["is_liked"])
 
-    def test_visitor_can_toggle_like_but_owner_cannot(self):
+    def test_visitor_and_owner_can_toggle_like(self):
         like_response = self.visitor_client.put(
             f"/api/scores/{self.score.pk}/like/",
             HTTP_X_CSRFTOKEN=self.visitor_csrf,
@@ -768,7 +799,7 @@ class ScoreCommunityApiTests(TestCase):
         self.assertEqual(like_response.status_code, 200)
         self.assertEqual(repeat_response.json()["like_count"], 1)
         self.assertEqual(remove_response.json()["like_count"], 0)
-        self.assertEqual(owner_response.status_code, 403)
+        self.assertEqual(owner_response.status_code, 200)
 
     def test_visitor_can_comment_and_delete_own_comment_but_not_owner_comment(self):
         create_response = self.request_json(

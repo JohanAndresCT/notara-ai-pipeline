@@ -6,6 +6,7 @@ import RegistrationPage from "./RegistrationPage";
 import ScoreCreatePage from "./ScoreCreatePage";
 import ScoreDetailPage from "./ScoreDetailPage";
 import ScoreEditPage from "./ScoreEditPage";
+import AppShell from "./AppShell";
 import { getCurrentUser, type NotaraUser } from "./lib/api";
 
 export default function App() {
@@ -25,8 +26,9 @@ export default function App() {
 
   if (isCheckingSession) {
     return (
-      <main className="page-shell">
-        <p role="status">Checking your session...</p>
+      <main className="app-loading" role="status">
+        <span className="logo-mark" aria-hidden="true">♫</span>
+        <p>Buscando tu espacio en la comunidad...</p>
       </main>
     );
   }
@@ -39,33 +41,36 @@ export default function App() {
     return <LoginPage onAuthenticated={() => window.location.assign("/")} />;
   }
 
-  if (path === "/profile" && !user) {
-    return <LoginPage onAuthenticated={() => window.location.assign("/profile")} />;
-  }
-
-  if (path === "/profile" && user) {
-    return <ProfilePage user={user} onProfileUpdated={setUser} />;
-  }
-
-  if (path === "/scores/new" && !user) {
-    return <LoginPage onAuthenticated={() => window.location.assign("/scores/new")} />;
-  }
-
-  if (path === "/scores/new" && user) {
-    return <ScoreCreatePage />;
-  }
-
-  if (scoreId !== null && !user) {
+  if ((path === "/profile" || path === "/scores/new" || scoreId !== null) && !user) {
+    if (path === "/profile") {
+      return <LoginPage onAuthenticated={() => window.location.assign("/profile")} />;
+    }
+    if (path === "/scores/new") {
+      return <LoginPage onAuthenticated={() => window.location.assign("/scores/new")} />;
+    }
     return <LoginPage onAuthenticated={() => window.location.assign(path)} />;
   }
 
-  if (scoreId !== null && user && isEditScoreRoute) {
-    return <ScoreEditPage scoreId={scoreId} />;
+  if (!user) {
+    return <HomePage user={null} />;
   }
 
-  if (scoreId !== null && user) {
-    return <ScoreDetailPage scoreId={scoreId} currentUserId={user.id} />;
+  let page;
+  if (path === "/profile") {
+    page = <ProfilePage user={user} onProfileUpdated={setUser} />;
+  } else if (path === "/scores/new") {
+    page = <ScoreCreatePage />;
+  } else if (scoreId !== null && isEditScoreRoute) {
+    page = <ScoreEditPage scoreId={scoreId} />;
+  } else if (scoreId !== null) {
+    page = <ScoreDetailPage scoreId={scoreId} currentUserId={user.id} currentUserName={user.name} />;
+  } else {
+    page = <HomePage user={user} />;
   }
 
-  return <HomePage user={user} onLoggedOut={() => window.location.assign("/")} />;
+  return (
+    <AppShell user={user} onLoggedOut={() => window.location.assign("/")}>
+      {page}
+    </AppShell>
+  );
 }

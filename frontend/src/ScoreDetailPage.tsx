@@ -4,9 +4,9 @@ import {
   deleteComment,
   deleteScore,
   getComments,
+  getInitials,
   getScore,
   toggleReaction,
-  updateScore,
   type PublishedScore,
   type ScoreComment,
 } from "./lib/api";
@@ -14,16 +14,17 @@ import {
 export default function ScoreDetailPage({
   scoreId,
   currentUserId,
+  currentUserName,
 }: {
   scoreId: number;
   currentUserId: number;
+  currentUserName: string;
 }) {
   const [score, setScore] = useState<PublishedScore | null>(null);
   const [comments, setComments] = useState<ScoreComment[]>([]);
   const [error, setError] = useState("");
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     Promise.all([getScore(scoreId), getComments(scoreId)])
@@ -62,34 +63,12 @@ export default function ScoreDetailPage({
   }
 
   async function handleDelete() {
-    if (!score || !window.confirm("Delete this score?")) return;
+    if (!score || !window.confirm("¿Quieres eliminar esta partitura?")) return;
     try {
       await deleteScore(score.id);
       window.location.assign("/");
     } catch (requestError) {
       setError((requestError as Error).message);
-    }
-  }
-
-  async function handleUpdate(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!score) return;
-    const data = new FormData(event.currentTarget);
-    setIsSubmitting(true);
-    try {
-      const updated = await updateScore(score.id, {
-        title: String(data.get("title") ?? "").trim(),
-        instrument: String(data.get("instrument") ?? "").trim(),
-        description: String(data.get("description") ?? "").trim(),
-        format: score.format,
-        content: String(data.get("content") ?? ""),
-      });
-      setScore(updated);
-      setIsEditing(false);
-    } catch (requestError) {
-      setError((requestError as Error).message);
-    } finally {
-      setIsSubmitting(false);
     }
   }
 
@@ -105,70 +84,60 @@ export default function ScoreDetailPage({
   }
 
   if (error && !score) {
-    return <main className="page-shell"><p className="form-error" role="alert">{error}</p><a href="/">Return home</a></main>;
+    return <div className="empty-state"><span aria-hidden="true">!</span><h2>No se pudo cargar la partitura</h2><p className="form-error" role="alert">{error}</p><a className="button secondary" href="/">Volver al inicio</a></div>;
   }
-  if (!score) return <main className="page-shell"><p role="status">Loading score...</p></main>;
+  if (!score) return <div className="loading-list" role="status"><div className="skeleton-card">Cargando partitura...</div></div>;
 
   const isOwner = score.author_id === currentUserId;
   return (
-    <main className="page-shell">
-      <section className="home-panel" aria-labelledby="score-detail-heading">
-        <p className="eyebrow">Community score</p>
-        <h1 id="score-detail-heading">{score.title}</h1>
-        {isEditing ? (
-          <form className="registration-form" onSubmit={handleUpdate}>
-            <label htmlFor="edit-title">Title</label>
-            <input id="edit-title" name="title" defaultValue={score.title} required />
-            <label htmlFor="edit-instrument">Instrument</label>
-            <input id="edit-instrument" name="instrument" defaultValue={score.instrument} required />
-            <label htmlFor="edit-description">Description</label>
-            <textarea id="edit-description" name="description" defaultValue={score.description} required rows={3} />
-            <label htmlFor="edit-content">Score content</label>
-            <textarea id="edit-content" name="content" defaultValue={score.content} required maxLength={1000} rows={8} />
-            <button type="submit" disabled={isSubmitting}>{isSubmitting ? "Saving..." : "Save changes"}</button>
-            <button type="button" onClick={() => setIsEditing(false)}>Cancel</button>
-          </form>
-        ) : null}
-        <p className="score-meta">{score.instrument} · {score.author} · {score.format}</p>
-        {!isEditing ? <><p>{score.description}</p><pre>{score.content}</pre></> : null}
-        <div className="score-actions">
-          {!isOwner ? (
-            <button type="button" onClick={handleReaction}>
-              {score.user_reacted ? "Unlike" : "Like"} ({score.reaction_count})
-            </button>
-          ) : <span>{score.reaction_count} reactions</span>}
-          {isOwner && !isEditing ? <button type="button" onClick={() => setIsEditing(true)}>Edit score</button> : null}
-          {isOwner ? <button type="button" onClick={handleDelete}>Delete score</button> : null}
-        </div>
-        {error ? <p className="form-error" role="alert">{error}</p> : null}
-        <section aria-labelledby="comments-heading">
-          <h2 id="comments-heading">Comments ({score.comment_count})</h2>
-          {comments.map((item) => (
-            <article className="score-item" key={item.id}>
-              <p>{item.body}</p>
-              <p className="score-meta">{item.author} · {new Date(item.created_at).toLocaleString()}</p>
-              {item.author_id === currentUserId ? (
-                <button type="button" onClick={() => handleCommentDelete(item.id)}>Delete comment</button>
-              ) : null}
-            </article>
-          ))}
-          {!isOwner ? (
-            <form className="registration-form" onSubmit={handleComment}>
-              <label htmlFor="score-comment">Add a comment</label>
-              <textarea
-                id="score-comment"
-                value={comment}
-                maxLength={500}
-                onChange={(event) => setComment(event.target.value)}
-                rows={3}
-                required
-              />
-              <button type="submit" disabled={isSubmitting}>{isSubmitting ? "Sending..." : "Comment"}</button>
-            </form>
+    <div className="detail-page">
+      <a className="back" href="/">← Volver al inicio</a>
+      <article className="detail-card" aria-labelledby="score-detail-heading">
+        <div className="detail-top">
+          <span className={`format ${score.format === "ABC" ? "abc" : "text"}`}>{score.format === "ABC" ? "NOTACIÓN ABC" : "PARTITURA EN TEXTO"}</span>
+          {isOwner ? (
+            <div className="owner-actions">
+              <a className="button secondary small" href={`/scores/${score.id}/edit`}>Editar</a>
+              <button className="danger" type="button" onClick={handleDelete}>Eliminar</button>
+            </div>
           ) : null}
-        </section>
-        <p className="form-footer"><a href="/">Back to community</a></p>
+        </div>
+        <>
+            <div className="detail-title">
+              <span className="instrument">{score.instrument}</span>
+              <h1 id="score-detail-heading">{score.title}</h1>
+              <p>Compartida por <strong>{score.author}</strong></p>
+              <p>{score.description}</p>
+            </div>
+            <section className={`score ${score.format === "ABC" ? "abc" : "text"}`} aria-label="Notación de la partitura">
+              <div className="score-bar"><span>{score.format === "ABC" ? "NOTACIÓN ABC" : "TEXTO SIN FORMATO"}</span><span>{score.content.length} caracteres</span></div>
+              <pre>{score.content}</pre>
+            </section>
+            <div className="detail-reactions">
+              <button className={`detail-reaction-button${score.user_reacted ? " liked" : ""}`} type="button" onClick={handleReaction} aria-pressed={score.user_reacted}>
+                <span className="reaction-emoji" aria-hidden="true">{score.user_reacted ? "❤️" : "🤍"}</span>
+                {score.user_reacted ? "Te gusta" : "Me gusta"} · {score.reaction_count}
+              </button>
+              <span><span className="reaction-emoji comment-emoji" aria-hidden="true">💬</span>{score.comment_count} comentarios</span>
+            </div>
+        </>
+      </article>
+      {error ? <p className="form-error" role="alert">{error}</p> : null}
+      <section className="comments-card" aria-labelledby="comments-heading">
+        <h2 id="comments-heading">Comentarios de la comunidad <span>({score.comment_count})</span></h2>
+        <form className="comment-form" onSubmit={handleComment}>
+          <span className="avatar tone-1" aria-hidden="true">{getInitials(currentUserName) || "N"}</span>
+          <div><textarea id="score-comment" aria-label="Añadir un comentario" placeholder="Escribe un comentario..." value={comment} maxLength={500} onChange={(event) => setComment(event.target.value)} rows={3} required /><button className="button primary small" type="submit" disabled={isSubmitting}>{isSubmitting ? "Enviando..." : "Comentar"}</button></div>
+        </form>
+        {comments.length === 0 ? <p className="comments-empty">Todavía no hay comentarios. Inicia la conversación.</p> : null}
+        {comments.map((item) => (
+          <article className="comment" key={item.id}>
+            <span className="avatar tone-2" aria-hidden="true">{getInitials(item.author) || "N"}</span>
+            <div><p><strong>{item.author}</strong><span>{new Date(item.created_at).toLocaleString("es-ES")}</span></p><div>{item.body}</div></div>
+            {item.author_id === currentUserId ? <button className="comment-delete" type="button" onClick={() => handleCommentDelete(item.id)}>Eliminar</button> : null}
+          </article>
+        ))}
       </section>
-    </main>
+    </div>
   );
 }

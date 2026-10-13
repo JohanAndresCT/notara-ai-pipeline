@@ -116,6 +116,8 @@ def scores_view(request):
         instrument = request.GET.get("instrument", "").strip()
         if instrument:
             scores = scores.filter(instrument__iexact=instrument)
+        if request.GET.get("mine") == "1":
+            scores = scores.filter(owner=request.user)
         page_size = 10
         total_count = scores.count()
         total_pages = max(1, (total_count + page_size - 1) // page_size)
@@ -226,8 +228,6 @@ def score_reaction_view(request, score_id):
         score = Score.objects.get(pk=score_id)
     except Score.DoesNotExist:
         return JsonResponse({"message": "Score not found."}, status=404)
-    if score.owner_id == request.user.pk:
-        return JsonResponse({"message": "You cannot react to your own score."}, status=403)
     deleted, _ = Reaction.objects.filter(score=score, user=request.user).delete()
     if deleted:
         return JsonResponse({"reacted": False, "reaction_count": score.reactions.count()})
@@ -295,8 +295,6 @@ def comment_create_view(request, score_id):
         score = Score.objects.get(pk=score_id)
     except Score.DoesNotExist:
         return JsonResponse({"message": "Score not found."}, status=404)
-    if score.owner_id == request.user.pk:
-        return JsonResponse({"message": "You cannot comment on your own score."}, status=403)
     payload, payload_error = _json_payload(request)
     if payload_error:
         return JsonResponse(payload_error, status=400)
@@ -331,8 +329,6 @@ def score_like_view(request, score_id):
         score = Score.objects.get(pk=score_id)
     except Score.DoesNotExist:
         return JsonResponse({"message": "Score not found."}, status=404)
-    if score.owner_id == request.user.pk:
-        return JsonResponse({"message": "You cannot react to your own score."}, status=403)
     if request.method == "PUT":
         Like.objects.get_or_create(score=score, user=request.user)
     else:
