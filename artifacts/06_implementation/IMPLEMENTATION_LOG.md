@@ -184,7 +184,7 @@ Product Owner approval is `PENDING`; the story is not marked fully done.
 - Added a dedicated React login form, authenticated home logout action, and
   public login/register navigation. Login and logout mutations use CSRF and
   same-origin session cookies.
-- No user model or migration changes were needed. Existing `/api/` route
+- No user model or migration changes were needed. Existing `/api/v1/` route
   convention was retained; the architecture's `/api/v1/` difference is logged.
 
 ### Verification
@@ -197,7 +197,7 @@ Product Owner approval is `PENDING`; the story is not marked fully done.
   changes detected.
 - `npm run build`: PASSED.
 - Integrated Chrome 150 browser checks passed at 360 px for invalid/valid login,
-  logout, public redirect, and post-logout `/api/me/` denial; desktop checks at
+  logout, public redirect, and post-logout `/api/v1/me/` denial; desktop checks at
   1280 px confirmed generic invalid-login feedback and navigation. No horizontal
   overflow was observed.
 - PostgreSQL/Docker and Edge/Firefox/768 px checks were not run.
@@ -267,7 +267,7 @@ Owner approval and upstream alignment remain `PENDING`.
   limit, and the minimal approved ABC headers/musical-line check.
 - Added a minimal React score-create form and persisted score list on the
   authenticated home. Full US-007 pagination/filter/detail remains out of scope.
-- Preserved existing account/profile records and the repository's `/api/` route
+- Preserved existing account/profile records and migrated the repository to the approved `/api/v1/` route
   convention.
 
 ### Verification
@@ -288,3 +288,42 @@ The user selected `TEXT_ONLY` after P06.5 identified the content-format
 conflict. JPG/PNG publication is not implemented; the image AC is superseded
 for this run. Product Owner approval remains `PENDING`; PostgreSQL and full
 browser matrix checks remain outstanding.
+
+## Current Consolidated State
+
+### Date and status
+
+- Updated after frontend/backend integration and feed completion.
+- Current status: `READY_WITH_ASSUMPTIONS`.
+- Current validation: `artifacts/06_implementation/IMPLEMENTATION_VALIDATION.md`.
+
+### Current implementation
+
+- Django accounts and session authentication are integrated with the React
+  client, including CSRF-protected writes.
+- Scores support publication, newest-first listing, exact case-insensitive
+  instrument filtering, server-side pages of ten, detail, owner-only edit and
+  delete, reactions, and append-only comments.
+- The frontend supports registration, login, profile, score creation, feed
+  filtering/pagination, score detail, reactions, comments, edit, and delete.
+- PostgreSQL configuration, Docker Compose, migrations, and SQLite test
+  fallback are present.
+
+### Current verification
+
+- `manage.py check`: passed with SQLite.
+- `manage.py makemigrations --check --dry-run`: passed.
+- `manage.py test scores`: 53 tests passed with SQLite.
+- `npm run build`: passed.
+- `npx tsc --noEmit --pretty false`: passed.
+- PostgreSQL execution remains pending because the local server rejected the
+  configured credentials; this is recorded in the validation artifact.
+
+### Open decisions and gates
+
+- The API migration to the approved `/api/v1/` prefix is complete across Django
+  routes, frontend calls, Vite proxy configuration, tests, and implementation
+  artifacts.
+- The implementation uses a reaction toggle endpoint while the architecture
+  describes separate like operations.
+- P07 must validate PostgreSQL and the complete browser flow matrix.

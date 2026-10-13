@@ -44,7 +44,7 @@ para retirar de la comunidad contenido que ya no deseo compartir.
 | Item | Criterio de verificación |
 |---|---|
 | Solo el autor puede eliminar su partitura | El endpoint retorna 403 si `request.user != score.owner` |
-| Partitura eliminada desaparece del feed | Después del DELETE, GET `/api/scores/` no contiene la partitura eliminada |
+| Partitura eliminada desaparece del feed | Después del DELETE, GET `/api/v1/scores/` no contiene la partitura eliminada |
 | Confirmación requerida antes de eliminar | Responsabilidad del frontend — el backend no implementa confirmación |
 | Probado en móvil y escritorio | Viewport 360 px y 1280 px verificados en browser (Dev Apoyo) |
 | Aprobación del Product Owner | Pendiente — registrar evidencia tras revisión |
@@ -58,7 +58,7 @@ para retirar de la comunidad contenido que ya no deseo compartir.
 - **Backend:** Django 5.2.1, Django REST Framework 3.15.2, Python 3.14.2
 - **Base de datos:** SQLite en desarrollo (`DJANGO_DB_ENGINE=sqlite`), PostgreSQL en producción
 - **Autenticación:** Session authentication + CSRF tokens
-- **Convención de rutas:** `/api/` (no `/api/v1/`)
+- **Convención de rutas:** `/api/v1/` (no `/api/v1/`)
 - **App de partituras:** `backend/scores/`
 
 ### Modelo Score existente
@@ -85,7 +85,7 @@ class Score(models.Model):
 ### Endpoint existente en `score_detail_view`
 
 ```
-PATCH /api/scores/<id>/   → editar partitura (US-005, ya implementado)
+PATCH /api/v1/scores/<id>/   → editar partitura (US-005, ya implementado)
 ```
 
 El patrón de URL ya está registrado como:
@@ -135,7 +135,7 @@ comienza el bloque de parseo JSON del PATCH.
 **Flujo completo del endpoint extendido:**
 
 ```
-DELETE /api/scores/<id>/
+DELETE /api/v1/scores/<id>/
   ├── No autenticado        → 401
   ├── Sin CSRF              → 403
   ├── Score no existe       → 404
@@ -161,11 +161,11 @@ casos:
 | Nombre del test | Qué verifica |
 |---|---|
 | `test_author_can_delete_own_score` | DELETE válido → 204 y `Score.objects.count() == 0` |
-| `test_deleted_score_absent_from_feed` | Después del DELETE, GET `/api/scores/` devuelve lista vacía |
+| `test_deleted_score_absent_from_feed` | Después del DELETE, GET `/api/v1/scores/` devuelve lista vacía |
 | `test_non_author_cannot_delete` | Usuario B intenta DELETE del score de Usuario A → 403, score sigue en DB |
 | `test_delete_requires_authentication` | Cliente anónimo DELETE → 401, score sigue en DB |
 | `test_delete_requires_csrf` | Autenticado sin CSRF token → 403, score sigue en DB |
-| `test_delete_nonexistent_score_returns_404` | DELETE `/api/scores/99999/` → 404 |
+| `test_delete_nonexistent_score_returns_404` | DELETE `/api/v1/scores/99999/` → 404 |
 
 **Estructura sugerida para setUp** (mismo patrón que `ScoreEditTests`):
 
@@ -180,7 +180,7 @@ class ScoreDeleteTests(TestCase):
             email="other2@example.com", name="Other2", password="pass1234"
         )
         self.client.force_login(self.author)
-        self.csrf_token = self.client.get("/api/csrf/").json()["csrfToken"]
+        self.csrf_token = self.client.get("/api/v1/csrf/").json()["csrfToken"]
         self.score = Score.objects.create(
             owner=self.author,
             title="Score to Delete",
@@ -193,7 +193,7 @@ class ScoreDeleteTests(TestCase):
     def delete_score(self, score_id, client=None):
         c = client or self.client
         return c.delete(
-            f"/api/scores/{score_id}/",
+            f"/api/v1/scores/{score_id}/",
             content_type="application/json",
             HTTP_X_CSRFTOKEN=self.csrf_token,
         )
@@ -228,7 +228,7 @@ python manage.py test accounts scores -v 1
 
 | Dentro de HU06 | Fuera de HU06 |
 |---|---|
-| `DELETE /api/scores/<id>/` → 204 | Confirmación de eliminación (frontend) |
+| `DELETE /api/v1/scores/<id>/` → 204 | Confirmación de eliminación (frontend) |
 | Control de autoría (403) | Soft delete / papelera de reciclaje |
 | Score desaparece del feed tras DELETE | Eliminación en cascada de likes/comentarios (se resuelve automáticamente por `on_delete=CASCADE` en FK) |
 | Tests backend (6 casos) | Integración frontend (Dev Apoyo) |

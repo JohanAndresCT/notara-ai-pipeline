@@ -69,8 +69,30 @@ def scores_view(request):
         return JsonResponse({"message": "Authentication is required."}, status=401)
 
     if request.method == "GET":
+        instrument = request.GET.get("instrument", "").strip()
+        try:
+            page = max(int(request.GET.get("page", "1")), 1)
+        except ValueError:
+            return JsonResponse({"message": "Page must be a positive integer."}, status=400)
+
         scores = Score.objects.select_related("owner").all()
-        return JsonResponse({"scores": [_score_data(score, request.user) for score in scores]})
+        if instrument:
+            scores = scores.filter(instrument__iexact=instrument)
+
+        page_size = 10
+        total_count = scores.count()
+        start = (page - 1) * page_size
+        page_scores = scores[start : start + page_size]
+        return JsonResponse(
+            {
+                "scores": [_score_data(score, request.user) for score in page_scores],
+                "page": page,
+                "page_size": page_size,
+                "total_count": total_count,
+                "has_next": start + page_size < total_count,
+                "has_previous": page > 1,
+            }
+        )
 
     if request.content_type != "application/json":
         return JsonResponse({"message": "Request body must be JSON."}, status=400)
@@ -124,19 +146,22 @@ def scores_view(request):
 
 
 @csrf_exempt
-@require_http_methods(["PATCH", "DELETE"])
+@require_http_methods(["GET", "PATCH", "DELETE"])
 def score_detail_view(request, score_id):
     if not request.user.is_authenticated:
         return JsonResponse({"message": "Authentication is required."}, status=401)
-
-    csrf_failure = _csrf_middleware.process_view(request, None, (), {})
-    if csrf_failure is not None:
-        return csrf_failure
 
     try:
         score = Score.objects.select_related("owner").get(pk=score_id)
     except Score.DoesNotExist:
         return JsonResponse({"message": "Score not found."}, status=404)
+
+    if request.method == "GET":
+        return JsonResponse({"score": _score_data(score, request.user)})
+
+    csrf_failure = _csrf_middleware.process_view(request, None, (), {})
+    if csrf_failure is not None:
+        return csrf_failure
 
     if score.owner != request.user:
         return JsonResponse({"message": "You do not have permission to edit this score."}, status=403)
@@ -155,12 +180,29 @@ def score_detail_view(request, score_id):
         return JsonResponse({"message": "Request body must be a JSON object."}, status=400)
 
     errors = {}
-    if "title" in payload:
-        if not isinstance(payload["title"], str) or payload["title"].strip() == "":
-            errors["title"] = ["Title is required."]
-    if "instrument" in payload:
-        if not isinstance(payload["instrument"], str) or payload["instrument"].strip() == "":
-            errors["instrument"] = ["Instrument is required."]
+    for field in ("title", "instrument", "description"):
+        if field in payload and (
+            not isinstance(payload[field], str) or not payload[field].strip()
+        ):
+            errors[field] = [f"{field.replace('_', ' ').capitalize()} is required."]
+
+    if "format" in payload and payload["format"] not in Score.Format.values:
+        errors["format"] = ["Choose ABC notation or plain text."]
+
+    if "content" in payload:
+        content = payload["content"]
+        if not isinstance(content, str) or not content.strip():
+            errors["content"] = ["Score content is required."]
+        elif len(content) > 1000:
+            errors["content"] = ["Score content must be 1,000 characters or fewer."]
+        elif payload.get("format", score.score_format) == Score.Format.ABC:
+            abc_error = _abc_validation_error(content)
+            if abc_error:
+                errors["content"] = [abc_error]
+    elif payload.get("format") == Score.Format.ABC and score.score_format != Score.Format.ABC:
+        abc_error = _abc_validation_error(score.content)
+        if abc_error:
+            errors["content"] = [abc_error]
 
     if errors:
         return JsonResponse({"errors": errors}, status=400)
@@ -170,7 +212,11 @@ def score_detail_view(request, score_id):
     if "instrument" in payload:
         score.instrument = payload["instrument"].strip()
     if "description" in payload:
-        score.description = payload["description"] if isinstance(payload["description"], str) else ""
+        score.description = payload["description"].strip()
+    if "format" in payload:
+        score.score_format = payload["format"]
+    if "content" in payload:
+        score.content = payload["content"]
 
     score.save()
     return JsonResponse({"score": _score_data(score, request.user)})

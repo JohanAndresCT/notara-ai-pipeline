@@ -130,7 +130,7 @@ def _profile_data(user):
         "name": user.name,
         "email": user.email,
         "main_instrument": user.main_instrument,
-        "photo_url": "/api/me/photo/" if user.photo else None,
+        "photo_url": "/api/v1/me/photo/" if user.photo else None,
     }
 
 

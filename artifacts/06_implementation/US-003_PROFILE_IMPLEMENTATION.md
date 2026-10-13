@@ -46,26 +46,26 @@ allows media storage/root and photo size limit to be configured independently.
 | Component | Implementation | Main files |
 |---|---|---|
 | Profile data | Added `main_instrument` and optional `ImageField` to the existing user model | `backend/accounts/models.py`, `backend/accounts/migrations/0002_user_main_instrument_user_photo.py` |
-| Profile API | Authenticated GET/PATCH on `/api/me/`; multipart PATCH parsed explicitly; returns updated safe profile data | `backend/accounts/views.py`, `backend/notara_backend/urls.py` |
+| Profile API | Authenticated GET/PATCH on `/api/v1/me/`; multipart PATCH parsed explicitly; returns updated safe profile data | `backend/accounts/views.py`, `backend/notara_backend/urls.py` |
 | Photo validation/storage | Pillow verifies actual JPEG/PNG bytes and extension; configurable 5 MiB default; old file is removed after successful replacement | `backend/accounts/views.py`, `backend/notara-ai-pipeline/backend/notara_backend/settings.py` |
-| Protected photo retrieval | `/api/me/photo/` streams only the current authenticated user's image with private/no-store and nosniff headers | `backend/accounts/views.py` |
-| Password change | `/api/me/password/` verifies current password, validates new password, hashes it, and preserves the session | `backend/accounts/views.py` |
+| Protected photo retrieval | `/api/v1/me/photo/` streams only the current authenticated user's image with private/no-store and nosniff headers | `backend/accounts/views.py` |
+| Password change | `/api/v1/me/password/` verifies current password, validates new password, hashes it, and preserves the session | `backend/accounts/views.py` |
 | Frontend profile | Isolated `/profile` page with photo preview, name/instrument form, and canonical password-change section | `frontend/src/ProfilePage.tsx`, `frontend/src/App.tsx` |
 | Frontend API | Typed multipart profile and password requests with cookies, CSRF, and field errors | `frontend/src/lib/api.ts` |
 | Media configuration | Environment-selectable Django storage backend and media root; local media excluded from Git | `backend/notara_backend/settings.py`, `.env.example`, `.gitignore` |
 
 ## 5. API Contract
 
-- `GET /api/me/`: returns safe identity/profile fields: name, email, main
+- `GET /api/v1/me/`: returns safe identity/profile fields: name, email, main
   instrument, and an authenticated photo URL when set.
-- `PATCH /api/me/`: accepts multipart profile fields/photo or JSON profile
+- `PATCH /api/v1/me/`: accepts multipart profile fields/photo or JSON profile
   fields; returns the updated safe profile.
-- `GET /api/me/photo/`: streams the current user's photo only to an
+- `GET /api/v1/me/photo/`: streams the current user's photo only to an
   authenticated session.
-- `POST /api/me/password/`: accepts current and new password; invalid data
+- `POST /api/v1/me/password/`: accepts current and new password; invalid data
   returns field errors and does not change the password.
 
-The repository's established `/api/` route convention remains in use; no
+The repository now uses the approved `/api/v1/` route convention; no
 unrelated API-wide `/api/v1/` migration was made.
 
 ## 6. Database and Media

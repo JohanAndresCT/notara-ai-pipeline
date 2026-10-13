@@ -56,16 +56,16 @@ para expresar apreciación hacia el contenido de la comunidad.
 - **Backend:** Django 5.2.1, Django REST Framework 3.15.2, Python 3.14.2
 - **Base de datos:** SQLite en desarrollo (`DJANGO_DB_ENGINE=sqlite`), PostgreSQL en producción
 - **Autenticación:** Session authentication + CSRF tokens
-- **Convención de rutas:** `/api/` (no `/api/v1/`)
+- **Convención de rutas:** `/api/v1/` (no `/api/v1/`)
 - **App de partituras:** `backend/scores/`
 
 ### Rutas actuales registradas
 
 ```
-GET  /api/scores/              → feed de partituras
-POST /api/scores/              → crear partitura
-PATCH  /api/scores/<id>/       → editar partitura (HU05)
-DELETE /api/scores/<id>/       → eliminar partitura (HU06)
+GET  /api/v1/scores/              → feed de partituras
+POST /api/v1/scores/              → crear partitura
+PATCH  /api/v1/scores/<id>/       → editar partitura (HU05)
+DELETE /api/v1/scores/<id>/       → eliminar partitura (HU06)
 ```
 
 ### Modelo Score existente
@@ -262,7 +262,7 @@ def score_reaction_view(request, score_id):
 **Flujo del endpoint:**
 
 ```
-POST /api/scores/<id>/reactions/
+POST /api/v1/scores/<id>/reactions/
   ├── No autenticado               → 401
   ├── Sin CSRF                     → 403
   ├── Score no existe              → 404
@@ -302,12 +302,12 @@ Agregar nueva clase `ScoreReactionTests(TestCase)` con los siguientes
 | Nombre del test | Qué verifica |
 |---|---|
 | `test_authenticated_user_can_react_to_others_score` | POST → 201, `reacted: true`, `reaction_count: 1`, Reaction en DB |
-| `test_reaction_reflected_in_feed` | Después del POST, GET `/api/scores/` incluye `reaction_count: 1` y `user_reacted: true` |
+| `test_reaction_reflected_in_feed` | Después del POST, GET `/api/v1/scores/` incluye `reaction_count: 1` y `user_reacted: true` |
 | `test_toggle_removes_existing_reaction` | POST cuando ya existe → 200, `reacted: false`, `reaction_count: 0`, Reaction eliminada de DB |
 | `test_author_cannot_react_to_own_score` | POST del autor → 403, `Reaction.objects.count() == 0` |
 | `test_reaction_requires_authentication` | Cliente anónimo POST → 401 |
 | `test_reaction_requires_csrf` | Autenticado sin CSRF → 403 |
-| `test_reaction_on_nonexistent_score_returns_404` | POST `/api/scores/99999/reactions/` → 404 |
+| `test_reaction_on_nonexistent_score_returns_404` | POST `/api/v1/scores/99999/reactions/` → 404 |
 | `test_multiple_users_can_react_independently` | Usuario A y B reaccionan → `reaction_count: 2` en feed |
 | `test_reaction_count_zero_by_default` | Score nuevo sin reacciones → `reaction_count: 0`, `user_reacted: false` en feed |
 | `test_reaction_cascade_delete_with_score` | Eliminar score → `Reaction.objects.count() == 0` |
@@ -328,7 +328,7 @@ class ScoreReactionTests(TestCase):
             email="reactor_other@example.com", name="OtherReactor", password="pass1234"
         )
         self.client.force_login(self.reactor)
-        self.csrf_token = self.client.get("/api/csrf/").json()["csrfToken"]
+        self.csrf_token = self.client.get("/api/v1/csrf/").json()["csrfToken"]
         self.score = Score.objects.create(
             owner=self.author,
             title="Reaction Target",
@@ -342,7 +342,7 @@ class ScoreReactionTests(TestCase):
         c = client or self.client
         sid = score_id if score_id is not None else self.score.pk
         return c.post(
-            f"/api/scores/{sid}/reactions/",
+            f"/api/v1/scores/{sid}/reactions/",
             content_type="application/json",
             HTTP_X_CSRFTOKEN=self.csrf_token,
         )

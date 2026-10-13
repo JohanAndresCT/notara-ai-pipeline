@@ -15,12 +15,12 @@ from .models import User
 class RegistrationTests(TestCase):
     def setUp(self):
         self.client = Client(enforce_csrf_checks=True)
-        csrf_response = self.client.get("/api/csrf/")
+        csrf_response = self.client.get("/api/v1/csrf/")
         self.csrf_token = csrf_response.json()["csrfToken"]
 
     def register(self, payload):
         return self.client.post(
-            "/api/auth/register/",
+            "/api/v1/auth/register/",
             data=json.dumps(payload),
             content_type="application/json",
             HTTP_X_CSRFTOKEN=self.csrf_token,
@@ -45,7 +45,7 @@ class RegistrationTests(TestCase):
         self.assertNotEqual(user.password, "correct-horse")
         self.assertNotIn("password", response.json())
 
-        current_user = self.client.get("/api/me/")
+        current_user = self.client.get("/api/v1/me/")
         self.assertEqual(current_user.status_code, 200)
         self.assertEqual(current_user.json()["user"]["email"], user.email)
 
@@ -98,7 +98,7 @@ class RegistrationTests(TestCase):
     def test_registration_requires_csrf_token(self):
         client_without_csrf = Client(enforce_csrf_checks=True)
         response = client_without_csrf.post(
-            "/api/auth/register/",
+            "/api/v1/auth/register/",
             data=json.dumps(self.valid_payload()),
             content_type="application/json",
         )
@@ -108,7 +108,7 @@ class RegistrationTests(TestCase):
 
     def test_authenticated_home_api_rejects_anonymous_visitor(self):
         client = Client()
-        response = client.get("/api/me/")
+        response = client.get("/api/v1/me/")
 
         self.assertEqual(response.status_code, 401)
 
@@ -121,7 +121,7 @@ class AuthenticationTests(TestCase):
             name="Login User",
             password="correct-horse",
         )
-        csrf_response = self.client.get("/api/csrf/")
+        csrf_response = self.client.get("/api/v1/csrf/")
         self.csrf_token = csrf_response.json()["csrfToken"]
 
     def post_json(self, path, payload=None, client=None):
@@ -134,54 +134,54 @@ class AuthenticationTests(TestCase):
 
     def test_valid_login_establishes_session_for_existing_user(self):
         response = self.post_json(
-            "/api/auth/login/",
+            "/api/v1/auth/login/",
             {"email": "LOGIN@example.com", "password": "correct-horse"},
         )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["user"]["email"], self.user.email)
-        self.assertEqual(self.client.get("/api/me/").status_code, 200)
+        self.assertEqual(self.client.get("/api/v1/me/").status_code, 200)
 
     def test_wrong_password_and_unknown_email_have_same_generic_error(self):
         wrong_password = self.post_json(
-            "/api/auth/login/",
+            "/api/v1/auth/login/",
             {"email": self.user.email, "password": "incorrect-password"},
         )
         unknown_email = self.post_json(
-            "/api/auth/login/",
+            "/api/v1/auth/login/",
             {"email": "unknown@example.com", "password": "incorrect-password"},
         )
 
         self.assertEqual(wrong_password.status_code, 400)
         self.assertEqual(unknown_email.status_code, 400)
         self.assertEqual(wrong_password.json(), unknown_email.json())
-        self.assertEqual(self.client.get("/api/me/").status_code, 401)
+        self.assertEqual(self.client.get("/api/v1/me/").status_code, 401)
 
     def test_logout_invalidates_session_and_protected_access(self):
         self.client.force_login(self.user)
         session_key = self.client.session.session_key
         self.assertIsNotNone(session_key)
 
-        response = self.post_json("/api/auth/logout/")
+        response = self.post_json("/api/v1/auth/logout/")
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Session.objects.filter(session_key=session_key).exists())
-        self.assertEqual(self.client.get("/api/me/").status_code, 401)
+        self.assertEqual(self.client.get("/api/v1/me/").status_code, 401)
 
     def test_login_and_logout_require_csrf(self):
         client_without_csrf = Client(enforce_csrf_checks=True)
         login_response = client_without_csrf.post(
-            "/api/auth/login/",
+            "/api/v1/auth/login/",
             data=json.dumps({"email": self.user.email, "password": "correct-horse"}),
             content_type="application/json",
         )
         self.assertEqual(login_response.status_code, 403)
-        self.assertEqual(client_without_csrf.get("/api/me/").status_code, 401)
+        self.assertEqual(client_without_csrf.get("/api/v1/me/").status_code, 401)
 
         client_without_csrf.force_login(self.user)
-        logout_response = client_without_csrf.post("/api/auth/logout/")
+        logout_response = client_without_csrf.post("/api/v1/auth/logout/")
         self.assertEqual(logout_response.status_code, 403)
-        self.assertEqual(client_without_csrf.get("/api/me/").status_code, 200)
+        self.assertEqual(client_without_csrf.get("/api/v1/me/").status_code, 200)
 
 
 class ProfileManagementTests(TestCase):
@@ -199,7 +199,7 @@ class ProfileManagementTests(TestCase):
             password="correct-horse",
         )
         self.client.force_login(self.user)
-        csrf_response = self.client.get("/api/csrf/")
+        csrf_response = self.client.get("/api/v1/csrf/")
         self.csrf_token = csrf_response.json()["csrfToken"]
 
     @staticmethod
@@ -215,14 +215,14 @@ class ProfileManagementTests(TestCase):
     def patch_profile(self, data):
         return self.client.generic(
             "PATCH",
-            "/api/me/",
+            "/api/v1/me/",
             data=encode_multipart(BOUNDARY, data),
             content_type=MULTIPART_CONTENT,
             HTTP_X_CSRFTOKEN=self.csrf_token,
         )
 
     def test_profile_returns_current_name_instrument_and_photo_field(self):
-        response = self.client.get("/api/me/")
+        response = self.client.get("/api/v1/me/")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["user"]["name"], "Profile User")
@@ -243,21 +243,21 @@ class ProfileManagementTests(TestCase):
         self.assertEqual(self.user.name, "Updated Profile")
         self.assertEqual(self.user.main_instrument, "Violin")
         self.assertTrue(self.user.photo.name.endswith(".jpg"))
-        self.assertIn("/api/me/photo/", response.json()["user"]["photo_url"])
-        self.assertEqual(self.client.get("/api/me/").json()["user"]["name"], "Updated Profile")
+        self.assertIn("/api/v1/me/photo/", response.json()["user"]["photo_url"])
+        self.assertEqual(self.client.get("/api/v1/me/").json()["user"]["name"], "Updated Profile")
 
     def test_png_photo_is_retrievable_only_through_authenticated_endpoint(self):
         response = self.patch_profile({"photo": self.image_file("PNG")})
 
         self.assertEqual(response.status_code, 200)
-        photo_response = self.client.get("/api/me/photo/")
+        photo_response = self.client.get("/api/v1/me/photo/")
         self.assertEqual(photo_response.status_code, 200)
         self.assertEqual(photo_response["Content-Type"], "image/png")
         self.assertEqual(photo_response["X-Content-Type-Options"], "nosniff")
         photo_bytes = b"".join(photo_response.streaming_content)
         photo_response.close()
         self.assertTrue(photo_bytes)
-        self.assertEqual(Client().get("/api/me/photo/").status_code, 401)
+        self.assertEqual(Client().get("/api/v1/me/photo/").status_code, 401)
 
     def test_replacing_photo_removes_previous_file(self):
         first_response = self.patch_profile({"photo": self.image_file()})
@@ -311,10 +311,10 @@ class ProfileManagementTests(TestCase):
     def test_profile_and_photo_require_authentication(self):
         anonymous_client = Client()
 
-        self.assertEqual(anonymous_client.get("/api/me/").status_code, 401)
-        self.assertEqual(anonymous_client.get("/api/me/photo/").status_code, 401)
+        self.assertEqual(anonymous_client.get("/api/v1/me/").status_code, 401)
+        self.assertEqual(anonymous_client.get("/api/v1/me/photo/").status_code, 401)
         self.assertEqual(
-            anonymous_client.patch("/api/me/", {"name": "Unauthorized"}).status_code,
+            anonymous_client.patch("/api/v1/me/", {"name": "Unauthorized"}).status_code,
             401,
         )
 
@@ -323,12 +323,12 @@ class ProfileManagementTests(TestCase):
         client_without_csrf.force_login(self.user)
         profile_response = client_without_csrf.generic(
             "PATCH",
-            "/api/me/",
+            "/api/v1/me/",
             data=encode_multipart(BOUNDARY, {"name": "No CSRF"}),
             content_type=MULTIPART_CONTENT,
         )
         password_response = client_without_csrf.post(
-            "/api/me/password/",
+            "/api/v1/me/password/",
             data=json.dumps({"current_password": "correct-horse", "new_password": "new-secret-8"}),
             content_type="application/json",
         )
@@ -341,7 +341,7 @@ class ProfileManagementTests(TestCase):
 
     def test_password_change_preserves_session_and_rejects_invalid_current_password(self):
         invalid_response = self.client.post(
-            "/api/me/password/",
+            "/api/v1/me/password/",
             data=json.dumps({"current_password": "wrong", "new_password": "new-secret-8"}),
             content_type="application/json",
             HTTP_X_CSRFTOKEN=self.csrf_token,
@@ -351,7 +351,7 @@ class ProfileManagementTests(TestCase):
         self.assertTrue(self.user.check_password("correct-horse"))
 
         short_password_response = self.client.post(
-            "/api/me/password/",
+            "/api/v1/me/password/",
             data=json.dumps({"current_password": "correct-horse", "new_password": "short"}),
             content_type="application/json",
             HTTP_X_CSRFTOKEN=self.csrf_token,
@@ -361,7 +361,7 @@ class ProfileManagementTests(TestCase):
         self.assertTrue(self.user.check_password("correct-horse"))
 
         valid_response = self.client.post(
-            "/api/me/password/",
+            "/api/v1/me/password/",
             data=json.dumps(
                 {"current_password": "correct-horse", "new_password": "new-secret-8"}
             ),
@@ -371,4 +371,4 @@ class ProfileManagementTests(TestCase):
         self.assertEqual(valid_response.status_code, 200)
         self.user.refresh_from_db()
         self.assertTrue(self.user.check_password("new-secret-8"))
-        self.assertEqual(self.client.get("/api/me/").status_code, 200)
+        self.assertEqual(self.client.get("/api/v1/me/").status_code, 200)

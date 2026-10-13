@@ -15,11 +15,11 @@ class ScorePublicationTests(TestCase):
             password="correct-horse",
         )
         self.client.force_login(self.user)
-        self.csrf_token = self.client.get("/api/csrf/").json()["csrfToken"]
+        self.csrf_token = self.client.get("/api/v1/csrf/").json()["csrfToken"]
 
     def post_score(self, payload):
         return self.client.post(
-            "/api/scores/",
+            "/api/v1/scores/",
             data=json.dumps(payload),
             content_type="application/json",
             HTTP_X_CSRFTOKEN=self.csrf_token,
@@ -55,10 +55,51 @@ class ScorePublicationTests(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Score.objects.count(), 1)
         self.assertEqual(Score.objects.get().owner, self.user)
-        feed_response = self.client.get("/api/scores/")
+        feed_response = self.client.get("/api/v1/scores/")
         self.assertEqual(feed_response.status_code, 200)
         self.assertEqual(feed_response.json()["scores"][0]["title"], "Morning Theme")
         self.assertEqual(feed_response.json()["scores"][0]["format"], "TEXT")
+        self.assertEqual(feed_response.json()["page"], 1)
+        self.assertEqual(feed_response.json()["page_size"], 10)
+
+    def test_feed_filters_by_instrument_and_paginates_ten_results(self):
+        for index in range(11):
+            Score.objects.create(
+                owner=self.user,
+                title=f"Piano {index}",
+                instrument="Piano",
+                description="Practice score.",
+                score_format=Score.Format.TEXT,
+                content="C D E F",
+            )
+        Score.objects.create(
+            owner=self.user,
+            title="Guitar score",
+            instrument="Guitar",
+            description="Practice score.",
+            score_format=Score.Format.TEXT,
+            content="C D E F",
+        )
+
+        first_page = self.client.get("/api/v1/scores/?instrument=piano&page=1")
+        second_page = self.client.get("/api/v1/scores/?instrument=Piano&page=2")
+
+        self.assertEqual(first_page.status_code, 200)
+        self.assertEqual(first_page.json()["total_count"], 11)
+        self.assertEqual(len(first_page.json()["scores"]), 10)
+        self.assertTrue(first_page.json()["has_next"])
+        self.assertEqual(second_page.json()["page"], 2)
+        self.assertEqual(len(second_page.json()["scores"]), 1)
+        self.assertFalse(second_page.json()["has_next"])
+        self.assertTrue(second_page.json()["has_previous"])
+        self.assertTrue(
+            all(score["instrument"] == "Piano" for score in first_page.json()["scores"])
+        )
+
+    def test_feed_rejects_invalid_page(self):
+        response = self.client.get("/api/v1/scores/?page=invalid")
+
+        self.assertEqual(response.status_code, 400)
 
     def test_authenticated_abc_publication_passes_minimal_checks(self):
         response = self.post_score(self.abc_payload())
@@ -108,11 +149,11 @@ class ScorePublicationTests(TestCase):
         anonymous_client = Client()
 
         publish_response = anonymous_client.post(
-            "/api/scores/",
+            "/api/v1/scores/",
             data=json.dumps(self.text_payload()),
             content_type="application/json",
         )
-        feed_response = anonymous_client.get("/api/scores/")
+        feed_response = anonymous_client.get("/api/v1/scores/")
 
         self.assertEqual(publish_response.status_code, 401)
         self.assertEqual(feed_response.status_code, 401)
@@ -122,7 +163,7 @@ class ScorePublicationTests(TestCase):
         client_without_csrf = Client(enforce_csrf_checks=True)
         client_without_csrf.force_login(self.user)
         response = client_without_csrf.post(
-            "/api/scores/",
+            "/api/v1/scores/",
             data=json.dumps(self.text_payload()),
             content_type="application/json",
         )
@@ -141,7 +182,7 @@ class ScoreEditTests(TestCase):
             email="other@example.com", name="Other", password="pass1234"
         )
         self.client.force_login(self.author)
-        self.csrf_token = self.client.get("/api/csrf/").json()["csrfToken"]
+        self.csrf_token = self.client.get("/api/v1/csrf/").json()["csrfToken"]
         self.score = Score.objects.create(
             owner=self.author,
             title="Original Title",
@@ -154,7 +195,7 @@ class ScoreEditTests(TestCase):
     def patch_score(self, score_id, payload, client=None):
         c = client or self.client
         return c.patch(
-            f"/api/scores/{score_id}/",
+            f"/api/v1/scores/{score_id}/",
             data=json.dumps(payload),
             content_type="application/json",
             HTTP_X_CSRFTOKEN=self.csrf_token,
@@ -175,17 +216,43 @@ class ScoreEditTests(TestCase):
         self.assertEqual(self.score.instrument, "Piano")
         self.assertEqual(self.score.description, "New desc")
 
+    def test_authenticated_user_can_read_score_detail(self):
+        response = self.client.get(f"/api/v1/scores/{self.score.pk}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["score"]["id"], self.score.pk)
+        self.assertEqual(response.json()["score"]["title"], "Original Title")
+
+    def test_score_detail_is_available_to_other_authenticated_users(self):
+        other_client = Client()
+        other_client.force_login(self.other_user)
+
+        response = other_client.get(f"/api/v1/scores/{self.score.pk}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["score"]["author_id"], self.author.pk)
+
+    def test_score_detail_requires_authentication(self):
+        response = Client().get(f"/api/v1/scores/{self.score.pk}/")
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_score_detail_nonexistent_returns_404(self):
+        response = self.client.get("/api/v1/scores/99999/")
+
+        self.assertEqual(response.status_code, 404)
+
     def test_edit_reflects_in_feed(self):
         self.patch_score(self.score.pk, {"title": "Feed Title"})
-        feed = self.client.get("/api/scores/").json()["scores"]
+        feed = self.client.get("/api/v1/scores/").json()["scores"]
         self.assertEqual(feed[0]["title"], "Feed Title")
 
     def test_non_author_cannot_edit(self):
         other_client = Client(enforce_csrf_checks=True)
         other_client.force_login(self.other_user)
-        other_csrf = other_client.get("/api/csrf/").json()["csrfToken"]
+        other_csrf = other_client.get("/api/v1/csrf/").json()["csrfToken"]
         response = other_client.patch(
-            f"/api/scores/{self.score.pk}/",
+            f"/api/v1/scores/{self.score.pk}/",
             data=json.dumps({"title": "Hijacked"}),
             content_type="application/json",
             HTTP_X_CSRFTOKEN=other_csrf,
@@ -197,7 +264,7 @@ class ScoreEditTests(TestCase):
     def test_edit_requires_authentication(self):
         anon = Client(enforce_csrf_checks=True)
         response = anon.patch(
-            f"/api/scores/{self.score.pk}/",
+            f"/api/v1/scores/{self.score.pk}/",
             data=json.dumps({"title": "Anon"}),
             content_type="application/json",
         )
@@ -207,7 +274,7 @@ class ScoreEditTests(TestCase):
         client_no_csrf = Client(enforce_csrf_checks=True)
         client_no_csrf.force_login(self.author)
         response = client_no_csrf.patch(
-            f"/api/scores/{self.score.pk}/",
+            f"/api/v1/scores/{self.score.pk}/",
             data=json.dumps({"title": "No CSRF"}),
             content_type="application/json",
         )
@@ -239,6 +306,27 @@ class ScoreEditTests(TestCase):
         self.assertEqual(self.score.instrument, "Guitar")
         self.assertEqual(self.score.description, "Original desc")
 
+    def test_patch_validates_format_and_content(self):
+        response = self.patch_score(
+            self.score.pk,
+            {"format": "ABC", "content": "not an ABC score"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("content", response.json()["errors"])
+        self.score.refresh_from_db()
+        self.assertEqual(self.score.score_format, Score.Format.TEXT)
+
+    def test_patch_can_update_format_and_content(self):
+        response = self.patch_score(
+            self.score.pk,
+            {"format": "TEXT", "content": "D E F G"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.score.refresh_from_db()
+        self.assertEqual(self.score.content, "D E F G")
+
 
 class ScoreDeleteTests(TestCase):
     def setUp(self):
@@ -250,7 +338,7 @@ class ScoreDeleteTests(TestCase):
             email="other2@example.com", name="Other2", password="pass1234"
         )
         self.client.force_login(self.author)
-        self.csrf_token = self.client.get("/api/csrf/").json()["csrfToken"]
+        self.csrf_token = self.client.get("/api/v1/csrf/").json()["csrfToken"]
         self.score = Score.objects.create(
             owner=self.author,
             title="Score to Delete",
@@ -263,7 +351,7 @@ class ScoreDeleteTests(TestCase):
     def delete_score(self, score_id, client=None):
         c = client or self.client
         return c.delete(
-            f"/api/scores/{score_id}/",
+            f"/api/v1/scores/{score_id}/",
             content_type="application/json",
             HTTP_X_CSRFTOKEN=self.csrf_token,
         )
@@ -275,15 +363,15 @@ class ScoreDeleteTests(TestCase):
 
     def test_deleted_score_absent_from_feed(self):
         self.delete_score(self.score.pk)
-        feed = self.client.get("/api/scores/").json()["scores"]
+        feed = self.client.get("/api/v1/scores/").json()["scores"]
         self.assertEqual(feed, [])
 
     def test_non_author_cannot_delete(self):
         other_client = Client(enforce_csrf_checks=True)
         other_client.force_login(self.other_user)
-        other_csrf = other_client.get("/api/csrf/").json()["csrfToken"]
+        other_csrf = other_client.get("/api/v1/csrf/").json()["csrfToken"]
         response = other_client.delete(
-            f"/api/scores/{self.score.pk}/",
+            f"/api/v1/scores/{self.score.pk}/",
             content_type="application/json",
             HTTP_X_CSRFTOKEN=other_csrf,
         )
@@ -293,7 +381,7 @@ class ScoreDeleteTests(TestCase):
     def test_delete_requires_authentication(self):
         anon = Client(enforce_csrf_checks=True)
         response = anon.delete(
-            f"/api/scores/{self.score.pk}/",
+            f"/api/v1/scores/{self.score.pk}/",
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 401)
@@ -303,7 +391,7 @@ class ScoreDeleteTests(TestCase):
         client_no_csrf = Client(enforce_csrf_checks=True)
         client_no_csrf.force_login(self.author)
         response = client_no_csrf.delete(
-            f"/api/scores/{self.score.pk}/",
+            f"/api/v1/scores/{self.score.pk}/",
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 403)
@@ -327,7 +415,7 @@ class ScoreReactionTests(TestCase):
             email="reactor_other@example.com", name="OtherReactor", password="pass1234"
         )
         self.client.force_login(self.reactor)
-        self.csrf_token = self.client.get("/api/csrf/").json()["csrfToken"]
+        self.csrf_token = self.client.get("/api/v1/csrf/").json()["csrfToken"]
         self.score = Score.objects.create(
             owner=self.author,
             title="Reaction Target",
@@ -341,7 +429,7 @@ class ScoreReactionTests(TestCase):
         c = client or self.client
         sid = score_id if score_id is not None else self.score.pk
         return c.post(
-            f"/api/scores/{sid}/reactions/",
+            f"/api/v1/scores/{sid}/reactions/",
             content_type="application/json",
             HTTP_X_CSRFTOKEN=self.csrf_token,
         )
@@ -356,7 +444,7 @@ class ScoreReactionTests(TestCase):
 
     def test_reaction_reflected_in_feed(self):
         self.post_reaction()
-        feed = self.client.get("/api/scores/").json()["scores"]
+        feed = self.client.get("/api/v1/scores/").json()["scores"]
         self.assertEqual(feed[0]["reaction_count"], 1)
         self.assertTrue(feed[0]["user_reacted"])
 
@@ -372,9 +460,9 @@ class ScoreReactionTests(TestCase):
     def test_author_cannot_react_to_own_score(self):
         author_client = Client(enforce_csrf_checks=True)
         author_client.force_login(self.author)
-        author_csrf = author_client.get("/api/csrf/").json()["csrfToken"]
+        author_csrf = author_client.get("/api/v1/csrf/").json()["csrfToken"]
         response = author_client.post(
-            f"/api/scores/{self.score.pk}/reactions/",
+            f"/api/v1/scores/{self.score.pk}/reactions/",
             content_type="application/json",
             HTTP_X_CSRFTOKEN=author_csrf,
         )
@@ -384,7 +472,7 @@ class ScoreReactionTests(TestCase):
     def test_reaction_requires_authentication(self):
         anon = Client()
         response = anon.post(
-            f"/api/scores/{self.score.pk}/reactions/",
+            f"/api/v1/scores/{self.score.pk}/reactions/",
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 401)
@@ -393,7 +481,7 @@ class ScoreReactionTests(TestCase):
         client_no_csrf = Client(enforce_csrf_checks=True)
         client_no_csrf.force_login(self.reactor)
         response = client_no_csrf.post(
-            f"/api/scores/{self.score.pk}/reactions/",
+            f"/api/v1/scores/{self.score.pk}/reactions/",
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 403)
@@ -406,17 +494,17 @@ class ScoreReactionTests(TestCase):
         self.post_reaction()
         other_client = Client(enforce_csrf_checks=True)
         other_client.force_login(self.other_reactor)
-        other_csrf = other_client.get("/api/csrf/").json()["csrfToken"]
+        other_csrf = other_client.get("/api/v1/csrf/").json()["csrfToken"]
         other_client.post(
-            f"/api/scores/{self.score.pk}/reactions/",
+            f"/api/v1/scores/{self.score.pk}/reactions/",
             content_type="application/json",
             HTTP_X_CSRFTOKEN=other_csrf,
         )
-        feed = self.client.get("/api/scores/").json()["scores"]
+        feed = self.client.get("/api/v1/scores/").json()["scores"]
         self.assertEqual(feed[0]["reaction_count"], 2)
 
     def test_reaction_count_zero_by_default(self):
-        feed = self.client.get("/api/scores/").json()["scores"]
+        feed = self.client.get("/api/v1/scores/").json()["scores"]
         self.assertEqual(feed[0]["reaction_count"], 0)
         self.assertFalse(feed[0]["user_reacted"])
 
@@ -439,7 +527,7 @@ class ScoreCommentTests(TestCase):
             email="comment_other@example.com", name="OtherCommenter", password="pass1234"
         )
         self.client.force_login(self.commenter)
-        self.csrf_token = self.client.get("/api/csrf/").json()["csrfToken"]
+        self.csrf_token = self.client.get("/api/v1/csrf/").json()["csrfToken"]
         self.score = Score.objects.create(
             owner=self.score_author,
             title="Commented Score",
@@ -453,7 +541,7 @@ class ScoreCommentTests(TestCase):
         c = client or self.client
         sid = score_id if score_id is not None else self.score.pk
         return c.post(
-            f"/api/scores/{sid}/comments/",
+            f"/api/v1/scores/{sid}/comments/",
             data=json.dumps({"body": body}),
             content_type="application/json",
             HTTP_X_CSRFTOKEN=self.csrf_token,
@@ -463,7 +551,7 @@ class ScoreCommentTests(TestCase):
         c = client or self.client
         sid = score_id if score_id is not None else self.score.pk
         return c.delete(
-            f"/api/scores/{sid}/comments/{comment_id}/",
+            f"/api/v1/scores/{sid}/comments/{comment_id}/",
             content_type="application/json",
             HTTP_X_CSRFTOKEN=self.csrf_token,
         )
@@ -479,7 +567,7 @@ class ScoreCommentTests(TestCase):
 
     def test_comment_appears_in_list(self):
         self.post_comment()
-        response = self.client.get(f"/api/scores/{self.score.pk}/comments/")
+        response = self.client.get(f"/api/v1/scores/{self.score.pk}/comments/")
         self.assertEqual(response.status_code, 200)
         comments = response.json()["comments"]
         self.assertEqual(len(comments), 1)
@@ -505,7 +593,7 @@ class ScoreCommentTests(TestCase):
     def test_comment_requires_authentication(self):
         anon = Client()
         response = anon.post(
-            f"/api/scores/{self.score.pk}/comments/",
+            f"/api/v1/scores/{self.score.pk}/comments/",
             data=json.dumps({"body": "Hello"}),
             content_type="application/json",
         )
@@ -515,7 +603,7 @@ class ScoreCommentTests(TestCase):
         client_no_csrf = Client(enforce_csrf_checks=True)
         client_no_csrf.force_login(self.commenter)
         response = client_no_csrf.post(
-            f"/api/scores/{self.score.pk}/comments/",
+            f"/api/v1/scores/{self.score.pk}/comments/",
             data=json.dumps({"body": "No token"}),
             content_type="application/json",
         )
@@ -537,9 +625,9 @@ class ScoreCommentTests(TestCase):
         comment = Comment.objects.first()
         other_client = Client(enforce_csrf_checks=True)
         other_client.force_login(self.other_commenter)
-        other_csrf = other_client.get("/api/csrf/").json()["csrfToken"]
+        other_csrf = other_client.get("/api/v1/csrf/").json()["csrfToken"]
         response = other_client.delete(
-            f"/api/scores/{self.score.pk}/comments/{comment.pk}/",
+            f"/api/v1/scores/{self.score.pk}/comments/{comment.pk}/",
             content_type="application/json",
             HTTP_X_CSRFTOKEN=other_csrf,
         )
@@ -552,7 +640,7 @@ class ScoreCommentTests(TestCase):
         client_no_csrf = Client(enforce_csrf_checks=True)
         client_no_csrf.force_login(self.commenter)
         response = client_no_csrf.delete(
-            f"/api/scores/{self.score.pk}/comments/{comment.pk}/",
+            f"/api/v1/scores/{self.score.pk}/comments/{comment.pk}/",
             content_type="application/json",
         )
         self.assertEqual(response.status_code, 403)

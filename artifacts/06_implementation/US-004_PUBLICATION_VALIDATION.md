@@ -37,7 +37,7 @@ the complete browser matrix remain pending.
 | P02 US-004 and FR-005..FR-009/FR-017 | Yes | Yes | PASS | Canonical text formats, metadata, and content rules used. |
 | P03 prioritization/backlog | Yes | Yes | PASS | US-004 remains P0 / MVP Core. |
 | P04 publication flow | Yes | Yes | PASS | Create flow and required feedback represented in minimal UI. |
-| P05 architecture | Yes | Yes | PASS_WITH_ROUTE_NOTE | Text storage and backend ownership used; existing `/api/` convention retained. |
+| P05 architecture | Yes | Yes | PASS_WITH_ROUTE_NOTE | Text storage and backend ownership used; existing `/api/v1/` convention retained. |
 | Content-mode decision | Yes | Yes | TEXT_ONLY | User selected text-only before code changes. |
 | Product Owner approval | No evidence | Reviewed as pending | PENDING | No approval evidence was supplied. |
 
@@ -74,7 +74,7 @@ the complete browser matrix remain pending.
 | Unsupported/invalid submission leaves no score | PASS | Backend tests assert score table remains unchanged on validation errors. |
 | Content safety | PASS | React renders text as escaped content; score text is shown in whitespace-preserving `<pre>`. |
 | Feed pagination/filter/detail | NOT_IN_SCOPE | Full discovery workflow belongs to later stories; current home list is minimal integration. |
-| API route versioning | REVIEW_GATE | Existing `/api/` convention retained instead of an unrelated `/api/v1/` migration. |
+| API route versioning | REVIEW_GATE | Existing `/api/v1/` convention retained instead of an unrelated `/api/v1/` migration. |
 
 ## 7. Frontend and Responsive Review
 
@@ -103,7 +103,7 @@ the complete browser matrix remain pending.
 |---|---|---|---|---|---|
 | SCOPE-001 | MEDIUM | User originally requested JPG/PNG score files, conflicting with canonical text-only scope; user selected `TEXT_ONLY` before implementation. | Explicit content-mode clarification plus P02/P03/P05 text-only rules. | Image AC-US004-01 is superseded, not satisfied by this text implementation. | Keep text mode unless a new approved change request explicitly authorizes image or dual-mode publication. |
 | VERIFY-001 | LOW | PostgreSQL and full Chrome/Edge/Firefox matrix were not tested. | Executed checks cover SQLite and integrated Chrome at 360/1280 px. | Runtime/browser confidence is partial. | Run remaining deployment/browser checks before release. |
-| ALIGN-001 | LOW | Local API uses `/api/scores/`; architecture examples use `/api/v1/scores`. | Existing repository API convention. | Version-prefix reconciliation remains outside US-004. | Address in a controlled API contract update. |
+| ALIGN-001 | LOW | Local API uses `/api/v1/scores/`; architecture examples use `/api/v1/scores`. | Existing repository API convention. | Version-prefix reconciliation remains outside US-004. | Address in a controlled API contract update. |
 
 ## 10. Definition of Done
 

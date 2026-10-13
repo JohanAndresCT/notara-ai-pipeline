@@ -56,7 +56,7 @@ para corregir o actualizar la información de mi contenido.
 - **Backend:** Django 5.2.1, Django REST Framework 3.15.2, Python 3.14.2
 - **Base de datos:** SQLite en desarrollo (`DJANGO_DB_ENGINE=sqlite`), PostgreSQL en producción
 - **Autenticación:** Session authentication + CSRF tokens
-- **Convención de rutas:** `/api/` (no `/api/v1/`)
+- **Convención de rutas:** `/api/v1/` (no `/api/v1/`)
 - **App de partituras:** `backend/scores/`
 
 ### Modelo Score existente
@@ -84,8 +84,8 @@ class Score(models.Model):
 ### Endpoint existente
 
 ```
-GET  /api/scores/       → lista paginada (feed)
-POST /api/scores/       → crear partitura
+GET  /api/v1/scores/       → lista paginada (feed)
+POST /api/v1/scores/       → crear partitura
 ```
 
 El archivo de rutas es `backend/notara_backend/urls.py`.
@@ -108,7 +108,7 @@ El campo `content` y `format` **no se editan** en esta historia
 #### Endpoint a crear
 
 ```
-PATCH /api/scores/<id>/
+PATCH /api/v1/scores/<id>/
 ```
 
 **Comportamiento esperado:**
@@ -179,13 +179,13 @@ Agregar una nueva clase `ScoreEditTests(TestCase)` con los siguientes casos:
 | Nombre del test | Qué verifica |
 |---|---|
 | `test_author_can_edit_title_instrument_description` | PATCH válido → 200 y cambios persistidos |
-| `test_edit_reflects_in_feed` | Después del PATCH, GET `/api/scores/` devuelve los valores actualizados |
+| `test_edit_reflects_in_feed` | Después del PATCH, GET `/api/v1/scores/` devuelve los valores actualizados |
 | `test_non_author_cannot_edit` | Usuario B intenta editar score de Usuario A → 403 |
 | `test_edit_requires_authentication` | Cliente anónimo → 401 |
 | `test_edit_requires_csrf` | PATCH sin CSRF token → 403 |
 | `test_empty_title_is_rejected` | `title: ""` → 400 con error en campo `title` y sin cambios en DB |
 | `test_empty_instrument_is_rejected` | `instrument: ""` → 400 con error en campo `instrument` |
-| `test_nonexistent_score_returns_404` | PATCH a `/api/scores/99999/` → 404 |
+| `test_nonexistent_score_returns_404` | PATCH a `/api/v1/scores/99999/` → 404 |
 | `test_partial_patch_only_updates_sent_fields` | Payload solo con `title` → solo `title` cambia, resto intacto |
 
 **Estructura sugerida para setUp:**
@@ -201,7 +201,7 @@ class ScoreEditTests(TestCase):
             email="other@example.com", name="Other", password="pass1234"
         )
         self.client.force_login(self.author)
-        self.csrf_token = self.client.get("/api/csrf/").json()["csrfToken"]
+        self.csrf_token = self.client.get("/api/v1/csrf/").json()["csrfToken"]
         self.score = Score.objects.create(
             owner=self.author,
             title="Original Title",
@@ -214,7 +214,7 @@ class ScoreEditTests(TestCase):
     def patch_score(self, score_id, payload, client=None):
         c = client or self.client
         return c.patch(
-            f"/api/scores/{score_id}/",
+            f"/api/v1/scores/{score_id}/",
             data=json.dumps(payload),
             content_type="application/json",
             HTTP_X_CSRFTOKEN=self.csrf_token,
@@ -250,7 +250,7 @@ python manage.py test accounts scores -v 1
 | Dentro de HU05 | Fuera de HU05 |
 |---|---|
 | Editar `title`, `instrument`, `description` | Editar `content` o `format` |
-| Endpoint `PATCH /api/scores/<id>/` | Endpoint `DELETE /api/scores/<id>/` |
+| Endpoint `PATCH /api/v1/scores/<id>/` | Endpoint `DELETE /api/v1/scores/<id>/` |
 | Validación de campos requeridos | Paginación o filtros del feed |
 | Control de autoría (403) | Vista de detalle completa (otra HU) |
 | Tests backend | Integración frontend (Dev Apoyo) |

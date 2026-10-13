@@ -59,17 +59,17 @@ autor y la comunidad.
 - **Backend:** Django 5.2.1, Django REST Framework 3.15.2, Python 3.14.2
 - **Base de datos:** SQLite en desarrollo (`DJANGO_DB_ENGINE=sqlite`), PostgreSQL en producción
 - **Autenticación:** Session authentication + CSRF tokens
-- **Convención de rutas:** `/api/` (no `/api/v1/`)
+- **Convención de rutas:** `/api/v1/` (no `/api/v1/`)
 - **App de partituras:** `backend/scores/`
 
 ### Rutas actuales registradas
 
 ```
-GET    /api/scores/                        → feed de partituras
-POST   /api/scores/                        → crear partitura
-PATCH  /api/scores/<id>/                   → editar partitura (HU05)
-DELETE /api/scores/<id>/                   → eliminar partitura (HU06)
-POST   /api/scores/<id>/reactions/         → toggle reacción (HU09)
+GET    /api/v1/scores/                        → feed de partituras
+POST   /api/v1/scores/                        → crear partitura
+PATCH  /api/v1/scores/<id>/                   → editar partitura (HU05)
+DELETE /api/v1/scores/<id>/                   → eliminar partitura (HU06)
+POST   /api/v1/scores/<id>/reactions/         → toggle reacción (HU09)
 ```
 
 ### Modelos existentes en `backend/scores/models.py`
@@ -234,7 +234,7 @@ def score_comments_view(request, score_id):
 
 **Flujo del endpoint GET:**
 ```
-GET /api/scores/<id>/comments/
+GET /api/v1/scores/<id>/comments/
   ├── No autenticado   → 401
   ├── Score no existe  → 404
   └── OK               → 200 {"comments": [...]}
@@ -242,7 +242,7 @@ GET /api/scores/<id>/comments/
 
 **Flujo del endpoint POST:**
 ```
-POST /api/scores/<id>/comments/
+POST /api/v1/scores/<id>/comments/
   ├── No autenticado          → 401
   ├── Sin CSRF                → 403
   ├── Score no existe         → 404
@@ -291,7 +291,7 @@ def score_comment_detail_view(request, score_id, comment_id):
 
 **Flujo:**
 ```
-DELETE /api/scores/<score_id>/comments/<comment_id>/
+DELETE /api/v1/scores/<score_id>/comments/<comment_id>/
   ├── No autenticado        → 401
   ├── Sin CSRF              → 403
   ├── Comentario no existe  → 404
@@ -354,7 +354,7 @@ class ScoreCommentTests(TestCase):
             email="comment_other@example.com", name="OtherCommenter", password="pass1234"
         )
         self.client.force_login(self.commenter)
-        self.csrf_token = self.client.get("/api/csrf/").json()["csrfToken"]
+        self.csrf_token = self.client.get("/api/v1/csrf/").json()["csrfToken"]
         self.score = Score.objects.create(
             owner=self.score_author,
             title="Commented Score",
@@ -368,7 +368,7 @@ class ScoreCommentTests(TestCase):
         c = client or self.client
         sid = score_id if score_id is not None else self.score.pk
         return c.post(
-            f"/api/scores/{sid}/comments/",
+            f"/api/v1/scores/{sid}/comments/",
             data=json.dumps({"body": body}),
             content_type="application/json",
             HTTP_X_CSRFTOKEN=self.csrf_token,
@@ -378,7 +378,7 @@ class ScoreCommentTests(TestCase):
         c = client or self.client
         sid = score_id if score_id is not None else self.score.pk
         return c.delete(
-            f"/api/scores/{sid}/comments/{comment_id}/",
+            f"/api/v1/scores/{sid}/comments/{comment_id}/",
             content_type="application/json",
             HTTP_X_CSRFTOKEN=self.csrf_token,
         )
@@ -389,13 +389,13 @@ class ScoreCommentTests(TestCase):
 | Nombre del test | Qué verifica |
 |---|---|
 | `test_authenticated_user_can_post_comment` | POST → 201, `Comment.objects.count() == 1`, respuesta incluye `author`, `body`, `created_at` |
-| `test_comment_appears_in_list` | POST luego GET `/api/scores/<id>/comments/` → lista contiene el comentario con datos correctos |
+| `test_comment_appears_in_list` | POST luego GET `/api/v1/scores/<id>/comments/` → lista contiene el comentario con datos correctos |
 | `test_empty_comment_is_rejected` | POST con `body: ""` → 400 con `errors["body"]`, `Comment.objects.count() == 0` |
 | `test_whitespace_only_comment_is_rejected` | POST con `body: "   "` → 400 con `errors["body"]` |
 | `test_comment_over_500_chars_is_rejected` | POST con body de 501 chars → 400 con `errors["body"]` |
 | `test_comment_requires_authentication` | Cliente anónimo POST → 401 |
 | `test_comment_requires_csrf` | Autenticado sin CSRF → 403 |
-| `test_comment_on_nonexistent_score_returns_404` | POST `/api/scores/99999/comments/` → 404 |
+| `test_comment_on_nonexistent_score_returns_404` | POST `/api/v1/scores/99999/comments/` → 404 |
 | `test_author_can_delete_own_comment` | POST luego DELETE → 204, `Comment.objects.count() == 0` |
 | `test_non_author_cannot_delete_comment` | Commenter crea, other_commenter intenta DELETE → 403, comentario sigue en DB |
 | `test_delete_requires_csrf` | Autenticado sin CSRF en DELETE → 403, comentario sigue en DB |

@@ -41,7 +41,7 @@ Product Owner approval remains pending.
 
 | Criterion | Result | Verification Procedure | Evidence |
 |---|---|---|---|
-| AC-US001-01: valid registration creates account, session, and home redirect | PASS | Django test plus browser sign-up at 360 x 800 | User persisted with hashed password; `/api/me/` returned authenticated user; browser returned to `/` and showed welcome state. |
+| AC-US001-01: valid registration creates account, session, and home redirect | PASS | Django test plus browser sign-up at 360 x 800 | User persisted with hashed password; `/api/v1/me/` returned authenticated user; browser returned to `/` and showed welcome state. |
 | AC-US001-02: duplicate email rejected without duplicate account | PASS | Django case-normalization test and browser duplicate submission | Clear “already exists” message; test asserted unchanged row count; SQLite retained one user after browser duplicate attempt. |
 | AC-US001-03: empty/invalid fields and password under 8 rejected | PASS | Backend tests plus browser field-feedback checks | Blank fields and malformed email rejected in backend tests; 7-character password rejected and 8-character password accepted; UI showed clear blank/short-password errors. |
 | P02 AC-001: valid registration creates account or clear result | PASS | Backend and browser success flow | Account creation returned success and authenticated session. |
