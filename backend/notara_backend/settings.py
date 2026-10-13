@@ -8,7 +8,22 @@ load_dotenv(BASE_DIR.parent / ".env")
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret-key-change-me")
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "backend"]
+railway_public_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN", "").strip()
+allowed_hosts_setting = os.getenv("DJANGO_ALLOWED_HOSTS")
+if allowed_hosts_setting:
+    ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_setting.split(",") if host.strip()]
+elif DEBUG:
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "backend"]
+else:
+    ALLOWED_HOSTS = [host for host in (railway_public_domain, "healthcheck.railway.app") if host]
+
+if not DEBUG:
+    if SECRET_KEY == "dev-secret-key-change-me":
+        raise ValueError("DJANGO_SECRET_KEY must be set when DJANGO_DEBUG is false.")
+    if not allowed_hosts_setting:
+        raise ValueError("Set DJANGO_ALLOWED_HOSTS explicitly for production.")
+    if not ALLOWED_HOSTS or "*" in ALLOWED_HOSTS:
+        raise ValueError("Set specific DJANGO_ALLOWED_HOSTS for production.")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -82,6 +97,7 @@ else:
 MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", BASE_DIR.parent / "media"))
 if not MEDIA_ROOT.is_absolute():
     MEDIA_ROOT = BASE_DIR.parent / MEDIA_ROOT
+STATIC_ROOT = Path(os.getenv("STATIC_ROOT", BASE_DIR.parent / "staticfiles"))
 PROFILE_PHOTO_MAX_BYTES = int(os.getenv("PROFILE_PHOTO_MAX_BYTES", 5 * 1024 * 1024))
 STORAGES = {
     "default": {
@@ -96,14 +112,25 @@ STORAGES = {
 }
 
 AUTH_USER_MODEL = "accounts.User"
-CSRF_TRUSTED_ORIGINS = os.getenv(
-    "DJANGO_CSRF_TRUSTED_ORIGINS",
-    "http://localhost:5173,http://127.0.0.1:5173",
-).split(",")
+default_csrf_origins = (
+    "http://localhost:5173,http://127.0.0.1:5173"
+    if DEBUG
+    else f"https://{railway_public_domain}" if railway_public_domain else ""
+)
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", default_csrf_origins).split(",")
+    if origin.strip()
+]
+if not DEBUG and not CSRF_TRUSTED_ORIGINS:
+    raise ValueError("Set DJANGO_CSRF_TRUSTED_ORIGINS for production.")
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https") if not DEBUG else None
+SECURE_HSTS_SECONDS = 31_536_000 if not DEBUG else 0
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
