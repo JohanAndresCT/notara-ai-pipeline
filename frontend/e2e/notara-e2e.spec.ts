@@ -111,6 +111,7 @@ test.describe("Notara E2E", () => {
     await publishScore(page, title);
     await page.getByRole("button", { name: /Cerrar sesión/i }).click();
     await expect(page).toHaveURL(/\/$/);
+    await expect(page.locator('header a[href="/login"]')).toBeVisible();
     await page.goto("/scores/new");
     await expect(page).toHaveURL(/\/scores\/new\/?$/);
     await expect(page.getByRole("heading", { name: /Inicia sesión/i })).toBeVisible();
