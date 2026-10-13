@@ -26,3 +26,55 @@ class Score(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+
+class Comment(models.Model):
+    score = models.ForeignKey(
+        Score,
+        on_delete=models.CASCADE,
+        related_name="comments",
+    )
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="comments",
+    )
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("created_at", "id")
+        indexes = [
+            models.Index(fields=("score", "created_at", "id"), name="comment_score_recent_idx")
+        ]
+
+    def __str__(self) -> str:
+        return f"Comment by {self.author} on {self.score}"
+
+
+class Like(models.Model):
+    score = models.ForeignKey(
+        Score,
+        on_delete=models.CASCADE,
+        related_name="likes",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="likes",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("score", "user"),
+                name="unique_score_like_per_user",
+            )
+        ]
+        indexes = [
+            models.Index(fields=("score", "created_at"), name="like_score_recent_idx")
+        ]
+
+    def __str__(self) -> str:
+        return f"Like by {self.user} on {self.score}"

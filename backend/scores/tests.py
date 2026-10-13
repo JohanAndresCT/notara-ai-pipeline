@@ -1,9 +1,10 @@
 import json
 
+from django.db import IntegrityError
 from django.test import Client, TestCase
 
 from accounts.models import User
-from .models import Score
+from .models import Comment, Like, Score
 
 
 class ScorePublicationTests(TestCase):
@@ -129,3 +130,40 @@ class ScorePublicationTests(TestCase):
 
         self.assertEqual(response.status_code, 403)
         self.assertEqual(Score.objects.count(), 0)
+
+
+class ScoreRelationshipIntegrityTests(TestCase):
+    def setUp(self):
+        self.owner = User.objects.create_user(
+            email="owner@example.com",
+            name="Score Owner",
+            password="correct-horse",
+        )
+        self.author = User.objects.create_user(
+            email="author@example.com",
+            name="Comment Author",
+            password="correct-horse",
+        )
+        self.score = Score.objects.create(
+            owner=self.owner,
+            title="Morning Theme",
+            instrument="Piano",
+            description="A short theme.",
+            score_format=Score.Format.TEXT,
+            content="C D E F",
+        )
+
+    def test_like_is_unique_per_user_and_score(self):
+        Like.objects.create(score=self.score, user=self.author)
+
+        with self.assertRaises(IntegrityError):
+            Like.objects.create(score=self.score, user=self.author)
+
+    def test_deleting_score_cascades_comments_and_likes(self):
+        Comment.objects.create(score=self.score, author=self.author, body="Nice theme.")
+        Like.objects.create(score=self.score, user=self.author)
+
+        self.score.delete()
+
+        self.assertEqual(Comment.objects.count(), 0)
+        self.assertEqual(Like.objects.count(), 0)

@@ -13,13 +13,20 @@ export default function HomePage({
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [scores, setScores] = useState<PublishedScore[]>([]);
   const [feedError, setFeedError] = useState("");
+  const [instrument, setInstrument] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     if (!user) return;
-    getCommunityScores()
-      .then(setScores)
+    setFeedError("");
+    getCommunityScores({ page, instrument })
+      .then((result) => {
+        setScores(result.scores);
+        setTotalPages(result.totalPages);
+      })
       .catch((error: Error) => setFeedError(error.message));
-  }, [user]);
+  }, [user, page, instrument]);
 
   async function handleLogout() {
     setLogoutError("");
@@ -52,19 +59,37 @@ export default function HomePage({
             </button>
             <section className="score-feed" aria-labelledby="community-heading">
               <h2 id="community-heading">Community scores</h2>
+              <label htmlFor="instrument-filter">Filter by instrument</label>
+              <input
+                id="instrument-filter"
+                value={instrument}
+                onChange={(event) => {
+                  setInstrument(event.target.value);
+                  setPage(1);
+                }}
+                placeholder="e.g. Piano"
+              />
               {feedError ? <p className="form-error" role="alert">{feedError}</p> : null}
               {!feedError && scores.length === 0 ? <p className="intro">No scores published yet.</p> : null}
               {scores.map((score) => (
                 <article className="score-item" key={score.id}>
                   <div className="score-heading-row">
-                    <h3>{score.title}</h3>
+                    <h3><a href={`/scores/${score.id}`}>{score.title}</a></h3>
                     <span>{score.format === "ABC" ? "ABC notation" : "Plain text"}</span>
                   </div>
                   <p className="score-meta">{score.instrument} · {score.author}</p>
                   <p>{score.description}</p>
                   <pre>{score.content}</pre>
+                  <p className="score-meta">{score.like_count} likes · {score.comment_count} comments</p>
                 </article>
               ))}
+              {totalPages > 1 ? (
+                <nav aria-label="Score pages">
+                  <button type="button" disabled={page <= 1} onClick={() => setPage((value) => value - 1)}>Previous</button>
+                  <span>Page {page} of {totalPages}</span>
+                  <button type="button" disabled={page >= totalPages} onClick={() => setPage((value) => value + 1)}>Next</button>
+                </nav>
+              ) : null}
             </section>
           </>
         ) : (

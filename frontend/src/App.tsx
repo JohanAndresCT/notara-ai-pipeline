@@ -4,6 +4,7 @@ import LoginPage from "./LoginPage";
 import ProfilePage from "./ProfilePage";
 import RegistrationPage from "./RegistrationPage";
 import ScoreCreatePage from "./ScoreCreatePage";
+import ScoreDetailPage from "./ScoreDetailPage";
 import { getCurrentUser, type NotaraUser } from "./lib/api";
 
 // Keep route selection minimal for US-001; replace with the product router as flows grow.
@@ -14,6 +15,8 @@ export default function App() {
   const isLoginRoute = window.location.pathname === "/login";
   const isProfileRoute = window.location.pathname === "/profile";
   const isCreateScoreRoute = window.location.pathname === "/scores/new";
+  const scoreDetailMatch = window.location.pathname.match(/^\/scores\/(\d+)\/?$/);
+  const scoreDetailId = scoreDetailMatch ? Number(scoreDetailMatch[1]) : null;
 
   useEffect(() => {
     getCurrentUser()
@@ -48,6 +51,14 @@ export default function App() {
 
   if (isCreateScoreRoute && user) {
     return <ScoreCreatePage />;
+  }
+
+  if (scoreDetailId !== null && !user) {
+    return <LoginPage onAuthenticated={() => window.location.assign(`/scores/${scoreDetailId}`)} />;
+  }
+
+  if (scoreDetailId !== null && user) {
+    return <ScoreDetailPage scoreId={scoreDetailId} currentUserId={user.id} />;
   }
 
   return <HomePage user={user} onLoggedOut={() => window.location.assign("/")} />;

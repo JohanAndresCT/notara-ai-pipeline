@@ -15,6 +15,19 @@ export type PublishedScore = {
   content: string;
   author: string;
   created_at: string;
+  like_count: number;
+  comment_count: number;
+  is_liked?: boolean;
+  is_owner?: boolean;
+  comments?: ScoreComment[];
+};
+
+export type ScoreComment = {
+  id: number;
+  body: string;
+  author: string;
+  author_id: number;
+  created_at: string;
 };
 
 type ApiError = {
@@ -149,11 +162,96 @@ export async function changePassword(
   }
 }
 
-export async function getCommunityScores(): Promise<PublishedScore[]> {
-  const response = await fetch("/api/scores/", { credentials: "include" });
+export async function getCommunityScores(options: { page?: number; instrument?: string } = {}): Promise<{
+  scores: PublishedScore[];
+  page: number;
+  totalPages: number;
+}> {
+  const params = new URLSearchParams();
+  if (options.page) params.set("page", String(options.page));
+  if (options.instrument) params.set("instrument", options.instrument);
+  const query = params.toString();
+  const response = await fetch(`/api/scores/${query ? `?${query}` : ""}`, { credentials: "include" });
   if (!response.ok) throw new Error("Could not load community scores.");
-  const body = (await response.json()) as { scores: PublishedScore[] };
-  return body.scores;
+  const body = (await response.json()) as { scores: PublishedScore[]; page: number; total_pages: number };
+  return { scores: body.scores, page: body.page, totalPages: body.total_pages };
+}
+
+export async function getScore(scoreId: number): Promise<PublishedScore> {
+  const response = await fetch(`/api/scores/${scoreId}/`, { credentials: "include" });
+  const body = (await response.json()) as { score?: PublishedScore } & ApiError;
+  if (!response.ok || !body.score) throw new Error(body.message ?? "Could not load the score.");
+  return body.score;
+}
+
+export async function toggleScoreLike(scoreId: number, liked: boolean): Promise<{ liked: boolean; likeCount: number }> {
+  const csrfToken = await getCsrfToken();
+  const response = await fetch(`/api/scores/${scoreId}/like/`, {
+    method: liked ? "DELETE" : "PUT",
+    credentials: "include",
+    headers: { "X-CSRFToken": csrfToken },
+  });
+  const body = (await response.json()) as { liked?: boolean; like_count?: number } & ApiError;
+  if (!response.ok) throw new Error(body.message ?? "Could not update the reaction.");
+  return { liked: Boolean(body.liked), likeCount: body.like_count ?? 0 };
+}
+
+export async function addScoreComment(scoreId: number, body: string): Promise<ScoreComment> {
+  const csrfToken = await getCsrfToken();
+  const response = await fetch(`/api/scores/${scoreId}/comments/`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+    body: JSON.stringify({ body }),
+  });
+  const result = (await response.json()) as { comment?: ScoreComment } & ApiError;
+  if (!response.ok || !result.comment) {
+    const fieldErrors = Object.values(result.errors ?? {}).flat();
+    throw new Error(result.message ?? fieldErrors[0] ?? "Could not add the comment.");
+  }
+  return result.comment;
+}
+
+export async function deleteScore(scoreId: number): Promise<void> {
+  const csrfToken = await getCsrfToken();
+  const response = await fetch(`/api/scores/${scoreId}/`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: { "X-CSRFToken": csrfToken },
+  });
+  if (!response.ok) {
+    const body = (await response.json()) as ApiError;
+    throw new Error(body.message ?? "Could not delete the score.");
+  }
+}
+
+export async function updateScore(
+  scoreId: number,
+  values: Pick<PublishedScore, "title" | "instrument" | "description" | "format" | "content">,
+): Promise<PublishedScore> {
+  const csrfToken = await getCsrfToken();
+  const response = await fetch(`/api/scores/${scoreId}/`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+    body: JSON.stringify(values),
+  });
+  const body = (await response.json()) as { score?: PublishedScore } & ApiError;
+  if (!response.ok || !body.score) throw new Error(body.message ?? "Could not update the score.");
+  return body.score;
+}
+
+export async function deleteComment(commentId: number): Promise<void> {
+  const csrfToken = await getCsrfToken();
+  const response = await fetch(`/api/comments/${commentId}/`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: { "X-CSRFToken": csrfToken },
+  });
+  if (!response.ok) {
+    const body = (await response.json()) as ApiError;
+    throw new Error(body.message ?? "Could not delete the comment.");
+  }
 }
 
 export async function publishScore(values: {

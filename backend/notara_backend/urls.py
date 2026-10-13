@@ -11,7 +11,13 @@ from accounts.views import (
     change_password_view,
     register_view,
 )
-from scores.views import scores_view
+from scores.views import (
+    comment_create_view,
+    comment_delete_view,
+    score_detail_view,
+    score_like_view,
+    scores_view,
+)
 
 
 def health_check(request):
@@ -29,4 +35,8 @@ urlpatterns = [
     path("api/me/photo/", profile_photo_view, name="profile-photo"),
     path("api/me/password/", change_password_view, name="change-password"),
     path("api/scores/", scores_view, name="scores"),
+    path("api/scores/<int:score_id>/", score_detail_view, name="score-detail"),
+    path("api/scores/<int:score_id>/comments/", comment_create_view, name="comment-create"),
+    path("api/comments/<int:comment_id>/", comment_delete_view, name="comment-delete"),
+    path("api/scores/<int:score_id>/like/", score_like_view, name="score-like"),
 ]
