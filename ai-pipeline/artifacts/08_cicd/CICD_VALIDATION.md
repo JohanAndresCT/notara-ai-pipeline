@@ -90,3 +90,10 @@ La documentación confirma que Config as Code (`railway.json`/`railway.toml`) es
 ## 11. Acción mínima siguiente
 
 Configurar reviewers/branch policy del GitHub Environment y recursos Railway con valores reales; ejecutar de nuevo el workflow corregido en un SHA concreto, confirmar PostgreSQL 16 y auditar logs. Validar Docker/runtime y persistencia antes de habilitar deploy automático. En esta continuación se corrigieron workflow/config como autorizó el usuario; no se desplegó.
+
+## 12. Actualización del despliegue
+
+Se observó una ejecución de CI exitosa para c76b08c en pruebas-despliegue.
+Se configuraron los recursos de Railway y se habilitó RAILWAY_DEPLOY_ENABLED.
+El despliegue y la verificación pública siguen pendientes.
+Esta actualización es posterior a la auditoría anterior.
