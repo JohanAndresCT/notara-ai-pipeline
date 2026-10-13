@@ -28,6 +28,31 @@ class Score(models.Model):
         return self.title
 
 
+class Reaction(models.Model):
+    score = models.ForeignKey(
+        Score,
+        on_delete=models.CASCADE,
+        related_name="reactions",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="reactions",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["score", "user"],
+                name="unique_reaction_per_user_per_score",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.user} → {self.score}"
+
+
 class Comment(models.Model):
     score = models.ForeignKey(
         Score,
@@ -39,7 +64,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name="comments",
     )
-    body = models.TextField()
+    body = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

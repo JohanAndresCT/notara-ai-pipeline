@@ -49,7 +49,7 @@ passed. P03/P05 remain unchanged.
 | Component | Implementation | Main files |
 |---|---|---|
 | Score persistence | Separate Django `scores` app; owner FK, title, instrument, description, format, text content, timestamps, newest-first index | `backend/scores/models.py`, `backend/scores/migrations/0001_initial.py`, `backend/scores/migrations/0002_alter_score_description_alter_score_instrument_and_more.py` |
-| Publication/feed API | Authenticated `POST /api/scores/` validates and persists; authenticated `GET /api/scores/` returns persisted entries | `backend/scores/views.py`, `backend/notara_backend/urls.py` |
+| Publication/feed API | Authenticated `POST /api/v1/scores/` validates and persists; authenticated `GET /api/v1/scores/` returns persisted entries | `backend/scores/views.py`, `backend/notara_backend/urls.py` |
 | Score rules | Required metadata/content; TEXT/ABC formats only; 1,000-character limit; minimal ABC required fields and basic musical-line check | `backend/scores/views.py` |
 | Tests | Publication, feed visibility, authentication, CSRF, required data, formats, length, ABC checks | `backend/scores/tests.py` |
 | Frontend create form | Minimal title/instrument/description/format/content form with field feedback | `frontend/src/ScoreCreatePage.tsx` |
@@ -57,16 +57,16 @@ passed. P03/P05 remain unchanged.
 
 ## 5. API and Data Behavior
 
-- `POST /api/scores/` requires an authenticated session and CSRF token. The
+- `POST /api/v1/scores/` requires an authenticated session and CSRF token. The
   server sets the score owner from `request.user`.
 - JSON fields are `title`, `instrument`, `description`, `format` (`ABC` or
   `TEXT`), and `content`.
 - Successful creation returns 201 with the saved score.
-- `GET /api/scores/` returns persisted scores ordered newest-first for the
+- `GET /api/v1/scores/` returns persisted scores ordered newest-first for the
   minimal feed integration. Full filtering, pagination, detail, and interaction
   behavior remains in US-007/US-008/US-009/US-010.
 - The P05 architecture shows `/api/v1/`; this implementation follows the
-  existing working `/api/` convention from US-001..US-003 and does not perform
+  approved `/api/v1/` convention and does not require another route migration.
   an unrelated API-version migration.
 
 ## 6. Database and Migrations

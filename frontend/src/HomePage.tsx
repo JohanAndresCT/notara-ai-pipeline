@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import type { NotaraUser, PublishedScore } from "./lib/api";
 import { getCommunityScores, logoutAccount } from "./lib/api";
 
@@ -14,19 +14,30 @@ export default function HomePage({
   const [scores, setScores] = useState<PublishedScore[]>([]);
   const [feedError, setFeedError] = useState("");
   const [instrument, setInstrument] = useState("");
+  const [instrumentInput, setInstrumentInput] = useState("");
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrevious, setHasPrevious] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     if (!user) return;
     setFeedError("");
-    getCommunityScores({ page, instrument })
-      .then((result) => {
-        setScores(result.scores);
-        setTotalPages(result.totalPages);
+    getCommunityScores(page, instrument)
+      .then((feed) => {
+        setScores(feed.scores);
+        setHasNext(feed.has_next);
+        setHasPrevious(feed.has_previous);
+        setTotalCount(feed.total_count);
       })
       .catch((error: Error) => setFeedError(error.message));
   }, [user, page, instrument]);
+
+  function applyInstrumentFilter(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setPage(1);
+    setInstrument(instrumentInput);
+  }
 
   async function handleLogout() {
     setLogoutError("");
@@ -59,35 +70,47 @@ export default function HomePage({
             </button>
             <section className="score-feed" aria-labelledby="community-heading">
               <h2 id="community-heading">Community scores</h2>
-              <label htmlFor="instrument-filter">Filter by instrument</label>
-              <input
-                id="instrument-filter"
-                value={instrument}
-                onChange={(event) => {
-                  setInstrument(event.target.value);
-                  setPage(1);
-                }}
-                placeholder="e.g. Piano"
-              />
+              <form className="filter" onSubmit={applyInstrumentFilter}>
+                <label htmlFor="instrument-filter">Instrument</label>
+                <input
+                  id="instrument-filter"
+                  value={instrumentInput}
+                  onChange={(event) => setInstrumentInput(event.target.value)}
+                  placeholder="All instruments"
+                />
+                <button type="submit">Filter</button>
+                {instrument ? (
+                  <button type="button" onClick={() => { setInstrumentInput(""); setInstrument(""); setPage(1); }}>
+                    Clear
+                  </button>
+                ) : null}
+              </form>
               {feedError ? <p className="form-error" role="alert">{feedError}</p> : null}
-              {!feedError && scores.length === 0 ? <p className="intro">No scores published yet.</p> : null}
+              {!feedError && scores.length === 0 ? (
+                <p className="intro">{instrument ? "No scores match this instrument." : "No scores published yet."}</p>
+              ) : null}
               {scores.map((score) => (
                 <article className="score-item" key={score.id}>
                   <div className="score-heading-row">
-                    <h3><a href={`/scores/${score.id}`}>{score.title}</a></h3>
+                  <h3><a href={`/scores/${score.id}`}>{score.title}</a></h3>
                     <span>{score.format === "ABC" ? "ABC notation" : "Plain text"}</span>
                   </div>
                   <p className="score-meta">{score.instrument} · {score.author}</p>
                   <p>{score.description}</p>
                   <pre>{score.content}</pre>
+                  <a className="primary-link" href={`/scores/${score.id}`}>View score</a>
                   <p className="score-meta">{score.like_count} likes · {score.comment_count} comments</p>
                 </article>
               ))}
-              {totalPages > 1 ? (
-                <nav aria-label="Score pages">
-                  <button type="button" disabled={page <= 1} onClick={() => setPage((value) => value - 1)}>Previous</button>
-                  <span>Page {page} of {totalPages}</span>
-                  <button type="button" disabled={page >= totalPages} onClick={() => setPage((value) => value + 1)}>Next</button>
+              {!feedError && totalCount > 0 ? (
+                <nav className="pagination" aria-label="Score pages">
+                  <button type="button" disabled={!hasPrevious} onClick={() => setPage((current) => current - 1)}>
+                    Previous
+                  </button>
+                  <span>Page {page}</span>
+                  <button type="button" disabled={!hasNext} onClick={() => setPage((current) => current + 1)}>
+                    Next
+                  </button>
                 </nav>
               ) : null}
             </section>

@@ -5,18 +5,16 @@ import ProfilePage from "./ProfilePage";
 import RegistrationPage from "./RegistrationPage";
 import ScoreCreatePage from "./ScoreCreatePage";
 import ScoreDetailPage from "./ScoreDetailPage";
+import ScoreEditPage from "./ScoreEditPage";
 import { getCurrentUser, type NotaraUser } from "./lib/api";
 
-// Keep route selection minimal for US-001; replace with the product router as flows grow.
 export default function App() {
   const [user, setUser] = useState<NotaraUser | null>(null);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
-  const isRegistrationRoute = window.location.pathname === "/register";
-  const isLoginRoute = window.location.pathname === "/login";
-  const isProfileRoute = window.location.pathname === "/profile";
-  const isCreateScoreRoute = window.location.pathname === "/scores/new";
-  const scoreDetailMatch = window.location.pathname.match(/^\/scores\/(\d+)\/?$/);
-  const scoreDetailId = scoreDetailMatch ? Number(scoreDetailMatch[1]) : null;
+  const path = window.location.pathname;
+  const scoreMatch = path.match(/^\/scores\/(\d+)(?:\/edit)?\/?$/);
+  const scoreId = scoreMatch ? Number(scoreMatch[1]) : null;
+  const isEditScoreRoute = /^\/scores\/\d+\/edit\/?$/.test(path);
 
   useEffect(() => {
     getCurrentUser()
@@ -26,39 +24,47 @@ export default function App() {
   }, []);
 
   if (isCheckingSession) {
-    return <main className="page-shell"><p role="status">Checking your session...</p></main>;
+    return (
+      <main className="page-shell">
+        <p role="status">Checking your session...</p>
+      </main>
+    );
   }
 
-  if (isRegistrationRoute && !user) {
+  if (path === "/register" && !user) {
     return <RegistrationPage onRegistered={() => window.location.assign("/")} />;
   }
 
-  if (isLoginRoute && !user) {
+  if (path === "/login" && !user) {
     return <LoginPage onAuthenticated={() => window.location.assign("/")} />;
   }
 
-  if (isProfileRoute && !user) {
+  if (path === "/profile" && !user) {
     return <LoginPage onAuthenticated={() => window.location.assign("/profile")} />;
   }
 
-  if (isProfileRoute && user) {
+  if (path === "/profile" && user) {
     return <ProfilePage user={user} onProfileUpdated={setUser} />;
   }
 
-  if (isCreateScoreRoute && !user) {
+  if (path === "/scores/new" && !user) {
     return <LoginPage onAuthenticated={() => window.location.assign("/scores/new")} />;
   }
 
-  if (isCreateScoreRoute && user) {
+  if (path === "/scores/new" && user) {
     return <ScoreCreatePage />;
   }
 
-  if (scoreDetailId !== null && !user) {
-    return <LoginPage onAuthenticated={() => window.location.assign(`/scores/${scoreDetailId}`)} />;
+  if (scoreId !== null && !user) {
+    return <LoginPage onAuthenticated={() => window.location.assign(path)} />;
   }
 
-  if (scoreDetailId !== null && user) {
-    return <ScoreDetailPage scoreId={scoreDetailId} currentUserId={user.id} />;
+  if (scoreId !== null && user && isEditScoreRoute) {
+    return <ScoreEditPage scoreId={scoreId} />;
+  }
+
+  if (scoreId !== null && user) {
+    return <ScoreDetailPage scoreId={scoreId} currentUserId={user.id} />;
   }
 
   return <HomePage user={user} onLoggedOut={() => window.location.assign("/")} />;

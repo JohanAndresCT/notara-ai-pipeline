@@ -32,7 +32,7 @@ runtime verification remain pending. Therefore this report records
 | P02 requirements/backlog | Yes | Yes | PASS | FR-002/FR-017, US-002, AC-003..AC-005, BR-002, EDGE-002, DEP-001. |
 | P03 prioritization/backlog | Yes | Yes | PASS | P0, delivery group 1; no estimates or assignments introduced. |
 | P04 UX and validation | Yes | Yes | PASS | FLOW-002, login, dashboard, logout-to-public navigation reviewed. |
-| P05 architecture and validation | Yes | Yes | REVIEW_GATE | Session/CSRF security used; `/api/` vs `/api/v1/` deviation retained. |
+| P05 architecture and validation | Yes | Yes | REVIEW_GATE | Session/CSRF security used; `/api/v1/` vs `/api/v1/` deviation retained. |
 | P06.2 account foundation | Yes | Yes | PASS | Existing email-based user and current-user endpoint reused. |
 | US-002 implementation and tests | Yes | Yes | PASS | Login/logout endpoints, UI, and four focused tests present. |
 
@@ -40,11 +40,11 @@ runtime verification remain pending. Therefore this report records
 
 | Criterion | Result | Verification Procedure | Evidence |
 |---|---|---|---|
-| AC-US002-01: valid credentials reach authenticated dashboard | PASS | Django authentication test and browser login at 360 x 800 | Login returned 200; `/api/me/` returned the user; authenticated home appeared. |
+| AC-US002-01: valid credentials reach authenticated dashboard | PASS | Django authentication test and browser login at 360 x 800 | Login returned 200; `/api/v1/me/` returned the user; authenticated home appeared. |
 | AC-US002-02: invalid credentials show error and do not grant access | PASS | Compare wrong-password/unknown-email responses; desktop browser submission | Both return the same generic error; UI remains on `/login`, without authenticated access. |
-| AC-US002-03: logout ends session and redirects to public home | PASS | Backend session deletion test and browser logout | Exact session row deleted; browser returned to public home; `/api/me/` returned 401. |
-| P02 AC-003: valid credentials enable protected functionality | PASS | Backend session and browser check | Authenticated session permits `/api/me/` access. |
-| P02 AC-004: logout removes protected access | PASS | Follow-up protected endpoint and session database check | `/api/me/` returns 401 and the exact session key no longer exists. |
+| AC-US002-03: logout ends session and redirects to public home | PASS | Backend session deletion test and browser logout | Exact session row deleted; browser returned to public home; `/api/v1/me/` returned 401. |
+| P02 AC-003: valid credentials enable protected functionality | PASS | Backend session and browser check | Authenticated session permits `/api/v1/me/` access. |
+| P02 AC-004: logout removes protected access | PASS | Follow-up protected endpoint and session database check | `/api/v1/me/` returns 401 and the exact session key no longer exists. |
 | P02 AC-005: invalid authentication never grants access | PASS | Backend tests and UI check | Failed credentials do not authenticate and produce the generic error. |
 
 ## 5. Authentication, Session, and Security Review
@@ -57,7 +57,7 @@ runtime verification remain pending. Therefore this report records
 | Session invalidation on logout | PASS | Test asserts the exact server-side session record is deleted; follow-up API call is 401. |
 | CSRF for login/logout POSTs | PASS | Tests without CSRF receive 403; rejected logout leaves its session active. |
 | Credential/token exposure | PASS | No token or password is stored in browser storage or returned in API payloads. |
-| API version alignment | REVIEW_GATE | Existing `/api/` routes retained instead of making an unrelated `/api/v1/` migration. |
+| API version alignment | REVIEW_GATE | Routes now use the approved `/api/v1/` contract. |
 
 ## 6. Frontend and Responsive Review
 
@@ -95,7 +95,7 @@ runtime verification remain pending. Therefore this report records
 |---|---|---|---|---|---|---|
 | VERIFY-001 | MEDIUM | Responsive coverage | Full Chrome/Edge/Firefox matrix at 360/768/1280 px was not run. | Browser checks cover integrated Chrome at 360 and 1280 px only. | NFR-002 remains partially verified. | Run remaining browser/viewport checks before claiming full coverage. |
 | VERIFY-002 | LOW | Database environment | PostgreSQL/Docker runtime was not tested. | This validation used the switchable SQLite test database. | PostgreSQL runtime parity remains unverified. | Run migrations and login/logout tests against PostgreSQL before deployment. |
-| ALIGN-001 | LOW | API contract | Architecture examples use `/api/v1/`; existing US-001 routes use `/api/`. | P05 API boundaries and current registered routes. | A version-prefix migration remains a separate API contract decision. | Reconcile through a controlled architecture/API change. |
+| ALIGN-001 | LOW | API contract | Architecture examples use `/api/v1/`; existing US-001 routes use `/api/v1/`. | P05 API boundaries and current registered routes. | A version-prefix migration remains a separate API contract decision. | Reconcile through a controlled architecture/API change. |
 
 ## 10. Definition of Done
 

@@ -50,15 +50,15 @@ P06.2 registration flow remains available and links to login.
 
 ## 5. API and Security Behavior
 
-- `POST /api/auth/login/` accepts email/password and returns safe user identity
+- `POST /api/v1/auth/login/` accepts email/password and returns safe user identity
   on success. Unknown email and incorrect password return the same generic
   message and status.
-- `POST /api/auth/logout/` requires an authenticated session and valid CSRF
+- `POST /api/v1/auth/logout/` requires an authenticated session and valid CSRF
   token; logout deletes that server-side session.
-- `GET /api/me/` remains the session authority and returns 401 after logout.
+- `GET /api/v1/me/` remains the session authority and returns 401 after logout.
 - Browser credentials remain in the form request only; no token or password is
   stored in local/session storage or returned by the API.
-- Routes follow the existing `/api/` convention used by US-001. Architecture
+- Routes follow the existing `/api/v1/` convention used by US-001. Architecture
   documents `/api/v1/`; no API-wide version migration was included.
 
 ## 6. Changed Files
@@ -79,7 +79,7 @@ P06.2 registration flow remains available and links to login.
 | Focused auth regression | `python backend/manage.py test accounts.tests.AuthenticationTests -v 2` | PASSED | 4 tests passed, including exact server-side session-row deletion on logout. |
 | Migration consistency | `python backend/manage.py makemigrations --check --dry-run` | PASSED | No model changes detected. |
 | Frontend production build | `npm run build` | PASSED | TypeScript project build and Vite bundle succeeded. |
-| Browser login/logout, mobile | VS Code integrated Chrome 150, 360 x 800 | PASSED | Wrong password stayed on login with generic feedback; correct login reached authenticated home; logout returned to public home; `/api/me/` returned 401; no horizontal overflow. |
+| Browser login/logout, mobile | VS Code integrated Chrome 150, 360 x 800 | PASSED | Wrong password stayed on login with generic feedback; correct login reached authenticated home; logout returned to public home; `/api/v1/me/` returned 401; no horizontal overflow. |
 | Browser invalid login/navigation, desktop | VS Code integrated Chrome 150, 1280 x 900 | PASSED | Unknown email showed the same generic error, remained on login, no horizontal overflow; registration login link navigated to `/login`. |
 | PostgreSQL/Docker runtime | Not run | NOT_RUN | Browser/backend validation used the existing SQLite test setup. |
 | Full browser matrix | Chrome/Edge/Firefox at 360/768/1280 px | PARTIAL | Integrated Chrome checked at 360 and 1280 px only. |
@@ -90,7 +90,7 @@ P06.2 registration flow remains available and links to login.
 |---|---|---|
 | Valid login opens authenticated home/dashboard | PASS | Backend session test and browser login at 360 px passed. |
 | Invalid credentials show safe error without access | PASS | Wrong password/unknown-email API responses match; browser remains public. |
-| Logout completely clears the active session | PASS | Test confirms exact session row deletion; browser `/api/me/` returns 401 after logout. |
+| Logout completely clears the active session | PASS | Test confirms exact session row deletion; browser `/api/v1/me/` returns 401 after logout. |
 | Flow verified on mobile devices | PASS_WITH_LIMITATION | Mobile viewport smoke test at 360 px passed; physical mobile and full matrix not run. |
 | Product Owner approval | PENDING | Record actual reviewer/date/approval evidence after review. |
 
@@ -100,7 +100,7 @@ P06.2 registration flow remains available and links to login.
   completion.
 - The complete P02/P04 browser matrix and PostgreSQL/Docker execution remain
   outstanding.
-- Existing `/api/` routes differ from architecture's `/api/v1/` examples.
+- Existing `/api/v1/` routes differ from architecture's `/api/v1/` examples.
   This story followed the working existing route convention and did not make an
   unrelated API-contract migration.
 

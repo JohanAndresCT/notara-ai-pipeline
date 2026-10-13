@@ -1,30 +1,44 @@
 import { useEffect, useState, type FormEvent } from "react";
 import {
-  addScoreComment,
+  addComment,
   deleteComment,
   deleteScore,
+  getComments,
   getScore,
-  toggleScoreLike,
+  toggleReaction,
   updateScore,
   type PublishedScore,
+  type ScoreComment,
 } from "./lib/api";
 
-export default function ScoreDetailPage({ scoreId, currentUserId }: { scoreId: number; currentUserId: number }) {
+export default function ScoreDetailPage({
+  scoreId,
+  currentUserId,
+}: {
+  scoreId: number;
+  currentUserId: number;
+}) {
   const [score, setScore] = useState<PublishedScore | null>(null);
+  const [comments, setComments] = useState<ScoreComment[]>([]);
   const [error, setError] = useState("");
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    getScore(scoreId).then(setScore).catch((requestError: Error) => setError(requestError.message));
+    Promise.all([getScore(scoreId), getComments(scoreId)])
+      .then(([loadedScore, loadedComments]) => {
+        setScore(loadedScore);
+        setComments(loadedComments);
+      })
+      .catch((requestError: Error) => setError(requestError.message));
   }, [scoreId]);
 
-  async function handleLike() {
+  async function handleReaction() {
     if (!score) return;
     try {
-      const result = await toggleScoreLike(score.id, Boolean(score.is_liked));
-      setScore({ ...score, is_liked: result.liked, like_count: result.likeCount });
+      const result = await toggleReaction(score.id);
+      setScore({ ...score, user_reacted: result.reacted, reaction_count: result.reaction_count });
     } catch (requestError) {
       setError((requestError as Error).message);
     }
@@ -36,12 +50,9 @@ export default function ScoreDetailPage({ scoreId, currentUserId }: { scoreId: n
     setIsSubmitting(true);
     setError("");
     try {
-      const newComment = await addScoreComment(score.id, comment.trim());
-      setScore({
-        ...score,
-        comments: [...(score.comments ?? []), newComment],
-        comment_count: score.comment_count + 1,
-      });
+      const created = await addComment(score.id, comment.trim());
+      setComments([...comments, created]);
+      setScore({ ...score, comment_count: score.comment_count + 1 });
       setComment("");
     } catch (requestError) {
       setError((requestError as Error).message);
@@ -73,7 +84,7 @@ export default function ScoreDetailPage({ scoreId, currentUserId }: { scoreId: n
         format: score.format,
         content: String(data.get("content") ?? ""),
       });
-      setScore({ ...updated, comments: score.comments });
+      setScore(updated);
       setIsEditing(false);
     } catch (requestError) {
       setError((requestError as Error).message);
@@ -84,14 +95,10 @@ export default function ScoreDetailPage({ scoreId, currentUserId }: { scoreId: n
 
   async function handleCommentDelete(commentId: number) {
     if (!score) return;
-    const currentScore = score;
     try {
       await deleteComment(commentId);
-      setScore({
-        ...currentScore,
-        comments: (currentScore.comments ?? []).filter((item) => item.id !== commentId),
-        comment_count: Math.max(0, currentScore.comment_count - 1),
-      });
+      setComments(comments.filter((item) => item.id !== commentId));
+      setScore({ ...score, comment_count: Math.max(0, score.comment_count - 1) });
     } catch (requestError) {
       setError((requestError as Error).message);
     }
@@ -102,6 +109,7 @@ export default function ScoreDetailPage({ scoreId, currentUserId }: { scoreId: n
   }
   if (!score) return <main className="page-shell"><p role="status">Loading score...</p></main>;
 
+  const isOwner = score.author_id === currentUserId;
   return (
     <main className="page-shell">
       <section className="home-panel" aria-labelledby="score-detail-heading">
@@ -124,24 +132,37 @@ export default function ScoreDetailPage({ scoreId, currentUserId }: { scoreId: n
         <p className="score-meta">{score.instrument} · {score.author} · {score.format}</p>
         {!isEditing ? <><p>{score.description}</p><pre>{score.content}</pre></> : null}
         <div className="score-actions">
-          {!score.is_owner ? <button type="button" onClick={handleLike}>{score.is_liked ? "Unlike" : "Like"} ({score.like_count})</button> : null}
-          {score.is_owner && !isEditing ? <button type="button" onClick={() => setIsEditing(true)}>Edit score</button> : null}
-          {score.is_owner ? <button type="button" onClick={handleDelete}>Delete score</button> : null}
+          {!isOwner ? (
+            <button type="button" onClick={handleReaction}>
+              {score.user_reacted ? "Unlike" : "Like"} ({score.reaction_count})
+            </button>
+          ) : <span>{score.reaction_count} reactions</span>}
+          {isOwner && !isEditing ? <button type="button" onClick={() => setIsEditing(true)}>Edit score</button> : null}
+          {isOwner ? <button type="button" onClick={handleDelete}>Delete score</button> : null}
         </div>
         {error ? <p className="form-error" role="alert">{error}</p> : null}
         <section aria-labelledby="comments-heading">
           <h2 id="comments-heading">Comments ({score.comment_count})</h2>
-          {(score.comments ?? []).map((item) => (
+          {comments.map((item) => (
             <article className="score-item" key={item.id}>
               <p>{item.body}</p>
               <p className="score-meta">{item.author} · {new Date(item.created_at).toLocaleString()}</p>
-              {item.author_id === currentUserId ? <button type="button" onClick={() => handleCommentDelete(item.id)}>Delete comment</button> : null}
+              {item.author_id === currentUserId ? (
+                <button type="button" onClick={() => handleCommentDelete(item.id)}>Delete comment</button>
+              ) : null}
             </article>
           ))}
-          {!score.is_owner ? (
+          {!isOwner ? (
             <form className="registration-form" onSubmit={handleComment}>
               <label htmlFor="score-comment">Add a comment</label>
-              <textarea id="score-comment" value={comment} onChange={(event) => setComment(event.target.value)} rows={3} required />
+              <textarea
+                id="score-comment"
+                value={comment}
+                maxLength={500}
+                onChange={(event) => setComment(event.target.value)}
+                rows={3}
+                required
+              />
               <button type="submit" disabled={isSubmitting}>{isSubmitting ? "Sending..." : "Comment"}</button>
             </form>
           ) : null}

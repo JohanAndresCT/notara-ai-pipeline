@@ -5,6 +5,17 @@ from django.conf import settings
 from django.db import migrations, models
 
 
+def create_comment_table_if_missing(apps, schema_editor):
+    try:
+        comment_model = apps.get_model("scores", "Comment")
+    except LookupError:
+        from scores.models import Comment
+
+        comment_model = Comment
+    if comment_model._meta.db_table not in schema_editor.connection.introspection.table_names():
+        schema_editor.create_model(comment_model)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -13,19 +24,29 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='Comment',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('body', models.TextField()),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to=settings.AUTH_USER_MODEL)),
-                ('score', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='scores.score')),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunPython(
+                    create_comment_table_if_missing,
+                    migrations.RunPython.noop,
+                ),
             ],
-            options={
-                'ordering': ('created_at', 'id'),
-                'indexes': [models.Index(fields=['score', 'created_at', 'id'], name='comment_score_recent_idx')],
-            },
+            state_operations=[
+                migrations.CreateModel(
+                    name='Comment',
+                    fields=[
+                        ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                        ('body', models.TextField(max_length=500)),
+                        ('created_at', models.DateTimeField(auto_now_add=True)),
+                        ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to=settings.AUTH_USER_MODEL)),
+                        ('score', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='scores.score')),
+                    ],
+                    options={
+                        'ordering': ('created_at', 'id'),
+                        'indexes': [models.Index(fields=['score', 'created_at', 'id'], name='comment_score_recent_idx')],
+                    },
+                ),
+            ],
         ),
         migrations.CreateModel(
             name='Like',
