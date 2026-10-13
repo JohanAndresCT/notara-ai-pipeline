@@ -61,3 +61,12 @@ La validación P06 conservada afirma que backend/PostgreSQL no existen, en contr
 - Railway docs oficiales consultadas 2026-10-13: https://docs.railway.com/config-as-code y https://docs.railway.com/infrastructure-as-code. Confirman deprecated; servicios nuevos no pueden elegir Config as Code; legacy deja de leer railway.toml/json el 2026-12-01. La afirmación anterior es correcta con ese alcance.
 - Estado de evidencia: P07 backend/E2E SQLite y checks locales están resumidos en los artifacts; GitHub Actions con PostgreSQL16, Docker y Railway continúan `NOT_RUN`. No se hicieron cambios a fuentes, tests ni workflow.
 - Informe actualizado: `ai-pipeline/artifacts/08_cicd/CICD_VALIDATION.md`; runtime sigue `NOT_DEPLOYED`.
+
+## 7. Revalidación P08 por fallo CI reportado
+
+- El usuario informó que CI para `c34419a` falló en E2E con `ModuleNotFoundError: No module named 'django'`. Clasificado como `USER_REPORTED`; no se inspeccionó el run ni se verificó que el SHA corresponda al checkout local.
+- Revisión directa: el job `e2e` configura PostgreSQL 16, Node/pnpm y Playwright, pero no usa `actions/setup-python` ni instala `backend/requirements.txt`. `frontend/playwright.config.ts` lanza Django mediante el comando `python backend/manage.py ...`; la ausencia de Django en ese runner explica el síntoma reportado.
+- Corrección aplicada: el job E2E usa `actions/setup-python@v5` con Python 3.12, instala `../backend/requirements.txt` antes de Playwright y entrega `steps.setup-python.outputs.python-path` a `DJANGO_PYTHON`. Playwright usa esa ruta para migrate/runserver. PostgreSQL 16 y los cinco tests se mantienen; no hay cambio a SQLite en CI ni exclusiones.
+- Validación local: workflow YAML pasa Prettier, typecheck app/E2E pasa; con `DJANGO_PYTHON` fijado a la ruta local, Playwright completó 5/5 en 23.1 s contra SQLite local aislado. Esta validación confirma el cableado del intérprete, no el job remoto ni PostgreSQL 16.
+- CI configuration: `READY_WITH_WARNINGS`; el run corregido de GitHub Actions y PostgreSQL 16 siguen `NOT_RUN`. La falla histórica de `c34419a` permanece como USER_REPORTED y no se borra del registro.
+- No hubo commit/push ni publicación.

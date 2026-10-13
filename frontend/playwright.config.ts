@@ -7,6 +7,7 @@ const repoRoot = fileURLToPath(new URL("..", import.meta.url));
 const frontendRoot = fileURLToPath(new URL(".", import.meta.url));
 const backendPort = 18237;
 const frontendPort = 15173;
+const djangoPython = process.env.DJANGO_PYTHON ?? "python";
 const databaseEngine = process.env.DJANGO_DB_ENGINE ?? "sqlite";
 const databaseEnv: Record<string, string> = databaseEngine === "sqlite"
   ? { SQLITE_DB_PATH: path.join(os.tmpdir(), `notara-playwright-e2e-${process.pid}.sqlite3`) }
@@ -45,7 +46,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: `python backend/manage.py migrate && python backend/manage.py runserver 0.0.0.0:${backendPort}`,
+      command: `"${djangoPython}" backend/manage.py migrate && "${djangoPython}" backend/manage.py runserver 0.0.0.0:${backendPort}`,
       cwd: repoRoot,
       url: `http://127.0.0.1:${backendPort}/api/v1/csrf/`,
       reuseExistingServer: false,
