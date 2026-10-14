@@ -1,78 +1,116 @@
-# Notara MVP Foundation
+# Notara
 
-This repository contains the Notara MVP implementation foundation and the first
-vertical story, account registration:
+Aplicación web responsive de comunidad y gestor básico de partituras en texto para estudiantes de música y músicos aficionados. Es un MVP académico construido con apoyo de un pipeline de prompts de IA.
 
-- Django + Django REST Framework backend
-- React + TypeScript + Vite frontend
-- PostgreSQL persistence via Docker Compose
-- switchable SQLite database for local registration testing
-- same-origin session authentication model for the MVP
+## Estado del proyecto
 
-## Repository layout
+| Dimensión | Estado | Evidencia |
+|---|---|---|
+| Implementación | `READY_WITH_ASSUMPTIONS`: MVP-001, 002, 004, 006, 007 y 008 implementados; MVP-003, 005, 009 y 010 con diferencias por decidir | [REQUIREMENTS_COVERAGE.md](./docs/REQUIREMENTS_COVERAGE.md) |
+| Pruebas | Backend: 88/88 OK en SQLite (P09). E2E: 5/5 en SQLite (P07, no reejecutado en P09). PostgreSQL local: no ejecutado | [TESTING.md](./docs/TESTING.md) |
+| CI | Workflow `ci.yml` con 4 jobs. Ejecuciones #7 y #16 exitosas; la #15 falló en E2E (causa desconocida) | [TESTING.md](./docs/TESTING.md) |
+| Despliegue | `DEPLOYED` en Railway: <https://notara-production.up.railway.app>. Observado el 2026-10-14: `/api/health/` devuelve 200 | [SETUP.md](./docs/SETUP.md) |
+| Documentación | Generada en P09, pendiente de validación | [DOCUMENTATION_REPORT.md](./ai-pipeline/artifacts/09_documentation/DOCUMENTATION_REPORT.md) |
+
+Sin verificar: persistencia del volumen de fotos, copias de seguridad, rollback, protección del environment y redirección HTTP→HTTPS.
+
+## Funcionalidades implementadas
+
+- Registro, inicio y cierre de sesión (sesión de Django).
+- Perfil: nombre, usuario, descripción, instrumento principal y cambio de contraseña.
+- Publicar partituras en formato ABC (con validación básica) o texto, hasta 1000 caracteres.
+- Feed de la comunidad y de publicaciones propias, con filtro por instrumento y paginación de 10.
+- Detalle de partitura, reacciones y comentarios.
+- Editar y eliminar las publicaciones propias.
+
+La interfaz no renderiza notación musical; muestra el contenido como texto.
+
+## Tecnologías
+
+| Capa | Tecnología |
+|---|---|
+| Backend | Django 5.2.1, Django REST Framework 3.15.2, Gunicorn 23 |
+| Frontend | React 19, TypeScript 5.7, Vite 8, Tailwind CSS 4 |
+| Base de datos | PostgreSQL 16 (producción y CI); SQLite para pruebas locales |
+| Pruebas | Django test runner, Playwright |
+| Despliegue | Docker (Nginx + Gunicorn), Railway, GitHub Actions |
+
+## Inicio rápido
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r backend\requirements.txt
+$env:DJANGO_DB_ENGINE = "sqlite"
+python backend\manage.py migrate
+python backend\manage.py runserver
+```
+
+```powershell
+cd frontend
+corepack enable
+pnpm install
+pnpm dev
+```
+
+Configuración, variables de entorno y Docker Compose en [docs/SETUP.md](./docs/SETUP.md).
+
+## Estructura
 
 ```text
-backend/            Python Django app
-frontend/           React + TypeScript client
-artifacts/06_implementation/   Implementation stage outputs
+backend/            Django: notara_backend, accounts, scores
+frontend/           SPA React + pruebas Playwright (e2e/)
+docs/               Documentación del proyecto
+deploy/, docker/    Entrypoint y plantilla de Nginx
+.github/workflows/  CI y despliegue
+ai-pipeline/        Prompts y artefactos del pipeline (P00-P09)
 ```
 
-## Local SQLite test setup
+## Pruebas
 
-Install backend dependencies and create the local test database. `db.sqlite3`
-is stored at the repository root and ignored by Git. The schema is managed by
-the same Django migrations used with PostgreSQL.
-
-```bash
-python -m pip install -r backend/requirements.txt
+```powershell
 $env:DJANGO_DB_ENGINE = "sqlite"
-python backend/manage.py migrate
-python backend/manage.py test accounts
-python backend/manage.py runserver 0.0.0.0:8000
+python backend\manage.py test accounts scores
+cd frontend; pnpm typecheck; pnpm test:e2e
 ```
 
-In a second terminal, start the frontend. Vite proxies `/api` to Django so the
-browser uses same-origin requests and session cookies during local development.
+Más detalles en [docs/TESTING.md](./docs/TESTING.md).
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+## Despliegue
 
-Open `http://localhost:5173/register` to create an account or
-`http://localhost:5173/login` to sign in. Registration and login establish a
-database-backed account session; logout returns to the public home screen.
-Authenticated users can open `http://localhost:5173/profile` to update their
-name and main instrument, upload a JPG/PNG photo, or change their password.
-Authenticated users can publish `.abc` or plain-text scores at
-`http://localhost:5173/scores/new`; saved scores appear in the home community
-list.
+La imagen del `Dockerfile` raíz sirve la SPA con Nginx y la API con Gunicorn. Railway despliega desde GitHub Actions cuando `RAILWAY_DEPLOY_ENABLED` es `true` y la rama coincide con `RAILWAY_PRODUCTION_BRANCH`. Ver [docs/SETUP.md](./docs/SETUP.md) y `ai-pipeline/artifacts/08_cicd/DEPLOYMENT_GUIDE.md`.
 
-## PostgreSQL / Docker
+## Documentación
 
-Copy `.env.example` to `.env`, keep `DJANGO_DB_ENGINE=postgresql`, and provide
-deployment-appropriate secrets and database values. Then run:
+| Documento | Contenido |
+|---|---|
+| [SETUP](./docs/SETUP.md) | Instalación, variables y despliegue |
+| [ARCHITECTURE](./docs/ARCHITECTURE.md) | Arquitectura real |
+| [API](./docs/API.md) | Endpoints |
+| [DATA_MODEL](./docs/DATA_MODEL.md) | Modelos y migraciones |
+| [USER_GUIDE](./docs/USER_GUIDE.md) | Guía de uso |
+| [TESTING](./docs/TESTING.md) | Pruebas y CI |
+| [REQUIREMENTS_COVERAGE](./docs/REQUIREMENTS_COVERAGE.md) | Cobertura de requisitos |
+| [KNOWN_LIMITATIONS](./docs/KNOWN_LIMITATIONS.md) | Limitaciones y discrepancias |
 
-```bash
-docker compose up --build
-```
+## Alcance y limitaciones
 
-The backend selects its database in `backend/notara_backend/settings.py` using
-`DJANGO_DB_ENGINE`; both database choices use Django models and migrations.
-Use `SQLITE_DB_PATH` to move the local SQLite file. Do not commit `.env` or
-production credentials.
+Fuera del MVP: voz, OMR, imágenes, audio y roles. Hay discrepancias abiertas que requieren decisión del equipo (rutas `/api` y `/api/v1`, reacciones y likes, foto de perfil, CSRF). Ver [docs/KNOWN_LIMITATIONS.md](./docs/KNOWN_LIMITATIONS.md).
 
-Profile photos use Django's storage backend and are stored locally under
-`MEDIA_ROOT` by default (`media/`, ignored by Git). Set
-`DJANGO_FILE_STORAGE_BACKEND` and `MEDIA_ROOT` for deployment storage. The
-default upload safeguard is 5 MiB and can be changed with
-`PROFILE_PHOTO_MAX_BYTES`.
+## Pipeline de IA
 
-## Registration files
+El proyecto se desarrolló por etapas (P00 contexto a P09 documentación). Prompts en `ai-pipeline/prompts/` y resultados en `ai-pipeline/artifacts/`. Las etapas P00 a P08 tienen artefactos con estados `PASS`, `PASS_WITH_WARNINGS` o `READY_WITH_ASSUMPTIONS` según cada validación.
 
-- Backend account model and registration API: `backend/accounts/`
-- Frontend registration page and API helper: `frontend/src/RegistrationPage.tsx`
-	and `frontend/src/lib/api.ts`
-- Database selection and session/CSRF settings:
-	`backend/notara_backend/settings.py`
+## Equipo
+
+| Integrante | Rol (P00) |
+|---|---|
+| Johan Andrés Ceballos Tabarez | Frontend / UX |
+| Emanuel Rivas | Backend / Arquitectura |
+| David Urrego | Backend |
+| Alejandro Rodríguez | Base de datos |
+| Alejandro Zamorano | Pruebas / DevOps |
+
+## Licencia
+
+No hay un archivo `LICENSE` en el repositorio; la licencia no está definida.

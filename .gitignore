@@ -5,14 +5,20 @@ __pycache__/
 *.pyd
 .venv/
 venv/
-.env
+.env*
 db.sqlite3
 media/
 
 # Node
 node_modules/
 dist/
+build/
+.cache/
 .vite/
+frontend/playwright-report/
+frontend/test-results/
+vite.config.*.timestamp-*
+*.tsbuildinfo
 
 # Editor
 .vscode/
@@ -20,3 +26,14 @@ dist/
 
 # OS
 Thumbs.db
+
+# Logs and temporary files
+*-debug.log*
+logs/
+*.log
+.claude-replay.*
+.tmp-*
+
+/.figma/design-context/
+/.plugins/
+/.opencode-skills/

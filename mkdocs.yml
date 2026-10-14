@@ -1,0 +1,21 @@
+site_name: Notara
+site_description: Documentación de Notara, comunidad y gestor básico de partituras en texto
+site_url: https://johanandresct.github.io/notara-ai-pipeline/
+repo_url: https://github.com/JohanAndresCT/notara-ai-pipeline
+docs_dir: docs
+strict: true
+
+theme:
+  name: material
+  language: es
+
+nav:
+  - Inicio: index.md
+  - Instalación: SETUP.md
+  - Arquitectura: ARCHITECTURE.md
+  - API: API.md
+  - Modelo de datos: DATA_MODEL.md
+  - Guía de usuario: USER_GUIDE.md
+  - Pruebas: TESTING.md
+  - Cobertura de requisitos: REQUIREMENTS_COVERAGE.md
+  - Limitaciones conocidas: KNOWN_LIMITATIONS.md

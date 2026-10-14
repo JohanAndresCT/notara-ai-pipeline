@@ -1,0 +1,231 @@
+name: Notara CI/CD
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: notara-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  backend:
+    name: Backend (PostgreSQL 16)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: notara_ci
+          POSTGRES_USER: notara_ci
+          POSTGRES_PASSWORD: ci-only-not-production
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U notara_ci -d notara_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DJANGO_DB_ENGINE: postgresql
+      DJANGO_DEBUG: "True"
+      DJANGO_SECRET_KEY: ci-only-not-production-secret
+      POSTGRES_DB: notara_ci
+      POSTGRES_USER: notara_ci
+      POSTGRES_PASSWORD: ci-only-not-production
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: "5432"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install backend dependencies
+        run: python -m pip install -r backend/requirements.txt
+      - name: Django checks
+        run: python backend/manage.py check
+      - name: Check migration drift
+        run: python backend/manage.py makemigrations --check --dry-run
+      - name: Apply migrations
+        run: python backend/manage.py migrate --noinput
+      - name: Run all account and score tests
+        shell: bash
+        run: |
+          set -o pipefail
+          python backend/manage.py test accounts scores --verbosity 1 2>&1 | tee "$RUNNER_TEMP/backend-tests.log"
+          grep -Eq 'Ran [1-9][0-9]* tests?' "$RUNNER_TEMP/backend-tests.log"
+
+  frontend:
+    name: Frontend typecheck and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.11.2
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - name: Install locked frontend dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck application
+        run: pnpm typecheck
+      - name: Typecheck browser suite
+        run: pnpm exec tsc --noEmit --strict --skipLibCheck --moduleResolution bundler --module esnext --target es2020 --types node playwright.config.ts e2e/notara-e2e.spec.ts
+      - name: Build frontend
+        run: pnpm build
+
+  e2e:
+    name: Playwright E2E (PostgreSQL 16)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: notara_e2e
+          POSTGRES_USER: notara_e2e
+          POSTGRES_PASSWORD: ci-e2e-only-not-production
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U notara_e2e -d notara_e2e"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DJANGO_DB_ENGINE: postgresql
+      DJANGO_DEBUG: "True"
+      DJANGO_SECRET_KEY: ci-e2e-only-not-production-secret
+      POSTGRES_DB: notara_e2e
+      POSTGRES_USER: notara_e2e
+      POSTGRES_PASSWORD: ci-e2e-only-not-production
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: "5432"
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        id: setup-python
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install backend dependencies
+        run: python -m pip install -r ../backend/requirements.txt
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.11.2
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - name: Install locked frontend dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium and system dependencies
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Run all browser scenarios against PostgreSQL
+        env:
+          DJANGO_PYTHON: ${{ steps.setup-python.outputs.python-path }}
+        run: pnpm test:e2e
+      - name: Preserve Playwright failure evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            frontend/test-results/
+            frontend/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  deploy-railway:
+    name: Deploy tested commit to Railway
+    if: >-
+      github.event_name == 'push' &&
+      vars.RAILWAY_DEPLOY_ENABLED == 'true' &&
+      vars.RAILWAY_PRODUCTION_BRANCH != '' &&
+      github.ref_name == vars.RAILWAY_PRODUCTION_BRANCH
+    needs:
+      - backend
+      - frontend
+      - e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    concurrency:
+      group: railway-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.11.2
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify Railway setup is complete
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID }}
+          RAILWAY_ENVIRONMENT_ID: ${{ vars.RAILWAY_ENVIRONMENT_ID }}
+          RAILWAY_SERVICE_ID: ${{ vars.RAILWAY_SERVICE_ID }}
+          RAILWAY_PUBLIC_URL: ${{ vars.RAILWAY_PUBLIC_URL }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${RAILWAY_TOKEN:?Configure RAILWAY_TOKEN in the protected production environment}"
+          : "${RAILWAY_PROJECT_ID:?Configure RAILWAY_PROJECT_ID after creating the Railway project}"
+          : "${RAILWAY_ENVIRONMENT_ID:?Configure RAILWAY_ENVIRONMENT_ID after creating the Railway environment}"
+          : "${RAILWAY_SERVICE_ID:?Configure RAILWAY_SERVICE_ID after creating the Railway web service}"
+          : "${RAILWAY_PUBLIC_URL:?Configure the exact public HTTPS URL after assigning a Railway domain}"
+          case "$RAILWAY_PUBLIC_URL" in https://*) ;; *) echo "RAILWAY_PUBLIC_URL must use HTTPS"; exit 1 ;; esac
+      - name: Deploy the checked-out commit and wait for success
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID }}
+          RAILWAY_ENVIRONMENT_ID: ${{ vars.RAILWAY_ENVIRONMENT_ID }}
+          RAILWAY_SERVICE_ID: ${{ vars.RAILWAY_SERVICE_ID }}
+        run: >-
+          pnpm dlx @railway/cli@5.67.1 up --ci
+          --project "$RAILWAY_PROJECT_ID"
+          --environment "$RAILWAY_ENVIRONMENT_ID"
+          --service "$RAILWAY_SERVICE_ID"
+          --message "GitHub Actions $GITHUB_SHA"
+      - name: Verify deployed health endpoint
+        env:
+          RAILWAY_PUBLIC_URL: ${{ vars.RAILWAY_PUBLIC_URL }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error "$RAILWAY_PUBLIC_URL/" >/dev/null \
+              && curl --fail --silent --show-error "$RAILWAY_PUBLIC_URL/api/health/"; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Railway health endpoint did not become ready within 5 minutes"
+          exit 1

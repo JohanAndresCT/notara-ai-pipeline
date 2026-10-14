@@ -4,16 +4,18 @@ import LoginPage from "./LoginPage";
 import ProfilePage from "./ProfilePage";
 import RegistrationPage from "./RegistrationPage";
 import ScoreCreatePage from "./ScoreCreatePage";
+import ScoreDetailPage from "./ScoreDetailPage";
+import ScoreEditPage from "./ScoreEditPage";
+import AppShell from "./AppShell";
 import { getCurrentUser, type NotaraUser } from "./lib/api";
 
-// Keep route selection minimal for US-001; replace with the product router as flows grow.
 export default function App() {
   const [user, setUser] = useState<NotaraUser | null>(null);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
-  const isRegistrationRoute = window.location.pathname === "/register";
-  const isLoginRoute = window.location.pathname === "/login";
-  const isProfileRoute = window.location.pathname === "/profile";
-  const isCreateScoreRoute = window.location.pathname === "/scores/new";
+  const path = window.location.pathname;
+  const scoreMatch = path.match(/^\/scores\/(\d+)(?:\/edit)?\/?$/);
+  const scoreId = scoreMatch ? Number(scoreMatch[1]) : null;
+  const isEditScoreRoute = /^\/scores\/\d+\/edit\/?$/.test(path);
 
   useEffect(() => {
     getCurrentUser()
@@ -23,32 +25,52 @@ export default function App() {
   }, []);
 
   if (isCheckingSession) {
-    return <main className="page-shell"><p role="status">Checking your session...</p></main>;
+    return (
+      <main className="app-loading" role="status">
+        <span className="logo-mark" aria-hidden="true">♫</span>
+        <p>Buscando tu espacio en la comunidad...</p>
+      </main>
+    );
   }
 
-  if (isRegistrationRoute && !user) {
+  if (path === "/register" && !user) {
     return <RegistrationPage onRegistered={() => window.location.assign("/")} />;
   }
 
-  if (isLoginRoute && !user) {
+  if (path === "/login" && !user) {
     return <LoginPage onAuthenticated={() => window.location.assign("/")} />;
   }
 
-  if (isProfileRoute && !user) {
-    return <LoginPage onAuthenticated={() => window.location.assign("/profile")} />;
+  if ((path === "/profile" || path === "/scores/new" || scoreId !== null) && !user) {
+    if (path === "/profile") {
+      return <LoginPage onAuthenticated={() => window.location.assign("/profile")} />;
+    }
+    if (path === "/scores/new") {
+      return <LoginPage onAuthenticated={() => window.location.assign("/scores/new")} />;
+    }
+    return <LoginPage onAuthenticated={() => window.location.assign(path)} />;
   }
 
-  if (isProfileRoute && user) {
-    return <ProfilePage user={user} onProfileUpdated={setUser} />;
+  if (!user) {
+    return <HomePage user={null} />;
   }
 
-  if (isCreateScoreRoute && !user) {
-    return <LoginPage onAuthenticated={() => window.location.assign("/scores/new")} />;
+  let page;
+  if (path === "/profile") {
+    page = <ProfilePage user={user} onProfileUpdated={setUser} />;
+  } else if (path === "/scores/new") {
+    page = <ScoreCreatePage />;
+  } else if (scoreId !== null && isEditScoreRoute) {
+    page = <ScoreEditPage scoreId={scoreId} />;
+  } else if (scoreId !== null) {
+    page = <ScoreDetailPage scoreId={scoreId} currentUserId={user.id} currentUserName={user.name} />;
+  } else {
+    page = <HomePage user={user} />;
   }
 
-  if (isCreateScoreRoute && user) {
-    return <ScoreCreatePage />;
-  }
-
-  return <HomePage user={user} onLoggedOut={() => window.location.assign("/")} />;
+  return (
+    <AppShell user={user} onLoggedOut={() => window.location.assign("/")}>
+      {page}
+    </AppShell>
+  );
 }
