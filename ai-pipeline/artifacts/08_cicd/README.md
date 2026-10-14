@@ -5,4 +5,4 @@
 - `DEPLOYMENT_GUIDE.md`: manual Railway prerequisites, activation and operations.
 - `PROMPT_LOG.md`: source review and command log.
 
-No Railway resources are provisioned and no deployment is active from this stage.
+Estado (2026-10-14): desplegado en https://notara-production.up.railway.app (`DEPLOYED_AND_VERIFIED`, alcance limitado). Ver `CICD_VALIDATION.md` sección 14 para evidencia, límites y hallazgos abiertos.

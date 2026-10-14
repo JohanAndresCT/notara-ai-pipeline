@@ -70,3 +70,12 @@ La validación P06 conservada afirma que backend/PostgreSQL no existen, en contr
 - Validación local: workflow YAML pasa Prettier, typecheck app/E2E pasa; con `DJANGO_PYTHON` fijado a la ruta local, Playwright completó 5/5 en 23.1 s contra SQLite local aislado. Esta validación confirma el cableado del intérprete, no el job remoto ni PostgreSQL 16.
 - CI configuration: `READY_WITH_WARNINGS`; el run corregido de GitHub Actions y PostgreSQL 16 siguen `NOT_RUN`. La falla histórica de `c34419a` permanece como USER_REPORTED y no se borra del registro.
 - No hubo commit/push ni publicación.
+
+## 8. Revalidación P08 posterior al despliegue (2026-10-14)
+
+- Motivo: la usuaria informó que Notara ya está desplegada en https://notara-production.up.railway.app, lo que contradecía `NOT_DEPLOYED` en los artefactos.
+- Consultas de solo lectura: API pública de GitHub Actions (runs `38481851856`, `38610251114`, `38606194394`, `38605929025`; jobs y pasos, sin logs) y GET a la URL pública (health, SPA, CSRF, 401 de API, estáticos, `/media/`, `/admin/login/`, cabecera HSTS).
+- Resultado: los 4 jobs del run `38481851856` (SHA `430dfad`) y del run `38610251114` (SHA `3ce012f`) en success, con deploy a Railway y verificación de health. El E2E falló en el run `38606194394` (PR, SHA `54a26f5`) y pasó en el run `38605929025` con el mismo SHA: hallazgo `P08-VAL-005`, causa UNKNOWN.
+- Actualizados: `CICD_VALIDATION.md` (sección 14 nueva; secciones 7/10 marcadas como históricas), `CICD_IMPLEMENTATION.md`, `DEPLOYMENT_GUIDE.md`, `README.md`. Las secciones 12-13 de la validación siguen siendo `USER_REPORTED`.
+- Runtime: `DEPLOYED_AND_VERIFIED` con alcance limitado. Sin verificar: persistencia de medios, backups, rollback, protección del Environment `production`, redirección HTTP→HTTPS, ID de deployment de Railway.
+- No se modificó código, tests, dependencias ni workflow; no hubo commit, push ni redeploy; no se crearon datos en producción ni se expusieron secretos.

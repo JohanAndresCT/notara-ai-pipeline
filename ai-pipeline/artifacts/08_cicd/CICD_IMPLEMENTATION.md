@@ -3,7 +3,7 @@
 ## 1. Metadatos y fuente
 
 - Proyecto: Notara
-- Estado: en implementación; ninguna ejecución remota ni publicación realizada.
+- Estado inicial (2026-10-13, histórico): en implementación; ninguna ejecución remota ni publicación realizada. Estado vigente tras el despliegue: ver sección 6 y `CICD_VALIDATION.md` sección 14.
 - Rama observada al iniciar: `Arch-Front-end`.
 - Inputs usados: `ai-pipeline/prompts/08_cicd/P08_cicd.md`, `ai-pipeline/artifacts/07_testing/TEST_VALIDATION.md`, `ai-pipeline/artifacts/05_architecture/ARCHITECTURE.md`, `ai-pipeline/artifacts/06_implementation/IMPLEMENTATION_VALIDATION.md`, manifests, settings, Compose y rutas reales.
 - Nota de coherencia: el informe P06 conservado describe un estado anterior al backend actualmente presente; para runtime y comandos prevalecen `backend/`, sus tests y sus settings actuales. Se conserva el informe y se registra el desfase.
@@ -44,7 +44,7 @@ El deploy requiere push al branch cuyo nombre exacto se configure en `RAILWAY_PR
 - Passwords PostgreSQL en CI son credenciales sintéticas de job y distintas a producción.
 - El workflow nunca expone token Railway a PR. El deploy requiere environment protegido y `RAILWAY_TOKEN` como secret.
 - `.railwayignore` excluye artefactos, traces, resultados, `.env` y credenciales locales de `railway up`.
-- Ninguna rama, commit, recurso Railway ni URL pública fue creado.
+- Estado inicial (histórico, previo al despliegue): ninguna rama, commit, recurso Railway ni URL pública fue creado por esta etapa.
 
 ## 6. Validación y estado
 
@@ -52,4 +52,4 @@ Evidencia ejecutada: `pnpm install --frozen-lockfile` PASS; YAML workflow parsea
 
 Pendiente: GitHub Actions real con PostgreSQL 16, Docker build/runtime, ejecución E2E PostgreSQL, configurar environment/secrets/vars y servicios/volumen Railway, validar HSTS conforme al dominio elegido y primer deployment/healthcheck. Docker no está instalado localmente y no se creó ni modificó ningún recurso remoto.
 
-Estado actual: configuración CI `READY_WITH_WARNINGS`; ejecución remota `NOT_RUN`; producción `READY_WITH_WARNINGS`; runtime `NOT_DEPLOYED`.
+Estado actual (revalidado 2026-10-14): configuración CI `READY_WITH_WARNINGS`; ejecución remota `PASS` (run `38481851856`, SHA `430dfad`, y run `38610251114`, SHA `3ce012f`, rama `pruebas-despliegue`, con E2E intermitente en el run `38606194394`); producción `READY_WITH_WARNINGS`; runtime `DEPLOYED_AND_VERIFIED` (alcance limitado: health, SPA, 401 de API y CSRF verificados; persistencia de medios, backups y rollback pendientes). URL: https://notara-production.up.railway.app. Detalle y límites en `CICD_VALIDATION.md` sección 14. Esta revalidación no cambió código, tests, workflow ni configuración.

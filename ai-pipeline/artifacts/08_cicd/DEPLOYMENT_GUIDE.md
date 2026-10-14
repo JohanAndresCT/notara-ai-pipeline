@@ -2,7 +2,7 @@
 
 ## Estado
 
-`NOT_DEPLOYED`. Esta guía prepara el servicio, no crea recursos ni publica Notara. Railway/Docker no se ejecutaron desde esta máquina.
+`DEPLOYED_AND_VERIFIED` (alcance limitado, revalidado 2026-10-14): https://notara-production.up.railway.app responde health (`/api/health/` 200), SPA, 401 en API sin sesión y cookie CSRF `Secure`. El despliegue lo hizo el job `deploy-railway` (runs `38481851856` y `38610251114`, rama `pruebas-despliegue`, todos los pasos success). Pendientes: persistencia de medios en `/data`, backups, rollback y protección del Environment `production`. Ver `CICD_VALIDATION.md` sección 14. El texto de esta guía describe la preparación previa; los recursos Railway fueron creados por el equipo fuera de esta etapa y sus IDs no se registran aquí.
 
 ## Arquitectura preparada
 
@@ -43,4 +43,4 @@ El deploy está apagado por defecto: sin `RAILWAY_DEPLOY_ENABLED=true`, branch a
 
 Railway healthcheck comprueba disponibilidad durante el rollout; el workflow también solicita el endpoint de salud tras el deploy. Volúmenes montados pueden producir breve downtime en reemplazo. Rollback de código no revierte automáticamente migraciones ni datos: revisar el plan y respaldos antes de confirmar.
 
-No se incluyeron IDs, dominios, tokens, regiones ni tamaños inventados. No se creó un proyecto/servicio/DB/volumen ni se hizo publicación.
+No se incluyeron IDs, dominios internos, tokens, regiones ni tamaños inventados. Esta etapa no creó proyecto, servicio, base de datos ni volumen; el despliegue lo realizó el equipo y se contrastó con metadatos de GitHub Actions y comprobaciones públicas.

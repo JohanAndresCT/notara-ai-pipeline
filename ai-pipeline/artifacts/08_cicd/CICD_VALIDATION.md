@@ -39,7 +39,7 @@ El deploy ejecuta checkout explícito con `ref: ${{ github.sha }}` y `persist-cr
 | Playwright con ejecutable explícito | `DJANGO_DB_ENGINE=sqlite; DJANGO_PYTHON=(Get-Command python).Source; pnpm test:e2e` | 5 tests P07 | Local, SQLite aislado | 5/5 PASS en 23.1 s | LOCAL_EXECUTION | Confirma cableado al intérprete dado; no prueba Python 3.12 hosted ni PostgreSQL 16. |
 | CI frontend | Job `frontend` | Node 24/pnpm frozen | GitHub-hosted | NOT_RUN | NOT_RUN | Los equivalentes locales pasaron, no el job remoto. |
 | Docker image/runtime | Dockerfile + smoke | Working tree; SHA UNKNOWN | Docker | NOT_RUN | STATIC_REVIEW; NOT_RUN ejecución | Docker CLI no está instalado; no hay prueba Nginx/volumen/UID. |
-| Railway deploy/health | Job `deploy-railway` | `github.sha` estático; SHA efectivo UNKNOWN | Railway | NOT_RUN / NOT_DEPLOYED | STATIC_REVIEW; NOT_RUN ejecución | Sin proyecto, token, IDs, domain, volumen ni logs reales. |
+| Railway deploy/health | Job `deploy-railway` | `github.sha` estático; SHA efectivo UNKNOWN | Railway | NOT_RUN / NOT_DEPLOYED (auditoría 2026-10-13; superado por la sección 14) | STATIC_REVIEW; NOT_RUN ejecución | Sin proyecto, token, IDs, domain, volumen ni logs reales. |
 
 ## 5. Revisión de producción
 
@@ -85,7 +85,7 @@ La documentación confirma que Config as Code (`railway.json`/`railway.toml`) es
 - CI configuration: `READY_WITH_WARNINGS`; el setup E2E ya incluye Python 3.12, requirements y el mismo ejecutable Django/Playwright.
 - CI execution: `FAIL` histórico USER_REPORTED para `c34419a`; configuración corregida sin ejecución remota todavía. Backend y PostgreSQL 16 remotos no verificados.
 - Production preparation: `READY_WITH_WARNINGS` estático; Docker, volume, HSTS y Environment protection pendientes.
-- Runtime deployment: `NOT_DEPLOYED`.
+- Runtime deployment: `NOT_DEPLOYED` (estado de la auditoría 2026-10-13, conservado como registro histórico; el estado vigente está en la sección 14).
 
 ## 11. Acción mínima siguiente
 
@@ -106,3 +106,62 @@ Esta actualización es posterior a la auditoría anterior.
 - Verificación manual del usuario: registro, inicio de sesión,
   publicación de partituras y foto de perfil funcionan.
 - Estado: DEPLOYED.
+
+Nota: las secciones 12 y 13 son declaraciones de la usuaria (`USER_REPORTED`) añadidas tras la auditoría. La sección 14 las contrasta con evidencia independiente. La sección 12 cita el SHA `c76b08c` y la 13 el run `38481851856`, cuyo SHA es `430dfad`; son ejecuciones distintas.
+
+## 14. Revalidación posterior al despliegue (2026-10-14)
+
+### 14.1 Alcance e identidad
+
+- Alcance: CI, producción y despliegue real en Railway. Se auditó sin modificar código, tests, workflow ni configuración; no se hizo commit, push ni redeploy.
+- Working tree local: rama `Arch-Front-end`, HEAD `54a26f5`. El despliegue ocurre desde la rama `pruebas-despliegue` (inferido por los runs; `RAILWAY_PRODUCTION_BRANCH` no se inspeccionó). El checkout local **no** es el commit desplegado.
+- Evidencia remota: metadatos de la API pública de GitHub Actions (`REMOTE_VERIFIED` para estado, SHA, jobs y pasos). Los logs de los jobs no se inspeccionaron, por lo que conteos de tests y salida de comandos no están verificados.
+- Evidencia de runtime: peticiones GET de solo lectura a la URL pública, 2026-10-14 13:49 (-05:00). No se enviaron credenciales ni se crearon datos.
+
+### 14.2 Checks
+
+| Check | Exact command/job | Source/run identity | Environment | Result | Evidence provenance | Limitation |
+|---|---|---|---|---|---|---|
+| CI backend | Job `Backend (PostgreSQL 16)` | Run `38481851856` (#7, push, `pruebas-despliegue`), SHA `430dfad` | GitHub-hosted + PostgreSQL 16 | PASS | REMOTE_VERIFIED (metadatos) | Conteo de tests no verificado (logs no leídos). |
+| CI frontend | Job `Frontend typecheck and build` | Mismo run y SHA | GitHub-hosted | PASS | REMOTE_VERIFIED (metadatos) | Sin logs. |
+| CI E2E | Job `Playwright E2E (PostgreSQL 16)`, paso `Run all browser scenarios against PostgreSQL` | Mismo run y SHA | GitHub-hosted + PostgreSQL 16 | PASS | REMOTE_VERIFIED (metadatos) | Número de escenarios no verificado. Corrige `P08-VAL-001`. |
+| Deploy gate | Job `Deploy tested commit to Railway` con `needs` de los tres checks | Mismo run; los 4 jobs comparten `head_sha` `430dfad` | GitHub Actions + Railway | PASS | REMOTE_VERIFIED (metadatos) | Pasos `Verify Railway setup is complete`, `Deploy the checked-out commit and wait for success` y `Verify deployed health endpoint`: success. ID de deployment de Railway no inspeccionado. |
+| Último run en rama de despliegue | Run `38610251114` (#16, push, `pruebas-despliegue`), SHA `3ce012f` | 2026-10-14 | GitHub Actions + Railway | PASS (4/4 jobs, incluido deploy) | REMOTE_VERIFIED (metadatos) | El SHA corresponde al último deploy exitoso observado; el ID de deployment de Railway no se comparó. |
+| PR sin deploy | Run `38606194394` (#15, `pull_request`, `Arch-Front-end`, SHA `54a26f5`) | Deploy omitido | GitHub Actions | PASS para el gate (`deploy` skipped en PR) | REMOTE_VERIFIED (metadatos) | Ver `P08-VAL-005`: el job E2E de ese run falló. |
+| CI E2E intermitente | Job E2E, run #15 (falló) vs run #14 (push, mismo SHA `54a26f5`, pasó) | `54a26f5` | GitHub-hosted + PostgreSQL 16 | FAIL (run #15) / PASS (run #14) | REMOTE_VERIFIED (metadatos) | Causa UNKNOWN: logs no inspeccionados. No se omite ni se relaja el test. |
+| Health pública | `GET /api/health/`, `GET /api/v1/health/` | URL pública | Railway | PASS (200, JSON `{"status":"ok","service":"notara-backend"}`) | LOCAL_EXECUTION | Indica servicio activo, no el SHA desplegado. |
+| Rutas públicas SPA | `GET /`, `/login`, `/scores/1` | URL pública | Railway | PASS (200, `text/html`, fallback SPA) | LOCAL_EXECUTION | No prueba la UI funcional. |
+| API protegida | `GET /api/me/`, `/api/v1/scores/` sin sesión | URL pública | Railway | PASS (401 sin autenticación) | LOCAL_EXECUTION | Autorización por rol no auditada. |
+| CSRF y cookies | `GET /api/csrf/` | URL pública | Railway | PASS (200; cookie con atributo `Secure`) | LOCAL_EXECUTION | Solo atributo `Secure`; no se auditó el resto de atributos. |
+| Estáticos Django | `GET /static/admin/css/base.css` | URL pública | Railway | PASS (200, `text/css`) | LOCAL_EXECUTION | |
+| HSTS | Cabecera de `/api/health/` | URL pública | Railway | PASS_WITH_WARNINGS: `max-age=31536000`, sin `includeSubDomains`/`preload` | LOCAL_EXECUTION | Decisión de dominio sobre `includeSubDomains`/`preload` sigue pendiente. |
+| `/media/` | `GET /media/` | URL pública | Railway | PASS_WITH_WARNINGS: devuelve el HTML de la SPA (200), sin listado de medios | LOCAL_EXECUTION | No se comprobó un archivo de media concreto ni su acceso autenticado. |
+| Redirección HTTP→HTTPS | `GET http://…/api/health/` | URL pública | Railway | NOT_RUN | NOT_RUN | La respuesta no pudo interpretarse con este método. |
+| Flujos de usuario | Registro, login, publicar partitura, foto de perfil | URL pública | Railway | PASS según la usuaria | USER_REPORTED | No se repitieron: crearía datos reales. |
+| Docker local | `docker build` + smoke | Working tree | Local | NOT_RUN | NOT_RUN | Docker no instalado. La imagen sí se construyó en la plataforma de despliegue (el deploy terminó en success). |
+| Persistencia de medios, backup/restore, rollback | Volumen `/data`, restart, restauración | Railway | Railway | NOT_RUN | NOT_RUN | Sin evidencia. |
+| Protección del Environment `production` | Reviewers y ramas permitidas | GitHub | GitHub | NOT_RUN | NOT_RUN | No inspeccionado (requiere acceso a la configuración del repositorio). |
+
+### 14.3 Hallazgos vigentes
+
+| Finding ID | Severity | File/symbol | Evidence | Impact | Minimum proposed correction |
+|---|---|---|---|---|---|
+| `P08-VAL-001` | Resuelto | Job `e2e` | Run #7 (SHA `430dfad`): E2E con PostgreSQL 16 en success; el workflow instala Python 3.12 y requisitos. | Ninguno | Ninguna. |
+| `P08-VAL-002` | Medium, abierto | GitHub Environment `production` | Sigue sin inspeccionarse; el deploy se ejecutó. | Puede faltar aprobación humana efectiva. | Verificar reviewers y ramas permitidas en GitHub. |
+| `P08-VAL-003` | Parcialmente resuelto | Jobs de CI y deploy | Los cuatro jobs del run #7 comparten el mismo `head_sha`; el deploy dependió de los tres checks. Logs, conteos de tests e ID de deployment de Railway no se inspeccionaron. | Gate demostrado por metadatos; no por logs. | Guardar el ID de deployment de Railway y el conteo de tests ejecutados. |
+| `P08-VAL-004` | Medium, abierto | Dockerfile, volumen `/data` | Sin prueba de persistencia, permisos ni restart; Docker local no ejecutado. | Medios de perfil podrían perderse tras un redeploy. | Probar subida de foto, redeploy y lectura con el volumen. |
+| `P08-VAL-005` | Medium, nuevo | Job `Playwright E2E (PostgreSQL 16)`, run `38606194394` | Falló en el run #15 (PR) y pasó en el run #14 con el mismo SHA `54a26f5`. | Posible test intermitente; un falso verde o rojo reduce la confianza del gate. | Inspeccionar logs y trazas del run #15; no saltar ni debilitar el test. |
+| `P08-VAL-006` | Low, observación | `/admin/` | `GET /admin/login/` responde 200 en la URL pública. | Superficie administrativa expuesta; no hay requisito que lo prohíba. | Decisión del equipo (`REQUIRES_DECISION`). |
+| `P08-VAL-007` | Low | Artefactos P08 | `CICD_IMPLEMENTATION.md` y `DEPLOYMENT_GUIDE.md` decían `NOT_DEPLOYED`. | Contradicción entre artefactos. | Corregido en esta revalidación; ver sección 14.4. |
+
+### 14.4 Estados vigentes (separados)
+
+- CI configuration: `READY_WITH_WARNINGS` (Environment sin verificar).
+- CI execution: `PASS` en el run `38481851856` y en el run `38610251114`; `FAIL` intermitente del job E2E en el run `38606194394` (`P08-VAL-005`); la falla histórica de `c34419a` se conserva como `USER_REPORTED`.
+- Production preparation: `READY_WITH_WARNINGS` (Docker local, volumen, HSTS y backups pendientes).
+- Runtime deployment: `DEPLOYED_AND_VERIFIED`, con alcance limitado a: despliegue completado por el job (pasos success), disponibilidad, health, rutas SPA, protección 401 de la API y cookie CSRF `Secure`. Persistencia de medios, restart, backup/restore, rollback y los flujos de usuario siguen sin verificación independiente (`USER_REPORTED` o `NOT_RUN`).
+- URL pública: https://notara-production.up.railway.app
+
+### 14.5 Acción mínima siguiente
+
+Revisar los logs del run #15 para explicar el E2E intermitente; configurar y verificar la protección del Environment `production`; probar persistencia de medios con redeploy; registrar el ID de deployment de Railway junto con el SHA. Esta revalidación no modificó código ni configuración y no desplegó.
