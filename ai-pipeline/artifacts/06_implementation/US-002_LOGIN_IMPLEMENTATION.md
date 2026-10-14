@@ -12,7 +12,7 @@
 - Implementation status: `READY_WITH_REVIEW_GATES`
 - Implementation prompt: `prompts/06_implementation/P06.3_US-002_authenticate_and_leave_account.md`
 - Validation prompt: `prompts/06_implementation/P06.3_US-002_authenticate_and_leave_account_validation.md`
-- Validation report: `artifacts/06_implementation/US-002_LOGIN_VALIDATION.md`
+- Validation report: `ai-pipeline/artifacts/06_implementation/US-002_LOGIN_VALIDATION.md`
 
 ## 2. Summary
 

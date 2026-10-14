@@ -30,8 +30,8 @@ The foundation stage created the project skeleton components needed to support t
 
 ### Generated outputs
 
-- `artifacts/06_implementation/IMPLEMENTATION_LOG.md`
-- `artifacts/06_implementation/IMPLEMENTATION_FOUNDATION_VALIDATION.md`
+- `ai-pipeline/artifacts/06_implementation/IMPLEMENTATION_LOG.md`
+- `ai-pipeline/artifacts/06_implementation/IMPLEMENTATION_FOUNDATION_VALIDATION.md`
 
 ### Notes
 
@@ -74,7 +74,7 @@ implementation-log evidence requirements.
 ### Validation prompt and report
 
 - Validation prompt: `prompts/06_implementation/P06.3_US-002_authenticate_and_leave_account_validation.md`
-- Report: `artifacts/06_implementation/US-002_LOGIN_VALIDATION.md`
+- Report: `ai-pipeline/artifacts/06_implementation/US-002_LOGIN_VALIDATION.md`
 - Current validation execution: `PARTIAL`; implementation and available
   backend, build, and integrated-browser checks have been completed.
 - The prompts preserve the current session architecture, generic invalid-login
@@ -83,8 +83,8 @@ implementation-log evidence requirements.
 
 ### Implementation result
 
-- Artifact: `artifacts/06_implementation/US-002_LOGIN_IMPLEMENTATION.md`
-- Validation report: `artifacts/06_implementation/US-002_LOGIN_VALIDATION.md`
+- Artifact: `ai-pipeline/artifacts/06_implementation/US-002_LOGIN_IMPLEMENTATION.md`
+- Validation report: `ai-pipeline/artifacts/06_implementation/US-002_LOGIN_VALIDATION.md`
 - Result: `READY_WITH_REVIEW_GATES` / `PASS_WITH_WARNINGS`.
 - All 12 account tests passed; frontend production build passed. Browser checks
   verified login, generic invalid credentials, logout, public return, and
@@ -102,8 +102,8 @@ implementation-log evidence requirements.
 
 ### Implementation and Validation Results
 
-- Implementation artifact: `artifacts/06_implementation/US-003_PROFILE_IMPLEMENTATION.md`
-- Validation report: `artifacts/06_implementation/US-003_PROFILE_VALIDATION.md`
+- Implementation artifact: `ai-pipeline/artifacts/06_implementation/US-003_PROFILE_IMPLEMENTATION.md`
+- Validation report: `ai-pipeline/artifacts/06_implementation/US-003_PROFILE_VALIDATION.md`
 - Result: `READY_WITH_REVIEW_GATES` / `PASS_WITH_WARNINGS`.
 - 22 account tests, Django migration/system checks, and frontend production
   build passed. Integrated Chrome profile checks passed at 360 and 1280 px;
@@ -118,8 +118,8 @@ implementation-log evidence requirements.
 - Validation prompt: `prompts/06_implementation/P06.5_US-004_publish_a_score_validation.md`
 - Story: `US-004` / `HU04` / `MVP-004`, P0 / `MVP_CORE`
 - Selected content mode: `TEXT_ONLY`, explicitly selected before implementation.
-- Implementation artifact: `artifacts/06_implementation/US-004_PUBLICATION_IMPLEMENTATION.md`
-- Validation report: `artifacts/06_implementation/US-004_PUBLICATION_VALIDATION.md`
+- Implementation artifact: `ai-pipeline/artifacts/06_implementation/US-004_PUBLICATION_IMPLEMENTATION.md`
+- Validation report: `ai-pipeline/artifacts/06_implementation/US-004_PUBLICATION_VALIDATION.md`
 - Result: `READY_WITH_REVIEW_GATES` / `PASS_WITH_WARNINGS`.
 - 30 account/score tests, migration checks, and frontend production build passed.
   Chrome checks at 360 and 1280 px verified publication, feed visibility, and

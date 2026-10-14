@@ -13,7 +13,7 @@
 - Implementation status: `READY_WITH_REVIEW_GATES`
 - Prompt: `prompts/06_implementation/P06.4_US-003_manage_profile.md`
 - Validation prompt: `prompts/06_implementation/P06.4_US-003_manage_profile_validation.md`
-- Validation report: `artifacts/06_implementation/US-003_PROFILE_VALIDATION.md`
+- Validation report: `ai-pipeline/artifacts/06_implementation/US-003_PROFILE_VALIDATION.md`
 
 ## 2. Summary
 
