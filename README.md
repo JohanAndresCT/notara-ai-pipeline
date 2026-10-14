@@ -15,7 +15,7 @@ community flow for textual scores:
 ```text
 backend/            Python Django app
 frontend/           React + TypeScript client
-artifacts/06_implementation/   Implementation stage outputs
+ai-pipeline/artifacts/06_implementation/   Implementation stage outputs
 ```
 
 ## Local SQLite test setup

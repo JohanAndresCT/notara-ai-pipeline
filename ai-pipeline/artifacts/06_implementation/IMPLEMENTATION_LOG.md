@@ -1,203 +1,329 @@
-# Implementation Log
+# P06.1 Implementation Log
 
-## 1. Document Metadata
+## 1. Metadata
 
-- Version: 1.0
-- Stage: P06 — Implementation
-- Status: BLOCKED
-- Generated From: `ai-pipeline/outputs/05_architecture/ARCHITECTURE.md`, `ai-pipeline/outputs/04_ux/UX_SPEC.md`, `ai-pipeline/outputs/03_planning/PRIORITIZATION.md`, repository state
-- Validation Dependency: P05 architecture approval; P06 implementation validation
+- Phase: `P06.1` - Implementation Foundation
+- Version: `1.0`
+- Execution Date: `2026-10-10`
+- Implementation Status: `READY_WITH_REVIEW_GATES`
+- Project Context: Notara MVP foundation aligned to the approved Django + React + PostgreSQL architecture
+- Input Artifacts:
+  - `prompts/system/SYSTEM_PROMPT.md`
+  - `prompts/06_implementation/P06.1_implementation_foundation.md`
+  - `artifacts/05_architecture/ARCHITECTURE.md`
+  - `artifacts/05_architecture/ARCHITECTURE_VALIDATION.md`
+  - `artifacts/03_planning/PRIORITIZATION.md`
+  - `artifacts/03_planning/product_backlog.json`
+  - `artifacts/04_ux/UX_SPEC.md`
+  - `artifacts/04_ux/UX_SPEC_VALIDATION.md`
 
-## 2. Implementation Scope
+## 2. Executive Summary
 
-### 2.1 Implemented Foundation
+The implementation foundation was created to match the approved Notara architecture: a same-origin browser client powered by React + TypeScript + Vite, a Django + Django REST Framework backend, and a PostgreSQL-ready configuration. The repository now contains a minimal but coherent technical shell, environment examples, and the supporting local infrastructure needed for future feature work.
 
-- Frontend application scaffold exists under `frontend/`.
-- `frontend/src/main.tsx` bootstraps the React app.
-- `frontend/src/App.tsx` implements a UI shell and interactive mock screens.
-- `frontend/src/index.css` includes design tokens, layout primitives, and visual styling.
-- Vite + React + TypeScript toolchain is configured and builds successfully.
+The foundation does not implement product stories or business logic beyond the minimal shell required to start the project and support later feature development. The application was not fully bootstrapped with package installation in this environment; the current validation therefore focuses on structural correctness, config integrity, and Python syntax viability.
 
-### 2.2 Explicitly Deferred User-Story Work
+## 3. Implemented Components
 
-- Authentication and registration backend
-- Session and authorization enforcement
-- Score publication, edit, delete, and ownership logic
-- Database model and migrations
-- Feed, detail, comment, and reaction APIs
-- Real backend integration and persistence flow
-
-### 2.3 Out of Scope for P06
-
-- Complete user-story implementation
-- Product feature completion
-- Full MVP flow execution
-- Production deployment
-
-## 3. Architecture Implementation
-
-| Architecture ID | Component / Decision | Implementation Location | Status | Notes |
+| Component | Purpose | Relevant Files | Architecture Link | Outcome |
 |---|---|---|---|---|
-| ARCH-001 | Frontend app bootstrap | `frontend/src/main.tsx` | IMPLEMENTED | Valid React app entry point exists |
-| ARCH-002 | React + TS + Vite | `frontend/package.json`, `frontend/vite.config.ts` | IMPLEMENTED | Frontend scaffold is operational |
-| ARCH-003 | Shared design system / theme | `frontend/src/index.css` | IMPLEMENTED | Shared design tokens and styles exist |
-| ARCH-004 | UX shell / screen flow | `frontend/src/App.tsx` | PARTIALLY_IMPLEMENTED | UI shell and mock flows exist, but are not backend-backed |
-| ARCH-005 | Django backend / API foundation | Not present | MISSING | Required by architecture |
-| ARCH-006 | PostgreSQL persistence foundation | Not present | MISSING | Required by architecture |
-| ARCH-007 | Auth/session infrastructure | Not present | MISSING | Required by architecture |
-| ARCH-008 | Service boundaries and API contracts | Not present | MISSING | Required by architecture |
+| Repository root | Standard project metadata and environment setup | `.gitignore`, `.env.example`, `README.md`, `docker-compose.yml` | Architecture runtime and environment section | Implemented |
+| Backend foundation | Django application startup, settings, and API health endpoint | `backend/manage.py`, `backend/requirements.txt`, `backend/notara_backend/*` | API + authentication + persistence architecture | Implemented |
+| Frontend foundation | Vite React app shell for same-origin client | `frontend/package.json`, `frontend/vite.config.ts`, `frontend/src/*` | Browser client architecture | Implemented |
+| Database configuration | PostgreSQL service for local development and parity | `docker-compose.yml`, `.env.example` | Persistence architecture | Implemented |
+| Implementation stage outputs | Pipeline log and validation artifact | `ai-pipeline/artifacts/06_implementation/*` | Stage traceability requirement | Implemented |
 
-## 4. Project Structure
+## 4. Repository Changes
 
-Current structure:
+- Added root-level project documentation and environment defaults.
+- Created a Django backend base with settings, URL config, ASGI/WSGI bootstrapping, and a health endpoint.
+- Created a React + TypeScript frontend shell that matches the same-origin browser architecture.
+- Added Docker Compose support for the backend, frontend, and PostgreSQL services.
+- Added implementation-stage log and validation outputs under `ai-pipeline/artifacts/06_implementation/`.
 
-- `frontend/` contains the React frontend app
-- `frontend/src/App.tsx` contains the UI shell and mock feature states
-- `frontend/src/main.tsx` initializes the app
-- `frontend/src/index.css` contains the design system and responsive styling
-- `ai-pipeline/outputs/...` contains approved architecture and UX source artifacts
+## 5. Architectural Conformance and Deviations
 
-Missing from the repository:
-
-- Django project structure
-- API modules and versioned routes
-- persistence models and migration files
-- auth/session configuration
-- server-side validation and authorization layer
-
-## 5. Core Infrastructure
-
-### 5.1 Application Bootstrap
-
-Implemented:
-
-- React app renders successfully in the browser build
-
-Missing:
-
-- Backend server startup
-- service bootstrap for API layer
-
-### 5.2 Configuration
-
-Implemented:
-
-- Frontend dependency setup and render config
-
-Missing:
-
-- environment-driven backend configuration
-- secure secret handling
-- DB/runtime settings for production and local development
-
-### 5.3 Dependencies
-
-Implemented:
-
-- Vite, React, TypeScript, Tailwind dependencies
-
-Missing:
-
-- Django, DRF, PostgreSQL driver, migration tooling
-
-### 5.4 Persistence Foundation
-
-Status: MISSING
-
-No PostgreSQL configuration, ORM setup, or schema foundation exists.
-
-### 5.5 API / Service Foundation
-
-Status: MISSING
-
-No backend routes, serializers, or domain services exist.
-
-### 5.6 Security Foundation
-
-Status: MISSING
-
-No auth/session middleware, CSRF setup, or secure server-side ownership enforcement exists.
-
-### 5.7 Error Handling and Logging
-
-Status: PARTIALLY_IMPLEMENTED
-
-Frontend form and UI states exist, but there is no backend logging/error infrastructure.
-
-### 5.8 Integration Boundaries
-
-Status: MISSING
-
-No backend API integration boundary exists between the UI and persistent data layer.
-
-## 6. UX Foundation
-
-- Application shell exists and is visually coherent.
-- Screen navigation is represented as front-end state rather than real routing.
-- Shared UI patterns and a design language exist.
-- The implementation remains product-demo style rather than a backend-backed product foundation.
-
-## 7. Sprint Readiness
-
-| Sprint Item | Required Foundation | P06 Status | Future Work |
-|---|---|---|---|
-| Registration / login | Auth backend + secure session | MISSING | Must be implemented in backend |
-| Publish score | Persistence + API + validation | MISSING | Must be implemented |
-| Feed + detail | API + data access + rendering | MISSING | Must be implemented |
-| Likes + comments | Domain model + persistence + auth | MISSING | Must be implemented |
-| Profile + password | Identity backend | MISSING | Must be implemented |
-| Ownership enforcement | Auth + backend validation | MISSING | Must be implemented |
-
-## 8. Files Created or Modified
-
-| File | Change | Reason | Related Architecture |
-|---|---|---|---|
-| `frontend/src/App.tsx` | Created UI shell | Provides the front-end foundation | ARCH-004 |
-| `frontend/src/main.tsx` | Created bootstrap | React root initialization | ARCH-001 |
-| `frontend/src/index.css` | Added styles and tokens | Design foundation | ARCH-003 |
-| `frontend/package.json` | Dependency config | Frontend toolchain | ARCH-002 |
-| `frontend/vite.config.ts` | Build config | Vite setup | ARCH-002 |
-
-## 9. Implementation Verification
-
-| Check | Result | Evidence |
+| Topic | Conformance | Notes |
 |---|---|---|
-| Frontend install | PASS | `npm install` succeeded |
-| Frontend build | PASS | `npm run build` succeeded |
-| Architecture foundation completeness | FAIL | Missing backend, DB, and auth layers |
-| Security baseline | FAIL | No server-side auth/session enforcement |
-| Persistence layer | FAIL | No DB config or models |
+| Same-origin browser + API model | Yes | Frontend and backend are separated but configured for a single-origin MVP flow. |
+| Django modular monolith | Yes | Minimal Django project was created as the backend foundation. |
+| PostgreSQL persistence | Yes | Docker Compose and settings are PostgreSQL-ready. |
+| Session authentication | Yes | Default Django session auth is enabled. |
+| Story-specific implementation | No | No user stories were implemented. |
+| Deployment provider selection | No final decision | Hosting is intentionally left as a future decision due to no upstream provider requirement. |
 
-## 10. Assumptions
+No unapproved product features were introduced. The only major open decision is the hosting and operational environment, which remains intentionally unresolved at the architecture level.
 
-| ID | Assumption | Impact |
-|---|---|---|
-| ASSUM-001 | Frontend shell is intentionally early-stage and will be completed after backend foundation | Requires follow-up implementation |
-| ASSUM-002 | The architecture may still be implemented in subsequent backend work | Current phase remains incomplete |
+## 6. Configuration and Execution Instructions
 
-## 11. Known Limitations / Blockers
+### Prerequisites
 
-| ID | Issue | Impact | Required Action |
+- Python 3.12+
+- Node.js 20+
+- Docker Desktop or equivalent for Postgres orchestration
+
+### Backend
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver 0.0.0.0:8000
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev -- --host 0.0.0.0
+```
+
+### Database
+
+```bash
+docker compose up db -d
+```
+
+### Environment
+
+Copy `.env.example` to `.env` and adjust values before running the app in a real environment.
+
+## 7. Verification Results
+
+| Check | Command / Procedure | Result | Evidence |
 |---|---|---|---|
-| BLOCK-001 | No Django backend exists | Architecture is not implemented | Create backend project and modules |
-| BLOCK-002 | No PostgreSQL persistence exists | Product data cannot be persisted | Add DB setup and schemas |
-| BLOCK-003 | No authentication/session infrastructure exists | Protected actions and ownership cannot be enforced | Implement secure auth foundation |
-| BLOCK-004 | UI is mock/demo-style rather than product-backed | Frontend cannot prove real product behavior | Replace demo state with backend-driven data |
+| Python backend syntax validation | `python -m compileall backend` | PASSED | Syntax compiled successfully for the Django foundation files. |
+| File presence and repository structure validation | Local file inspection | PASSED | All expected foundation files and stage artifacts were created. |
+| Full app startup and dependency installation | Local runtime bootstrap | NOT_RUN | Dependencies were not installed in this current environment; the repository is a skeleton foundation, not a fully bootstrapped deployment. |
+| Frontend build validation | `npm install && npm run build` | NOT_RUN | The package dependencies were not installed in this environment. |
+| Postgres service validation | `docker compose up db -d` | NOT_RUN | Docker runtime was not exercised in this session. |
 
-## 12. Extension Guidance
+## 8. Assumptions and Unresolved Issues
 
-Future implementation should start with:
+| Item | Description | Impact | Status |
+|---|---|---|---|
+| Hosting provider | No production host or deployment environment was specified upstream | Deployment details remain unresolved | Unresolved |
+| Team stack confirmation | Architecture recommends Django + React + PostgreSQL; implementation assumes this choice is accepted | Future changes may require rework | Assumed from architecture |
+| Production secrets | Secrets were intentionally left as examples only | Safe for repository storage | Resolved with placeholder values |
+| Functional story implementation | Scope is intentionally limited to the foundation | No MVP feature work is present yet | Intentionally excluded |
 
-1. Django project and API foundation
-2. PostgreSQL configuration and model layer
-3. Auth/session and CSRF security foundation
-4. Ownership, validation, and domain service logic
-5. Frontend integration to real backend data and API contracts
+## 9. Scope Boundary
 
-## 13. Traceability Summary
+This implementation intentionally excludes:
 
-The architecture requires a full stack implementation with backend services and persistent relational data. The repository currently provides only part of the frontend layer. This means the approved architecture has not been sufficiently materialized yet. The gap is structural, not merely feature level.
+- end-user feature workflows
+- story-specific domain logic
+- product dashboard behavior
+- score management features
+- authentication UX beyond a shell
+- deployment bootstrap beyond the app skeleton
 
-## 14. Implementation Status
+The work is limited to the technical foundation required for the next increment of development.
 
-BLOCKED
+## P06.2 - US-001 Registration
+
+### Metadata and Status
+
+- Execution date: `2026-10-11`
+- Story: `US-001` / `HU01` / `MVP-001` / `FR-001`
+- Implementation status: `READY_WITH_REVIEW_GATES`
+- Detailed artifact: `ai-pipeline/artifacts/06_implementation/US-001_REGISTRATION_IMPLEMENTATION.md`
+- Validation report: `ai-pipeline/artifacts/06_implementation/US-001_REGISTRATION_VALIDATION.md`
+
+### Implemented
+
+- Added the custom Django account model, unique normalized email, migration,
+  CSRF-protected registration endpoint, and session-aware current-user endpoint.
+- Added the editable React registration page and minimal home state, with
+  client-side feedback and the Vite API proxy.
+- Added switchable SQLite/PostgreSQL database configuration. The root
+  `db.sqlite3` is ignored by Git; PostgreSQL remains the default.
+- Updated backend setup documentation and the compatible PostgreSQL driver pin.
+
+### Verification
+
+- `python backend/manage.py check`: PASSED.
+- `python backend/manage.py makemigrations --check --dry-run`: PASSED; no
+  pending model changes.
+- `python backend/manage.py test accounts -v 2`: PASSED; 8 tests.
+- `npx tsc --noEmit --pretty false`: PASSED.
+- `npm run build`: PASSED.
+- Browser checks in VS Code integrated Chrome 150 passed at 360 px for
+  successful registration/session/home navigation and 1280 px for duplicate
+  email, short-password, and blank-field feedback. No horizontal overflow was
+  observed at either width.
+- The SQLite file exists and contains the browser-created test account.
+- PostgreSQL/Docker runtime and the full Chrome/Edge/Firefox 360/768/1280
+  matrix were not run.
+
+### Review Gates
+
+The supplied story criteria are more specific than P02/P04 on registration
+fields, duplicate emails, minimum password length, and post-registration
+navigation. Upstream artifacts remain unchanged pending Product Owner review.
+Product Owner approval is `PENDING`; the story is not marked fully done.
+
+## P06.3 - US-002 Login and Logout
+
+### Metadata and Status
+
+- Execution date: `2026-10-11`
+- Story: `US-002` / `HU02` / `MVP-002` / `FR-002` / `FR-017`
+- Implementation status: `READY_WITH_REVIEW_GATES`
+- Detailed artifact: `ai-pipeline/artifacts/06_implementation/US-002_LOGIN_IMPLEMENTATION.md`
+- Validation report: `ai-pipeline/artifacts/06_implementation/US-002_LOGIN_VALIDATION.md`
+
+### Implemented
+
+- Added Django login/logout endpoints using the existing custom account and
+  session model. Invalid credentials return the same generic response for
+  unknown email and wrong password.
+- Added a dedicated React login form, authenticated home logout action, and
+  public login/register navigation. Login and logout mutations use CSRF and
+  same-origin session cookies.
+- No user model or migration changes were needed. Existing `/api/v1/` route
+  convention was retained; the architecture's `/api/v1/` difference is logged.
+
+### Verification
+
+- `python backend/manage.py check`: PASSED.
+- `python backend/manage.py test accounts -v 2`: PASSED; 12 tests.
+- `python backend/manage.py test accounts.tests.AuthenticationTests -v 2`:
+  PASSED; 4 auth tests, including exact session-row deletion.
+- `python backend/manage.py makemigrations --check --dry-run`: PASSED; no
+  changes detected.
+- `npm run build`: PASSED.
+- Integrated Chrome 150 browser checks passed at 360 px for invalid/valid login,
+  logout, public redirect, and post-logout `/api/v1/me/` denial; desktop checks at
+  1280 px confirmed generic invalid-login feedback and navigation. No horizontal
+  overflow was observed.
+- PostgreSQL/Docker and Edge/Firefox/768 px checks were not run.
+
+### Review Gates
+
+Product Owner approval is `PENDING`. The full supported browser matrix and
+PostgreSQL runtime check remain outstanding; the story is not marked fully done.
+
+## P06.4 - US-003 Profile Management
+
+### Metadata and Status
+
+- Execution date: `2026-10-11`
+- Story: `US-003` / `HU03` / `MVP-003` / `FR-003` / `FR-004`
+- Implementation status: `READY_WITH_REVIEW_GATES`
+- Detailed artifact: `ai-pipeline/artifacts/06_implementation/US-003_PROFILE_IMPLEMENTATION.md`
+- Validation report: `ai-pipeline/artifacts/06_implementation/US-003_PROFILE_VALIDATION.md`
+
+### Implemented
+
+- Added main-instrument and stored-photo fields through an additive account
+  migration; existing database users were preserved.
+- Added authenticated profile GET/PATCH, protected profile-photo streaming,
+  JPG/PNG content verification, replace-file cleanup, and canonical password
+  change with session preservation.
+- Added a replaceable React profile page, profile link, image preview, and
+  password-change form.
+- Configured storage backend/root and 5 MiB default upload guard through
+  environment variables; image bytes remain outside the database.
+
+### Verification
+
+- Pillow 11.3.0 installed; Django system check passed.
+- `python backend/manage.py test accounts -v 1`: PASSED; 22 tests.
+- `python backend/manage.py makemigrations --check --dry-run`: PASSED.
+- `npm run build`: PASSED.
+- Integrated Chrome 150 checks passed at 360 and 1280 px for profile edits;
+  PNG upload returned 200/image/png through authenticated photo retrieval. No
+  horizontal overflow was observed.
+- Edge/Firefox/768 px, PostgreSQL, and remote storage were not exercised.
+
+### Review Gates
+
+The requested photo expands P03 OOS-003/P05 media scope. P02 username and
+description fields were not added because the supplied criteria specify
+name/photo/instrument; the 5 MiB technical cap is also unapproved. Product
+Owner approval and upstream alignment remain `PENDING`.
+
+## P06.5 - US-004 Score Publication
+
+### Metadata and Status
+
+- Execution date: `2026-10-11`
+- Story: `US-004` / `HU04` / `MVP-004` / `FR-005..FR-009` / `FR-017`
+- Priority: `P0` / `MVP_CORE`
+- Selected content mode: `TEXT_ONLY` (explicit user selection before code)
+- Implementation status: `READY_WITH_REVIEW_GATES`
+- Detailed artifact: `ai-pipeline/artifacts/06_implementation/US-004_PUBLICATION_IMPLEMENTATION.md`
+- Validation report: `ai-pipeline/artifacts/06_implementation/US-004_PUBLICATION_VALIDATION.md`
+
+### Implemented
+
+- Added a separate Django `scores` app, persistent score model, and migrations.
+- Added authenticated/CSRF-protected create and community-list API endpoints.
+- Enforced required fields, text formats, non-empty content, the 1,000-character
+  limit, and the minimal approved ABC headers/musical-line check.
+- Added a minimal React score-create form and persisted score list on the
+  authenticated home. Full US-007 pagination/filter/detail remains out of scope.
+- Preserved existing account/profile records and migrated the repository to the approved `/api/v1/` route
+  convention.
+
+### Verification
+
+- `python backend/manage.py check`: PASSED.
+- `python backend/manage.py test accounts scores -v 1`: PASSED; 30 tests.
+- `python backend/manage.py makemigrations --check --dry-run`: PASSED.
+- `npm run build`: PASSED.
+- Integrated Chrome 150 checks passed at 360 px for plain-text publication and
+  feed visibility, and at 1280 px for required-field errors plus ABC
+  publication/feed visibility. No horizontal overflow was observed.
+- SQLite inspection confirmed two users and two browser-created scores.
+- PostgreSQL and the full browser matrix were not exercised.
+
+### Scope Decision and Review Gates
+
+The user selected `TEXT_ONLY` after P06.5 identified the content-format
+conflict. JPG/PNG publication is not implemented; the image AC is superseded
+for this run. Product Owner approval remains `PENDING`; PostgreSQL and full
+browser matrix checks remain outstanding.
+
+## Current Consolidated State
+
+### Date and status
+
+- Updated after frontend/backend integration and feed completion.
+- Current status: `READY_WITH_ASSUMPTIONS`.
+- Current validation: `ai-pipeline/artifacts/06_implementation/IMPLEMENTATION_VALIDATION.md`.
+
+### Current implementation
+
+- Django accounts and session authentication are integrated with the React
+  client, including CSRF-protected writes.
+- Scores support publication, newest-first listing, exact case-insensitive
+  instrument filtering, server-side pages of ten, detail, owner-only edit and
+  delete, reactions, and append-only comments.
+- The frontend supports registration, login, profile, score creation, feed
+  filtering/pagination, score detail, reactions, comments, edit, and delete.
+- PostgreSQL configuration, Docker Compose, migrations, and SQLite test
+  fallback are present.
+
+### Current verification
+
+- `manage.py check`: passed with SQLite.
+- `manage.py makemigrations --check --dry-run`: passed.
+- `manage.py test scores`: 53 tests passed with SQLite.
+- `npm run build`: passed.
+- `npx tsc --noEmit --pretty false`: passed.
+- PostgreSQL execution remains pending because the local server rejected the
+  configured credentials; this is recorded in the validation artifact.
+
+### Open decisions and gates
+
+- The API migration to the approved `/api/v1/` prefix is complete across Django
+  routes, frontend calls, Vite proxy configuration, tests, and implementation
+  artifacts.
+- The implementation uses a reaction toggle endpoint while the architecture
+  describes separate like operations.
+- P07 must validate PostgreSQL and the complete browser flow matrix.

@@ -9,7 +9,7 @@
 - Version: 1.0
 - Execution date: 2026-10-11
 - Implementation status: `READY_WITH_REVIEW_GATES`
-- Validation report: `artifacts/06_implementation/US-001_REGISTRATION_VALIDATION.md`
+- Validation report: `ai-pipeline/artifacts/06_implementation/US-001_REGISTRATION_VALIDATION.md`
 - Prompt: `prompts/06_implementation/P06.2_US-001_register_an_account.md`
 
 ## 2. Summary

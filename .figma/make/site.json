@@ -1,4 +1,5 @@
 {
+  "title": "Notara",
   "description": "An academic platform for sharing and managing short textual music scores with user authentication, filtering, reactions, and responsive design.",
   "robots": {
     "index": false

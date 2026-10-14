@@ -32,7 +32,7 @@ The implementation foundation was created in a minimal but coherent form consist
 | Backend foundation | Yes | PASS | Django project skeleton created under `backend/`. |
 | Frontend foundation | Yes | PASS | React + TypeScript + Vite app shell created under `frontend/`. |
 | Database environment config | Yes | PASS | PostgreSQL service configured in Docker Compose. |
-| Implementation stage artifacts | Yes | PASS | Logs and validation report created under `artifacts/06_implementation/`. |
+| Implementation stage artifacts | Yes | PASS | Logs and validation report created under `ai-pipeline/artifacts/06_implementation/`. |
 | Story-specific implementation | No | PASS | Business logic and user stories remain excluded from the foundation. |
 
 ## 5. Architecture Conformance

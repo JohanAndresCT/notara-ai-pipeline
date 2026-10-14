@@ -16,7 +16,7 @@
 - Implementation status: `READY_WITH_REVIEW_GATES`
 - Implementation prompt: `prompts/06_implementation/P06.5_US-004_publish_a_score.md`
 - Validation prompt: `prompts/06_implementation/P06.5_US-004_publish_a_score_validation.md`
-- Validation report: `artifacts/06_implementation/US-004_PUBLICATION_VALIDATION.md`
+- Validation report: `ai-pipeline/artifacts/06_implementation/US-004_PUBLICATION_VALIDATION.md`
 
 ## 2. Summary
 
