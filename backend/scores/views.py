@@ -2,7 +2,7 @@ import json
 import re
 from json import JSONDecodeError
 
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.middleware.csrf import CsrfViewMiddleware
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -176,7 +176,7 @@ def score_detail_view(request, score_id):
         return JsonResponse({"message": "You do not have permission to edit this score."}, status=403)
     if request.method == "DELETE":
         score.delete()
-        return JsonResponse({}, status=204)
+        return HttpResponse(status=204)
 
     payload, payload_error = _json_payload(request)
     if payload_error:
@@ -284,7 +284,7 @@ def score_comment_detail_view(request, score_id, comment_id):
     if comment.author_id != request.user.pk:
         return JsonResponse({"message": "You do not have permission to delete this comment."}, status=403)
     comment.delete()
-    return JsonResponse({}, status=204)
+    return HttpResponse(status=204)
 
 
 @require_http_methods(["POST"])

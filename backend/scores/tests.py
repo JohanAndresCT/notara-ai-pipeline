@@ -1,9 +1,11 @@
 import json
+from unittest.mock import patch
 
 from django.db import IntegrityError
-from django.test import Client, TestCase
+from django.test import Client, RequestFactory, TestCase
 
 from accounts.models import User
+from .views import score_comment_detail_view, score_detail_view
 from .models import Comment, Like, Reaction, Score
 
 
@@ -393,6 +395,15 @@ class ScoreDeleteTests(TestCase):
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Score.objects.count(), 0)
 
+    def test_delete_204_response_has_no_body(self):
+        request = RequestFactory().delete(f"/api/v1/scores/{self.score.pk}/")
+        request.user = self.author
+        with patch("scores.views._csrf_middleware.process_view", return_value=None):
+            response = score_detail_view(request, self.score.pk)
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.content, b"")
+
     def test_deleted_score_absent_from_feed(self):
         self.delete_score(self.score.pk)
         feed = self.client.get("/api/v1/scores/").json()["scores"]
@@ -651,6 +662,22 @@ class ScoreCommentTests(TestCase):
         response = self.delete_comment(comment.pk)
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Comment.objects.count(), 0)
+
+    def test_delete_204_response_has_no_body(self):
+        comment = Comment.objects.create(
+            score=self.score,
+            author=self.commenter,
+            body="Great score!",
+        )
+        request = RequestFactory().delete(
+            f"/api/v1/scores/{self.score.pk}/comments/{comment.pk}/"
+        )
+        request.user = self.commenter
+        with patch("scores.views._csrf_middleware.process_view", return_value=None):
+            response = score_comment_detail_view(request, self.score.pk, comment.pk)
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.content, b"")
 
     def test_non_author_cannot_delete_comment(self):
         self.post_comment()

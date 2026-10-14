@@ -1,0 +1,14 @@
+.git
+.github
+.env*
+.venv
+venv
+node_modules
+frontend/node_modules
+frontend/playwright-report
+frontend/test-results
+media
+ai-pipeline
+artifacts
+*.sqlite3
+*-debug.log*
