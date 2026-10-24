@@ -1,7 +1,8 @@
 import json
 
-from django.db import IntegrityError
+from django.db import IntegrityError, connection
 from django.test import Client, RequestFactory, TestCase
+from django.test.utils import CaptureQueriesContext
 
 from accounts.models import User
 from .views import score_comment_detail_view, score_detail_view
@@ -902,3 +903,73 @@ class ScoreCommunityApiTests(TestCase):
         self.assertEqual(body["page_size"], 10)
         self.assertEqual(body["total_pages"], 2)
         self.assertTrue(all(score["instrument"] == "Piano" for score in body["scores"]))
+
+
+class ScoreFeedQueryCountTests(TestCase):
+    """El feed no debe hacer más consultas a medida que crece el número de partituras."""
+
+    def setUp(self):
+        self.client = Client()
+        self.viewer = User.objects.create_user(
+            email="viewer@example.com", name="Viewer", password="correct-horse"
+        )
+        self.author = User.objects.create_user(
+            email="author@example.com", name="Author", password="correct-horse"
+        )
+        self.client.force_login(self.viewer)
+
+    def add_scores(self, count):
+        for index in range(count):
+            score = Score.objects.create(
+                owner=self.author,
+                title=f"Score {Score.objects.count()}-{index}",
+                instrument="Piano",
+                description="Practice theme",
+                score_format=Score.Format.TEXT,
+                content="C D E F",
+            )
+            Reaction.objects.create(score=score, user=self.viewer)
+            Like.objects.create(score=score, user=self.viewer)
+            Comment.objects.create(score=score, author=self.author, body="Nice")
+
+    def feed_query_count(self):
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get("/api/v1/scores/")
+        self.assertEqual(response.status_code, 200)
+        return len(queries)
+
+    def test_feed_query_count_does_not_grow_with_scores(self):
+        self.add_scores(2)
+        queries_with_few = self.feed_query_count()
+        self.add_scores(8)
+        queries_with_many = self.feed_query_count()
+
+        self.assertEqual(queries_with_few, queries_with_many)
+
+    def test_feed_reports_counts_and_current_user_state(self):
+        self.add_scores(1)
+        other = User.objects.create_user(
+            email="other@example.com", name="Other", password="correct-horse"
+        )
+        score = Score.objects.get()
+        Reaction.objects.create(score=score, user=other)
+        Comment.objects.create(score=score, author=other, body="Second")
+
+        data = self.client.get("/api/v1/scores/").json()["scores"][0]
+
+        self.assertEqual(data["reaction_count"], 2)
+        self.assertTrue(data["user_reacted"])
+        self.assertEqual(data["like_count"], 1)
+        self.assertTrue(data["is_liked"])
+        self.assertEqual(data["comment_count"], 2)
+
+    def test_detail_reports_counts_and_current_user_state(self):
+        self.add_scores(1)
+        score = Score.objects.get()
+
+        data = self.client.get(f"/api/v1/scores/{score.pk}/").json()["score"]
+
+        self.assertEqual(data["reaction_count"], 1)
+        self.assertTrue(data["user_reacted"])
+        self.assertEqual(data["comment_count"], 1)
+        self.assertEqual(len(data["comments"]), 1)

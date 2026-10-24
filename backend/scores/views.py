@@ -2,6 +2,8 @@ import json
 import re
 from json import JSONDecodeError
 
+from django.db.models import Count, Exists, IntegerField, OuterRef, Subquery
+from django.db.models.functions import Coalesce
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 
@@ -10,6 +12,51 @@ from .models import Comment, Like, Reaction, Score
 ABC_REQUIRED_FIELDS = ("X", "T", "M", "L", "K")
 ABC_NOTE_PATTERN = re.compile(r"(?<![A-Za-z])[A-Ga-gzZ](?:[,']*)(?:\d+|/\d+)?")
 ABC_MUSIC_LINE_PATTERN = re.compile(r"^[A-Ga-gzZ0-9|:\[\](){}<>^_=,'/.\-\s]+$")
+
+
+def _count_subquery(model):
+    """Cuenta los registros de `model` ligados a cada partitura, sin multiplicar filas."""
+    return Coalesce(
+        Subquery(
+            model.objects.filter(score=OuterRef("pk"))
+            .order_by()
+            .values("score")
+            .annotate(total=Count("pk"))
+            .values("total"),
+            output_field=IntegerField(),
+        ),
+        0,
+    )
+
+
+def _scores_with_stats(user):
+    """Partituras con conteos y estado del usuario calculados en la misma consulta."""
+    return Score.objects.select_related("owner").annotate(
+        reaction_total=_count_subquery(Reaction),
+        like_total=_count_subquery(Like),
+        comment_total=_count_subquery(Comment),
+        user_reacted_flag=Exists(Reaction.objects.filter(score=OuterRef("pk"), user=user)),
+        is_liked_flag=Exists(Like.objects.filter(score=OuterRef("pk"), user=user)),
+    )
+
+
+def _score_stats(score, user):
+    if hasattr(score, "reaction_total"):
+        return {
+            "reaction_count": score.reaction_total,
+            "user_reacted": score.user_reacted_flag,
+            "like_count": score.like_total,
+            "is_liked": score.is_liked_flag,
+            "comment_count": score.comment_total,
+        }
+    # Partitura recién creada o sin anotar: se calculan los conteos con consultas sueltas.
+    return {
+        "reaction_count": score.reactions.count(),
+        "user_reacted": score.reactions.filter(user=user).exists() if user else False,
+        "like_count": score.likes.count(),
+        "is_liked": score.likes.filter(user=user).exists() if user else False,
+        "comment_count": score.comments.count(),
+    }
 
 
 def _score_data(score, user=None):
@@ -23,11 +70,7 @@ def _score_data(score, user=None):
         "author": score.owner.name,
         "author_id": score.owner_id,
         "created_at": score.created_at.isoformat(),
-        "reaction_count": score.reactions.count(),
-        "user_reacted": score.reactions.filter(user=user).exists() if user else False,
-        "like_count": score.likes.count(),
-        "is_liked": score.likes.filter(user=user).exists() if user else False,
-        "comment_count": score.comments.count(),
+        **_score_stats(score, user),
         "is_owner": user is not None and score.owner_id == user.pk,
     }
 
@@ -109,7 +152,7 @@ def scores_view(request):
                 raise ValueError
         except (TypeError, ValueError):
             return JsonResponse({"message": "Page must be a positive integer."}, status=400)
-        scores = Score.objects.select_related("owner").all()
+        scores = _scores_with_stats(request.user)
         instrument = request.GET.get("instrument", "").strip()
         if instrument:
             scores = scores.filter(instrument__iexact=instrument)
@@ -153,7 +196,7 @@ def score_detail_view(request, score_id):
     if not request.user.is_authenticated:
         return JsonResponse({"message": "Authentication is required."}, status=401)
     try:
-        score = Score.objects.select_related("owner").get(pk=score_id)
+        score = _scores_with_stats(request.user).get(pk=score_id)
     except Score.DoesNotExist:
         return JsonResponse({"message": "Score not found."}, status=404)
 
