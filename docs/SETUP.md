@@ -12,7 +12,7 @@ Guía para ejecutar Notara en local, con Docker Compose y para entender el despl
 | PostgreSQL | 16 (Compose y CI) | `docker-compose.yml`, `ci.yml` |
 | Docker + Docker Compose | Solo para la opción Compose | `docker-compose.yml` |
 
-> `.mise.toml` declara Node 22 y pnpm 10.34.3, lo que difiere de `package.json`, el Dockerfile y el CI. Ver [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md) (`P09-DISC-005`). No se verificó cuál es la versión mínima real soportada.
+> `.mise.toml`, `package.json`, el Dockerfile y el CI usan Node 24 y pnpm 12.11.2. No se verificó cuál es la versión mínima real soportada.
 
 ## Variables de entorno
 
@@ -60,7 +60,7 @@ pnpm install
 pnpm dev
 ```
 
-El servidor de desarrollo de Vite hace proxy de `/api` hacia `http://127.0.0.1:8000`. Su puerto es `PORT` o 8443 (`vite.config.ts`).
+El servidor de desarrollo de Vite hace proxy de `/api` hacia `http://127.0.0.1:8000`. Su puerto es `PORT` o 5173 (`vite.config.ts`).
 
 ## Opción B: Docker Compose
 

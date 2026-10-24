@@ -4,7 +4,7 @@
 
 | Capa | Herramienta | Cantidad | Último resultado verificado |
 |---|---|---:|---|
-| Backend | Django `manage.py test` (`accounts/tests.py`, `scores/tests.py`) | 88 | 88 OK, SQLite, Python 3.13.14, Django 5.2.1 (ejecutado en P09, 81 s) |
+| Backend | Django `manage.py test` (`accounts/tests.py`, `scores/tests.py`) | 91 | 91 OK, SQLite, Python 3.12.3, Django 5.2.18 (2026-10-24, 49 s). En P09 eran 88 pruebas con Django 5.2.1; se agregaron 3 de consultas del feed |
 | E2E | Playwright (`frontend/e2e/notara-e2e.spec.ts`) | 5 | 5/5 en SQLite en P07 (22.9 s); **no se reejecutó en P09** |
 | Tipos | `tsc --noEmit` | n/a | Exit 0 (P09) |
 | Build | `vite build` | n/a | Exit 0 (P09); advierte sobre `@tailwind utilities` en CSS |

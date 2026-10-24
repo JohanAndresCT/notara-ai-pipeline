@@ -6,7 +6,7 @@ Referencia de los endpoints existentes en `backend/notara_backend/urls.py`, con 
 
 - Formato JSON. Los errores usan `{"message": "..."}` o `{"errors": {"campo": ["..."]}}`. Los mensajes están en inglés.
 - Autenticación por sesión (cookie). Sin sesión, los endpoints protegidos responden **401** `{"message": "Authentication is required."}`.
-- CSRF: `GET /api/v1/csrf/` devuelve `{"csrfToken": "..."}` y fija la cookie. `CsrfViewMiddleware` está activo, pero varias vistas de `scores` están marcadas `@csrf_exempt` (ver [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md), `P09-DISC-007`).
+- CSRF: `GET /api/v1/csrf/` devuelve `{"csrfToken": "..."}` y fija la cookie. `CsrfViewMiddleware` está activo para todas las vistas: las peticiones que modifican datos deben enviar la cabecera `X-CSRFToken`; sin ella la respuesta es 403.
 - Existen **dos prefijos**: `/api/...` (heredado) y `/api/v1/...`. El frontend usa `/api/v1/` salvo `deleteComment`, que usa `/api/comments/<id>/`. Esta guía usa `/api/v1/` salvo indicación.
 - Probado por el equipo y en producción (2026-10-14): `/api/health/` y `/api/v1/health/` → 200; `/api/me/` y `/api/v1/scores/` sin sesión → 401.
 

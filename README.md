@@ -7,7 +7,7 @@ Aplicación web responsive de comunidad y gestor básico de partituras en texto 
 | Dimensión | Estado | Evidencia |
 |---|---|---|
 | Implementación | `READY_WITH_ASSUMPTIONS`: MVP-001, 002, 004, 006, 007 y 008 implementados; MVP-003, 005, 009 y 010 con diferencias por decidir | [REQUIREMENTS_COVERAGE.md](./docs/REQUIREMENTS_COVERAGE.md) |
-| Pruebas | Backend: 88/88 OK en SQLite (P09). E2E: 5/5 en SQLite (P07, no reejecutado en P09). PostgreSQL local: no ejecutado | [TESTING.md](./docs/TESTING.md) |
+| Pruebas | Backend: 91/91 OK en SQLite (2026-10-24). E2E: 5/5 en SQLite (P07, no reejecutado en P09). PostgreSQL local: no ejecutado | [TESTING.md](./docs/TESTING.md) |
 | CI | Workflow `ci.yml` con 4 jobs. Ejecuciones #7 y #16 exitosas; la #15 falló en E2E (causa desconocida) | [TESTING.md](./docs/TESTING.md) |
 | Despliegue | `DEPLOYED` en Railway: <https://notara-production.up.railway.app>. Observado el 2026-10-14: `/api/health/` devuelve 200 | [SETUP.md](./docs/SETUP.md) |
 | Documentación | Generada en P09, pendiente de validación | [DOCUMENTATION_REPORT.md](./ai-pipeline/artifacts/09_documentation/DOCUMENTATION_REPORT.md) |

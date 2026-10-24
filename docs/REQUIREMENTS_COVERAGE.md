@@ -25,11 +25,11 @@ Estados: `IMPLEMENTED`, `PARTIAL` (implementado con diferencias que requieren de
 |---|---|---|
 | NFR-001 Legibilidad | IMPLEMENTED | Líneas conservadas en `<pre>` y formato visible |
 | NFR-002 Responsive 360/768/1280 | UNKNOWN | P06 reporta comprobaciones manuales de US-003 a 360 y 1280 px; no hay validación automática ni registro para Edge/Firefox |
-| NFR-003 Seguridad | PARTIAL | Autenticación exigida y propiedad verificada; varias vistas de `scores` son `@csrf_exempt` (`P09-DISC-007`) |
+| NFR-003 Seguridad | PARTIAL | Autenticación exigida, propiedad verificada y CSRF validado por el middleware global (`P09-DISC-007` resuelto). Siguen sin validadores de contraseña ni límite de intentos de login |
 
 ## Trazabilidad con pruebas
 
-Backend: 88 pruebas (`accounts` y `scores`). E2E: 5 escenarios que cubren MVP-001, 002, 004, 005, 006, 008 y el acceso anónimo (FR-017). Reacciones y comentarios se prueban solo en el backend y, según P07, en el E2E de publicación/detalle/reacción. Ver [TESTING.md](./TESTING.md).
+Backend: 91 pruebas (`accounts` y `scores`). E2E: 5 escenarios que cubren MVP-001, 002, 004, 005, 006, 008 y el acceso anónimo (FR-017). Reacciones y comentarios se prueban solo en el backend y, según P07, en el E2E de publicación/detalle/reacción. Ver [TESTING.md](./TESTING.md).
 
 ## Validación de historias de P06
 
