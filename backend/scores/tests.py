@@ -1,5 +1,4 @@
 import json
-from unittest.mock import patch
 
 from django.db import IntegrityError
 from django.test import Client, RequestFactory, TestCase
@@ -297,10 +296,12 @@ class ScoreEditTests(TestCase):
 
     def test_edit_requires_authentication(self):
         anon = Client(enforce_csrf_checks=True)
+        anon_csrf = anon.get("/api/v1/csrf/").json()["csrfToken"]
         response = anon.patch(
             f"/api/v1/scores/{self.score.pk}/",
             data=json.dumps({"title": "Anon"}),
             content_type="application/json",
+            HTTP_X_CSRFTOKEN=anon_csrf,
         )
         self.assertEqual(response.status_code, 401)
 
@@ -398,8 +399,7 @@ class ScoreDeleteTests(TestCase):
     def test_delete_204_response_has_no_body(self):
         request = RequestFactory().delete(f"/api/v1/scores/{self.score.pk}/")
         request.user = self.author
-        with patch("scores.views._csrf_middleware.process_view", return_value=None):
-            response = score_detail_view(request, self.score.pk)
+        response = score_detail_view(request, self.score.pk)
 
         self.assertEqual(response.status_code, 204)
         self.assertEqual(response.content, b"")
@@ -423,9 +423,11 @@ class ScoreDeleteTests(TestCase):
 
     def test_delete_requires_authentication(self):
         anon = Client(enforce_csrf_checks=True)
+        anon_csrf = anon.get("/api/v1/csrf/").json()["csrfToken"]
         response = anon.delete(
             f"/api/v1/scores/{self.score.pk}/",
             content_type="application/json",
+            HTTP_X_CSRFTOKEN=anon_csrf,
         )
         self.assertEqual(response.status_code, 401)
         self.assertEqual(Score.objects.count(), 1)
@@ -673,8 +675,7 @@ class ScoreCommentTests(TestCase):
             f"/api/v1/scores/{self.score.pk}/comments/{comment.pk}/"
         )
         request.user = self.commenter
-        with patch("scores.views._csrf_middleware.process_view", return_value=None):
-            response = score_comment_detail_view(request, self.score.pk, comment.pk)
+        response = score_comment_detail_view(request, self.score.pk, comment.pk)
 
         self.assertEqual(response.status_code, 204)
         self.assertEqual(response.content, b"")

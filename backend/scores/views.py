@@ -3,8 +3,6 @@ import re
 from json import JSONDecodeError
 
 from django.http import HttpResponse, JsonResponse
-from django.middleware.csrf import CsrfViewMiddleware
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from .models import Comment, Like, Reaction, Score
@@ -12,7 +10,6 @@ from .models import Comment, Like, Reaction, Score
 ABC_REQUIRED_FIELDS = ("X", "T", "M", "L", "K")
 ABC_NOTE_PATTERN = re.compile(r"(?<![A-Za-z])[A-Ga-gzZ](?:[,']*)(?:\d+|/\d+)?")
 ABC_MUSIC_LINE_PATTERN = re.compile(r"^[A-Ga-gzZ0-9|:\[\](){}<>^_=,'/.\-\s]+$")
-_csrf_middleware = CsrfViewMiddleware(lambda request: None)
 
 
 def _score_data(score, user=None):
@@ -151,7 +148,6 @@ def scores_view(request):
     return JsonResponse({"score": _score_data(score, request.user)}, status=201)
 
 
-@csrf_exempt
 @require_http_methods(["GET", "PATCH", "DELETE"])
 def score_detail_view(request, score_id):
     if not request.user.is_authenticated:
@@ -169,9 +165,6 @@ def score_detail_view(request, score_id):
         ]
         return JsonResponse({"score": data})
 
-    csrf_failure = _csrf_middleware.process_view(request, None, (), {})
-    if csrf_failure is not None:
-        return csrf_failure
     if score.owner_id != request.user.pk:
         return JsonResponse({"message": "You do not have permission to edit this score."}, status=403)
     if request.method == "DELETE":
@@ -216,14 +209,10 @@ def score_detail_view(request, score_id):
     return JsonResponse({"score": _score_data(score, request.user)})
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def score_reaction_view(request, score_id):
     if not request.user.is_authenticated:
         return JsonResponse({"message": "Authentication is required."}, status=401)
-    csrf_failure = _csrf_middleware.process_view(request, None, (), {})
-    if csrf_failure is not None:
-        return csrf_failure
     try:
         score = Score.objects.get(pk=score_id)
     except Score.DoesNotExist:
@@ -238,15 +227,10 @@ def score_reaction_view(request, score_id):
     )
 
 
-@csrf_exempt
 @require_http_methods(["GET", "POST"])
 def score_comments_view(request, score_id):
     if not request.user.is_authenticated:
         return JsonResponse({"message": "Authentication is required."}, status=401)
-    if request.method == "POST":
-        csrf_failure = _csrf_middleware.process_view(request, None, (), {})
-        if csrf_failure is not None:
-            return csrf_failure
     try:
         score = Score.objects.get(pk=score_id)
     except Score.DoesNotExist:
@@ -269,14 +253,10 @@ def score_comments_view(request, score_id):
     return JsonResponse({"comment": _comment_data(comment)}, status=201)
 
 
-@csrf_exempt
 @require_http_methods(["DELETE"])
 def score_comment_detail_view(request, score_id, comment_id):
     if not request.user.is_authenticated:
         return JsonResponse({"message": "Authentication is required."}, status=401)
-    csrf_failure = _csrf_middleware.process_view(request, None, (), {})
-    if csrf_failure is not None:
-        return csrf_failure
     try:
         comment = Comment.objects.get(pk=comment_id, score_id=score_id)
     except Comment.DoesNotExist:
