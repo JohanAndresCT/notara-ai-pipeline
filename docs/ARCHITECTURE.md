@@ -31,7 +31,7 @@ En desarrollo, Vite sirve la SPA y hace proxy de `/api` al servidor de Django.
 
 ## Backend
 
-- Django 5.2.1 y Django REST Framework 3.15.2 en `INSTALLED_APPS`. Las vistas de `accounts` y `scores` devuelven `JsonResponse`.
+- Django 5.2.18 y Django REST Framework 3.15.2 en `INSTALLED_APPS`. Las vistas de `accounts` y `scores` devuelven `JsonResponse`.
 - Autenticación por sesión y CSRF de Django. Cookies `SameSite=Lax`.
 - Base de datos seleccionada con `DJANGO_DB_ENGINE` (`sqlite` o PostgreSQL).
 - Rutas duplicadas bajo `/api/` y `/api/v1/` (ver [API.md](./API.md) y `P09-DISC-001`).

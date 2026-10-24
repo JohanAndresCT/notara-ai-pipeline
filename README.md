@@ -29,7 +29,7 @@ La interfaz no renderiza notación musical; muestra el contenido como texto.
 
 | Capa | Tecnología |
 |---|---|
-| Backend | Django 5.2.1, Django REST Framework 3.15.2, Gunicorn 23 |
+| Backend | Django 5.2.18, Django REST Framework 3.15.2, Gunicorn 23 |
 | Frontend | React 19, TypeScript 5.7, Vite 8, Tailwind CSS 4 |
 | Base de datos | PostgreSQL 16 (producción y CI); SQLite para pruebas locales |
 | Pruebas | Django test runner, Playwright |
