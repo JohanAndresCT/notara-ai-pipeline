@@ -19,6 +19,8 @@ frontend/playwright-report/
 frontend/test-results/
 vite.config.*.timestamp-*
 *.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
 
 # Editor
 .vscode/
