@@ -1,244 +1,73 @@
 # P05 - Software Architecture Design
 
-**Version:** 1.0  
-**Stage:** P05 - Architecture  
-**Type:** Generation Prompt  
-**Project:** Notara  
-**Previous Stage:** P04 - UX/UI  
+**Version:** 2.0
+**Stage:** P05 - Architecture
+**Type:** Generation Prompt
+**Project:** Notara
+**Release covered:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT), incremental update of MVP 1
+**Previous Stage:** P04 - UX/UI
 **Next Stage:** P06 - Implementation
+
+## Change Log
+
+| Version | Change |
+|---|---|
+| 1.0 | Architecture proposal for MVP 1 before implementation. |
+| 2.0 | Incremental mode for MVP 2. The delivered MVP 1 code and deployment are the baseline ("as built"); MVP 2 is designed as an addendum with ADRs for external voice services, audio storage, synchronous processing limits, usage quotas and the ABC reader. External services are allowed only as decided in DEC-201-DEC-203. |
 
 ## 1. Purpose
 
-Transform the validated Notara context, product vision, requirements,
-prioritization, and UX specification into a clear, traceable architecture for
-MVP 1. Define the system boundaries, logical components, data and API
-responsibilities, security approach, deployment shape, quality-attribute
-responses, decisions, risks, and P06 handoff.
+Design the smallest maintainable architecture change that lets the delivered Notara system satisfy the MVP 2 requirements (FR-018-FR-044, NFR-004-NFR-010), the plan (P03) and the UX handoff (P04 section 14), and record it as an addendum to the MVP 1 architecture.
 
-The architecture is a proposal for human review. It is not evidence that a
-technology choice has been approved, code exists, or deployment has occurred.
+The result is a proposal for human review. It does not claim code exists.
 
-## 2. Inputs and Source of Truth
-
-Review these repository artifacts before generating the architecture:
+## 2. Inputs
 
 ```text
-ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md
-ai-pipeline/outputs/00_context/CONTEXT_VALIDATION.md
-ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md
-ai-pipeline/outputs/01_discovery/PRODUCT_VISION_VALIDATION.md
-ai-pipeline/outputs/02_requirements/REQUIREMENTS.md
-ai-pipeline/outputs/02_requirements/REQUIREMENTS_VALIDATION.md
-ai-pipeline/outputs/03_planning/PRIORITIZATION.md
-ai-pipeline/outputs/03_planning/PRIORITIZATION_VALIDATION.md
-ai-pipeline/outputs/04_ux/UX_SPEC.md
-ai-pipeline/outputs/04_ux/UX_SPEC_VALIDATION.md
-ai-pipeline/outputs/05_architecture/ARCHITECTURE.md (if present, treat as a draft to review/update)
+ai-pipeline/outputs/02_requirements/REQUIREMENTS.md (v3.0) and validation
+ai-pipeline/outputs/03_planning/PRIORITIZATION.md (v2.0) and validation (PRE-001-PRE-010)
+ai-pipeline/outputs/04_ux/UX_SPEC.md (v2.0) and validation (handoff needs, UX-VAL-203)
+ai-pipeline/outputs/00_context/DECISIONS_MVP2.md
+ai-pipeline/outputs/05_architecture/ARCHITECTURE.md (v1.0)
+Repository: backend/, frontend/, Dockerfile, docker/, deploy/, .github/workflows/
 ai-pipeline/prompts/system/SYSTEM_PROMPT.md
 ```
 
-The repository is the source of truth. P02 is authoritative for requirements
-and approved product decisions; P03 for P0/P1 priorities; P04 for screens,
-flows, access states, and responsive UX constraints. Do not rely on
-undocumented conversation context.
+The repository is authoritative for the MVP 1 baseline. Where it differs from architecture v1.0, record the as-built state and the deviation.
 
-Generate or update:
+## 3. Role
 
-```text
-ai-pipeline/outputs/05_architecture/ARCHITECTURE.md
-```
+Act as a **Senior Software Architect**. You must explain each technical choice (fit, alternatives, trade-offs, approval status), keep authentication, authorization, validation and data ownership server-side, and distinguish FACT, DECISION, PROPOSAL, ASSUMPTION and UNKNOWN.
 
-If existing architecture decisions conflict with upstream artifacts, identify
-the conflict and impact; do not silently choose an interpretation. Recommend
-technical defaults only when reasonable, and label them as proposals pending
-human approval. If missing or contradictory evidence prevents a reliable
-design, identify it and mark the affected decision `BLOCKED`.
+You must not add product capabilities, add microservices, queues or providers beyond the decisions, invent quantitative targets, assign people or dates, or claim implementation exists.
 
-## 3. Role and Boundaries
+## 4. Process
 
-Act as a **Senior Software Architect** for the Notara academic MVP.
+1. **As-built baseline:** summarize the delivered stack, modules, API style, storage, deployment, workers and timeouts, and the deviations from v1.0.
+2. **Drivers:** extract MVP 2 functional drivers, the UX handoff needs, decisions, NFRs and P03 preconditions that are technical (PRE-005, PRE-007, PRE-009).
+3. **Context:** update the system context with the external voice services and trust boundaries.
+4. **Decisions:** record ADRs for provider integration, processing model (synchronous vs. asynchronous), audio storage and serving, cache, quotas, ABC reading for solfege/tutor/piano, voice comments, API versioning, runtime and timeouts, configuration and testing.
+5. **Components, data, interfaces:** describe new modules, model changes, endpoints, request/response outcomes and error codes that the UX messages need.
+6. **Runtime flows:** dictation, voice comment, solfege/tutor with cache, quota and fallback, piano, MP3, comment deletion.
+7. **Security, privacy, quality:** secrets, upload validation, protected media, personal data lifecycle, logging, NFR responses with verification evidence.
+8. **Deployment:** environment variables, worker model, timeouts, storage persistence, CI behavior.
+9. **Conflicts and decisions needed:** report any conflict with upstream artifacts (decisions, UX handoff, requirements) and propose resolutions without applying them silently.
+10. **Traceability and P06 handoff:** map FR/NFR/US/FLOW to components and endpoints; order implementation consistent with P03 groups.
 
-You must:
+## 5. Output
 
-- choose the smallest maintainable design that satisfies the approved scope
-	and the five-person, one two-week sprint constraint;
-- explain technology recommendations through requirement fit, known team
-	capability, complexity, security, deployment constraints, alternatives,
-	trade-offs, and impact;
-- distinguish `FACT`, `ASSUMPTION`, `DECISION`, `PROPOSAL`, and `UNKNOWN`;
-- preserve identifiers including `FR-*`, `NFR-*`, `HU*`, `AC-*`, `BR-*`,
-	`Q-*`, and P04 `SCR-*` / `FLOW-*`;
-- make authentication, authorization, validation, and data ownership
-	boundaries explicit.
+`ai-pipeline/outputs/05_architecture/ARCHITECTURE.md` with: Change Log; Metadata; Executive Summary; MVP 1 As-Built Baseline; MVP 2 Drivers and Boundaries; System Context; Technology Decisions; Logical Components; Data Model; API Boundaries; Runtime Flows; Security and Privacy; Quality Attributes; Deployment and Configuration; ADRs; Conflicts; Risks, Assumptions and Decisions Needed; Traceability; P06 Handoff; Status.
 
-You must not:
+## 6. Status
 
-- add or reprioritize product capabilities;
-- present technical recommendations as approved facts;
-- invent team expertise, hosting, budget, scale, availability, performance,
-	privacy, or deployment constraints;
-- add microservices, queues, external integrations, or infrastructure without
-	demonstrated need and rationale;
-- add voice, OMR, images, audio, differentiated roles, account recovery,
-	advanced ABC, extra feed sorting, or comment editing/deletion to MVP 1;
-- assign developers, dates, sprints, estimates, or Story Points;
-- generate code or claim implementation/deployment is complete.
+`READY_FOR_REVIEW`, `READY_WITH_WARNINGS` or `BLOCKED`. State P06 readiness separately.
 
-## 4. Approved Product and UX Baseline
+## 7. Self-review
 
-Notara MVP 1 is a responsive web community and basic textual score manager.
-Authenticated users can publish, discover, read, filter, comment on, and react
-to short scores. The promise is readable text, not audio or professional
-notation editing.
-
-Preserve these requirements and decisions:
-
-- Registration and login/logout (`FR-001`..`FR-002`); approved profile fields
-	and password change (`FR-003`..`FR-004`).
-- Score title, instrument, description, format, and content (`FR-005`); `.abc`
-	and plain text (`FR-006`); non-empty content up to 1,000 characters
-	(`FR-007`, `BR-004`).
-- Minimal ABC validation requires `X:`, `T:`, `M:`, `L:`, and `K:` fields plus
-	a valid musical line; advanced ABC is not required (`FR-008`, `BR-005`,
-	`Q-001`).
-- Publication makes valid content and metadata available (`FR-009`); only
-	authenticated owners edit/delete their scores (`FR-010`..`FR-011`,
-	`BR-007`).
-- Newest-first feed, 10 items per page, instrument filtering, and no extra
-	ordering (`FR-012`..`FR-013`, `BR-008`, `Q-003`).
-- Readable detail preserves line breaks and identifies format (`FR-014`,
-	`BR-009`, `NFR-001`).
-- Authenticated users can like/unlike and comment on another user's score
-	(`FR-015`..`FR-016`); comments cannot be edited/deleted (`BR-010`..`BR-011`,
-	`Q-004`). Protected actions require authentication (`FR-017`).
-- Account recovery is excluded; password change remains available (`Q-005`).
-- Responsive validation: current Chrome, Edge, Firefox at 360, 768, and
-	1280 px; Safari is outside initial scope (`NFR-002`, `Q-002`).
-- P0 is the coherent registration/authentication, publication,
-	discovery/detail/filter, reaction, and comment flow. Profile/password and
-	owner edit/delete are P1 and must not displace P0.
-- Preserve the remaining approved decision `Q-006` and all exclusions from
-	P02/P03/P04. No voice, OMR, image upload, audio, roles/administration,
-	account recovery, advanced ABC, extra sorting, or comment management in MVP.
-
-## 5. Architecture Design Process
-
-### Step 1 - Confirm inputs and drivers
-
-Record artifact versions and validation statuses. Reconcile historical P00
-warnings against later approved decisions. Extract product, functional,
-quality, team, and schedule drivers.
-
-### Step 2 - Define context and boundaries
-
-Show users, the Notara system boundary, trust boundaries, data ownership, and
-external systems only when supported by evidence. Include a concise context
-diagram. Do not invent hosting providers or external dependencies.
-
-### Step 3 - Choose and explain the architecture
-
-Select the simplest suitable architecture style. For each major stack,
-database, API, authentication, storage, or deployment recommendation, state:
-
-```text
-Approach / technology
-Requirement fit and rationale
-Relevant alternative(s)
-Trade-offs
-Approval status and impact
-```
-
-A modular monolith may be considered, but is not mandatory. If team skills,
-course restrictions, or hosting are unknown, mark the choice as a proposal
-pending confirmation.
-
-### Step 4 - Define logical components
-
-Describe client, application/API, domain responsibilities, and persistence.
-Cover identity/profile, scores, discovery, comments, and reactions without
-unnecessary code-level classes or deployment services.
-
-### Step 5 - Define conceptual data and interfaces
-
-Assess users, scores, comments, and likes; describe relationships and
-integrity rules required by approved behavior. Describe the necessary API or
-system interfaces and access states. Do not invent unspecified fields or
-policies. Flag registration/password details, comment validation/limits, user
-deletion semantics, and other schema-affecting unknowns.
-
-### Step 6 - Address security and quality attributes
-
-Explain authentication, ownership checks, server-side validation, safe text
-rendering, credential/session handling, secrets, and relevant data
-constraints. Connect each NFR to a design response and verifiable evidence.
-Do not claim quantitative service levels without approved targets.
-
-### Step 7 - Describe deployment and decisions
-
-Give a minimal deployment/environment shape only as far as evidence permits.
-Leave provider-specific and operational unknowns visible. Record major
-decisions as stable `ADR-*` entries with rationale, trade-offs, and revisit
-triggers.
-
-### Step 8 - Trace and hand off
-
-Map `FR-001`..`FR-017`, `NFR-001`..`NFR-003`, P0/P1 scope, and relevant UX
-flows/screens to components, interfaces, data, and verification concerns.
-List risks, assumptions, human decisions, and P06 guidance that protects the
-P0 slice without assigning people or dates.
-
-## 6. Required Architecture Artifact Structure
-
-`ARCHITECTURE.md` must include:
-
-1. Metadata, status, sources, and upstream validation statuses.
-2. Executive summary.
-3. Architecture drivers, MVP boundary, and exclusions.
-4. System context and trust/system-boundary diagram.
-5. Technology decisions with rationale, alternatives, trade-offs, and
-	 approval status.
-6. Logical components and responsibilities.
-7. Conceptual data model and integrity constraints.
-8. API/interface boundaries and access rules, if applicable.
-9. Key publication, discovery, ownership, and interaction flows.
-10. Security/privacy baseline and unknown policies.
-11. Quality-attribute strategy tied to NFRs and verification evidence.
-12. Deployment/environment topology and infrastructure unknowns.
-13. Architecture decisions (`ADR-*`) and trade-offs.
-14. Risks, assumptions, unknowns, and human decisions needed.
-15. Requirement/UX traceability matrix.
-16. Implementation handoff and next-stage readiness.
-
-## 7. Status and Readiness
-
-Use exactly one status:
-
-```text
-READY_FOR_REVIEW
-READY_WITH_WARNINGS
-BLOCKED
-```
-
-These statuses describe artifact readiness, not human approval. State P06
-readiness separately and distinguish work that can proceed from required
-human decisions.
-
-## 8. Self-Review Checklist
-
-- [ ] All available P00-P04 artifacts and validation reports were reviewed.
-- [ ] Functional requirements, P0/P1, and P04 access/flow rules are preserved.
-- [ ] Authentication, ownership, content rules, display, feed, pagination,
-			and filtering are represented.
-- [ ] NFR-001..003 have design responses and verifiable evidence.
-- [ ] Technical choices include rationale, trade-offs, and approval status.
-- [ ] Missing product/operational rules are visible, not silently invented.
-- [ ] No unsupported scope, infrastructure, or quantitative target is stated
-			as fact.
-- [ ] Traceability, risks, assumptions, and P06 handoff are present.
-- [ ] No implementation or deployment completion is falsely claimed.
-
-## 9. Final Response
-
-Summarize the architecture status and design shape, technical recommendations
-and approval status, requirement coverage and trade-offs, and human decisions
-or blockers for P06.
+- Every FR-018-FR-044 and NFR-004-NFR-010 has a design response.
+- Every P04 handoff need is satisfied or a conflict is reported.
+- External services limited to decided ones; keys server-side only.
+- Error outcomes allow the UX messages (M-01-M-16) without server errors.
+- Personal-data lifecycle (DEC-214) and quotas (DEC-213) are enforced server-side.
+- Deployment changes needed (workers, timeouts, env vars, storage) are explicit.
+- No quantitative targets invented; unknowns visible.

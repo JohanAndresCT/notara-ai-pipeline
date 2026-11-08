@@ -2,90 +2,137 @@
 
 ## 1. Validation Metadata
 
-- **Validator:** P05 Architecture self-review against approved upstream artifacts
+- **Validator:** P05 - Software Architecture Validation Prompt v2.0 (Senior Architecture Reviewer)
 - **Project:** Notara
-- **Architecture Version:** 1.0
-- **Validation Date:** 2026-10-09
-- **Upstream validation statuses:** P01 `PASS`; P02 `PASS`; P03 `PASS`; P04 `PASS`; P00 warnings reconciled downstream.
+- **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
+- **Architecture Version:** 2.0
+- **Validation Date:** 2026-11-08
+- **Upstream statuses:** P02 `PASS_WITH_WARNINGS`; P03 `PASS_WITH_WARNINGS`; P04 `PASS_WITH_WARNINGS`
 - **Overall result:** `PASS_WITH_WARNINGS`
 - **P06 readiness:** `YES_WITH_REVIEW_GATES`
 
-The files `ai-pipeline/prompts/05_architecture/P05_architecture.md` and `ai-pipeline/prompts/05_architecture/P05_validation.md` were empty at the time of this work. This report therefore validates the architecture directly against the approved P00-P04 artifacts and does not claim to execute or satisfy unavailable prompt-specific criteria.
+> The MVP 1 report (architecture 1.0, result `PASS_WITH_WARNINGS`, produced while the P05 prompt files were empty) is preserved in Git history. This run uses the v2.0 validation prompt.
 
 ## 2. Executive Summary
 
-The architecture defines a complete, bounded implementation shape for the approved MVP: a responsive React/TypeScript client, a Django/DRF modular-monolith API, PostgreSQL persistence, same-origin session authentication, backend validation/authorization, API boundaries, deployment shape, and quality-attribute verification. It preserves the product's P0/P1 ordering and excludes unapproved capabilities.
+The addendum is the smallest sound change to the delivered system. It adds no service, queue or worker process. External services are limited to the decided ones and sit behind server-side adapters.
 
-No requirement-coverage blocker was found. Warnings remain for stack/team confirmation, hosting selection, and source requirements that do not define comment length, exact registration/password policy, quantitative service targets, or deployment operations.
+**Strengths:**
+- **Runtime risk addressed:** synchronous provider calls that would block the current two sync workers are handled with threaded workers and timeouts.
+- **Single ABC reader:** one reader serves solfege, tutor and piano, and piano playback needs no extra request.
+- **Privacy enforced in design:** dictation audio is not persisted, and voice-comment audio is deleted together with its comment, including on cascade.
+- **Server-side controls:** quotas and the cache are enforced on the server.
+- **Clean UX mapping:** every UX message maps to a typed error code.
+
+The as-built baseline was verified against the repository. Every FR-018-FR-044 and NFR-004-NFR-010 has a design response.
+
+**No CRITICAL or HIGH findings.**
+
+**Two MEDIUM findings:**
+- the ADRs and two conflicts with decisions need team approval;
+- storage persistence is still unverified.
+
+**Four LOW findings.**
 
 ## 3. Input Readiness
 
-| Input | Present | Status | Review result |
+| Input | Present | Status | Notes |
 |---|---|---|---|
-| P00 project context and validation | YES | `PASS_WITH_WARNINGS` | Scope, platform, team, and constraints reviewed; no hosting/stack selected upstream. |
-| P01 product vision and validation | YES | `PASS` | Product promise and exclusions preserved. |
-| P02 requirements and validation | YES | `PASS` | FR-001..017, NFR-001..003, business rules, dependencies reviewed. |
-| P03 prioritization and validation | YES | `PASS` | P0/P1 sequencing and one-sprint constraint preserved. |
-| P04 UX specification and validation | YES | `PASS` | Screens, flows, access boundaries, responsive targets, and display rules preserved. |
-| P05 architecture prompt | YES, empty | Not executable | No stage-specific architecture instructions available. |
-| P05 validation prompt | YES, empty | Not executable | No stage-specific validation rubric available. |
+| REQUIREMENTS v3.0 / validation | Yes | PASS_WITH_WARNINGS | All FR/NFR covered |
+| PRIORITIZATION v2.0 / validation | Yes | PASS_WITH_WARNINGS | Handoff order follows delivery groups; PRE-005, PRE-007, PRE-009 addressed |
+| UX_SPEC v2.0 / validation | Yes | PASS_WITH_WARNINGS | Six handoff needs and UX-VAL-203 addressed |
+| DECISIONS_MVP2.md | Yes | Team input | DEC-201-DEC-203 providers respected; DEC-202 CI part in conflict (reported) |
+| ARCHITECTURE v1.0 | Yes (Git) | — | ADR-001-ADR-005 preserved |
+| Repository | Yes | — | Spot-checked (section 4) |
 
-## 4. Structural and Design Validation
+## 4. As-Built Baseline Verification
 
-| Area | Present | Result | Notes |
-|---|---|---|---|
-| Architecture drivers and scope | YES | PASS | P0/P1 and exclusions are explicit. |
-| System context and logical components | YES | PASS | Browser, application/API, and database boundaries are clear. |
-| Technology decisions | YES | PASS_WITH_WARNING | Coherent stack selected; team/course confirmation is still required. |
-| Data model and constraints | YES | PASS_WITH_WARNING | User, score, comment, and like relationships are defined; unspecified fields are not given invented limits. |
-| API boundaries | YES | PASS | Covers identity, profile, scores, feed, comments, and likes. |
-| Authentication/authorization | YES | PASS | Session, CSRF, server-side ownership checks, and logout are covered. |
-| Content validation/display | YES | PASS | `.abc` subset, plain text, length boundary, escaping, and line breaks are covered. |
-| Deployment and operations | YES | PASS_WITH_WARNING | Topology is specified; provider, backups, and operational targets remain open. |
-| Quality verification | YES | PASS | Requirements map to concrete test evidence. |
-| Decision log, risks, handoff | YES | PASS | Trade-offs and implementation gates are visible. |
-
-## 5. Requirements Coverage
-
-| Requirement area | Architecture evidence | Result |
+| Claim | Evidence | Result |
 |---|---|---|
-| FR-001..004 identity/profile | Identity module and registration, auth, profile, and password endpoints | COVERED |
-| FR-005..009 publication | Server-side field/content validation and score persistence | COVERED |
-| FR-010..011 ownership | Backend owner checks on update/delete | COVERED |
-| FR-012..013 discovery | Database filtering and fixed 10-item newest-first pagination | COVERED |
-| FR-014 readable detail | Detail API and escaped, newline-preserving client display | COVERED |
-| FR-015 likes | Unique `(score, user)` constraint and idempotent API | COVERED |
-| FR-016 comments | Authenticated, non-owner create/read; no edit/delete endpoints | COVERED |
-| FR-017/NFR-003 security boundary | Session authentication and server-enforced authorization | COVERED |
-| NFR-001 readability | Stored format/content and whitespace-preserving display | COVERED |
-| NFR-002 responsive behavior | Supported browsers and viewport widths are explicitly test targets | COVERED |
-| P03/P04 scope | P0/P1 included; deferred and excluded functions omitted | COVERED |
+| Function-based views with `JsonResponse` and `{"errors": ...}` | `backend/scores/views.py` (e.g. lines 182, 289) | Verified |
+| `Comment.body` max 500 | `backend/scores/models.py:67` | Verified |
+| `Reaction` and `Like` both exist; `/api/v1/` uses `Reaction` | `models.py`; `urls.py` (`score-reactions` v1, `score-like` legacy) | Verified |
+| Comment deletion by author in `/api/v1/` | `urls.py` `score-comment-detail`; `views.py` lines 299-311 | Verified |
+| Profile photo via authenticated `FileResponse`, `default_storage` | `accounts/views.py` `profile_photo_view`; `settings.py` `STORAGES` | Verified |
+| Gunicorn 2 sync workers, no timeout set | `deploy/entrypoint.sh` (no `gthread`, no `--timeout`) | Verified |
+| Nginx `client_max_body_size 6m`, no `proxy_read_timeout` | `docker/nginx.conf.template` | Verified |
+| Frontend has only React as runtime dependency | `frontend/package.json` | Verified |
+| `MEDIA_ROOT=/data/media`, persistence unverified | `Dockerfile`; P08 deployment guide | Verified |
 
-## 6. Security and Data Integrity Review
+## 5. Requirements and UX Coverage
 
-- Client-side state is not trusted for authentication, ownership, or content validity.
-- Unsafe session-authenticated requests require CSRF protection; cookie flags and HTTPS are specified for deployment.
-- Password handling uses Django's authentication facilities; browser local storage is not used for tokens.
-- Score, comment, and profile content is rendered as escaped text rather than HTML.
-- The relational model includes uniqueness for a user's like per score and foreign-key relationships for owned content.
-- The architecture does not claim quantified security, availability, or performance guarantees absent approved targets.
+**Requirements: PASS.**
+- **Coverage:** an automated check found every FR-018-FR-044 and NFR-004-NFR-010 referenced. Section 17 maps each one to components and endpoints, and US-010-US-019 are all mapped.
+- **One gap fixed during review:** M-06 (dictation over 1,000 characters) is now handled explicitly in runtime flow 10.1.
 
-**Result:** `PASS` for the defined MVP security boundary; operational policies remain to be selected before public deployment.
+**UX handoff needs:**
 
-## 7. Findings and Warnings
+| Need | Response | Result |
+|---|---|---|
+| 1. Typed outcomes for dictation and voice comments | Error codes in section 9 (M-01, M-05b, M-07, M-09) | PASS |
+| 2. Synthesis outcomes: limit, unrenderable, unavailable | `DAILY_LIMIT_REACHED`, `ABC_UNSUPPORTED`, `NOT_ABC`, `AUDIO_UNAVAILABLE` | PASS |
+| 3. MP3 retrievable | MP3 body returned; download from the client object URL | PASS |
+| 4. Voice comment as one deletable entity | ADR-011; `on_commit` + `post_delete` | PASS |
+| 5. File loading and piano without server calls | Client-side file reading; events in the detail response (CONFLICT-ARCH-204 resolved) | PASS |
+| 6. Deletion compatible with confirmation | Unchanged delete endpoint; the confirmation is a UI concern | PASS |
+| UX-VAL-203 timeouts | ADR-014; timeouts lead to M-07/M-15 | PASS (values PROPOSAL) |
 
-No blocking architecture coverage findings identified.
+## 6. Technology and Architecture Decision Review
 
-| ID | Severity | Finding / Warning | Required action |
-|---|---|---|---|
-| WARN-001 | Medium | P00-P04 do not specify an implementation stack, and architecture prompt files are empty. The stack in P05 is therefore a reasoned recommendation, not an upstream-approved constraint. | Team/course owner reviews React/TypeScript, Django/DRF, and PostgreSQL before implementation. |
-| WARN-002 | Medium | Hosting provider and production operations are unspecified. | Select the deployment target and define HTTPS, secrets, backups, and migration/rollback handling before public release. |
-| WARN-003 | Low | Exact registration/password fields and comment validation/length are not fully specified in the reviewed requirements. | Confirm against the approved registration flow and product decisions; do not add arbitrary limits. |
-| WARN-004 | Low | No quantitative latency, availability, capacity, retention, or recovery targets are approved. | Keep claims qualitative until owners define targets; add operational checks if required. |
-| WARN-005 | Low | The phrase “valid musical line” has no concrete examples in the architecture inputs. | Agree representative valid/invalid examples before implementing the minimal ABC validator. |
+**PASS_WITH_WARNINGS.**
+- **ADR quality:** ADR-006-ADR-015 each state benefit, trade-off and revisit trigger, and all are labeled PROPOSAL.
+- **Providers:** the choices match DEC-201-DEC-203. FluidSynth, PyDub/FFmpeg and vendor SDKs are not added, with reasons. The new dependencies (`httpx`, `edge-tts`, `tone`) are justified.
+- **Rejected alternatives:** a job queue is rejected with a revisit trigger.
+- **API versioning:** ADR-013 freezes the legacy `/api/` routes, which resolves PRE-007 for MVP 2 without a risky cleanup.
+- **Open conflicts:** CONFLICT-ARCH-201 (DEC-202 in CI) and CONFLICT-ARCH-202 (500-character limit) are reported, not resolved silently.
 
-## 8. Final Decision
+## 7. Security, Data Integrity, Privacy and Runtime Review
 
-**Overall result: `PASS_WITH_WARNINGS`**
+**PASS.**
+- **Secrets:** keys are server-only and absent from CI.
+- **Uploads:** whitelist checked against both MIME and file signature, generated filenames, 2 MB server limit.
+- **Media:** served only through authenticated views with `nosniff`.
+- **Privacy:**
+  - no dictation persistence;
+  - voice-comment audio deleted on commit and on cascade, which also mitigates CONFLICT-203 (account deletion) for administrative deletions;
+  - cached audio contains no user voice.
+- **Logging:** no transcripts, audio or keys.
+- **Quota:** an atomic counter, incremented only on cache misses.
+- **Runtime budget:** primary 20 s plus fallback 20 s fits within the 75 s worker timeout; Nginx at 90 s sits above it.
+- **Failure handling:** expected provider failures return typed 4xx/503 JSON, never an unhandled error.
 
-**P06 readiness:** `YES_WITH_REVIEW_GATES`. Architecture coverage is sufficient to begin implementation planning, provided the team reviews the stack recommendation and resolves API-specific ambiguities before encoding them as schema constraints. Hosting-specific work is a release gate, not a reason to expand MVP scope.
+## 8. Scope and Planning Boundary Review
+
+**PASS.**
+- **Scope:** no new product capability. The tutor text header serves an approved UX proposal (UX-PROP-005), and quotas and limits come from DEC-213.
+- **Boundaries:** no people, dates or quantitative targets are claimed. Timeouts are labeled PROPOSAL, and NFR-009 stays open.
+- **Order:** the handoff order matches the P03 groups.
+
+## 9. Findings
+
+| ID | Severity | Category | Finding | Evidence | Recommendation |
+|---|---|---|---|---|---|
+| ARCH-VAL-201 | MEDIUM | Decisions | ADR-006-ADR-015 are proposals, and two conflicts with upstream need a decision: CONFLICT-ARCH-201 (fake engine in CI instead of `edge-tts`, against DEC-202/AC-063) and CONFLICT-ARCH-202 (voice transcripts vs. the 500-character limit, new Q-026). | ARCHITECTURE sections 14.2, 15 | Review with TEAM-002; record the outcome in `DECISIONS_MVP2.md` and amend DEC-202 / AC-063 if approved. |
+| ARCH-VAL-202 | MEDIUM | Operations | Persistence of `/data/media` on Railway is unverified. Voice-comment audio loss would be data loss. | Section 13; PRE-005; P08 deployment guide | Verify the volume before US-012/US-016 reach production; otherwise switch to S3-compatible storage (ADR-008 trigger). |
+| ARCH-VAL-203 | LOW | Interface | The tutor text travels in a URL-encoded response header (`X-Notara-Tutor-Text`). It works for short text but is unusual, and needs CORS-safe exposure if origins ever split. | Section 9 | Acceptable for same-origin MVP 2; alternatively return JSON with an audio URL. Decide in P06. |
+| ARCH-VAL-204 | LOW | Cost | Transcription has no daily cap (ARCH-RISK-203). | Section 16 | Team decision Q-027; a second counter in `VoiceQuota` is enough. |
+| ARCH-VAL-205 | LOW | Performance | Timeout values (25 s / 20 s / 75 s / 90 s) are proposals without measured latency. | ADR-014; NFR-009 | Measure in staging when keys exist; feed results into Q-012. |
+| ARCH-VAL-206 | LOW | Traceability | New questions Q-026 and Q-027 exist only in P05. | Section 16 | Add them to the P02 open-questions list or `DECISIONS_MVP2.md` section 3 when the team decides. |
+
+## 10. P06 Readiness
+
+- **Ready:** `YES_WITH_REVIEW_GATES`
+- **Can start now:**
+  - Group 1a/1b: US-015 (reader and piano), US-019 (file loader), DEFECT-001;
+  - Group 2 with fake and Edge engines: US-017, US-016, US-013;
+  - runtime configuration (threaded Gunicorn, Nginx timeout, environment variables, fake engines in CI).
+- **Review gates:**
+  - **ADR approval:** ARCH-VAL-201.
+  - **US-011:** PRE-002 (vocabulary and headers) and PRE-004 (OpenAI key).
+  - **US-012:** PRE-005 and Q-026.
+  - **US-014:** PRE-003 (difficulty rule).
+  - **ElevenLabs adapter:** PRE-004.
+
+## 11. Final Decision
+
+**`PASS_WITH_WARNINGS`.** The architecture addendum may proceed to P06 under the review gates above.

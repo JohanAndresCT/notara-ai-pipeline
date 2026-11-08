@@ -1,243 +1,410 @@
-# Notara MVP 1 Architecture
+# Notara Architecture — MVP 1 As-Built and MVP 2 Addendum
+
+## 0. Change Log
+
+| Version | Release | Summary |
+|---|---|---|
+| 1.0 | MVP 1 | Pre-implementation architecture proposal (React/TS + Django/DRF + PostgreSQL, same-origin session auth). ADR-001-ADR-005. |
+| 2.0 | MVP 2 | Records the MVP 1 as-built baseline and its deviations from 1.0. Adds the MVP 2 addendum for voice and audio: `voice` module with provider adapters, synchronous processing with bounded timeouts, protected audio storage, synthesized-audio cache, daily quota, single ABC reader for solfege, tutor and piano, voice comments, configuration and testing. ADR-006-ADR-015. |
 
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 1.0
+- **Version:** 2.0
+- **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P05 - Architecture
-- **Status:** `READY_FOR_REVIEW`
-- **Sources:** P00 project context; P01 product vision; P02 requirements v2.0; P03 prioritization; P04 UX specification v1.0.
-- **Upstream validation:** P00 `PASS_WITH_WARNINGS` (reconciled by later decisions); P01 `PASS`; P02 `PASS`; P03 `PASS`; P04 `PASS`.
-- **Purpose:** Define an implementable, low-operational-complexity architecture for the approved Notara MVP 1. This document selects a recommended stack; it does not imply that any code or deployment already exists.
+- **Status:** `READY_WITH_WARNINGS`
+- **Sources:**
+  - `REQUIREMENTS.md` v3.0, `PRIORITIZATION.md` v2.0, `UX_SPEC.md` v2.0 and their validations
+  - `DECISIONS_MVP2.md`
+  - `ARCHITECTURE.md` v1.0
+  - The repository on 2026-11-08: `backend/`, `frontend/`, `Dockerfile`, `docker/nginx.conf.template`, `deploy/entrypoint.sh`, `.github/workflows/ci.yml`
+- **Upstream validation:** P02 `PASS_WITH_WARNINGS`; P03 `PASS_WITH_WARNINGS`; P04 `PASS_WITH_WARNINGS` (P05 readiness WITH CONSTRAINTS)
+- **Labels:** FACT (verified in repository or approved source), DECISION (`DEC-2NN`), PROPOSAL (this architecture, pending review), ASSUMPTION, UNKNOWN.
+- **Nature:** design proposal. No MVP 2 code exists yet.
 
 ## 2. Executive Summary
 
-Use a same-origin responsive web application backed by a Django modular monolith, Django REST Framework, and PostgreSQL. Build the browser client with React, TypeScript, and Vite. The backend owns authentication, authorization, validation, and all durable state. The React client provides the P04 screens and calls a versioned JSON API.
+MVP 2 keeps the delivered shape: one same-origin web application (React client and Django API behind Nginx) plus PostgreSQL, deployed as one container on Railway. It adds no service, queue or worker process. Instead it makes four changes inside the monolith.
 
-Use Django's session authentication with secure, HTTP-only cookies and CSRF protection rather than browser-stored bearer tokens. Deploy the frontend and API behind one origin to keep the session boundary simple. A relational database models users, scores, comments, and likes with database constraints for ownership-related invariants.
+**1. A `voice` backend module** wraps the three decided external services behind small adapters:
+- Whisper (OpenAI API) transcribes speech;
+- ElevenLabs is the primary text-to-speech voice;
+- `edge-tts` is the fallback voice.
 
-This is a single application and database, not a microservice system. No AI inference, audio processing, image storage, queue, or external notation service is required for this MVP.
+The browser never calls a provider and never sees a key.
 
-## 3. Architecture Drivers and Boundaries
+**2. Synchronous, bounded processing** (ADR-007).
+- Inputs are small: recordings are at most 30 s / 2 MB, and scores at most 1,000 characters.
+- Each request calls the provider with a strict timeout and returns a typed outcome.
+- Gunicorn moves from 2 sync workers to threaded workers, with a timeout above the provider budget, so slow providers cannot freeze the API.
 
-### 3.1 Drivers
+**3. One ABC reader in the backend** (ADR-010) turns the supported ABC subset into normalized note events.
+- The events drive the solfege script, the tutor summary and the browser piano: the score detail response carries them, and Tone.js plays them locally.
+- There is a single parser, and piano playback needs no extra request and no external service.
 
-- Support visitor registration/login and authenticated profile actions (FR-001..004, FR-017).
-- Publish and manage `.abc` or plain-text scores with required metadata, a 1,000-character maximum, and the approved minimal ABC checks (FR-005..011; BR-003..007).
-- Provide newest-first, ten-item pagination, instrument filtering, readable detail, comments, and reversible likes (FR-012..016; BR-008..011).
-- Enforce authentication and score ownership on the server, regardless of client state (NFR-003).
-- Preserve score line breaks and visibly identify the content format (NFR-001).
-- Support current Chrome, Edge, and Firefox at 360, 768, and 1280 px (NFR-002).
-- Fit the one two-week sprint and five-person team by minimizing deployment and operational components.
+**4. Protected audio storage.**
+- **Voice-comment audio** is stored with the comment and served only through authenticated views, as profile photos already are.
+- **Synthesized audio** is cached by a hash of the spoken text, voice and language, and returned to the client as an MP3 body. The client plays it and offers it for download from memory.
+- **Dictation audio** is never stored.
 
-### 3.2 In Scope
+**Server-side enforcement:**
+- quotas (20 new syntheses per user per day);
+- upload limits;
+- deletion of audio together with its comment;
+- a silent fallback, logged without personal content.
 
-The P0 flow is registration/authentication, score publication, feed/detail/filter, likes, and comments. P1 includes profile/password change and owner-only score edit/delete. All features have a place in the component and API design; P03 retains P0 as the delivery-protection priority.
+**Status `READY_WITH_WARNINGS`.** Two conflicts with upstream decisions need human confirmation (section 15):
+- `edge-tts` in CI against NFR-010;
+- the 500-character comment limit against 30-second transcriptions.
 
-### 3.3 Explicitly Out of Scope
+Storage persistence on Railway is still unverified (PRE-005).
 
-Voice, OMR, images, audio, differentiated roles, account recovery, advanced ABC support, extra feed sorting, and comment editing/deletion. Do not add infrastructure for these features in MVP 1.
+## 3. MVP 1 As-Built Baseline (verified 2026-11-08)
 
-## 4. System Context
+| Concern | As built | Deviation from v1.0 |
+|---|---|---|
+| Frontend | React 19, TypeScript, Vite 8, Tailwind 4; pages `HomePage`, `ScoreCreatePage`, `ScoreEditPage`, `ScoreDetailPage`, `ProfilePage`; API client `frontend/src/lib/api.ts` with same-origin `fetch` and CSRF. | None material. No runtime dependencies besides React. |
+| Backend | Django 5.2.18; apps `accounts` (custom `User` with `photo`) and `scores`. Views are **function-based Django views returning `JsonResponse`** with an `{"errors": {field: [...]}}` shape. DRF 3.15.2 is installed and configured, but serializers are not used. | v1.0 assumed DRF serializers. |
+| Auth | Session cookies, CSRF middleware (no `csrf_exempt`, commit `689e25e`), `SameSite=Lax`, `Secure` in production. | As designed. |
+| Data | `Score` (format `ABC`/`TEXT`, `content` ≤ 1,000); `Comment` (`body` ≤ **500**); **both `Reaction` and `Like`** models. `/api/v1/` uses `Reaction`; legacy `/api/` uses `Like`. | v1.0 had one Like model and no comment limit. |
+| API | Routes duplicated under `/api/` (legacy) and `/api/v1/`. The frontend uses `/api/v1/` only. Comment deletion by author exists (`DELETE /api/v1/scores/{id}/comments/{comment_id}/`). | v1.0 had no comment deletion; ratified by DEC-211. |
+| Files | `default_storage` (`FileSystemStorage`, pluggable through `DJANGO_FILE_STORAGE_BACKEND`), `MEDIA_ROOT=/data/media`. Profile photos are served by an authenticated `FileResponse` view; Nginx does not expose `/media/`. | v1.0 had no file storage. |
+| Runtime | One container: Nginx (`client_max_body_size 6m`, default proxy timeouts) → Gunicorn **2 sync workers, default 30 s timeout** → Django. | — |
+| Deployment | Railway, deployed by GitHub Actions `deploy-railway`; PostgreSQL 16 as a separate Railway service. `/data` persistence across deploys is **not verified**. | v1.0 left hosting open. |
+| CI | GitHub Actions: backend tests, frontend build, Playwright E2E, deploy. | — |
+
+The v1.0 decisions ADR-001-ADR-005 (section 14.1) remain valid.
+
+## 4. MVP 2 Drivers and Boundaries
+
+### 4.1 Drivers
+
+- **Dictation (FR-018-FR-021, FR-025):** speech → text → ABC, with typed failures (P04 M-01, M-06, M-07).
+- **File loading (FR-022-FR-024):** fully client-side (DEC-217).
+- **Voice comments (FR-026-FR-028):** text plus audio as one deletable entity (P04 handoff 4).
+- **Solfege and tutor (FR-031-FR-034):** synthesized with the decided providers, fallback (FR-040), cache (FR-038, FR-039) and quota (FR-044).
+- **Piano (FR-035):** in the browser, with no external service (DEC-203) and no extra server request (P04 handoff 5).
+- **MP3 (FR-042):** voice only (DEC-204).
+- **Constraints:** Spanish only (NFR-007), notice and retention (NFR-004, DEC-214), no server errors (NFR-005), cost control (NFR-006), tests independent of providers (NFR-010).
+- **Technical preconditions from P03:** PRE-005 (storage), PRE-007 (route prefix and duplicated models), PRE-009 (latency).
+
+### 4.2 Out of scope
+
+- OMR, image uploads, roles, comment editing, sung solfege, mixed voice and instrument MP3, server-side instrument synthesis, other languages;
+- background job infrastructure;
+- object storage migration, unless PRE-005 fails (see ADR-008).
+
+## 5. System Context
 
 ```text
-Visitor / authenticated user
-            |
-            | HTTPS, same-origin browser requests
-            v
-+--------------------------------------+
-| Notara web application               |
-| React + TypeScript static client      |
-| Django + Django REST Framework API    |
-| Authentication, domain rules, API    |
-+------------------+-------------------+
-                   | SQL via Django ORM
-                   v
-             PostgreSQL
+User (browser: Chrome, Edge, Firefox; HTTPS)
+  |  microphone (MediaRecorder), file picker (FileReader), audio playback, Tone.js
+  |  same-origin requests: session cookie + CSRF
+  v
++------------------------------- Railway container -------------------------------+
+| Nginx (static SPA, /api proxy)                                                  |
+|   -> Gunicorn (threaded workers) -> Django                                      |
+|        accounts | scores | community (comments) | voice (NEW) | abc_reader (NEW)|
+|        default_storage -> /data/media (profile_photos/, voice_comments/,        |
+|                                        audio_cache/)                           |
++------------------------------------|-------------------------------------------+
+            | SQL (private network)          | HTTPS, server-side keys only
+            v                                v
+      PostgreSQL 16              OpenAI Whisper API (STT)        [DEC-201]
+                                 ElevenLabs API (TTS primary)    [DEC-202]
+                                 Microsoft Edge online TTS via `edge-tts` (fallback) [DEC-202]
 ```
 
-The user interacts through a supported browser. The web application serves the frontend and `/api/v1/` from one origin. The API is the only application path to persistent data. PostgreSQL stores account and community content. No external runtime service is required by the approved product scope.
+**Trust boundaries:**
+- **Browser to API:** authenticated session.
+- **API to providers:** server-held keys over HTTPS.
+- **User audio** leaves the system only to the STT provider (Whisper).
+- **Score-derived text** leaves the system only to the TTS providers.
 
-## 5. Technology Decisions
+## 6. Technology Decisions (MVP 2)
 
-| Concern | Decision | Rationale / Constraint |
+| Concern | Decision | Rationale | Alternatives | Status |
+|---|---|---|---|---|
+| STT | Whisper through the OpenAI HTTP API, Spanish (`language=es`). | DEC-201; accepts browser `webm`/`ogg` audio directly. | Deepgram (discarded by DEC-201); local Whisper (too heavy for the container). | DECISION |
+| TTS primary | ElevenLabs HTTP API, MP3 output, one Spanish voice ID from configuration. | DEC-202; supports pause markup for pacing (to verify, ARCH-ASSUM-201). | Azure, Google (discarded). | DECISION |
+| TTS fallback / dev | `edge-tts` Python package, Spanish neural voice from configuration, MP3 output. | DEC-202; free; already Python. | gTTS (lower quality). | DECISION; CI use is a conflict (CONFLICT-ARCH-201) |
+| HTTP client | `httpx` for the OpenAI and ElevenLabs calls (timeouts, easy mocking). | One small dependency instead of two vendor SDKs. | Vendor SDKs. | PROPOSAL |
+| MP3 processing | None. Both TTS engines return MP3; no PyDub/FFmpeg. | DEC-204 (voice only) removes mixing; resolves EXT-006. | PyDub/FFmpeg (only needed for mixing or conversion). | PROPOSAL |
+| Piano | Tone.js `Sampler` with a small set of piano samples **bundled as static assets** (no CDN), falling back to `PolySynth` if samples fail to load. | DEC-203; "no external service" includes sample CDNs. | abcjs synth (fetches soundfonts from a CDN); a plain synth only (not piano-like). | PROPOSAL; sample licence to confirm (ARCH-RISK-206) |
+| Recording | Browser `MediaRecorder` in the native container (`audio/webm;codecs=opus` in Chrome/Edge/Firefox), 30 s client timer, size check. | Supported in the NFR-002 browsers; Whisper accepts it. | Client-side WAV encoding (larger; extra code). | PROPOSAL; backlog says `.wav` (CONFLICT-ARCH-203) |
+| File loading | `FileReader.readAsText` in the browser; no upload. | DEC-217. | — | DECISION |
+| Processing model | Synchronous request/response with timeouts; threaded Gunicorn workers. | Inputs bounded; no new infrastructure. | Background jobs (Celery/RQ + Redis): more infra and an extra service on Railway. | PROPOSAL (ADR-007) |
+
+## 7. Logical Components
+
+### 7.1 Backend (Django, same project)
+
+| Module | Responsibility | New / changed |
 |---|---|---|
-| Frontend | React + TypeScript + Vite | Fits the responsive, form- and feed-oriented UX and allows frontend/backend work to proceed in parallel. Keep state and dependencies lean. |
-| Backend | Python + Django + Django REST Framework | Django provides mature account/session/CSRF primitives, ORM, migrations, and an API framework suitable for a compact academic product. |
-| Database | PostgreSQL | Relational constraints and transactions suit ownership, comments, likes, and paginated/filterable records. |
-| API | Same-origin JSON REST under `/api/v1/` | Clear frontend/backend contract without introducing cross-origin session configuration. |
-| Authentication | Django server-side session; secure, HTTP-only cookie; CSRF token for unsafe requests | Avoids storing credentials or bearer tokens in browser local storage. Authentication and authorization remain backend-enforced. |
-| Score storage | Text column in PostgreSQL; format enum/choice (`ABC`, `TEXT`) | Scores are capped at 1,000 characters; no file/object storage is needed. Preserve content as text, including newlines. |
-| Runtime shape | One deployable web application plus PostgreSQL | Avoids microservice, queue, and distributed-transaction overhead for the MVP team. |
-| Local development | One documented local environment; Docker Compose is recommended for app/database parity | Recommendation only; no existing tooling or hosting provider is assumed by the source artifacts. |
+| `scores` | Scores CRUD, MVP 1 validation. Detail response gains a `playback` block (ADR-010). | Changed |
+| `scores` comments (community) | Text comments; **voice comments** (audio field, multipart create); delete removes audio. | Changed |
+| `abc_reader` (pure Python) | Parse the supported ABC subset into note events; build the solfege script and tutor facts (clef, meter, tempo, estimated difficulty per BR-014); report unsupported constructs. No Django dependency; fully unit-testable. | New |
+| `dictation` (pure Python) | Closed-vocabulary Spanish dictation → ABC line and meter (BR-013); compose a full document (BR-025). | New |
+| `voice` | `SttAdapter` (Whisper), `TtsAdapter` (ElevenLabs, Edge, Fake), `VoiceService` (cache lookup, quota, primary→fallback, logging), endpoints for STT and synthesis. | New |
+| Shared | Error helper producing `{"code": ..., "message": ..., "errors": {...}}` with stable codes; upload validation; authenticated file serving. | New helper, MVP 1 shape preserved |
 
-These choices are architecture recommendations for review, not product requirements. The project sources do not specify existing code, hosting provider, budget, or deployment environment.
+### 7.2 Frontend (React)
 
-## 6. Logical Components
-
-### 6.1 Browser Client
-
-- **Public access:** entry, registration, and login (SCR-001..003).
-- **Authenticated experience:** dashboard/feed, score detail, create/edit forms, profile, and delete confirmation (SCR-004..009).
-- **API client:** sends same-origin requests, includes CSRF protection for mutations, and presents API validation/authentication results in the UX-defined states.
-- **Score display:** renders content as escaped text in a whitespace-preserving element; never interpret score text as HTML.
-- **Responsive layout:** implement and verify the P04 requirements at the three approved widths and browser set.
-
-The client may mirror validation for responsive feedback, but client checks are advisory. The server is authoritative for every write and access decision.
-
-### 6.2 Django API and Domain Modules
-
-Organize code as modules in one Django project, not separately deployed services:
-
-- **Identity:** registration, login/logout, current-user profile, password change.
-- **Scores:** score create/read/list/update/delete, metadata/content validation, minimal ABC validation, ownership checks.
-- **Community:** score comments and per-user likes.
-- **Shared API:** request validation, pagination, error response conventions, and authentication/CSRF configuration.
-
-Keep business rules in backend validation/domain code and call them from API handlers. Use Django ORM transactions for operations that update related records. Avoid a generic plugin or event architecture at this scope.
-
-### 6.3 Persistence
-
-Use PostgreSQL as the system of record. Apply schema changes through checked-in Django migrations. API handlers must not bypass model/domain validation or rely on frontend filtering for confidentiality or ownership.
-
-## 7. Data Model
-
-| Entity | MVP fields (illustrative) | Relationships and constraints |
-|---|---|---|
-| User | Django user identity; username, name, description, main instrument | Unique username. Use Django password hashing and authentication facilities. Registration fields and password policy follow the approved registration flow; this architecture does not invent additional profile fields. |
-| Score | id, owner, title, instrument, description, format, content, created_at, updated_at | `owner` references User; format is `ABC` or `TEXT`; content is non-empty and at most 1,000 characters; required metadata is validated. Index `(created_at, id)` for deterministic newest-first listing and an instrument/date index for filtering. |
-| Comment | id, score, author, body, created_at | References Score and User. Created only by an authenticated user on another user's score. No edit/delete API in MVP 1. Comment length policy is not specified upstream and must be clarified before choosing a limit. |
-| Like | id, score, user, created_at | Unique constraint on `(score, user)` so repeated like requests cannot create duplicates. Creation/deletion is idempotent from the API perspective. |
-
-Deleting a score removes its associated comments and likes through database/application cascade behavior so deleted score interactions cannot remain orphaned. User deletion semantics are not defined by the MVP and are not designed here. Use stable identifiers and database foreign keys. The fields above are a conceptual model; final field nullability and exact types belong in implementation migrations.
-
-## 8. API Boundaries
-
-All endpoints return JSON and use a consistent error shape with a stable error code and field-level details where applicable. Exact payload schemas should be finalized during implementation and tested against P02 acceptance criteria.
-
-| Method and route | Access | Behavior |
-|---|---|---|
-| `POST /api/v1/auth/register` | Visitor | Create a user; return field validation errors or success. |
-| `POST /api/v1/auth/login` | Visitor | Establish a server-side session; reject invalid credentials. |
-| `POST /api/v1/auth/logout` | Authenticated | Invalidate the session. |
-| `GET /api/v1/me` | Authenticated | Return the current user's approved profile fields. |
-| `PATCH /api/v1/me` | Authenticated | Update approved profile fields. |
-| `POST /api/v1/me/password` | Authenticated | Change the current user's password; account recovery is not provided. |
-| `GET /api/v1/scores?instrument=&page=` | Authenticated | Return newest-first results, 10 per page, optionally filtered by instrument. Enforce page size on the server. |
-| `POST /api/v1/scores` | Authenticated | Validate and create a score owned by the current user. |
-| `GET /api/v1/scores/{id}` | Authenticated | Return score metadata, readable content, format, comments, and the current user's like state. |
-| `PATCH /api/v1/scores/{id}` | Authenticated owner | Validate and update an owned score. Non-owners receive a denied/not-found response consistent with the API's disclosure policy. |
-| `DELETE /api/v1/scores/{id}` | Authenticated owner | Delete an owned score and associated interactions. |
-| `POST /api/v1/scores/{id}/comments` | Authenticated, non-owner | Create a comment on another user's score. |
-| `PUT /api/v1/scores/{id}/like` | Authenticated, non-owner | Ensure the current user's like exists; repeated calls do not duplicate it. |
-| `DELETE /api/v1/scores/{id}/like` | Authenticated, non-owner | Remove the current user's like; repeated calls leave it absent. |
-
-The API must not expose comment update/delete operations. Listing/detail responses must not imply audio, image, or advanced ABC capabilities.
-
-## 9. Key Runtime Flows
-
-### 9.1 Publish Score
-
-1. The browser submits metadata, format, and content with an authenticated session and valid CSRF token.
-2. The API validates required fields, supported format, non-empty content, and the 1,000-character limit.
-3. For `ABC`, the server checks the required `X:`, `T:`, `M:`, `L:`, and `K:` fields and the approved valid musical-line condition. It does not claim full ABC grammar support.
-4. The API sets owner from the authenticated session, persists the score, and returns the created resource.
-5. The client navigates to detail and displays escaped text with preserved line breaks and a visible format label.
-
-### 9.2 Feed and Instrument Filter
-
-The API applies an optional exact instrument filter, deterministic newest-first ordering, and server-side page size 10. Filtering and pagination are performed in the database query. Empty results return a successful empty page; the client presents the specified empty state.
-
-### 9.3 Owner-Only Mutation
-
-For score update/delete, derive the actor from the authenticated session and compare it with the persisted score owner inside the request's authorization path. Never accept an owner identifier from the client as authority. A non-owner mutation must not change data.
-
-### 9.4 Like and Comment
-
-Enforce authentication and the non-owner rule at the API/domain boundary. The unique `(score, user)` constraint makes like creation safe against duplicates and concurrent repeat requests. Comments are append-only for MVP 1; the API offers creation and reading only.
-
-## 10. Security and Privacy Baseline
-
-- Require HTTPS in deployed environments; keep session cookies `Secure`, `HttpOnly`, and appropriately `SameSite` configured.
-- Use Django's CSRF protection for cookie-authenticated state-changing requests; do not disable it to simplify frontend integration.
-- Use Django's password hashing and session invalidation behavior; never store plaintext passwords or tokens in browser storage.
-- Enforce authentication and ownership server-side on every protected endpoint, including direct API requests.
-- Validate all submitted fields on the server. Render user-supplied score, profile, and comment text as escaped text; do not allow raw HTML.
-- Use ORM parameterization and database constraints; do not construct SQL from user input.
-- Keep secrets and database credentials outside source control, supplied through the deployment environment.
-- Return only fields needed by each view. Do not expose password hashes or internal session data.
-- No differentiated roles are introduced. Authenticated user status and resource ownership are the authorization model for this MVP.
-
-Specific rate limits, retention periods, privacy jurisdiction, backup policy, and quantitative security targets are not defined by the upstream requirements and remain deployment/operational decisions.
-
-## 11. Quality Attribute Strategy
-
-| Attribute | Architecture response | Verification evidence |
-|---|---|---|
-| Readability (NFR-001) | Store content unchanged; return the format; render escaped text with line breaks preserved. | Detail-view tests for multiline ABC/plain text and format label. |
-| Responsive behavior (NFR-002) | Responsive browser client; no viewport-specific backend assumptions. | Exercise P04 main flows in current Chrome, Edge, Firefox at 360/768/1280 px. |
-| Access/ownership (NFR-003) | Session authentication plus server-side authorization on API mutations. | API tests for anonymous access, owner success, non-owner denial, and logout invalidation. |
-| Content integrity | Server-side format/content validation and relational constraints. | Boundary tests for empty, 1,000, and 1,001 characters; ABC required fields/line; unsupported formats. |
-| Feed correctness | Database filtering, stable newest-first order, fixed page size 10. | API tests for order, page boundaries, filter results, and empty results. |
-| Sprint feasibility | One frontend, one backend application, one relational database; no required third-party runtime dependencies. | Demonstrate the P0 path end-to-end before P1 completion. |
-
-The requirements define no latency, throughput, availability, recovery-time, or concurrent-user targets. Do not claim quantitative performance or availability guarantees until product/operations owners define them.
-
-## 12. Deployment and Environments
-
-Recommended deployment topology: a single public origin terminates HTTPS and serves the compiled React assets plus Django API routes; Django connects to PostgreSQL on a private network. The exact hosting provider and production topology remain unselected because no provider, budget, or hosting constraint is present in P00.
-
-For local development, provide reproducible frontend/backend/database setup and migrations. Keep configuration environment-based and separate local, test, and deployed settings. Before public deployment, define database backups, migrations/rollback procedure, secret management, and HTTPS/session settings. No queue, object store, CDN, or AI model endpoint is required for MVP 1.
-
-## 13. Architecture Decisions and Trade-offs
-
-| ID | Decision | Benefit | Trade-off / revisit trigger |
-|---|---|---|---|
-| ADR-001 | Use a modular monolith instead of microservices. | Lowest operational and integration burden for a five-person, one-sprint project. | Revisit only if independently scaling or deploying a domain becomes a demonstrated need. |
-| ADR-002 | Use React/TypeScript with Django/DRF and PostgreSQL. | Clear frontend/backend ownership and mature account/data primitives. | Adds a separate frontend build and API contract; requires team familiarity and review before implementation. |
-| ADR-003 | Use same-origin Django session authentication with CSRF. | Avoids browser token storage and cross-origin credential configuration. | Deployment must route assets/API under one origin; cross-origin hosting would require a deliberate security redesign. |
-| ADR-004 | Keep score content in the relational database as bounded text. | Simple persistence, backup, and transaction behavior for 1,000-character content. | If attachments or substantially larger content are approved later, revisit storage. |
-| ADR-005 | Make the API authoritative for validation and ownership. | Direct API access cannot bypass client-side checks. | Requires API/domain tests in addition to UX tests. |
-
-## 14. Risks, Assumptions, and Decisions Needed
-
-| ID | Item | Impact | Handling / owner |
-|---|---|---|---|
-| ARCH-RISK-001 | The selected stack may not match team experience or course constraints. | Could threaten the two-week plan. | Team/technical lead confirms stack before implementation; retain modular monolith if replacing a technology. |
-| ARCH-RISK-002 | Hosting and production operations are unspecified. | Deployment, cookie settings, backups, and release steps cannot be finalized. | Select hosting and define operational baseline before public release. |
-| ARCH-RISK-003 | Comment length/validation and exact registration/password fields are not specified in these source requirements. | API schemas and database constraints could otherwise encode invented rules. | Confirm the approved flows or make explicit product decisions before implementation; do not silently add limits. |
-| ARCH-RISK-004 | ABC “valid musical line” may require interpretation during implementation. | Overly strict checks could reject valid intended MVP content. | Implement only the approved minimal subset and test examples agreed by product/UX; advanced grammar remains excluded. |
-| ARCH-ASSUM-001 | The UI and API can be served from one origin. | Enables session-cookie and CSRF approach. | Validate against chosen host; revise only if deployment requires separate origins. |
-| ARCH-ASSUM-002 | MVP traffic and data volume do not require distributed scaling. | Supports a single application and database. | Revisit if actual measured load or availability needs require it. |
-| ARCH-DECISION-001 | Stack recommendation is selected by P05 for implementation planning, subject to team/course review. | Removes the unspecified-stack blocker from technical design while exposing the human review gate. | Confirm prior to implementation. |
-
-## 15. Requirement Traceability
-
-| Requirements / UX | Architectural elements |
+| Area | Responsibility |
 |---|---|
-| FR-001..004; FR-017 | Identity module, Django session auth, profile/password endpoints, protected API. |
-| FR-005..009; BR-003..006 | Scores module, bounded text storage, server validation, publication endpoint, readable detail. |
-| FR-010..011; BR-007 | Owner-derived authorization for score update/delete. |
-| FR-012..013; BR-008 | Database-backed newest-first, 10-item pagination, instrument filter. |
-| FR-014; BR-009; NFR-001 | Score detail response and escaped whitespace-preserving text display. |
-| FR-015; BR-010 | Unique per-user like constraint and idempotent create/remove API. |
-| FR-016; BR-011 | Append-only comment API; no comment edit/delete endpoints. |
-| NFR-002 | Responsive client validated at approved browser/viewport combinations. |
-| NFR-003 | Authentication and ownership enforcement in backend, independent of UI visibility. |
-| P03 P0/P1 boundary and P04 SCR-001..009 | End-to-end component and API coverage for P0 and P1; excluded capabilities omitted. |
+| `lib/api.ts` | New calls: `transcribeDictation`, `synthesizeSolfege`, `synthesizeTutor`, `createVoiceComment`; maps error codes to P04 messages (M-01-M-16). |
+| Recorder hook | `getUserMedia` / `MediaRecorder`, permission and support states, 30 s countdown, 2 MB check (FLOW-018). |
+| Dictation panel (REG-001, REG-008) | Notice, vocabulary help, insertion per BR-025 / UX-PROP-001. |
+| File loader (REG-002, SCR-010) | Client validation (extension, empty, readable, ≤ 1,000), replace confirmation. |
+| Listening panel and player (REG-003, REG-004) | Solfege and tutor requests (MP3 body → object URL), Tone.js piano from `playback.events`, download from the object URL, one audio at a time. |
+| Voice comments (REG-005-REG-007, SCR-011) | Record, preview, send, play, delete with confirmation. |
 
-## 16. Implementation Handoff
+## 8. Data Model Changes
 
-1. Confirm the recommended stack against course constraints and team skills.
-2. Agree API schemas for registration, profile/password, comments, and the minimal ABC musical-line test cases without adding unapproved product rules.
-3. Scaffold the frontend, Django API, and PostgreSQL environment; add migrations and a reproducible local run path.
-4. Implement and test the P0 path end-to-end: registration/login, publish, feed/filter/detail, like, and comment.
-5. Add P1 profile/password and owner edit/delete flows without displacing P0 acceptance coverage.
-6. Verify security, content validation, responsive behavior, and release operations against the validation evidence in this stage.
+| Entity | Change | Constraints |
+|---|---|---|
+| `Comment` | Add `kind` (`TEXT`/`VOICE`, default `TEXT`), `audio` (`FileField`, `upload_to="voice_comments/%Y/%m/"`, nullable), `audio_mime` (short char), `audio_duration_ms` (nullable int). | `VOICE` requires `audio`. Audio file deleted on comment deletion and on cascaded deletion (a `post_delete` signal also covers administrative user deletion; see Q-022). `body` limit: see CONFLICT-ARCH-202. |
+| `SynthesizedAudio` (new) | `key` (sha256 hex, unique), `kind` (`SOLFEGE`/`TUTOR`), `language`, `voice_id`, `engine` (`ELEVENLABS`/`EDGE`), `file` (`audio_cache/`), `size_bytes`, `created_at`. | Unique `key`; lookup is an indexed equality query (O(1) for the user, AC-016-02). Not linked to users (not personal data, DEC-214). |
+| `VoiceQuota` (new) | `user`, `day` (date, UTC), `syntheses` (int). | Unique `(user, day)`; incremented atomically with `F()` inside a transaction, only on cache miss. |
+| Dictation audio | **No model.** Processed in memory or a temporary file deleted in `finally`. | NFR-004. |
+| `Score` | No schema change. | `playback` is computed on read. |
 
-## 17. Status and Next Actions
+**Cache key (DEC-210):** `sha256(kind | spoken_text | voice_id | language)`. `spoken_text` is derived from the score content, so editing the content changes the key (AC-057).
 
-- **Status:** `READY_FOR_REVIEW`
-- **Next stage:** P06 - Implementation
-- **Before implementation:** Review ADR-002 and confirm the stack; settle the explicitly listed API/product ambiguities; select a hosting target before deployment.
-- **Scope guard:** Any addition of voice, OMR, images, audio, roles, account recovery, advanced ABC, extra sorting, or comment management requires an approved scope change and traceability update.
+## 9. API Boundaries (new and changed, all under `/api/v1/`)
+
+New endpoints use only `/api/v1/` (ADR-013). All require an authenticated session and CSRF for unsafe methods (FR-043). Errors use stable codes.
+
+| Method and route | Request | Success | Error codes (HTTP) → UX message |
+|---|---|---|---|
+| `POST /api/v1/audio/stt/` | multipart: `audio` (≤ 2 MB; `audio/webm`, `audio/ogg`, `audio/wav`, `audio/mp4`), `title` (optional, for BR-025) | `200 {transcript, meter, abc_line, abc_document}` | `AUDIO_TOO_LARGE` (413) → M-05b; `AUDIO_INVALID` (400) → M-01; `DICTATION_UNINTERPRETABLE` (422) → M-01; `STT_UNAVAILABLE` (503) → M-07 |
+| `GET /api/v1/scores/{id}/` *(changed)* | — | Adds `playback: {playable, reason, meter, tempo_bpm, events:[{pitch, start, duration}]}`; `reason` ∈ `NOT_ABC`, `UNSUPPORTED_ELEMENTS`, `null` | — (M-02 when `NOT_ABC`, M-03 when `UNSUPPORTED_ELEMENTS`) |
+| `POST /api/v1/scores/{id}/audio/solfege/` | — | `200 audio/mpeg` body | `NOT_ABC` (409) → M-02; `ABC_UNSUPPORTED` (422) → M-03; `DAILY_LIMIT_REACHED` (429) → M-10; `AUDIO_UNAVAILABLE` (503) → M-15 |
+| `POST /api/v1/scores/{id}/audio/tutor/` | — | `200 audio/mpeg` body + header `X-Notara-Tutor-Text` (URL-encoded summary, UX-PROP-005) | Same as solfege |
+| `POST /api/v1/scores/{id}/comments/` *(changed)* | JSON `{body}` (text, unchanged) **or** multipart `audio` (voice) | `201` comment with `kind`, `body`, `audio_url` when voice | `AUDIO_TOO_LARGE` (413) → M-05b; `TRANSCRIPTION_FAILED` (422) → M-09; `STT_UNAVAILABLE` (503) → M-09; `OWN_SCORE` (403) |
+| `GET /api/v1/comments/{id}/audio/` | — | `200` audio `FileResponse` with stored MIME, `X-Content-Type-Options: nosniff` | `404` if no audio |
+| `DELETE /api/v1/scores/{id}/comments/{comment_id}/` *(changed)* | — | `200`; removes comment and audio file after commit | Existing ownership errors |
+
+**MP3 download (FR-042):** the client already holds the solfege MP3 body. It offers it with an object URL and the `download` attribute (`<title>-solfeo.mp3`), so no extra request or synthesis is needed. This matches UX-PROP-007 and AC-064.
+
+## 10. Runtime Flows
+
+### 10.1 Dictation (US-011)
+
+1. The client shows the notice and records up to 30 s, then posts `audio` and `title` to `/audio/stt/`.
+2. The server checks authentication, size and MIME, then calls `SttAdapter.transcribe(language="es", timeout=STT_TIMEOUT)`.
+3. `dictation.parse(transcript)` returns the ABC line and meter, or raises `Uninterpretable`.
+4. The server composes `abc_document` (BR-025) and returns both forms. Before inserting, the client checks that the resulting content stays within 1,000 characters; if not, it shows M-06 and leaves the field unchanged (EDGE-017). Otherwise it inserts the full document if the field is empty, or appends the line.
+5. The audio is discarded in a `finally` block. No dictation audio is stored or logged.
+6. Publishing uses the MVP 1 validation (DEC-218).
+
+### 10.2 Solfege and tutor (US-013, US-014, US-016, US-017)
+
+1. The server loads the score and returns `NOT_ABC` if the format is `TEXT`.
+2. `abc_reader.read(content)` produces events, or `ABC_UNSUPPORTED`.
+3. The server builds `spoken_text`:
+   - **Solfege:** Spanish fixed-do names with "sostenido"/"bemol" and "silencio". Pauses between notes are proportional to duration: break markup for ElevenLabs, punctuation for Edge (DEC-206).
+   - **Tutor:** "Partitura en clave de …, compás de …, dificultad estimada: …", plus the tempo if `Q:` is present.
+4. Cache lookup by the primary voice key returns a hit if one exists (no quota used).
+5. On a miss, the quota is checked (`DAILY_LIMIT_REACHED` if 20 are used), then the primary voice synthesizes within `TTS_TIMEOUT`.
+6. On a primary failure (402, 429, 5xx, timeout, network), the fallback is tried:
+   - log the event `voice_fallback` with score ID and reason only;
+   - look up the fallback key; on a miss, synthesize with `edge-tts` within `TTS_TIMEOUT`.
+7. If both fail, return `AUDIO_UNAVAILABLE` (503) with a JSON body, never an unhandled error.
+8. On success:
+   - increment the quota once (misses only);
+   - store the file and its `SynthesizedAudio` row (best effort; a storage failure is logged and the audio is still returned, AC-058);
+   - return the MP3 body.
+
+The response never reveals the engine (DEC-216).
+
+### 10.3 Piano (US-015)
+
+The detail response includes `playback.events`. On "Reproducir Piano", Tone.js starts the audio context (user gesture), loads the bundled samples once, and schedules the events at `tempo_bpm` (default when no `Q:`). Playback makes no server request and does not use the quota.
+
+### 10.4 Voice comment (US-012)
+
+1. The client records, previews and sends multipart `audio` to `POST /scores/{id}/comments/`.
+2. The server checks authentication, that the score is not the user's own (`OWN_SCORE`), and size and MIME.
+3. It transcribes. An empty result or failure returns `TRANSCRIPTION_FAILED` or `STT_UNAVAILABLE`, and nothing is stored.
+4. Otherwise it saves `Comment(kind=VOICE, body=transcript, audio=file)` in one transaction.
+5. The audio is served only through `/comments/{id}/audio/`.
+
+### 10.5 Comment deletion (US-010, US-012)
+
+The author deletes the comment; `transaction.on_commit` removes the audio file. A `post_delete` signal ensures files are removed when comments are deleted by cascade (score deletion, administrative user deletion).
+
+## 11. Security and Privacy
+
+- **Secrets:**
+  - `OPENAI_API_KEY` and `ELEVENLABS_API_KEY` exist only in server environment variables (Railway and local `.env`). They are never in the client bundle, logs or responses.
+  - CI uses no real keys.
+- **Upload validation:**
+  - Server-side size limit of 2 MB (`AUDIO_MAX_BYTES`) and a MIME whitelist checked against both the declared type and the file signature.
+  - Nginx's `client_max_body_size 6m` already allows 2 MB.
+  - Filenames are generated by storage, never taken from the user.
+- **Protected media:** voice-comment audio and cached audio are never under a public path. Access goes through authenticated views with `nosniff` and an explicit `Content-Type`, following the profile-photo pattern.
+- **Personal data (DEC-214):**
+  - Dictation audio is not persisted.
+  - Voice-comment audio lives with the comment.
+  - Transcripts are comment text and follow comment rules.
+  - Cached audio is derived from public score text and contains no user voice.
+- **Third-party processing:** user audio is sent to OpenAI for transcription, which the notice (M-11) discloses. The provider's retention and usage terms must be reviewed by the team (ARCH-RISK-205).
+- **Logging:** provider failures and fallbacks are logged with score or comment IDs and error class. Transcripts, audio and keys are never logged.
+- **Abuse and cost:** the daily synthesis quota is enforced server-side (DEC-213); transcription has no quota yet (ARCH-RISK-203).
+- **Existing protections unchanged:** session, CSRF, HTTPS, HSTS and ownership checks.
+
+## 12. Quality Attribute Strategy
+
+| Attribute | Design response | Verification evidence |
+|---|---|---|
+| NFR-004 Privacy | No dictation persistence; audio deleted with comment (`on_commit` + `post_delete`). | Test: STT endpoint leaves no file in storage; deleting a voice comment removes its file; cascade delete removes files. |
+| NFR-005 Reliability | Typed error codes for every expected failure; provider timeouts; fallback; text flows untouched. | Tests with adapters raising timeout, 402, 429, 5xx; both-fail case returns 503 JSON; E2E publish works with voice disabled. |
+| NFR-006 Cost | Cache before quota before provider; quota only on miss; `VOICE_PRIMARY_ENGINE` per environment. | Tests: second request hits cache (no adapter call); 21st miss returns 429; hit at limit still returns audio. |
+| NFR-007 Language | `language=es` for STT; Spanish voices; Spanish vocabulary and texts. | Unit tests on `dictation` and solfege/tutor text. |
+| NFR-008 Platform | Feature detection for `MediaRecorder`/`getUserMedia`; HTTPS already enforced in production. | E2E in Chromium with fake media device; manual check in Edge and Firefox at 360/768/1280 px. |
+| NFR-009 Performance | Bounded inputs; timeouts `STT_TIMEOUT=25s`, `TTS_TIMEOUT=20s` (PROPOSAL); worker timeout 75 s. No latency target is claimed (Q-012). | Measure p50/p95 in staging once keys exist; feed results into Q-012. |
+| NFR-010 Testability | `TtsAdapter`/`SttAdapter` interfaces with a `Fake` engine selected by `VOICE_PRIMARY_ENGINE=fake` and `STT_ENGINE=fake`; pure `abc_reader`/`dictation` modules. | CI runs with fake engines and no network; unit tests for reader and parser cover BR-013, BR-014, BR-025, BR-026. |
+
+## 13. Deployment and Configuration
+
+**Environment variables (new):**
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `STT_ENGINE` | `whisper` (`fake` in CI) | Transcription engine. |
+| `OPENAI_API_KEY` | — | Whisper. |
+| `VOICE_PRIMARY_ENGINE` | `edge` in development; `elevenlabs` for demos; `fake` in CI | DEC-202 / CONFLICT-ARCH-201. |
+| `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID` | — | Primary voice. |
+| `EDGE_TTS_VOICE` | Spanish neural voice | Fallback voice. |
+| `VOICE_DAILY_LIMIT` | `20` | DEC-213. |
+| `AUDIO_MAX_BYTES` | `2097152` | DEC-213. |
+| `STT_TIMEOUT_SECONDS`, `TTS_TIMEOUT_SECONDS` | `25`, `20` | ADR-014 (PROPOSAL). |
+
+**Runtime changes (ADR-014):**
+- Gunicorn `--worker-class gthread --threads 4 --workers ${GUNICORN_WORKERS:-2} --timeout 75`.
+- Nginx `proxy_read_timeout 90s` on `/api/`.
+- `client_max_body_size` stays at 6m.
+
+**Storage:**
+- New prefixes `voice_comments/` and `audio_cache/` under `MEDIA_ROOT` (`/data/media`).
+- PRE-005 must confirm that `/data` is a persistent Railway volume before HU12 and HU16 reach production. If it is not, switch `DJANGO_FILE_STORAGE_BACKEND` to an S3-compatible backend (ADR-008 revisit trigger).
+- Losing the cache only costs credits; losing voice-comment audio is data loss.
+
+**Dependencies:**
+- Backend adds `httpx` and `edge-tts`.
+- Frontend adds `tone`, plus the bundled sample files.
+
+**CI:** fake engines, no keys and no network to providers. Real-provider smoke checks are manual or run in a protected environment.
+
+## 14. Architecture Decisions
+
+### 14.1 MVP 1 decisions (preserved)
+
+| ID | Decision | Status in v2.0 |
+|---|---|---|
+| ADR-001 | Modular monolith, no microservices. | Valid; MVP 2 adds modules, not services. |
+| ADR-002 | React/TypeScript + Django/DRF + PostgreSQL. | Valid as built (Django views without DRF serializers). |
+| ADR-003 | Same-origin session auth with CSRF. | Valid; new endpoints follow it. |
+| ADR-004 | Score content as bounded text in the database. | Valid; audio files go to storage, not the database. |
+| ADR-005 | API authoritative for validation and ownership. | Valid; extended to quotas, upload limits and audio access. |
+
+### 14.2 MVP 2 decisions
+
+| ID | Decision | Benefit | Trade-off / revisit trigger | Status |
+|---|---|---|---|---|
+| ADR-006 | External voice services only behind backend adapters in a `voice` module; keys server-side. | No secrets in the client; provider swap or fake in one place; one place for fallback, cache and quota. | All audio traffic passes through the API. Revisit if browser-direct streaming becomes necessary. | PROPOSAL |
+| ADR-007 | Synchronous processing with timeouts; no job queue. | No new services on Railway; simple error handling for the UX. | Long provider latency holds a thread. Revisit if measured p95 approaches the timeout or concurrency grows. | PROPOSAL |
+| ADR-008 | Audio files in `default_storage` under `/data/media`, served only by authenticated views. | Reuses the profile-photo pattern; storage backend already pluggable. | Depends on volume persistence (PRE-005). Revisit: move to S3-compatible storage if `/data` is not persistent. | PROPOSAL |
+| ADR-009 | Dictation parsing in the backend (`dictation` module), deterministic, closed vocabulary. | Single source of truth; testable; no LLM cost (DEC-205). | Vocabulary changes need a deploy. Revisit when Q-021 extends the vocabulary. | PROPOSAL |
+| ADR-010 | One ABC reader in the backend producing note events for solfege, tutor and piano; events delivered in the score detail response. | One parser and one supported subset; piano without extra requests or external services. | The detail payload grows, which is acceptable for 1,000 characters; the client depends on the backend for events. Revisit if offline playback without the API is required. | PROPOSAL |
+| ADR-011 | Voice comments as an extension of `Comment` (`kind`, `audio`), not a new entity. | One entity to list, delete and authorize (P04 handoff 4). | `Comment` gains nullable fields. | PROPOSAL |
+| ADR-012 | Daily quota as a `VoiceQuota(user, day)` counter incremented only on cache miss. | Cheap, atomic, auditable. | UTC day boundary. Revisit if the team wants a rolling window. | PROPOSAL |
+| ADR-013 | New endpoints only under `/api/v1/`; legacy `/api/` routes frozen (not extended, not removed in MVP 2); new code uses `Reaction`, not `Like`. | Resolves PRE-007 for MVP 2 without a risky cleanup mid-sprint. | Duplication persists. Revisit with a cleanup CR after MVP 2 that removes legacy routes and `Like`. | PROPOSAL |
+| ADR-014 | Threaded Gunicorn workers (2 × 4 threads), worker timeout 75 s, provider timeouts 25 s / 20 s, Nginx read timeout 90 s. | Slow providers cannot block the API; fallback fits inside the worker timeout (20 + 20 < 75). | More concurrent DB connections (8). Revisit after staging measurements (Q-012). | PROPOSAL |
+| ADR-015 | Engine selection by environment (`fake` / `edge` / `elevenlabs`; `fake` / `whisper`). | NFR-010; credits protected (DEC-202). | Real-provider behavior must be checked outside CI. | PROPOSAL; changes DEC-202 for CI (CONFLICT-ARCH-201) |
+
+## 15. Conflicts with Upstream Artifacts
+
+| ID | Conflict | Sources | Proposed resolution | Status |
+|---|---|---|---|---|
+| CONFLICT-ARCH-201 | DEC-202 makes `edge-tts` the default voice in CI, but `edge-tts` calls an online Microsoft service, so CI would depend on an external provider, against NFR-010. | DEC-202; NFR-010; AC-063 | Use a `fake` engine in CI; keep `edge-tts` as the default in local development. Amend DEC-202 and AC-063 wording ("development") accordingly. | Needs team confirmation |
+| CONFLICT-ARCH-202 | `Comment.body` is limited to 500 characters (as built), but a 30-second Spanish transcription can exceed it. Rejecting a valid recording would be confusing; truncating changes the user's words. | `scores/models.py`; FR-026; DEC-213 | Allow voice-comment transcripts up to 1,000 characters (text comments keep 500), or keep 500 and reject with M-09. Recommendation: 1,000 for `VOICE`. | Needs team decision (new Q-026) |
+| CONFLICT-ARCH-203 | Backlog AC-012-02 mentions a `.wav` file; browsers record `webm`/`ogg` natively. Converting needs FFmpeg. | Backlog AC-012-02; ADR-006 | Store the recorded container as received (whitelisted MIME); `.wav` accepted if sent. | PROPOSAL; low impact |
+| CONFLICT-ARCH-204 | P04 handoff 5 says piano playback needs "no server calls". ADR-010 delivers events inside the detail response the page already loads, so no additional call happens. | UX_SPEC section 14 | Satisfied; recorded for clarity. | Resolved by design |
+
+## 16. Risks, Assumptions, and Decisions Needed
+
+| ID | Item | Impact | Handling |
+|---|---|---|---|
+| ARCH-RISK-001-004 | MVP 1 risks (stack fit, hosting, comment/registration rules, ABC interpretation). | — | Resolved by delivery (stack, Railway, 500-char comments); ARCH-RISK-004 now applies to the ABC reader subset. |
+| ARCH-RISK-201 | `/data` persistence on Railway unverified. | High for voice comments | PRE-005 before HU12/HU16 in production; S3-compatible fallback (ADR-008). |
+| ARCH-RISK-202 | Provider latency unknown; synchronous calls hold threads. | Medium | Timeouts, threaded workers, staging measurement (Q-012). |
+| ARCH-RISK-203 | Transcription has no quota; repeated dictation could consume OpenAI credits. | Medium | Propose a daily transcription cap (e.g. reuse `VoiceQuota` with a second counter); team decision (Q-027). |
+| ARCH-RISK-204 | The ABC reader supports a subset; valid MVP 1 scores with chords, tuplets, ties, voices or grace notes get M-03. | Medium | Document the subset; dictation output is always inside it; extend after MVP 2. |
+| ARCH-RISK-205 | Provider data handling (retention, training use) for user audio is not reviewed. | Medium | Team reviews OpenAI terms; M-11 wording (UX-Q-002). |
+| ARCH-RISK-206 | Piano sample licence and size. | Low | Use a CC-licensed sample set with attribution, or fall back to `PolySynth`. |
+| ARCH-RISK-207 | `edge-tts` is unofficial and may break with service changes. | Medium | It is the fallback; ElevenLabs is primary for demos; fake in CI. |
+| ARCH-ASSUM-201 | ElevenLabs accepts pause markup for pacing; `edge-tts` does not accept custom SSML, so punctuation is used. | Medium | Verify in a P06 spike; DEC-206 already allows constant pace. |
+| ARCH-ASSUM-202 | Threaded workers are safe for the current code (no thread-unsafe globals). | Low | Review in P06; tests run under the same config. |
+| ARCH-DECISION-201 | Approve ADR-006-ADR-015. | — | Team / technical lead (TEAM-002). |
+| ARCH-DECISION-202 | Resolve CONFLICT-ARCH-201 and CONFLICT-ARCH-202 (Q-026). | — | Team. |
+| ARCH-DECISION-203 | Transcription cap (Q-027). | — | Team. |
+
+## 17. Requirement Traceability
+
+| Requirement / UX | Architecture elements |
+|---|---|
+| FR-018-FR-021, FR-025, FR-029, FR-030 / US-011 / FLOW-011 | `/audio/stt/`, `SttAdapter`, `dictation`, recorder hook, dictation panel; no persistence. |
+| FR-022-FR-024 / US-019 / FLOW-012 | File loader (client only). |
+| FR-026-FR-028 / US-012, US-010 / FLOW-010, FLOW-013 | `Comment.kind/audio`, multipart create, `/comments/{id}/audio/`, delete with file removal. |
+| FR-031-FR-033 / US-013 / FLOW-014 | `abc_reader`, solfege text, `/audio/solfege/`, `VoiceService`. |
+| FR-034 / US-014 / FLOW-015 | `abc_reader` facts, BR-014, `/audio/tutor/` with text header. |
+| FR-035 / US-015 / FLOW-016 | `playback.events` in detail, Tone.js sampler. |
+| FR-036, FR-037 | `playback.reason`; `NOT_ABC`, `ABC_UNSUPPORTED`. |
+| FR-038, FR-039 / US-016 | `SynthesizedAudio`, cache key, `audio_cache/`. |
+| FR-040, FR-041 / US-017 / FLOW-019 | Primary→fallback in `VoiceService`; `voice_fallback` log; `AUDIO_UNAVAILABLE`. |
+| FR-042 / US-018 / FLOW-017 | Client download of the MP3 body. |
+| FR-043 | Session auth on all new endpoints. |
+| FR-044 | `VoiceQuota`; `DAILY_LIMIT_REACHED`. |
+| NFR-004-NFR-010 | Section 12. |
+| UX handoff 1-6 | Sections 9 and 10; error codes mapped to M-01-M-16; deletion compatible with SCR-011. |
+| UX-VAL-203 | Timeouts in ADR-014 lead to `STT_UNAVAILABLE`/`AUDIO_UNAVAILABLE` (M-07/M-15). |
+
+## 18. P06 Handoff
+
+Implementation order follows the P03 delivery groups:
+
+1. **Group 1a/1b (no providers):**
+   - US-015: `abc_reader` + `playback` in detail + Tone.js;
+   - US-019: file loader;
+   - DEFECT-001: placeholder fix.
+2. **Group 2 (voice output):**
+   - `voice` module with `Fake` and Edge engines;
+   - US-017 fallback logic;
+   - US-016 cache and `VoiceQuota`;
+   - US-013 solfege endpoint and UI.
+   - Then add the ElevenLabs adapter when keys exist (PRE-004).
+3. **Group 3:** US-011 — `dictation` module (after PRE-002), Whisper adapter, `/audio/stt/`, recorder and dictation panel.
+4. **Group 4:**
+   - US-014 tutor (after PRE-003);
+   - US-012 voice comments (after PRE-005 and Q-026), including `Comment` migration and delete hooks.
+5. **Group 5:** US-018 download from the solfege body.
+6. **Cross-cutting:** runtime changes (Gunicorn, Nginx), environment variables, fake engines in CI, tests listed in section 12.
+
+Before coding, the team needs to approve or resolve:
+- ADR-006-ADR-015;
+- CONFLICT-ARCH-201 and CONFLICT-ARCH-202;
+- PRE-002 (vocabulary and headers);
+- PRE-004 (keys);
+- PRE-005 (storage).
+
+## 19. Status and Next Actions
+
+- **Status:** `READY_WITH_WARNINGS`
+- **P06 readiness:** YES_WITH_REVIEW_GATES. Groups 1a, 1b and 2 (with fake and Edge engines) can start now. US-011, US-012 and US-014 wait for their preconditions.
+- **Next actions:**
+  1. Validate with `P05_validation.md` v2.0.
+  2. Take ADRs and conflicts to the team (TEAM-002 as architect).
+  3. Run a spike to confirm pause markup support (ARCH-ASSUM-201).
