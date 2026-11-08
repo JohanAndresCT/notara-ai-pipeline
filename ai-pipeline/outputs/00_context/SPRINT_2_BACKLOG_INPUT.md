@@ -113,3 +113,27 @@
 
 **Criterios de Aceptación:**
 * **AC-018-01:** **Dado** que la pista de audio (Voz TTS + Instrumento) ya fue sintetizada, **cuando** el usuario haga clic en "Descargar MP3", **entonces** el navegador iniciará la descarga del archivo binario comprimido `.mp3`.
+
+---
+
+## Addendum — 2026-11-08 (CR-002)
+
+**Requested by:** Johan Andrés Ceballos Tabarez (TEAM-001).
+**Reason:** The MVP 1 input stated that the MVP "accepts ABC notation files (`.abc`)", but MVP 1 only lets users type or paste ABC text; no file can be loaded.
+**Effect on totals:** 9 user stories; 28 SP by backlog estimates (31 SP after DEC-208, see `DECISIONS_MVP2.md`).
+
+| ID | Código | Historia de Usuario | Categoría | Tecnología | SP | MOSCoW |
+| :--- | :--- | :--- | :--- | :--- | :---: | :---: |
+| **HU19** | US-019 | Carga de Partitura desde Archivo `.abc` | Entrada (archivo) | Lectura local en el navegador | 2 | Should Have |
+
+#### HU19 / US-019: Carga de Partitura desde Archivo `.abc`
+* **Como** estudiante, músico aficionado o profesor de música,
+* **Quiero** cargar un archivo `.abc` desde mi equipo al crear o editar una partitura,
+* **Para** que su contenido se muestre como texto en el campo de partitura sin tener que copiarlo y pegarlo.
+
+**Criterios de Aceptación:**
+* **AC-019-01:** **Dado** que el usuario está en `ScoreCreatePage` o `ScoreEditPage`, **cuando** seleccione un archivo con extensión `.abc`, **entonces** el formato cambia a "Notación ABC" y el texto del archivo se muestra en el campo "Tu partitura", conservando sus saltos de línea y siendo editable antes de publicar.
+* **AC-019-02:** **Dado** que el campo de partitura ya tiene contenido, **cuando** el usuario cargue un archivo, **entonces** se le pedirá confirmación antes de reemplazar el contenido.
+* **AC-019-03:** **Dado** que el archivo no tiene extensión `.abc`, está vacío, no es texto legible o supera los 1.000 caracteres, **cuando** se intente cargar, **entonces** se mostrará un mensaje claro y el contenido actual no se modificará.
+* **AC-019-04:** **Dado** que el contenido cargado se publica, **cuando** se envíe el formulario, **entonces** se aplicarán las mismas validaciones del MVP 1 (campos obligatorios y validación básica de ABC); el archivo no se almacena, solo su texto.
+

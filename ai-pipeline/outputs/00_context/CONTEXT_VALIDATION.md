@@ -1,15 +1,15 @@
 # P00 — Context Validation Report
 
-**Project:** Notara  
-**Release:** MVP 2 — Sprint 2 (Audio, Voice and TTS/STT)  
-**Input Artifact:** `ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md` (version 2.1, CR-001)  
-**Team Inputs:** `ai-pipeline/outputs/00_context/INITIAL_PROJECT_INPUT.md` (MVP 1 + MVP 2 pointer), `ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md`  
-**Baseline:** context version 1.0 at tag `v1.0.0`; `prompts/system/RELEASE_PLAN.md`; `outputs/03_planning/PRIORITIZATION.md`; `outputs/10_evaluation/MVP_EVALUATION.md`; repository state on 2026-11-08 (branch `pipeline/mvp2-p00-context`, base commit `d3d4b9d`)  
-**Validator Role:** Senior Software Engineering Process Auditor and Product Context Validator  
-**Validation Prompt:** `ai-pipeline/prompts/00_context/P00_validation.md` v2.0  
-**Run:** 2 of 2 for MVP 2 (run 1 validated version 2.0 → `FAIL`; see §4.0)
+**Project:** Notara
+**Release:** MVP 2 — Sprint 2 (Audio, Voice and TTS/STT)
+**Input Artifact:** `ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md` (version 2.2, CR-001 + CR-002)
+**Team Inputs:** `INITIAL_PROJECT_INPUT.md`, `SPRINT_2_BACKLOG_INPUT.md` (with the 2026-11-08 HU19 addendum), `DECISIONS_MVP2.md`
+**Baseline:** context version 1.0 (tag `v1.0.0`) and 2.1; `prompts/system/RELEASE_PLAN.md`; `outputs/03_planning/PRIORITIZATION.md`; `outputs/10_evaluation/MVP_EVALUATION.md`; repository state on 2026-11-08 (branch `pipeline/mvp2-p00-context`)
+**Validator Role:** Senior Software Engineering Process Auditor and Product Context Validator
+**Validation Prompt:** `ai-pipeline/prompts/00_context/P00_validation.md` v2.0
+**Run:** 3 for MVP 2
 
-> The MVP 1 validation (result `PASS_WITH_WARNINGS`) is preserved in Git at tag `v1.0.0` (`ai-pipeline/artifacts/00_context/CONTEXT_VALIDATION.md`).
+> MVP 1 validation (`PASS_WITH_WARNINGS`) is preserved at tag `v1.0.0`. Runs 1–2 of MVP 2 are preserved in Git history (commit `fe459d5` holds run 2).
 
 ## 1. Overall Result
 
@@ -17,31 +17,31 @@
 PASS_WITH_WARNINGS
 ```
 
-All HIGH and MEDIUM findings of run 1 are resolved. Two LOW warnings remain; neither blocks P01 — Discovery. Open team decisions (PDEC-201–PDEC-210, dates, budget, limits) are correctly recorded as pending and are not validation defects.
+No CRITICAL, HIGH or MEDIUM findings. Two LOW warnings.
 
 ## 2. Executive Summary
 
-- Structure is complete (sections 0–16, change log, CR reference).
-- All 37 MVP 1 identifiers from `v1.0.0` are present; superseded items are marked; MVP 1 risk wording is restored with appended MVP 2 notes.
-- HU11–HU18 map 1:1 to MVP-011–MVP-018; SP (total 26) and MoSCoW match the backlog; descriptions now follow the backlog wording (HU13 "hablado/cantado", HU14 "clave, métrica y dificultad", HU18 "Voz TTS + Instrumento").
-- Every narrowing or technology choice not stated by the team is a `PROPOSAL` with an ID in the Proposed Decisions table (PDEC-201–PDEC-210), with the original backlog statement next to it. The `PDEC-2NN` prefix does not collide with P03 `DEC-001`–`DEC-003`.
-- Repository facts are accurate; closed MVP 1 debt is marked closed with commit evidence.
-- The comment-deletion deviation from P03 `DEC-002` is reported and has an open question (Q-017).
+- **New inputs are sound.** `DECISIONS_MVP2.md` defines DEC-201–DEC-218 with what each replaces or resolves, its rationale, who approved it and when, and that ratification is pending. The backlog addendum for HU19 is dated, attributed and separated from the original backlog text, which is unchanged.
+- **Decisions are applied consistently.** Every `DEC-2NN` cited in the context exists in the decision log (automated check). PDEC-201–PDEC-210 are kept by ID as resolved, not deleted. The DECISION label is defined in the legend and kept distinct from FACT, with the ratification caveat visible in §8.
+- **HU19 is traceable.** HU19 maps to MVP-019 (2 SP, Should), CR-002 gives its reason (the MVP 1 input promised `.abc` files; the code never supported loading them), SUCCESS-016 covers it, and OOS-003 clarifies that it is not an image upload.
+- **Backlog adjustments are transparent.** The load is 31 SP (26 + HU19 2 + DEC-208 3, automated sum). Re-estimates and re-prioritizations show the original backlog value next to the decided one.
+- **MVP 1 identifiers are intact.** All 37 MVP 1 identifiers are present (automated check).
+- **The new defect is confirmed in the repository.** DEFECT-001 points to `frontend/src/ScoreCreatePage.tsx:76`: the placeholder contains `&#10;` inside a JavaScript string, and the UI shows the entity literally.
 
 ## 3. Structural Validation
 
-| Required Section | Status |
+| Section | Status |
 |---|---|
 | 0. Change Log | PASS |
 | 1. Project Identification | PASS |
 | 2. Problem | PASS |
 | 3. Proposed Solution | PASS |
 | 4. Target Users | PASS |
-| 5. Initial Product Scope | PASS |
+| 5. Initial Product Scope (features, rules, approved decisions, historical proposals, future, out of scope) | PASS |
 | 6. User Value | PASS |
 | 7. Platform and Environment | PASS |
 | 8. Team Context | PASS |
-| 9. Technical Context | PASS |
+| 9. Technical Context (incl. debt and defects) | PASS |
 | 10. Assumptions | PASS |
 | 11. Unknowns and Open Questions | PASS |
 | 12. Initial Risks | PASS |
@@ -50,99 +50,79 @@ All HIGH and MEDIUM findings of run 1 are resolved. Two LOW warnings remain; nei
 | 15. Context Status | PASS |
 | 16. Generation Metadata | PASS |
 
-No schemas, API contracts or code were introduced. Storage path and page names appear only as backlog acceptance-criteria details.
-
 ## 4. Section-by-Section Findings
 
-### 4.0 Resolution of run 1 findings
+### 4.0 Status of earlier findings
 
-| Run 1 ID | Severity | Resolution in version 2.1 | Status |
-|---|---|---|---|
-| VAL-201 | HIGH | `DEC-01`–`DEC-07` removed. Proposed Decisions table added (§5) with PDEC-201–PDEC-210, backlog statement, affected items and status. Legend now says PROPOSAL = generator proposal, not team. PyDub/FFmpeg listed (EXT-006). All PDEC references resolve to a row (automated check). | Resolved |
-| VAL-202 | MEDIUM | §9 has a debt table checked on 2026-11-08: CSRF exemption and N+1 closed (commits `689e25e`, `6bea185`); duplicate routes and models open. RISK-011 lists only open items. | Resolved |
-| VAL-203 | MEDIUM | MVP-014 restored to "key, meter and difficulty"; Q-018 asks how difficulty is determined. | Resolved |
-| VAL-204 | MEDIUM | §5 reports the deviation from P03 `DEC-002`; Q-004 marked as conflict; Q-017 asks for ratification; link to MVP-012 audio lifecycle stated. | Resolved |
-| VAL-205 | LOW | Q-016 added (behavior for plain-text or invalid ABC in HU13–HU15). | Resolved |
-| VAL-206 | LOW | ASM-009 states HU16/HU17 are enabler stories with no admin role. | Resolved |
-| VAL-207 | LOW | Metadata cites `SPRINT_2_BACKLOG_INPUT.md` and the other sources by repository path. | Resolved |
-| VAL-208 | LOW | Q-014 records Spanish dictation as FACT and keeps the question for other audio. | Resolved |
-| VAL-209 | LOW | MVP 2 problem statement labeled "derived from the backlog — ASSUMPTION". | Resolved |
-| VAL-210 | LOW | RISK-001, RISK-002, RISK-004 and RISK-005 keep MVP 1 wording with "MVP 2 update" notes. | Resolved |
-
-### 4.1 Incremental integrity
-
-**PASS.** Automated check: no MVP 1 identifier missing. FUT-001, FUT-003, OOS-001 and OOS-004 are superseded by CR-001. Q-015 is retained as a merged placeholder rather than deleted, which respects ID stability.
-
-### 4.2 MVP 2 scope traceability
-
-**PASS.** Each MVP-011–MVP-018 row cites HU/US, SP and MoSCoW identical to the backlog (sum 26 SP). Proposed changes to SP or priority (PDEC-208, PDEC-209) stay in the Proposed Decisions table and are not applied to the feature table.
-
-### 4.3 Change Request
-
-**PASS_WITH_WARNINGS.** CR-001 is referenced consistently and does not collide with another CR. It is still a one-line statement without the SYSTEM_PROMPT §11 fields (VAL-211).
-
-### 4.4 Technologies and external services
-
-**PASS.** EXT-002–EXT-006 list every technology named in the backlog with its alternatives. Names from the backlog are FACT; single choices are PROPOSAL. The "offline" contradiction in HU17 is explicit.
-
-### 4.5 Decision IDs
-
-**PASS.** Every cited decision exists either in §5 (PDEC-201–PDEC-210) or in P03 (`DEC-001`–`DEC-003`). No collisions.
-
-### 4.6 Repository-verifiable facts
-
-**PASS.** Re-checked: tag `v1.0.0` on `origin`; Railway deployment (`DEPLOYMENT_GUIDE.md`); `NEEDS_ITERATION` (`MVP_EVALUATION.md`); Django 5.2.18 and DRF 3.15.2; PostgreSQL 16; `MEDIA_ROOT=/data/media`; no `csrf_exempt`; `/api/` and `/api/v1/` routes; `Like` and `Reaction` models; `comment_delete_view`.
-
-### 4.7 Contradiction detection
-
-| Contradiction | Reported in 2.1 |
+| ID | Status in run 3 |
 |---|---|
-| 26 SP (29) in one sprint, dates unknown | RISK-001, Q-010 |
-| Backlog alternatives vs. single provider | PDEC-201, PDEC-202, PDEC-203 |
-| Browser playback vs. voice + instrument MP3 | PDEC-203, PDEC-204, RISK-012 |
-| "Hablado/cantado" vs. spoken only | PDEC-206, ASM-006 |
-| HU17 "Offline" vs. `edge-tts` online | EXT-004 |
-| Paid APIs vs. unknown budget | Q-011, RISK-010 |
-| Plain-text scores vs. ABC-only audio | PDEC-207, Q-016 |
-| HU16 administrator vs. no roles | ASM-009 |
-| Comment deletion vs. P03 `DEC-002` | §5, Q-004, Q-017 |
+| VAL-201–VAL-210 | Resolved in run 2; still resolved. |
+| VAL-211 — CR-001 not written in full | **Resolved:** CR-001 and CR-002 are written with the SYSTEM_PROMPT §11 fields in `PRODUCT_VISION.md` Annexes A and B. |
+| VAL-212 — Release Plan lacks MVP 2 stories | **Open (LOW)**, now HU11–HU19. |
 
-### 4.8 Platform, team, risks, questions, success
+### 4.1 Decisions and sources
 
-**PASS.** HTTPS/microphone constraint recorded; browsers UNKNOWN; team roles FACT, dates and ownership UNKNOWN; risks cover scope, external APIs, dictation quality, storage, personal data, credit abuse and MVP 1 debt; success criteria are qualitative and map to MVP-011–MVP-018.
+**PASS.**
+- **What was checked:** every decision in the context resolves to a row of `DECISIONS_MVP2.md`, and every row states what it replaces or resolves.
+- **No collisions:** the `DEC-2NN` range does not collide with P03 `DEC-001`–`DEC-003`.
+- **Decisions are not overstated:** they are labeled DECISION, not FACT, with "ratification pending".
+- **Gaps stay open:** what the decisions do not settle remains UNKNOWN, such as the global monthly cap (depends on Q-011) and the exact difficulty rule (for P02).
+
+### 4.2 Fidelity to the backlog
+
+**PASS.**
+- **Original wording kept:** wherever a decision narrows a backlog story, the context keeps the backlog wording next to it. Examples: HU13 "hablado/cantado" → DEC-206; HU18 "Voz TTS + Instrumento" → DEC-204; HU17 "Offline" → EXT-004 / DEC-202.
+- **Reverses are visible:** this explicit record is what the incremental rules require, so no story was narrowed silently.
+
+### 4.3 HU19 / CR-002
+
+**PASS.**
+- **Scope check:** the scope gap is real. The MVP 1 input says "accepts ABC notation files (`.abc`)", MVP 1 P02 AC-012 treats format only, and no file input exists in `frontend/src/`.
+- **Size check:** HU19 is frontend-only (DEC-217) and adds no external service, storage or endpoint, so 2 SP is plausible.
+- **Rules check:** content rules apply to loaded content (DEC-218).
+
+### 4.4 Repository-verifiable facts
+
+**PASS.** Re-confirmed:
+- DEFECT-001, observed in the code and the UI;
+- no `.abc` file loading in the frontend;
+- the debt table as in run 2.
+
+### 4.5 Questions, risks and success criteria
+
+**PASS.**
+- **Questions:** resolved questions keep their ID with the resolving decision, and Q-020 tracks ratification.
+- **Risks:** RISK-012 is resolved by DEC-204, RISK-014 is added for ratification risk, and RISK-001 is updated to 31 SP with the Must subset (21 SP).
+- **Success criteria:** SUCCESS-016 is added for HU19.
 
 ## 5. Scope and Traceability Audit
 
-| Statement | Source | Classification in context | Status |
+| Statement | Source | Classification | Status |
 |---|---|---|---|
-| Professional notation software is a barrier | Input A | FACT | Supported |
-| Typing is a barrier and text cannot be heard | HU11/HU13/HU15 benefit clauses | ASSUMPTION (derived) | Labeled |
-| Users: students, hobbyists, teachers | Input A; backlog | FACT | Supported |
-| MVP 1 delivered, Railway, `v1.0.0`, NEEDS_ITERATION | Repository, P08, P10 | FACT | Supported |
-| HU11–HU18, 26 SP, MoSCoW | Input B | FACT | Supported |
-| Dictation in Spanish | Input B HU11 | FACT | Supported |
-| Voice comment ≤ 30 s, text + audio | Input B HU12 | FACT | Supported |
-| Solfège "hablado/cantado" | Input B HU13 | FACT; spoken-only = PDEC-206 | Supported / labeled |
-| Tutor: key, meter, difficulty | Input B HU14 | FACT | Supported |
-| Instrument playback without external TTS | Input B HU15 | FACT; Tone.js-only = PDEC-203 | Supported / labeled |
-| Cache by content hash | Input B HU16 | FACT; key extension = PDEC-210 | Supported / labeled |
-| Fallback with `edge-tts`, no HTTP 500 | Input B HU17 | FACT | Supported |
-| MP3 with voice + instrument | Input B HU18 | FACT; voice-only = PDEC-204 | Supported / labeled |
-| Closed-vocabulary parser | Generator | PROPOSAL (PDEC-205) | Labeled |
-| Microphone needs HTTPS | Browser platform constraint | FACT | Supported |
-| Voice recordings are personal data | Inference | ASSUMPTION (ASM-008) | Labeled |
+| HU11–HU18, MoSCoW, SP | Backlog | FACT | Supported |
+| HU19, 2 SP, Should | Backlog addendum (2026-11-08) | FACT | Supported |
+| HU11 = 8 SP, HU17 = Must | DEC-208, DEC-209 | DECISION | Supported; original values shown |
+| Whisper / ElevenLabs / `edge-tts` / Tone.js | DEC-201–DEC-203 | DECISION | Supported; discarded alternatives listed |
+| MP3 = voice only | DEC-204 | DECISION | Supported; backlog wording kept |
+| Spoken solfège | DEC-206 | DECISION | Supported; backlog wording kept |
+| Listening only for `.abc` | DEC-207 | DECISION | Supported |
+| Comment deletion ratified | DEC-211 vs. P03 DEC-002 | DECISION | Supported; supersession stated |
+| Estimated difficulty | DEC-212 | DECISION | Supported; rule deferred to P02 |
+| Limits 20/day, 30 s, 2 MB | DEC-213 | DECISION | Supported; global cap UNKNOWN |
+| Retention rules | DEC-214 | DECISION | Supported |
+| Spanish only | DEC-215 | DECISION | Supported |
+| `.abc` read in browser, not stored | DEC-217 | DECISION | Supported |
+| DEFECT-001 | `ScoreCreatePage.tsx:76`, UI | FACT | Verified |
 | OMR in MVP 3 | Input A | FACT | Supported |
 
-**Scope creep:** none. No capability beyond HU11–HU18 was added; limits and retention are questions, not requirements.
+**Scope creep:** none. HU19 enters through a dated team request and CR-002, not silently.
 
 ## 6. Findings
 
 | ID | Severity | Finding | Evidence | Recommendation |
 |---|---|---|---|---|
-| VAL-211 | LOW | CR-001 is referenced but not written out with the SYSTEM_PROMPT §11 fields (Reason, Affected Artifacts, Affected Requirements, Impact, Proposed Change, Required Revalidation). | `PROJECT_CONTEXT.md` header and §16; SYSTEM_PROMPT §11. | Write CR-001 in full during P01 or P02 (it lists the downstream artifacts P01–P10 that must be revalidated). |
-| VAL-212 | LOW | `RELEASE_PLAN.md` covers only HU01–HU10; HU11–HU18 exist only in the Sprint 2 backlog. Traceability is correct today, but stages that read the Release Plan will not see MVP 2. | `prompts/system/RELEASE_PLAN.md` (no HU11+). | Add the Sprint 2 stories to the Release Plan, or make P01–P03 read `SPRINT_2_BACKLOG_INPUT.md` explicitly. |
-
-No CRITICAL, HIGH or MEDIUM findings.
+| VAL-212 | LOW | `RELEASE_PLAN.md` covers only HU01–HU10; MVP 2 stories (HU11–HU19) live in the backlog input. | `prompts/system/RELEASE_PLAN.md` | Extend the Release Plan, or make P02/P03 read `SPRINT_2_BACKLOG_INPUT.md` and `DECISIONS_MVP2.md` explicitly. |
+| VAL-213 | LOW | DEC-201–DEC-218 were approved by one team member (TEAM-001) who delegated the choice to the pipeline. The context labels them correctly and tracks ratification (Q-020, RISK-014), but a reversal would ripple into P01–P05. | `DECISIONS_MVP2.md` header; context §8. | Ratify with TEAM-002 to TEAM-005 before P03 planning; record the ratification date in `DECISIONS_MVP2.md`. |
 
 ## 7. Context Status Assessment
 
@@ -150,17 +130,11 @@ No CRITICAL, HIGH or MEDIUM findings.
 READY_WITH_ASSUMPTIONS — justified
 ```
 
-Problem, users, MVP 1 baseline, MVP 2 scope, team and technical baseline are identifiable and traceable. The open items are team decisions (PDEC-201–PDEC-210, Q-007–Q-018) that P01–P05 need but that do not prevent discovery. `READY` is not justified because provider choices, limits, budget, storage persistence and dates are still unknown; `BLOCKED` is not justified because nothing essential is missing.
+The product definition is now settled by decisions. The remaining unknowns (dates, budget, storage, latency, browsers, ratification) affect planning and architecture, not the product definition, so `READY_WITH_ASSUMPTIONS` is justified and `READY` is not.
 
 ## 8. Required Actions
 
-Before P01: none blocking.
-
-Recommended in P01/P02:
-
-1. VAL-211: write CR-001 in full.
-2. VAL-212: make the MVP 2 stories visible to stages that read the Release Plan.
-3. Bring Q-007 (PDEC-201–PDEC-210), Q-010 (dates and ownership) and Q-011 (budget and keys) to the team; P05 Architecture cannot finalize providers without them.
+None blocking. Recommended: VAL-212 when adapting P02/P03; VAL-213 before P03.
 
 ## 9. Validation Metadata
 
@@ -168,9 +142,21 @@ Recommended in P01/P02:
 |---|---|
 | Validator | P00 — Context Validation Prompt |
 | Prompt Version | 2.0 |
-| Validated Artifact | `PROJECT_CONTEXT.md` version 2.1 (CR-001) |
+| Validated Artifact | `PROJECT_CONTEXT.md` version 2.2 |
 | Output | `ai-pipeline/outputs/00_context/CONTEXT_VALIDATION.md` |
 | Overall Result | `PASS_WITH_WARNINGS` (0 HIGH, 0 MEDIUM, 2 LOW) |
 | Date | 2026-11-08 |
-| Run history | Run 1 — version 2.0 → `FAIL` (1 HIGH, 3 MEDIUM, 6 LOW); Run 2 — version 2.1 → `PASS_WITH_WARNINGS` |
+| Run history | Run 1 — v2.0 → `FAIL`; Run 2 — v2.1 → `PASS_WITH_WARNINGS`; Run 3 — v2.2 → `PASS_WITH_WARNINGS` |
 | Previous release | MVP 1: `PASS_WITH_WARNINGS` (tag `v1.0.0`) |
+
+## Addendum — Run 4 (version 2.3)
+
+**Date:** 2026-11-08 · **Trigger:** P02 findings REQ-VAL-202 and REQ-VAL-203 · **Result:** `PASS_WITH_WARNINGS` (0 HIGH, 0 MEDIUM, 2 LOW — VAL-212, VAL-213 unchanged)
+
+| Check | Result |
+|---|---|
+| HU14 wording | §3 item 4 and MVP-014 now say clef ("clave"), matching the backlog example "clave de Sol" and P02 BR-028. Remaining "key" occurrences are only the change-log explanation and "cache key". |
+| Q-002 / Q-006 | Shown as resolved in MVP 1 requirements v2.0 (NFR-002; MVP 1 success decision); removed from §14 Pending Decisions. |
+| Scope | No feature, decision or SP changed. |
+| MVP 1 identifiers | All 37 present (automated check). |
+| Change log / metadata | Version 2.3 recorded with reason. |

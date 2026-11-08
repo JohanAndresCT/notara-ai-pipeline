@@ -175,3 +175,36 @@ Las advertencias anteriores quedaron resueltas:
   P02.
 
 No quedan correcciones pendientes para avanzar a P03.
+
+---
+
+# MVP 2 — Sprint 2 (Audio, Speech & TTS/STT)
+
+## 02. Requirements (MVP 2): adaptación de prompts
+
+- `prompts/02_requirements/P02_requirements.md` → v2.0: modo incremental; HU11–HU19 en alcance (CR-001, CR-002); entradas nuevas `SPRINT_2_BACKLOG_INPUT.md` y `DECISIONS_MVP2.md` (resuelve DISC-VAL-202); MoSCoW/SP del equipo como dato de origen en `traceability.team_backlog`, campos de planificación en null.
+- `prompts/02_requirements/P02_validation.md` → v2.0: valida cobertura HU11–HU19, reflejo de DEC-201..DEC-218, preservación y reemplazo de IDs del MVP 1, conflictos y límites técnico/planificación.
+
+## 02. Requirements (MVP 2)
+
+Ejecuta P02 v2.0 con PRODUCT_VISION.md v2.1, PROJECT_CONTEXT.md v2.2, SPRINT_2_BACKLOG_INPUT.md,
+DECISIONS_MVP2.md y REQUIREMENTS.md / product_backlog.json v2.0 (MVP 1).
+
+Resultado: REQUIREMENTS.md v3.0 y product_backlog.json v3.0 — READY_WITH_ASSUMPTIONS.
+- US-011..US-019, FR-018..FR-044, NFR-004..NFR-010, AC-029..AC-069, BR-013..BR-028, EDGE-014..EDGE-030, DEP-004..DEP-010, EPIC-005..EPIC-007.
+- US-010 enmendada por DEC-211 (AC-028 → AC-029, BR-011 → BR-019).
+- Reglas PROPOSAL: BR-013 (vocabulario de dictado), BR-014 (dificultad estimada), BR-025 (cabeceras del ABC dictado).
+- Conflictos: CONFLICT-201 (ejemplo AC-011-02 sin cabeceras), CONFLICT-202 ("clave" = clef, no key), CONFLICT-203 (no existe borrado de cuenta), CONFLICT-204 (P00 desincronizado), CONFLICT-205 (MP3, resuelto por DEC-204).
+
+## 02. Requirements (MVP 2): Validation
+
+## MVP 2 V3.0 Result: PASS_WITH_WARNINGS (0 HIGH, 2 MEDIUM, 4 LOW)
+
+- REQ-VAL-201 (MEDIUM): aprobar BR-013, BR-014 y BR-025 antes de estimar US-011 y US-014.
+- REQ-VAL-202 (MEDIUM): corregir "key" → "clef (clave)" en P00 y P01.
+- REQ-VAL-203..206 (LOW): sincronizar P00 (Q-002/Q-006), Q-022 borrado de cuenta, códigos 402/429 en AC-059, AC-063 operativo.
+
+P03 readiness: READY_WITH_ASSUMPTIONS.
+## Post-validación
+
+REQ-VAL-202 y REQ-VAL-203 corregidas aguas arriba (P00 v2.3, P01 v2.2). CONFLICT-202 y CONFLICT-204 en REQUIREMENTS.md marcados como corregidos/sincronizados. El informe de validación P02 se conserva tal como se emitió.

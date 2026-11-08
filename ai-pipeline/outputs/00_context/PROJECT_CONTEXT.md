@@ -1,15 +1,16 @@
 # Project Context
 
-**Version:** 2.1
+**Version:** 2.3
 **Release:** MVP 2 — Sprint 2 (Audio, Voice and TTS/STT)
-**Supersedes:** Version 2.0 (MVP 2, failed P00 validation) and version 1.0 (MVP 1, repository tag `v1.0.0`)
+**Supersedes:** Version 2.2 (wording of HU14 and MVP 1 question status), version 2.1 (MVP 2, proposals pending) and version 1.0 (MVP 1, repository tag `v1.0.0`)
 **last edited by:** Johan Andrés Ceballos
 **Mode:** Incremental update. All MVP 1 content is preserved; MVP 2 content is added and marked.
-**Change Request:** CR-001 — Move voice and audio capabilities from future scope into MVP 2.
+**Change Requests:** CR-001 — Voice and audio capabilities enter MVP 2. CR-002 — Loading a score from an `.abc` file enters MVP 2 (HU19).
 
 > Classification legend:
 > **FACT** — stated by the team in an input artifact or verifiable in the repository.
-> **PROPOSAL** — proposed by the P00 context generator, **not** stated by the team and **not** approved. Every proposal that affects scope or technology has an ID in §5 "Proposed Decisions" (`PDEC-2NN`).
+> **DECISION** — approved team decision recorded in `DECISIONS_MVP2.md` (`DEC-2NN`). Treated as FACT for downstream stages; team-wide ratification is pending (see §8).
+> **PROPOSAL** — proposed by the pipeline, not approved.
 > **ASSUMPTION** — reasonable but unconfirmed.
 > **UNKNOWN** — missing information.
 
@@ -18,10 +19,12 @@
 | Version | Release | Summary |
 |---|---|---|
 | 1.0 | MVP 1 | Initial context: text-first scores (`.abc` and plain text), HU01–HU10, no audio, no voice, no OMR. |
-| 2.0 | MVP 2 | Voice input (STT) and audio output (TTS, instrument playback) enter scope through HU11–HU18. OMR stays in MVP 3. Failed P00 validation (VAL-201). |
-| 2.1 | MVP 2 | Corrections from `CONTEXT_VALIDATION.md` (VAL-201–VAL-210): unsourced `DEC-01`–`DEC-07` replaced by the Proposed Decisions table (`PDEC-201`–`PDEC-210`); PROPOSAL legend corrected; MVP 1 debt updated against the repository; HU14 restored to backlog wording; comment-deletion deviation from P03 `DEC-002` reported; MVP 1 risks restored with MVP 2 notes; source paths fixed. |
+| 2.0 | MVP 2 | Voice input and audio output enter scope through HU11–HU18 (CR-001). Failed P00 validation (VAL-201). |
+| 2.1 | MVP 2 | Corrections VAL-201–VAL-210; proposals PDEC-201–PDEC-210 tabled. |
+| 2.2 | MVP 2 | Proposals resolved by DEC-201–DEC-210; open questions resolved by DEC-211–DEC-218 (`DECISIONS_MVP2.md`). HU19 / MVP-019 added through CR-002. Load becomes 31 SP. Defect DEFECT-001 (ABC placeholder) recorded. |
+| 2.3 | MVP 2 | Corrections from P02 validation: HU14 "clave" is the clef, not the key (REQ-VAL-202 / CONFLICT-202), in §3 and MVP-014; Q-002 and Q-006 synced with their MVP 1 resolution in requirements v2.0 (REQ-VAL-203 / CONFLICT-204). No scope change. |
 
-Identifiers are stable. Items that changed status keep their ID and are marked as superseded; they are not renumbered.
+Identifiers are stable. Items that changed status keep their ID and are marked as superseded or resolved; they are not renumbered.
 
 ## 1. Project Identification
 
@@ -40,13 +43,13 @@ Identifiers are stable. Items that changed status keep their ID and are marked a
 
 **FACT:** Music students and hobbyist musicians need a simple, accessible space to create, share, and view short pieces of sheet music without relying on complex professional notation software such as MuseScore, Finale, or Sibelius.
 
-**Derived from the Sprint 2 backlog (benefit clauses of HU11, HU13 and HU15) — ASSUMPTION:** typing notation, even as text, is still a barrier ("sin escribirlas a mano"), and a text score cannot be heard ("saber exactamente cómo debe sonar la melodía"). The team has not stated this as a separate problem statement.
+**Derived from the Sprint 2 backlog (benefit clauses of HU11, HU13, HU15 and HU19) — ASSUMPTION:** typing notation, even as text, is still a barrier ("sin escribirlas a mano", "sin tener que copiarlo y pegarlo"), and a text score cannot be heard ("saber exactamente cómo debe sonar la melodía"). The team has not stated this as a separate problem statement.
 
 ### Current Situation
 
 **FACT:** The steep learning curve of professional notation software is a barrier for someone who only wants to jot down a quick musical idea.
 
-**FACT:** After MVP 1, scores are published and read as text only. Users cannot dictate a score, hear it, or leave spoken feedback.
+**FACT:** After MVP 1, scores are published and read as text only. Users cannot dictate a score, load an existing `.abc` file, hear a score, or leave spoken feedback.
 
 ### Problem Impact
 
@@ -60,30 +63,31 @@ Identifiers are stable. Items that changed status keep their ID and are marked a
 
 **FACT:** Notara is a community platform and basic sheet-music manager where users create or submit short textual scores, publish them to a shared feed, and allow other musicians to view, comment on, and react to them.
 
-**FACT:** MVP 1 accepts both `.abc` files and plain text. Score content must be non-empty and have a maximum of 1,000 characters. `.abc` content receives basic syntax validation (header fields `X:`, `T:`, `M:`, `L:`, `K:` and at least one musical line); plain text uses a free format.
+**FACT:** MVP 1 accepts both `.abc` and plain-text content typed or pasted by the user. Score content must be non-empty and have a maximum of 1,000 characters. `.abc` content receives basic syntax validation (header fields `X:`, `T:`, `M:`, `L:`, `K:` and at least one musical line); plain text uses a free format.
 
 **FACT:** Published content is displayed as readable text preserving line breaks, with its format distinguishable as `.abc` or plain text.
 
-**FACT (MVP 2 scope, HU11–HU18):** MVP 2 adds a voice and audio layer on top of the MVP 1 community:
+**FACT (MVP 2 scope, HU11–HU19):** MVP 2 adds a voice, audio and file-input layer on top of the MVP 1 community:
 
 1. Dictate a score by voice in Spanish and have it converted to ABC (HU11).
 2. Record a voice comment that is transcribed and published as text with its audio (HU12).
-3. Listen to a synthesized voice pronouncing ("hablado/cantado") the notes of a score (HU13).
-4. Listen to a spoken educational summary of a score: key, meter and difficulty (HU14).
+3. Listen to a synthesized voice pronounce the notes of a score (HU13).
+4. Listen to a spoken educational summary of a score: clef ("clave"), meter and estimated difficulty (HU14).
 5. Play the score with an instrument sound (HU15).
 6. Cache synthesized audio to avoid repeated provider calls (HU16).
 7. Fall back to a free voice engine when the commercial provider fails (HU17).
-8. Download the synthesized audio (voice TTS + instrument, per the backlog) as MP3 (HU18).
+8. Download the synthesized solfège as MP3 (HU18).
+9. Load a score from an `.abc` file and see its text in the editor (HU19, CR-002).
 
 ### Product Phases
 
 1. **FACT — MVP 1:** Manual textual score creation or submission using `.abc` or plain text. Delivered.
-2. **FACT — MVP 2:** Voice-based input and audio output (this release).
+2. **FACT — MVP 2:** Voice-based input, `.abc` file loading and audio output (this release).
 3. **FACT — MVP 3:** Image recognition of physical sheet music (OMR). Not part of this release.
 
 ### Value Proposition
 
-**ASSUMPTION:** A voice-first workflow lowers the barrier further than text entry, and spoken solfège plus instrument playback help students practice sight-reading.
+**ASSUMPTION:** A voice-first workflow and file loading lower the barrier further than typing, and spoken solfège plus instrument playback help students practice sight-reading.
 
 **FACT:** Users can publish content and receive community comments and reactions.
 
@@ -93,11 +97,12 @@ Identifiers are stable. Items that changed status keep their ID and are marked a
 
 **FACT:** In MVP 1 audio was excluded and the product promise was viewing. MVP 2 introduces the listening promise through HU13–HU15 and HU18.
 
-The backlog leaves several boundaries open. The generator proposes the following; none is approved (see §5 Proposed Decisions):
+**DECISION:** The boundaries left open by the backlog are now set:
 
-- **PROPOSAL (PDEC-206):** solfège is spoken (note names in order); sung solfège and rhythmic synchronization are deferred. The backlog title says "Hablado/Cantado" and AC-013-01 says "pronunciar las notas a tiempo".
-- **PROPOSAL (PDEC-204):** the MP3 contains only the synthesized voice. The backlog (AC-018-01) says "Voz TTS + Instrumento".
-- **PROPOSAL (PDEC-207):** solfège, tutor and instrument playback apply only to `.abc` scores. The backlog says "partitura con código ABC válido" for HU13 and HU15, but does not say what happens with plain-text or invalid scores (Q-016).
+- **DEC-206:** solfège is spoken, not sung; pauses follow note durations when the TTS engine supports it, otherwise a constant pace.
+- **DEC-204:** the MP3 contains the synthesized solfège voice only. The backlog wording "Voz TTS + Instrumento" (AC-018-01) is reworded.
+- **DEC-207:** listening features are available only for `.abc` scores; plain-text scores show disabled buttons with a message; unrenderable ABC shows a clear message.
+- **DEC-217:** `.abc` files are read in the browser; the file itself is not uploaded or stored.
 
 ## 4. Target Users
 
@@ -109,9 +114,9 @@ The backlog leaves several boundaries open. The generator proposes the following
 
 **FACT:** There is no differentiated role management; registered users manage only their own content.
 
-**FACT (MVP 2):** The Sprint 2 stories address students and teachers (HU11), community members (HU12), students (HU13, HU18), hobbyist users (HU14), any user (HU15), the system administrator (HU16) and the developer team (HU17).
+**FACT (MVP 2):** The Sprint 2 stories address students and teachers (HU11), community members (HU12), students (HU13, HU18), hobbyist users (HU14), any user (HU15), the system administrator (HU16), the developer team (HU17) and students, hobbyists and teachers (HU19).
 
-**ASSUMPTION:** HU16 ("como administrador del sistema") and HU17 ("como desarrollador del proyecto") are technical enabler stories written from an operator's perspective. They do **not** introduce an administrator role in the product, consistent with OOS-005.
+**ASSUMPTION:** HU16 ("como administrador del sistema") and HU17 ("como desarrollador del proyecto") are technical enabler stories written from an operator's perspective. They do **not** introduce an administrator role, consistent with OOS-005.
 
 ## 5. Initial Product Scope
 
@@ -128,24 +133,29 @@ The backlog leaves several boundaries open. The generator proposes the following
 | MVP-007 | HU07 | Dashboard | FACT | View recent personal and community scores and filter by instrument. |
 | MVP-008 | HU08 | Feed and detail | FACT | Explore scores and view readable content, format, metadata, and comments. |
 | MVP-009 | HU09 | Reactions | FACT | Like and remove a like from another user's score. |
-| MVP-010 | HU10 | Comments | FACT | Comment on scores published by other users. |
+| MVP-010 | HU10 | Comments | FACT | Comment on scores published by other users; authors can delete their own comments (DEC-211). |
 
-**FACT — deviation from an approved decision:** P03 approved `DEC-002` "Comments cannot be edited or deleted in MVP 1" (`outputs/03_planning/PRIORITIZATION.md`). The delivered code lets authors delete their own comments (`backend/scores/views.py`, `comment_delete_view`). The team has not ratified this deviation (Q-004, Q-017). It matters for MVP-012, because a voice comment adds an audio file whose lifecycle depends on whether comments can be deleted.
+**FACT — resolved deviation:** P03 approved `DEC-002` "Comments cannot be edited or deleted in MVP 1", but the delivered code lets authors delete their own comments. **DEC-211** ratifies the delivered behavior and supersedes P03 `DEC-002`. Deleting a voice comment also deletes its audio.
+
+**FACT — scope gap from MVP 1:** the MVP 1 input says the MVP "accepts ABC notation files (`.abc`)", but MVP 1 requirements and code only support typed or pasted text. CR-002 closes the gap in MVP 2 with HU19.
 
 ### MVP 2 Features (new)
 
-Story Points and MoSCoW come from the Sprint 2 backlog (`SPRINT_2_BACKLOG_INPUT.md`). Total: 26 SP.
+Story Points and MoSCoW come from the Sprint 2 backlog and its addendum (`SPRINT_2_BACKLOG_INPUT.md`), adjusted by DEC-208 and DEC-209.
 
 | ID | Traceability | Feature | Classification | Description | SP | MoSCoW |
 |---|---|---|---|---|---:|---|
-| MVP-011 | HU11 / US-011 | Voice dictation of a score | FACT | Dictate notes and bars in Spanish from the create or edit page; the system converts the dictation to ABC in the content field, or shows a clear message when it cannot interpret it. | 5 | Must |
+| MVP-011 | HU11 / US-011 | Voice dictation of a score | FACT | Dictate notes and bars in Spanish from the create or edit page; the system converts the dictation to ABC in the content field, or shows a clear message when it cannot interpret it. | 8 (backlog 5; DEC-208) | Must |
 | MVP-012 | HU12 / US-012 | Voice comments | FACT | Record a voice note (up to 30 s) on another user's score; it is transcribed and stored as a comment with the text and a link to its audio. | 3 | Should |
-| MVP-013 | HU13 / US-013 | Solfège by voice | FACT | Listen to a synthesized voice pronounce ("hablado/cantado") the note names of a valid ABC score. | 5 | Must |
-| MVP-014 | HU14 / US-014 | Audio tutor | FACT | Listen to a spoken summary of the score's key, meter and difficulty before practicing it. | 3 | Should |
-| MVP-015 | HU15 / US-015 | Instrument playback | FACT | Play a valid ABC score with an instrument (piano) sound without consuming external TTS APIs. | 3 | Must |
-| MVP-016 | HU16 / US-016 | Synthesized-audio cache | FACT | Store generated TTS audio indexed by a hash of the score content and reuse it for repeated requests. | 3 | Must |
-| MVP-017 | HU17 / US-017 | Voice fallback | FACT | Switch to a free voice engine when the commercial TTS provider fails or has no credits, without a server error. | 2 | Should |
-| MVP-018 | HU18 / US-018 | MP3 download | FACT | Download the synthesized audio as an MP3 file. | 2 | Could |
+| MVP-013 | HU13 / US-013 | Spoken solfège | FACT + DEC-206 | Listen to a synthesized voice pronounce the note names of a valid ABC score, paced by note duration where supported. | 5 | Must |
+| MVP-014 | HU14 / US-014 | Audio tutor | FACT + DEC-212 | Listen to a spoken summary of the score's clef ("clave"), meter and estimated difficulty before practicing it. | 3 | Should |
+| MVP-015 | HU15 / US-015 | Instrument playback | FACT + DEC-203 | Play a valid ABC score with a piano sound in the browser, without external APIs. | 3 | Must |
+| MVP-016 | HU16 / US-016 | Synthesized-audio cache | FACT + DEC-210 | Store generated TTS audio keyed by a hash of content, voice and language, and reuse it. | 3 | Must |
+| MVP-017 | HU17 / US-017 | Voice fallback | FACT + DEC-209 | Switch to `edge-tts` when the commercial TTS provider fails or has no credits, without a server error. | 2 | Must (backlog Should; DEC-209) |
+| MVP-018 | HU18 / US-018 | MP3 download | FACT + DEC-204 | Download the synthesized solfège voice as an MP3 file. | 2 | Could |
+| MVP-019 | HU19 / US-019 | Load score from `.abc` file | FACT (CR-002) + DEC-217 | Select an `.abc` file on the create or edit page; its text is shown in the content field, editable before publishing, after confirmation if the field already has content. | 2 | Should |
+
+**FACT:** Total MVP 2 load: **31 SP** (backlog 26 + HU19 2 + HU11 re-estimate 3).
 
 ### Textual Content Rules (unchanged)
 
@@ -159,24 +169,36 @@ Story Points and MoSCoW come from the Sprint 2 backlog (`SPRINT_2_BACKLOG_INPUT.
 | Display | FACT | Readable text preserving line breaks and distinguishing the format. |
 | Required publication fields | FACT | Title, instrument, textual content, and description. |
 
-**ASSUMPTION (MVP 2):** Dictated ABC (MVP-011) must satisfy these same rules, including the 1,000-character limit and the existing ABC validation. The backlog does not state it explicitly.
+**DECISION (DEC-218):** Content produced by dictation (HU11) or file loading (HU19) must pass these same rules before publication.
 
-### Proposed Decisions
+### Approved Decisions
 
-All rows are **PROPOSAL** by the P00 context generator, pending team approval (Q-007). They are not part of the Sprint 2 backlog. The `PDEC-2NN` prefix avoids collision with the approved P03 decisions `DEC-001`–`DEC-003`.
+Source: `DECISIONS_MVP2.md`. Summary:
 
-| ID | Proposal | Backlog statement | Affects | Status |
-|---|---|---|---|---|
-| PDEC-201 | Use one STT provider: Whisper (OpenAI API). | HU11 "Whisper"; HU12 "Whisper / Deepgram". | MVP-011, MVP-012, EXT-002 | PROPOSAL |
-| PDEC-202 | Use one commercial TTS provider: ElevenLabs, with `edge-tts` as the fallback. | HU13 "ElevenLabs / Azure"; HU14 "ElevenLabs / Google"; HU17 `edge-tts`. | MVP-013, MVP-014, MVP-017, EXT-003, EXT-004 | PROPOSAL |
-| PDEC-203 | Instrument playback in the browser with Tone.js; no server-side FluidSynth. | HU15 "Tone.js (Frontend) o FluidSynth (Backend)". | MVP-015, MVP-018, OOS-008 | PROPOSAL |
-| PDEC-204 | The MP3 download contains only the synthesized voice; voice + instrument mixing is deferred. | AC-018-01 "Voz TTS + Instrumento"; technology "PyDub / FFmpeg". | MVP-018, FUT-005, OOS-007, RISK-012 | PROPOSAL |
-| PDEC-205 | Convert dictation to ABC with a deterministic parser over a closed Spanish vocabulary (notes Do–Si, accidentals, note values, rests, meter); no LLM. | AC-011-02 only states the expected ABC output. | MVP-011, ASM-005, RISK-007 | PROPOSAL |
-| PDEC-206 | Spoken solfège only; sung solfège and rhythmic synchronization deferred. | HU13 "Hablado/Cantado", "pronunciar las notas a tiempo". | MVP-013, FUT-004, OOS-006, ASM-006 | PROPOSAL |
-| PDEC-207 | Solfège, tutor and instrument playback are available only for `.abc` scores. | HU13 and HU15 require "código ABC válido"; HU14 silent. | MVP-013–MVP-015, Q-016 | PROPOSAL |
-| PDEC-208 | Re-estimate HU11 from 5 to 8 SP (total 29 SP) because PDEC-205 adds a vocabulary parser. | HU11 = 5 SP. | MVP-011, RISK-001 | PROPOSAL |
-| PDEC-209 | Raise HU17 from Should to Must, because HU13 (Must) depends on it for reliable demos. | HU17 = Should Have. | MVP-017 | PROPOSAL |
-| PDEC-210 | Extend the cache key to content + voice + language. | AC-016-01 "indexado por el HASH del contenido". | MVP-016 | PROPOSAL |
+| ID | Replaces / resolves | Decision |
+|---|---|---|
+| DEC-201 | PDEC-201 | Whisper (OpenAI API) as the single STT provider. |
+| DEC-202 | PDEC-202 | ElevenLabs as commercial TTS, `edge-tts` as fallback and as default in development and CI. |
+| DEC-203 | PDEC-203 | Instrument playback in the browser with Tone.js. |
+| DEC-204 | PDEC-204 | MP3 contains the solfège voice only. |
+| DEC-205 | PDEC-205 | Deterministic closed-vocabulary dictation parser, vocabulary shown to the user. |
+| DEC-206 | PDEC-206 | Spoken solfège paced by note duration where supported. |
+| DEC-207 | PDEC-207, Q-016 | Listening only for `.abc`; disabled with message for plain text; clear message for unrenderable ABC. |
+| DEC-208 | PDEC-208 | HU11 = 8 SP. |
+| DEC-209 | PDEC-209 | HU17 = Must. |
+| DEC-210 | PDEC-210 | Cache key = content + voice + language. |
+| DEC-211 | Q-004, Q-017 | Comment deletion by its author ratified; supersedes P03 DEC-002. |
+| DEC-212 | Q-018 | Estimated difficulty from a simple documented ABC rule. |
+| DEC-213 | Q-008 | Auth required; 20 new syntheses per user per day; recordings ≤ 30 s and ≤ 2 MB. |
+| DEC-214 | Q-013 | Dictation audio discarded; voice-comment audio lives with its comment; user informed before recording. |
+| DEC-215 | Q-014 | Spanish only. |
+| DEC-216 | Q-019 | Fallback voice not signaled to the user; logged. |
+| DEC-217 | HU19 | `.abc` file read in the browser, not uploaded or stored; `.abc` only. |
+| DEC-218 | ASM-010 | Dictated and loaded content must pass MVP 1 content rules. |
+
+### Proposed Decisions (historical)
+
+PDEC-201 to PDEC-210 (version 2.1) are all **resolved** by DEC-201 to DEC-210. They are kept by ID for traceability; their full text is in version 2.1 in Git history.
 
 ### Future Considerations
 
@@ -185,8 +207,8 @@ All rows are **PROPOSAL** by the P00 context generator, pending team approval (Q
 | FUT-001 | Voice-based input | **Superseded by CR-001:** in scope for MVP 2 (MVP-011, MVP-012). |
 | FUT-002 | Image recognition / OMR | FACT — MVP 3 |
 | FUT-003 | Audio playback or sharing | **Superseded by CR-001:** playback in scope for MVP 2 (MVP-013 to MVP-015, MVP-018). |
-| FUT-004 | Sung solfège with rhythmic synchronization | PROPOSAL — future release, only if PDEC-206 is approved |
-| FUT-005 | Single MP3 mixing synthesized voice and instrument | PROPOSAL — future release, only if PDEC-204 is approved |
+| FUT-004 | Sung solfège with rhythmic synchronization | DECISION — future release (DEC-206) |
+| FUT-005 | Single MP3 mixing synthesized voice and instrument | DECISION — future release (DEC-204) |
 | FUT-006 | Email verification, account recovery | FACT — not in the MVP 2 backlog. Note: `RELEASE_PLAN.md` suggested considering email verification for MVP 2. |
 
 ### Out of Scope
@@ -195,18 +217,20 @@ All rows are **PROPOSAL** by the P00 context generator, pending team approval (Q
 |---|---|---|
 | OOS-001 | Voice input in MVP 1 | FACT (MVP 1). **Superseded by CR-001** for MVP 2. |
 | OOS-002 | OMR in MVP 1 and MVP 2 | FACT |
-| OOS-003 | Image uploads | FACT |
+| OOS-003 | Image uploads | FACT. Note: HU19 loads text files only; it is not an image upload. |
 | OOS-004 | Audio playback or sharing in MVP 1 | FACT (MVP 1). **Superseded by CR-001** for MVP 2. |
 | OOS-005 | Differentiated role management | FACT |
-| OOS-006 | Sung solfège and rhythmic synchronization | PROPOSAL — depends on PDEC-206 |
-| OOS-007 | Mixed voice + instrument MP3 export | PROPOSAL — depends on PDEC-204 |
-| OOS-008 | Server-side instrument synthesis (FluidSynth) | PROPOSAL — depends on PDEC-203 |
+| OOS-006 | Sung solfège | DECISION (DEC-206) |
+| OOS-007 | Mixed voice + instrument MP3 export | DECISION (DEC-204) |
+| OOS-008 | Server-side instrument synthesis (FluidSynth) | DECISION (DEC-203) |
+| OOS-009 | Storing uploaded `.abc` files; formats other than `.abc` for file loading | DECISION (DEC-217) |
+| OOS-010 | Languages other than Spanish for voice features | DECISION (DEC-215) |
 
 ## 6. User Value
 
 **FACT:** Users can publish textual scores, discover community content, filter by instrument, comment, and react.
 
-**FACT (MVP 2):** Users will additionally be able to dictate scores by voice, leave spoken comments, and listen to scores through synthesized solfège, an audio summary, and instrument playback.
+**FACT (MVP 2):** Users will additionally be able to dictate scores by voice, load `.abc` files, leave spoken comments, and listen to scores through spoken solfège, an audio summary, and instrument playback.
 
 **ASSUMPTION:** This provides a simpler way to share short musical ideas, practice reading, and receive feedback.
 
@@ -216,7 +240,7 @@ All rows are **PROPOSAL** by the P00 context generator, pending team approval (Q
 
 **FACT:** Responsive web application.
 
-**FACT (MVP 2):** Microphone capture requires a browser that supports audio recording and a secure (HTTPS) context.
+**FACT (MVP 2):** Microphone capture requires a browser that supports audio recording and a secure (HTTPS) context. File loading (HU19) uses the browser's file selection.
 
 **UNKNOWN:** Supported browsers, primary devices, connectivity, accessibility, and usage frequency are not formally specified. MVP 1 end-to-end tests ran on Chromium only.
 
@@ -225,13 +249,13 @@ All rows are **PROPOSAL** by the P00 context generator, pending team approval (Q
 | ID | Service / library | Purpose | Classification |
 |---|---|---|---|
 | EXT-001 | None in MVP 1 | — | FACT (MVP 1) |
-| EXT-002 | Whisper (OpenAI API); alternative: Deepgram | Speech-to-text for dictation and voice comments | Named in backlog (FACT); single choice is PROPOSAL (PDEC-201) |
-| EXT-003 | ElevenLabs API; alternatives: Azure Speech, Google TTS | Text-to-speech for solfège and tutor audio | Named in backlog (FACT); single choice is PROPOSAL (PDEC-202) |
-| EXT-004 | `edge-tts` (Python package; uses Microsoft's online voice service; unofficial) | Fallback voice when EXT-003 fails | Named in backlog (FACT). **Not offline**, despite the HU17 title "Modo Respaldo / Fallback de Voz Offline". |
-| EXT-005 | Tone.js (browser) or FluidSynth (server) | Instrument synthesis | Named in backlog (FACT); browser-only is PROPOSAL (PDEC-203) |
-| EXT-006 | PyDub / FFmpeg | MP3 encoding or mixing for downloads | Named in backlog (FACT); need depends on PDEC-204 |
+| EXT-002 | Whisper (OpenAI API) | Speech-to-text for dictation and voice comments | DECISION (DEC-201); Deepgram not used |
+| EXT-003 | ElevenLabs API | Text-to-speech for solfège and tutor, enabled for demos | DECISION (DEC-202); Azure and Google not used |
+| EXT-004 | `edge-tts` (Python package; uses Microsoft's online voice service; unofficial) | Fallback voice and default voice in development/CI. **Not offline**, despite the HU17 title. | DECISION (DEC-202) |
+| EXT-005 | Tone.js (browser) | Instrument synthesis | DECISION (DEC-203); FluidSynth not used |
+| EXT-006 | PyDub / FFmpeg | Named in backlog for MP3. Need is reduced by DEC-204 (voice only); P05 decides whether any conversion is required. | FACT (named) / UNKNOWN (need) |
 
-**FACT:** Introducing external services requires a Change Request and an architecture decision record, per the pipeline's system prompt (§7, §11, §12).
+**FACT:** Introducing external services requires an architecture decision record (P05), per the pipeline's system prompt (§7, §11, §12).
 
 ## 8. Team Context
 
@@ -244,6 +268,8 @@ All rows are **PROPOSAL** by the P00 context generator, pending team approval (Q
 | TEAM-005 | Alejandro Zamorano | Tester / DevOps | FACT |
 
 **FACT:** Academic project for Proyecto Integrador II, five-person team.
+
+**FACT:** DEC-201 to DEC-218 were approved by TEAM-001 on 2026-11-08, delegating the choice to the pipeline's recommendation. Ratification by TEAM-002 to TEAM-005 is pending.
 
 **UNKNOWN:** Sprint 2 start and delivery dates, story allocation per developer, budget for external APIs, who holds the API keys and credits, and availability.
 
@@ -261,13 +287,14 @@ The stack below was established during MVP 1 and is the baseline for MVP 2.
 | Deployment | Single container (Nginx + Gunicorn) on Railway, built from the repository Dockerfile | FACT |
 | CI | GitHub Actions: backend, frontend, E2E (Playwright) and deploy jobs | FACT |
 | Persistent file storage | Volume at `/data/media` (used for profile photos); persistence across deployments **not verified** | UNKNOWN |
-| Instrument playback | Tone.js in the browser | PROPOSAL (PDEC-203) |
-| Dictation-to-ABC conversion | Deterministic closed-vocabulary parser | PROPOSAL (PDEC-205) |
-| Audio caching | Files under `/data/media/audio_cache/` indexed by a content hash | FACT (backlog AC-016-01); key extension is PROPOSAL (PDEC-210) |
+| Instrument playback | Tone.js in the browser | DECISION (DEC-203) |
+| Dictation-to-ABC conversion | Deterministic closed-vocabulary parser | DECISION (DEC-205) |
+| Audio caching | Files under `/data/media/audio_cache/` keyed by content + voice + language hash | FACT (backlog) + DECISION (DEC-210) |
+| `.abc` file loading | Read in the browser; no file upload endpoint | DECISION (DEC-217) |
 
 **FACT:** MVP 1 architecture stated that no AI inference, audio processing, or external service was required. MVP 2 changes this and requires an architecture addendum.
 
-### MVP 1 technical debt relevant to MVP 2 (checked against the repository on 2026-11-08)
+### MVP 1 technical debt and defects relevant to MVP 2 (checked against the repository on 2026-11-08)
 
 | Item | Status | Evidence |
 |---|---|---|
@@ -275,6 +302,7 @@ The stack below was established during MVP 1 and is the baseline for MVP 2.
 | Per-score query overhead (N+1) in the feed | **Closed** | Commit `6bea185` |
 | Duplicate API routes (`/api/` and `/api/v1/`) | Open | `backend/notara_backend/urls.py` |
 | Duplicated `Like` and `Reaction` models | Open | `backend/scores/models.py` |
+| **DEFECT-001** — the ABC placeholder in the create form shows literal `&#10;` instead of line breaks | Open | `frontend/src/ScoreCreatePage.tsx` line 76: the HTML entity is inside a JavaScript string, so React does not decode it. Observed in the UI on 2026-11-08. Same field as HU19. |
 
 The new endpoints in the backlog use the `/api/v1/` prefix, so the duplicate-route decision affects MVP 2.
 
@@ -283,15 +311,16 @@ The new endpoints in the backlog use the `/api/v1/` prefix, so the duplicate-rou
 | ID | Assumption | Validation |
 |---|---|---|
 | ASM-001 | Responsive means the main flows adapt to supported viewport sizes. | Confirm browsers/devices. |
-| ASM-002 | Basic ABC syntax validation is sufficient for MVP 1. | Resolved by implementation (headers plus one musical line). Revisit if dictation output needs more syntax. |
+| ASM-002 | Basic ABC validation is sufficient for MVP 1. | Resolved by implementation (headers plus one musical line). Applies to dictated and loaded content (DEC-218). |
 | ASM-003 | Preserving line breaks is sufficient for readable score display. | Validate in UX. |
-| ASM-004 | One speech-to-text provider and one commercial text-to-speech provider are enough for MVP 2. | Team decision on PDEC-201 and PDEC-202. |
-| ASM-005 | A closed Spanish vocabulary is enough for dictation. | Team decision on PDEC-205; confirm the vocabulary, with a teacher if possible. |
-| ASM-006 | Spoken (not sung) solfège satisfies the learning goal of HU13. | Team decision on PDEC-206. |
-| ASM-007 | The Railway volume can persist audio files across deployments. | Verify before implementing HU16. |
-| ASM-008 | Voice recordings of users are personal data and need a retention and deletion rule. | Define the rule in P01/P02. |
+| ASM-004 | One STT and one commercial TTS provider are enough for MVP 2. | **Resolved by DEC-201, DEC-202.** |
+| ASM-005 | The closed Spanish vocabulary (DEC-205) is enough for useful dictation. | Still an assumption: test with real dictations, with a teacher if possible. |
+| ASM-006 | Spoken (not sung) solfège satisfies the learning goal of HU13. | **Decided by DEC-206**; learning effect remains unvalidated (RISK-013 in P01). |
+| ASM-007 | The Railway volume can persist audio files across deployments. | Verify before implementing HU16 (Q-009). |
+| ASM-008 | Voice recordings of users are personal data and need a retention and deletion rule. | **Resolved by DEC-214.** |
 | ASM-009 | HU16 and HU17 are technical enabler stories and do not introduce an administrator role. | Confirm with the team. |
-| ASM-010 | Dictated ABC must pass the existing MVP 1 content rules. | Confirm in P02. |
+| ASM-010 | Dictated ABC must pass the existing MVP 1 content rules. | **Resolved by DEC-218** (extended to HU19). |
+| ASM-011 | `.abc` files users load are plain UTF-8 text. | Test with files from common ABC tools; AC-019-03 handles unreadable files. |
 
 ## 11. Unknowns and Open Questions
 
@@ -300,45 +329,48 @@ The new endpoints in the backlog use the `/api/v1/` prefix, so the duplicate-rou
 | ID | Question | Status |
 |---|---|---|
 | Q-001 | What exact ABC syntax subset is required for "basic validation"? | Resolved in MVP 1: headers `X:`, `T:`, `M:`, `L:`, `K:` plus one musical line. |
-| Q-002 | What browsers and viewport sizes must be supported? | Open (MVP 1 tested Chromium only). |
+| Q-002 | What browsers and viewport sizes must be supported? | Resolved in MVP 1 requirements v2.0 (NFR-002): current Chrome, Edge and Firefox at 360, 768 and 1280 px; Safari outside initial validation. MVP 1 E2E tests ran on Chromium only. MVP 2 recording requirements extend it (NFR-008). |
 | Q-003 | What are the exact feed ordering and pagination rules? | Resolved in MVP 1 (P03 `DEC-001`): newest first, 10 per page. |
-| Q-004 | Can users edit or delete their comments? | **Conflict:** P03 `DEC-002` (Approved) says no; the delivered code allows authors to delete their own comments. Open until the team ratifies one (Q-017). |
+| Q-004 | Can users edit or delete their comments? | **Resolved by DEC-211:** authors can delete their own comments; editing is not available. |
 | Q-005 | What account recovery behavior is required? | Out of scope for MVP 1 (P03 `DEC-003`) and not in the MVP 2 backlog. |
-| Q-006 | What measurable criteria define MVP success? | Open. |
+| Q-006 | What measurable criteria define MVP success? | Resolved for MVP 1 in requirements v2.0 (demonstrate HU01–HU10 and pass the main acceptance criteria). MVP 2 uses qualitative indicators (SUCCESS-008–SUCCESS-016); no numeric target. |
 
 ### New for MVP 2
 
-| ID | Question | Priority |
+| ID | Question | Status / Priority |
 |---|---|---|
-| Q-007 | Does the team approve, modify or reject PDEC-201 to PDEC-210? | High |
-| Q-008 | What is the daily per-user limit for audio requests and the maximum audio file size? | High |
-| Q-009 | Does the Railway volume at `/data` persist across deployments? | High |
-| Q-010 | What are the Sprint 2 dates and who owns each story? | High |
-| Q-011 | What budget and credits are available for the STT and TTS providers, and who holds the keys? | High |
-| Q-012 | What are acceptable latency targets for transcription and synthesis? | Medium |
-| Q-013 | What retention and deletion policy applies to voice recordings (comment deletion, account deletion)? | Medium |
-| Q-014 | Dictation is in Spanish (FACT, HU11). Are TTS voices, the tutor and voice comments also Spanish-only? | Medium |
-| Q-015 | *(Merged into PDEC-208 and PDEC-209; kept for traceability.)* | — |
-| Q-016 | What should HU13–HU15 do for plain-text scores or invalid ABC (hide the buttons, show a message)? The backlog has no failure criterion. | Medium |
-| Q-017 | Does the team ratify comment deletion as delivered (superseding P03 `DEC-002`), or revert it? | Medium |
-| Q-018 | How is the "difficulty" of a score determined for the audio tutor (HU14)? It is not part of the score metadata. | Medium |
+| Q-007 | Does the team approve PDEC-201 to PDEC-210? | **Resolved by DEC-201–DEC-210** (ratification pending). |
+| Q-008 | What is the per-user limit and maximum audio size? | **Resolved by DEC-213**, except the global monthly cap (depends on Q-011). |
+| Q-009 | Does the Railway volume at `/data` persist across deployments? | Open — High |
+| Q-010 | What are the Sprint 2 dates and who owns each story? | Open — High |
+| Q-011 | What budget and credits are available for the providers, and who holds the keys? | Open — High |
+| Q-012 | What are acceptable latency targets for transcription and synthesis? | Open — Medium |
+| Q-013 | What retention and deletion policy applies to voice recordings? | **Resolved by DEC-214.** |
+| Q-014 | Which languages are supported? | **Resolved by DEC-215** (Spanish only). |
+| Q-015 | *(Merged into PDEC-208 and PDEC-209; resolved by DEC-208, DEC-209.)* | — |
+| Q-016 | What should HU13–HU15 do for plain-text or invalid ABC? | **Resolved by DEC-207.** |
+| Q-017 | Is comment deletion ratified? | **Resolved by DEC-211.** |
+| Q-018 | How is "difficulty" determined? | **Resolved by DEC-212** (the exact rule is defined in P02). |
+| Q-019 | Is the fallback voice signaled to the user? (raised in P01) | **Resolved by DEC-216.** |
+| Q-020 | Will the rest of the team ratify DEC-201 to DEC-218? | Open — Medium |
 
 ## 12. Initial Risks
 
 | ID | Risk | Impact | Mitigation |
 |---|---|---|---|
-| RISK-001 | Two-week scope pressure. **MVP 2 update:** 26 SP (29 if PDEC-208) in one sprint with unknown dates. | High | Prioritize Must stories and validate feasibility once dates are known. |
-| RISK-002 | Basic ABC validation may be ambiguous. **MVP 2 update:** dictated output must pass the existing validator. | Medium | Define the accepted syntax subset; test dictation output against it. |
+| RISK-001 | Two-week scope pressure. **MVP 2 update:** 31 SP in one sprint with unknown dates. | High | Prioritize Must stories (HU11, HU13, HU15, HU16, HU17 = 21 SP); HU18 (Could) is the first to drop. |
+| RISK-002 | Basic ABC validation may be ambiguous. **MVP 2 update:** dictated and loaded output must pass the existing validator (DEC-218). | Medium | Test dictation and file loading against the validator. |
 | RISK-003 | Text display may not be sufficiently readable for all content. | Medium | Validate presentation in UX. |
-| RISK-004 | Ownership and interaction rules may be inconsistent. **MVP 2 update:** see the comment-deletion conflict (Q-017). | Medium | Detail authorization and interaction behavior. |
+| RISK-004 | Ownership and interaction rules may be inconsistent. **MVP 2 update:** comment deletion resolved by DEC-211. | Medium | Detail authorization and interaction behavior. |
 | RISK-005 | Future voice/OMR capabilities may be confused with MVP 1. **MVP 2 update:** OMR (MVP 3) may be confused with MVP 2. | Medium | Keep OMR explicitly out of scope. |
-| RISK-006 | Dependence on external APIs (availability, credits, rate limits) can break demos. | High | Cache (HU16), fallback (HU17), mocks in CI, environment-based keys. |
-| RISK-007 | Dictation quality: STT returns free text, and conversion to ABC may reject natural phrasing. | High | Define the vocabulary (PDEC-205), show clear errors, test with real dictations. |
+| RISK-006 | Dependence on external APIs (availability, credits, rate limits) can break demos. | High | Cache (HU16), fallback (HU17, now Must), `edge-tts` default in dev/CI (DEC-202), mocks in CI. |
+| RISK-007 | Dictation quality: the closed-vocabulary parser may reject natural phrasing. | High | Show the vocabulary (DEC-205), clear errors, test with real dictations. |
 | RISK-008 | Persistent storage for audio is unverified. | High | Verify the Railway volume before HU16; degrade gracefully if writes fail. |
-| RISK-009 | Voice recordings are personal data. | Medium | Define retention and deletion; delete audio with its comment. |
-| RISK-010 | Any authenticated user could consume paid API credits. | High | Per-user daily limit, authentication required, cache by content hash. |
-| RISK-011 | Open MVP 1 debt (duplicate `/api/` + `/api/v1/` routes, duplicated `Like`/`Reaction` models) could spread to the new endpoints. | Medium | Decide on the route prefix and model before adding MVP 2 endpoints. |
-| RISK-012 | Browser-only instrument playback conflicts with an MP3 that includes the instrument (HU18). | Medium | Team decision on PDEC-203 and PDEC-204. |
+| RISK-009 | Voice recordings are personal data. | Medium | DEC-214. |
+| RISK-010 | Any authenticated user could consume paid API credits. | High | DEC-213 limits; global cap pending Q-011. |
+| RISK-011 | Open MVP 1 debt (duplicate `/api/` + `/api/v1/` routes, duplicated `Like`/`Reaction` models) could spread to new endpoints. | Medium | Decide on the route prefix and model before adding MVP 2 endpoints. |
+| RISK-012 | Browser-only instrument playback conflicts with an MP3 that includes the instrument. | Medium | **Resolved by DEC-204** (MP3 = voice only). |
+| RISK-014 | Decisions approved by one team member may be reversed at ratification, forcing rework in P02–P05. | Medium | Ratify DEC-201–DEC-218 before P03 planning (Q-020). |
 
 ## 13. Initial Success Definition
 
@@ -358,12 +390,13 @@ The following are **ASSUMPTION / PROPOSAL** criteria, not approved acceptance cr
 
 - **SUCCESS-008:** A user can dictate a score and obtain ABC in the content field, or a clear message when the dictation cannot be interpreted.
 - **SUCCESS-009:** A user can leave a voice comment of up to 30 seconds that is stored as text with its audio.
-- **SUCCESS-010:** A user can listen to the solfège and the audio summary of a valid ABC score.
-- **SUCCESS-011:** A user can play a valid ABC score with an instrument sound without any external TTS call.
+- **SUCCESS-010:** A user can listen to the spoken solfège and the audio summary of a valid ABC score.
+- **SUCCESS-011:** A user can play a valid ABC score with an instrument sound without any external API call.
 - **SUCCESS-012:** A second request for the same audio is served from the cache without calling the provider.
 - **SUCCESS-013:** When the commercial voice provider fails, the user still receives audio and no server error.
-- **SUCCESS-014:** A user can download the synthesized audio as an MP3 file.
+- **SUCCESS-014:** A user can download the synthesized solfège as an MP3 file.
 - **SUCCESS-015:** The team can demonstrate MVP 2 within the Sprint 2 timeline.
+- **SUCCESS-016:** A user can load an `.abc` file and see its text, with line breaks, in the content field before publishing; invalid files are rejected with a clear message.
 
 ## 14. Scope Summary
 
@@ -373,16 +406,16 @@ The following are **ASSUMPTION / PROPOSAL** criteria, not approved acceptance cr
 
 ### Included in MVP 2
 
-**FACT:** Voice dictation to ABC, voice comments, solfège by voice, audio tutor, instrument playback, audio cache, voice fallback, and MP3 download (HU11–HU18).
+**FACT:** Voice dictation to ABC, voice comments, spoken solfège, audio tutor, instrument playback, audio cache, voice fallback, MP3 download (HU11–HU18, CR-001) and `.abc` file loading (HU19, CR-002). 31 SP.
 
 ### Excluded from MVP 2
 
 **FACT:** OMR, image uploads, differentiated roles, account recovery.
-**PROPOSAL (pending Q-007):** sung solfège and rhythmic synchronization (PDEC-206), mixed voice + instrument MP3 (PDEC-204), server-side instrument synthesis (PDEC-203).
+**DECISION:** sung solfège (DEC-206), mixed voice + instrument MP3 (DEC-204), server-side instrument synthesis (DEC-203), storing loaded `.abc` files and other file formats (DEC-217), languages other than Spanish (DEC-215).
 
 ### Pending Decisions
 
-**UNKNOWN:** Team decision on PDEC-201 to PDEC-210, audio limits and file size, Sprint 2 dates and ownership, API budget and keys, Railway volume persistence, recording retention, comment-deletion ratification, tutor difficulty source, behavior for non-playable scores, latency targets, supported browsers, and success measurement.
+**UNKNOWN:** Sprint 2 dates and owners (Q-010), API budget and keys (Q-011), Railway volume persistence (Q-009), latency targets (Q-012), and team ratification of DEC-201–DEC-218 (Q-020).
 
 ## 15. Context Status
 
@@ -390,30 +423,30 @@ The following are **ASSUMPTION / PROPOSAL** criteria, not approved acceptance cr
 READY_WITH_ASSUMPTIONS
 ```
 
-**FACT:** The problem, users, MVP 1 delivery, MVP 2 scope (HU11–HU18), team, and technical baseline are identified.
+**FACT:** The problem, users, MVP 1 delivery, MVP 2 scope (HU11–HU19), approved decisions, team, and technical baseline are identified.
 
-**ASSUMPTION:** The context is sufficient to proceed to discovery (P01) in incremental mode.
+**ASSUMPTION:** The context is sufficient to proceed to discovery (P01) and requirements (P02) in incremental mode.
 
-**UNKNOWN:** The proposed decisions (PDEC-201 to PDEC-210), audio limits, dates, and budget must be resolved before requirements and architecture are finalized.
+**UNKNOWN:** Dates, budget, storage persistence and team ratification remain open; they affect P03 planning and P05 architecture, not the product definition.
 
 ## 16. Generation Metadata
 
 | Field | Value |
 |---|---|
 | Generated by | P00 — Project Context Prompt v2.0 (incremental mode) |
-| Version | 2.1 |
-| Sources | `ai-pipeline/outputs/00_context/INITIAL_PROJECT_INPUT.md`; `ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md`; context version 1.0 (tag `v1.0.0`); `ai-pipeline/outputs/03_planning/PRIORITIZATION.md`; `ai-pipeline/outputs/10_evaluation/MVP_EVALUATION.md`; repository state on 2026-11-08 |
+| Version | 2.3 |
+| Sources | `INITIAL_PROJECT_INPUT.md`; `SPRINT_2_BACKLOG_INPUT.md` (including the 2026-11-08 addendum, HU19); `DECISIONS_MVP2.md`; context version 1.0 (tag `v1.0.0`) and 2.1; `outputs/03_planning/PRIORITIZATION.md`; `outputs/10_evaluation/MVP_EVALUATION.md`; repository state on 2026-11-08 |
 | Status | READY_WITH_ASSUMPTIONS |
-| Revision | CR-001 — Voice and audio capabilities move from future scope to MVP 2. v2.1 applies VAL-201 to VAL-210 from `CONTEXT_VALIDATION.md`. |
+| Revision | CR-001 (voice and audio) and CR-002 (`.abc` file loading). v2.2 resolves PDEC-201–PDEC-210 and Q-004, Q-007, Q-008, Q-013, Q-014, Q-016–Q-019 through DEC-201–DEC-218, adds HU19 and DEFECT-001. v2.3 corrects HU14 wording (clef) and syncs Q-002/Q-006 (P02 REQ-VAL-202, REQ-VAL-203). |
 
 ## Validation Checklist
 
-- [x] All MVP 1 identifiers (MVP-001 to MVP-010, FUT-001 to FUT-003, OOS-001 to OOS-005, ASM-001 to ASM-003, Q-001 to Q-006, RISK-001 to RISK-005, SUCCESS-001 to SUCCESS-007) are preserved; MVP 1 risk wording is kept and MVP 2 notes are appended.
-- [x] MVP 2 features map 1:1 to HU11–HU18 with backlog SP and MoSCoW.
-- [x] Items whose status changed are marked as superseded, not deleted.
-- [x] Every proposal that narrows or changes the backlog has a `PDEC-2NN` entry and is not presented as approved.
-- [x] Every cited decision ID exists in this document or in P03.
-- [x] External services and libraries from the backlog are listed with their alternatives.
+- [x] All MVP 1 identifiers (MVP-001 to MVP-010, FUT-001 to FUT-003, OOS-001 to OOS-005, ASM-001 to ASM-003, Q-001 to Q-006, RISK-001 to RISK-005, SUCCESS-001 to SUCCESS-007) are preserved.
+- [x] MVP 2 features map 1:1 to HU11–HU19; SP and MoSCoW match the backlog, with DEC-208 and DEC-209 adjustments shown next to the original values.
+- [x] Every decision cited exists in `DECISIONS_MVP2.md` or in P03.
+- [x] PDEC identifiers are kept as resolved, not deleted.
+- [x] Items whose status changed are marked as superseded or resolved, not deleted.
+- [x] External services list the chosen option and the discarded alternatives.
 - [x] Repository facts were checked against the current repository state.
 - [x] OMR remains excluded from MVP 2.
 

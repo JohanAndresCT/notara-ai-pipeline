@@ -57,4 +57,6 @@ MVP 1 was delivered (tag `v1.0.0`). For MVP 2 the team input is the Sprint 2 pro
 
 It defines 8 user stories (HU11–HU18 / US-011–US-018, 26 SP) for the epic "Integración de Servicios de Voz y Audio (STT & TTS)": voice dictation of scores to ABC, voice comments, spoken/sung solfège, an audio tutor summary, instrument (MIDI) playback, a cache of synthesized audio, a voice fallback, and MP3 download. Image recognition (OMR) remains planned for MVP 3.
 
+On 2026-11-08 the team added HU19 (loading a score from an `.abc` file) through an addendum in the same backlog file (CR-002), and recorded the MVP 2 decisions in `ai-pipeline/outputs/00_context/DECISIONS_MVP2.md`.
+
 The MVP 1 section above is kept unchanged as the historical input of MVP 1.

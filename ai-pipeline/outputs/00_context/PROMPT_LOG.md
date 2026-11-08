@@ -156,3 +156,24 @@ EXT-005, EXT-006.
 Estado del contexto: READY_WITH_ASSUMPTIONS. Puede avanzar a P01 — Discovery.
 Decisiones del equipo pendientes: PDEC-201..PDEC-210 (Q-007), fechas y responsables (Q-010),
 presupuesto y llaves de API (Q-011).
+
+## 00. Context (MVP 2): decisiones + HU19 → v2.2
+
+Johan delegó las decisiones al pipeline ("respecto a decisiones toma las que consideres mejor")
+y pidió agregar la carga de archivos `.abc` como nueva HU del MVP 2.
+
+- Nuevo insumo: `outputs/00_context/DECISIONS_MVP2.md` (DEC-201..DEC-218; ratificación del resto del equipo pendiente, Q-020).
+- `SPRINT_2_BACKLOG_INPUT.md`: addendum fechado con HU19 / US-019 "Carga de Partitura desde Archivo .abc" (2 SP, Should), CR-002.
+- `INITIAL_PROJECT_INPUT.md`: referencia al addendum y al registro de decisiones.
+- `PROJECT_CONTEXT.md` v2.2: PDEC → DEC, MVP-019, 31 SP, DEFECT-001 (placeholder ABC muestra `&#10;`, `frontend/src/ScoreCreatePage.tsx:76`).
+
+## MVP 2 V2.2 Result (run 3): PASS_WITH_WARNINGS (0 HIGH, 0 MEDIUM, 2 LOW)
+
+- VAL-212: RELEASE_PLAN.md sin HU11–HU19.
+- VAL-213: decisiones aprobadas por un solo miembro; ratificar antes de P03.
+
+## 00. Context (MVP 2): v2.3 — corrección de redacción
+
+Tras P02 (REQ-VAL-202, REQ-VAL-203): HU14 "clave" = clef (no key) en §3 y MVP-014; Q-002 y Q-006 sincronizadas con su resolución del MVP 1. Sin cambio de alcance.
+
+## MVP 2 V2.3 Result (run 4): PASS_WITH_WARNINGS (2 LOW sin cambios: VAL-212, VAL-213)

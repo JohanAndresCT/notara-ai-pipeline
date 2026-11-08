@@ -1,11 +1,22 @@
 {
   "backlog_metadata": {
     "project": "Notara",
-    "version": "2.0",
+    "version": "3.0",
     "stage": "P02",
-    "status": "READY",
-    "source": "ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md",
-    "validation_source": "ai-pipeline/outputs/01_discovery/PRODUCT_VISION_VALIDATION.md"
+    "status": "READY_WITH_ASSUMPTIONS",
+    "source": "ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md (v2.1)",
+    "validation_source": "ai-pipeline/outputs/01_discovery/PRODUCT_VISION_VALIDATION.md",
+    "release": "MVP 2 - Sprint 2",
+    "additional_sources": [
+      "ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md",
+      "ai-pipeline/outputs/00_context/DECISIONS_MVP2.md",
+      "ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md (v2.2)"
+    ],
+    "change_requests": [
+      "CR-001",
+      "CR-002"
+    ],
+    "notes": "MVP 1 items US-001-US-010 preserved; US-010 amended by DEC-211 (AC-028 superseded by AC-029). Planning fields stay null; team MoSCoW and Story Points are recorded under traceability.team_backlog as source data."
   },
   "epics": [
     {
@@ -13,28 +24,83 @@
       "name": "Identity and Profile",
       "description": "Registration, authentication, profile data, and password change.",
       "scope": "MVP_CORE / MVP_SUPPORTING",
-      "traceability": ["USER-001..003", "HU01..03"]
+      "traceability": [
+        "USER-001..003",
+        "HU01..03"
+      ]
     },
     {
       "id": "EPIC-002",
       "name": "Score Publication and Ownership",
       "description": "Create, validate, publish, edit, and delete textual scores.",
       "scope": "MVP_CORE / MVP_SUPPORTING",
-      "traceability": ["NEED-001..002", "NEED-006", "HU04..06"]
+      "traceability": [
+        "NEED-001..002",
+        "NEED-006",
+        "HU04..06"
+      ]
     },
     {
       "id": "EPIC-003",
       "name": "Discovery and Score Viewing",
       "description": "Dashboard, feed, filtering, and score detail.",
       "scope": "MVP_CORE",
-      "traceability": ["NEED-003..004", "HU07..08"]
+      "traceability": [
+        "NEED-003..004",
+        "HU07..08"
+      ]
     },
     {
       "id": "EPIC-004",
       "name": "Community Interaction",
-      "description": "Comments and reactions on other users' scores.",
+      "description": "Comments and reactions on other users' scores; voice comments (MVP 2).",
       "scope": "MVP_CORE",
-      "traceability": ["NEED-005", "HU09..10"]
+      "traceability": [
+        "HU09..10",
+        "HU12",
+        "NEED-005"
+      ]
+    },
+    {
+      "id": "EPIC-005",
+      "name": "Voice and File Score Input",
+      "description": "Dictating a score by voice and loading a score from an .abc file into the editor.",
+      "scope": "MVP_CORE / MVP_SUPPORTING",
+      "traceability": [
+        "HU11",
+        "HU19",
+        "NEED-007",
+        "NEED-013"
+      ]
+    },
+    {
+      "id": "EPIC-006",
+      "name": "Listening and Audio Learning",
+      "description": "Spoken solfege, audio tutor, instrument playback and MP3 download for ABC scores.",
+      "scope": "MVP_CORE / MVP_SUPPORTING",
+      "traceability": [
+        "HU13",
+        "HU14",
+        "HU15",
+        "HU18",
+        "NEED-009",
+        "NEED-010",
+        "NEED-011",
+        "NEED-012"
+      ]
+    },
+    {
+      "id": "EPIC-007",
+      "name": "Audio Reliability and Cost Control",
+      "description": "Reuse of synthesized audio, voice fallback, authentication and usage limits for voice features.",
+      "scope": "MVP_SUPPORTING",
+      "traceability": [
+        "HU16",
+        "HU17",
+        "OPS-001",
+        "OPS-002",
+        "DEC-213"
+      ]
     }
   ],
   "items": [
@@ -42,7 +108,9 @@
       "id": "US-001",
       "title": "Register an account",
       "epic_id": "EPIC-001",
-      "requirement_ids": ["FR-001"],
+      "requirement_ids": [
+        "FR-001"
+      ],
       "user_story": {
         "as_a": "visitor",
         "i_want": "to register an account",
@@ -50,12 +118,28 @@
       },
       "scope": "MVP_CORE",
       "acceptance_criteria": [
-        {"id": "AC-001", "given": "a visitor provides the information required by the approved registration flow", "when": "they submit registration", "then": "an account is created or the user receives a clear validation result"},
-        {"id": "AC-002", "given": "registration data is invalid or incomplete", "when": "registration is submitted", "then": "the account is not created and the user can identify that correction is required"}
+        {
+          "id": "AC-001",
+          "given": "a visitor provides the information required by the approved registration flow",
+          "when": "they submit registration",
+          "then": "an account is created or the user receives a clear validation result"
+        },
+        {
+          "id": "AC-002",
+          "given": "registration data is invalid or incomplete",
+          "when": "registration is submitted",
+          "then": "the account is not created and the user can identify that correction is required"
+        }
       ],
-      "business_rule_ids": ["BR-001"],
-      "edge_case_ids": ["EDGE-001"],
-      "dependency_ids": ["DEP-001"],
+      "business_rule_ids": [
+        "BR-001"
+      ],
+      "edge_case_ids": [
+        "EDGE-001"
+      ],
+      "dependency_ids": [
+        "DEP-001"
+      ],
       "open_question_ids": [],
       "priority": null,
       "story_points": null,
@@ -63,13 +147,24 @@
       "sprint": null,
       "assigned_developers": [],
       "status": "DEFINED",
-      "traceability": {"p01_elements": ["USER-001..003", "SUCCESS-001"], "hu_ids": ["HU01"]}
+      "traceability": {
+        "p01_elements": [
+          "USER-001..003",
+          "SUCCESS-001"
+        ],
+        "hu_ids": [
+          "HU01"
+        ]
+      }
     },
     {
       "id": "US-002",
       "title": "Authenticate and leave the account",
       "epic_id": "EPIC-001",
-      "requirement_ids": ["FR-002", "FR-017"],
+      "requirement_ids": [
+        "FR-002",
+        "FR-017"
+      ],
       "user_story": {
         "as_a": "registered user",
         "i_want": "to log in and log out",
@@ -77,13 +172,34 @@
       },
       "scope": "MVP_CORE",
       "acceptance_criteria": [
-        {"id": "AC-003", "given": "a registered user provides valid authentication information", "when": "they submit it", "then": "they can access protected functionality"},
-        {"id": "AC-004", "given": "an authenticated user chooses to log out", "when": "logout completes", "then": "protected functionality is no longer available without authenticating again"},
-        {"id": "AC-005", "given": "authentication information is invalid", "when": "login is submitted", "then": "access is not granted and the user receives a clear result"}
+        {
+          "id": "AC-003",
+          "given": "a registered user provides valid authentication information",
+          "when": "they submit it",
+          "then": "they can access protected functionality"
+        },
+        {
+          "id": "AC-004",
+          "given": "an authenticated user chooses to log out",
+          "when": "logout completes",
+          "then": "protected functionality is no longer available without authenticating again"
+        },
+        {
+          "id": "AC-005",
+          "given": "authentication information is invalid",
+          "when": "login is submitted",
+          "then": "access is not granted and the user receives a clear result"
+        }
       ],
-      "business_rule_ids": ["BR-002"],
-      "edge_case_ids": ["EDGE-002"],
-      "dependency_ids": ["DEP-001"],
+      "business_rule_ids": [
+        "BR-002"
+      ],
+      "edge_case_ids": [
+        "EDGE-002"
+      ],
+      "dependency_ids": [
+        "DEP-001"
+      ],
       "open_question_ids": [],
       "priority": null,
       "story_points": null,
@@ -91,13 +207,23 @@
       "sprint": null,
       "assigned_developers": [],
       "status": "DEFINED",
-      "traceability": {"p01_elements": ["SUCCESS-001"], "hu_ids": ["HU02"]}
+      "traceability": {
+        "p01_elements": [
+          "SUCCESS-001"
+        ],
+        "hu_ids": [
+          "HU02"
+        ]
+      }
     },
     {
       "id": "US-003",
       "title": "Manage profile information",
       "epic_id": "EPIC-001",
-      "requirement_ids": ["FR-003", "FR-004"],
+      "requirement_ids": [
+        "FR-003",
+        "FR-004"
+      ],
       "user_story": {
         "as_a": "authenticated user",
         "i_want": "to manage my profile information and change my password",
@@ -105,13 +231,34 @@
       },
       "scope": "MVP_SUPPORTING",
       "acceptance_criteria": [
-        {"id": "AC-006", "given": "an authenticated user opens their profile", "when": "the profile is displayed", "then": "the approved profile fields are available to view or edit"},
-        {"id": "AC-007", "given": "an authenticated user submits valid profile changes", "when": "the changes are saved", "then": "the updated information is shown"},
-        {"id": "AC-008", "given": "an authenticated user submits invalid or incomplete password-change information", "when": "it is processed", "then": "the password is not changed and correction is indicated"}
+        {
+          "id": "AC-006",
+          "given": "an authenticated user opens their profile",
+          "when": "the profile is displayed",
+          "then": "the approved profile fields are available to view or edit"
+        },
+        {
+          "id": "AC-007",
+          "given": "an authenticated user submits valid profile changes",
+          "when": "the changes are saved",
+          "then": "the updated information is shown"
+        },
+        {
+          "id": "AC-008",
+          "given": "an authenticated user submits invalid or incomplete password-change information",
+          "when": "it is processed",
+          "then": "the password is not changed and correction is indicated"
+        }
       ],
-      "business_rule_ids": ["BR-002"],
-      "edge_case_ids": ["EDGE-003"],
-      "dependency_ids": ["DEP-001"],
+      "business_rule_ids": [
+        "BR-002"
+      ],
+      "edge_case_ids": [
+        "EDGE-003"
+      ],
+      "dependency_ids": [
+        "DEP-001"
+      ],
       "open_question_ids": [],
       "priority": null,
       "story_points": null,
@@ -119,13 +266,28 @@
       "sprint": null,
       "assigned_developers": [],
       "status": "DEFINED",
-      "traceability": {"p01_elements": ["NEED-006", "SUCCESS-002"], "hu_ids": ["HU03"]}
+      "traceability": {
+        "p01_elements": [
+          "NEED-006",
+          "SUCCESS-002"
+        ],
+        "hu_ids": [
+          "HU03"
+        ]
+      }
     },
     {
       "id": "US-004",
       "title": "Publish a textual score",
       "epic_id": "EPIC-002",
-      "requirement_ids": ["FR-005", "FR-006", "FR-007", "FR-008", "FR-009", "FR-017"],
+      "requirement_ids": [
+        "FR-005",
+        "FR-006",
+        "FR-007",
+        "FR-008",
+        "FR-009",
+        "FR-017"
+      ],
       "user_story": {
         "as_a": "authenticated musician",
         "i_want": "to publish a short .abc or plain-text score with its context",
@@ -133,14 +295,46 @@
       },
       "scope": "MVP_CORE",
       "acceptance_criteria": [
-        {"id": "AC-009", "given": "an authenticated user provides a title, instrument, description, supported format, and non-empty content of at most 1,000 characters", "when": "they publish", "then": "the score is published and its metadata is available"},
-        {"id": "AC-010", "given": "the selected format is .abc and the content fails the defined basic syntax validation", "when": "the user publishes", "then": "publication is rejected with a clear validation result"},
-        {"id": "AC-011", "given": "the selected format is plain text and the content is non-empty and within the limit", "when": "the user publishes", "then": "the content is accepted without requiring ABC syntax"},
-        {"id": "AC-012", "given": "required publication information is missing, content is empty, content is longer than 1,000 characters, or the format is unsupported", "when": "publication is submitted", "then": "it is rejected and the correction is indicated"}
+        {
+          "id": "AC-009",
+          "given": "an authenticated user provides a title, instrument, description, supported format, and non-empty content of at most 1,000 characters",
+          "when": "they publish",
+          "then": "the score is published and its metadata is available"
+        },
+        {
+          "id": "AC-010",
+          "given": "the selected format is .abc and the content fails the defined basic syntax validation",
+          "when": "the user publishes",
+          "then": "publication is rejected with a clear validation result"
+        },
+        {
+          "id": "AC-011",
+          "given": "the selected format is plain text and the content is non-empty and within the limit",
+          "when": "the user publishes",
+          "then": "the content is accepted without requiring ABC syntax"
+        },
+        {
+          "id": "AC-012",
+          "given": "required publication information is missing, content is empty, content is longer than 1,000 characters, or the format is unsupported",
+          "when": "publication is submitted",
+          "then": "it is rejected and the correction is indicated"
+        }
       ],
-      "business_rule_ids": ["BR-003", "BR-004", "BR-005", "BR-006"],
-      "edge_case_ids": ["EDGE-004", "EDGE-005", "EDGE-006", "EDGE-007"],
-      "dependency_ids": ["DEP-002"],
+      "business_rule_ids": [
+        "BR-003",
+        "BR-004",
+        "BR-005",
+        "BR-006"
+      ],
+      "edge_case_ids": [
+        "EDGE-004",
+        "EDGE-005",
+        "EDGE-006",
+        "EDGE-007"
+      ],
+      "dependency_ids": [
+        "DEP-002"
+      ],
       "open_question_ids": [],
       "priority": null,
       "story_points": null,
@@ -148,13 +342,25 @@
       "sprint": null,
       "assigned_developers": [],
       "status": "DEFINED",
-      "traceability": {"p01_elements": ["NEED-001", "NEED-002", "SUCCESS-003..005"], "hu_ids": ["HU04"]}
+      "traceability": {
+        "p01_elements": [
+          "NEED-001",
+          "NEED-002",
+          "SUCCESS-003..005"
+        ],
+        "hu_ids": [
+          "HU04"
+        ]
+      }
     },
     {
       "id": "US-005",
       "title": "Edit an owned score",
       "epic_id": "EPIC-002",
-      "requirement_ids": ["FR-010", "FR-017"],
+      "requirement_ids": [
+        "FR-010",
+        "FR-017"
+      ],
       "user_story": {
         "as_a": "authenticated author",
         "i_want": "to edit my publication",
@@ -162,12 +368,28 @@
       },
       "scope": "MVP_SUPPORTING",
       "acceptance_criteria": [
-        {"id": "AC-013", "given": "an authenticated user owns a publication", "when": "they submit valid edits", "then": "the publication reflects the updated information and remains subject to all score rules"},
-        {"id": "AC-014", "given": "an authenticated user does not own a publication", "when": "they attempt to edit it", "then": "the edit is not applied"}
+        {
+          "id": "AC-013",
+          "given": "an authenticated user owns a publication",
+          "when": "they submit valid edits",
+          "then": "the publication reflects the updated information and remains subject to all score rules"
+        },
+        {
+          "id": "AC-014",
+          "given": "an authenticated user does not own a publication",
+          "when": "they attempt to edit it",
+          "then": "the edit is not applied"
+        }
       ],
-      "business_rule_ids": ["BR-007"],
-      "edge_case_ids": ["EDGE-008"],
-      "dependency_ids": ["DEP-002"],
+      "business_rule_ids": [
+        "BR-007"
+      ],
+      "edge_case_ids": [
+        "EDGE-008"
+      ],
+      "dependency_ids": [
+        "DEP-002"
+      ],
       "open_question_ids": [],
       "priority": null,
       "story_points": null,
@@ -175,13 +397,23 @@
       "sprint": null,
       "assigned_developers": [],
       "status": "DEFINED",
-      "traceability": {"p01_elements": ["SUCCESS-006"], "hu_ids": ["HU05"]}
+      "traceability": {
+        "p01_elements": [
+          "SUCCESS-006"
+        ],
+        "hu_ids": [
+          "HU05"
+        ]
+      }
     },
     {
       "id": "US-006",
       "title": "Delete an owned score",
       "epic_id": "EPIC-002",
-      "requirement_ids": ["FR-011", "FR-017"],
+      "requirement_ids": [
+        "FR-011",
+        "FR-017"
+      ],
       "user_story": {
         "as_a": "authenticated author",
         "i_want": "to delete my publication",
@@ -189,12 +421,28 @@
       },
       "scope": "MVP_SUPPORTING",
       "acceptance_criteria": [
-        {"id": "AC-015", "given": "an authenticated user owns a publication", "when": "they confirm deletion", "then": "the publication is no longer available in the applicable product views"},
-        {"id": "AC-016", "given": "an authenticated user does not own a publication", "when": "they attempt to delete it", "then": "it is not deleted"}
+        {
+          "id": "AC-015",
+          "given": "an authenticated user owns a publication",
+          "when": "they confirm deletion",
+          "then": "the publication is no longer available in the applicable product views"
+        },
+        {
+          "id": "AC-016",
+          "given": "an authenticated user does not own a publication",
+          "when": "they attempt to delete it",
+          "then": "it is not deleted"
+        }
       ],
-      "business_rule_ids": ["BR-007"],
-      "edge_case_ids": ["EDGE-009"],
-      "dependency_ids": ["DEP-002"],
+      "business_rule_ids": [
+        "BR-007"
+      ],
+      "edge_case_ids": [
+        "EDGE-009"
+      ],
+      "dependency_ids": [
+        "DEP-002"
+      ],
       "open_question_ids": [],
       "priority": null,
       "story_points": null,
@@ -202,13 +450,23 @@
       "sprint": null,
       "assigned_developers": [],
       "status": "DEFINED",
-      "traceability": {"p01_elements": ["SUCCESS-006"], "hu_ids": ["HU06"]}
+      "traceability": {
+        "p01_elements": [
+          "SUCCESS-006"
+        ],
+        "hu_ids": [
+          "HU06"
+        ]
+      }
     },
     {
       "id": "US-007",
       "title": "Discover scores",
       "epic_id": "EPIC-003",
-      "requirement_ids": ["FR-012", "FR-013"],
+      "requirement_ids": [
+        "FR-012",
+        "FR-013"
+      ],
       "user_story": {
         "as_a": "user",
         "i_want": "to view recent personal and community scores and filter them by instrument",
@@ -216,13 +474,34 @@
       },
       "scope": "MVP_CORE",
       "acceptance_criteria": [
-        {"id": "AC-017", "given": "scores are available", "when": "a user opens the applicable discovery view", "then": "personal and community scores are displayed from newest to oldest, with 10 publications per page"},
-        {"id": "AC-018", "given": "a user selects an instrument filter", "when": "the filter is applied", "then": "the displayed scores correspond to that instrument"},
-        {"id": "AC-019", "given": "no score matches the selected filter", "when": "the filter is applied", "then": "the user receives an empty-result indication"}
+        {
+          "id": "AC-017",
+          "given": "scores are available",
+          "when": "a user opens the applicable discovery view",
+          "then": "personal and community scores are displayed from newest to oldest, with 10 publications per page"
+        },
+        {
+          "id": "AC-018",
+          "given": "a user selects an instrument filter",
+          "when": "the filter is applied",
+          "then": "the displayed scores correspond to that instrument"
+        },
+        {
+          "id": "AC-019",
+          "given": "no score matches the selected filter",
+          "when": "the filter is applied",
+          "then": "the user receives an empty-result indication"
+        }
       ],
-      "business_rule_ids": ["BR-008"],
-      "edge_case_ids": ["EDGE-010"],
-      "dependency_ids": ["DEP-003"],
+      "business_rule_ids": [
+        "BR-008"
+      ],
+      "edge_case_ids": [
+        "EDGE-010"
+      ],
+      "dependency_ids": [
+        "DEP-003"
+      ],
       "open_question_ids": [],
       "priority": null,
       "story_points": null,
@@ -230,13 +509,24 @@
       "sprint": null,
       "assigned_developers": [],
       "status": "DEFINED",
-      "traceability": {"p01_elements": ["NEED-003", "NEED-004", "SUCCESS-007"], "hu_ids": ["HU07"]}
+      "traceability": {
+        "p01_elements": [
+          "NEED-003",
+          "NEED-004",
+          "SUCCESS-007"
+        ],
+        "hu_ids": [
+          "HU07"
+        ]
+      }
     },
     {
       "id": "US-008",
       "title": "Read score details",
       "epic_id": "EPIC-003",
-      "requirement_ids": ["FR-014"],
+      "requirement_ids": [
+        "FR-014"
+      ],
       "user_story": {
         "as_a": "user",
         "i_want": "to view a score's readable details",
@@ -244,13 +534,34 @@
       },
       "scope": "MVP_CORE",
       "acceptance_criteria": [
-        {"id": "AC-020", "given": "a published score is available", "when": "a user opens its detail view", "then": "its title, instrument, description, format, and readable textual content are displayed"},
-        {"id": "AC-021", "given": "score content contains line breaks", "when": "the detail view is displayed", "then": "those line breaks remain distinguishable"},
-        {"id": "AC-022", "given": "a score is unavailable", "when": "its detail is requested", "then": "the user receives a clear unavailable-result indication"}
+        {
+          "id": "AC-020",
+          "given": "a published score is available",
+          "when": "a user opens its detail view",
+          "then": "its title, instrument, description, format, and readable textual content are displayed"
+        },
+        {
+          "id": "AC-021",
+          "given": "score content contains line breaks",
+          "when": "the detail view is displayed",
+          "then": "those line breaks remain distinguishable"
+        },
+        {
+          "id": "AC-022",
+          "given": "a score is unavailable",
+          "when": "its detail is requested",
+          "then": "the user receives a clear unavailable-result indication"
+        }
       ],
-      "business_rule_ids": ["BR-009"],
-      "edge_case_ids": ["EDGE-011"],
-      "dependency_ids": ["DEP-003"],
+      "business_rule_ids": [
+        "BR-009"
+      ],
+      "edge_case_ids": [
+        "EDGE-011"
+      ],
+      "dependency_ids": [
+        "DEP-003"
+      ],
       "open_question_ids": [],
       "priority": null,
       "story_points": null,
@@ -258,13 +569,25 @@
       "sprint": null,
       "assigned_developers": [],
       "status": "DEFINED",
-      "traceability": {"p01_elements": ["NEED-003", "SUCCESS-005", "SUCCESS-008"], "hu_ids": ["HU08"]}
+      "traceability": {
+        "p01_elements": [
+          "NEED-003",
+          "SUCCESS-005",
+          "SUCCESS-008"
+        ],
+        "hu_ids": [
+          "HU08"
+        ]
+      }
     },
     {
       "id": "US-009",
       "title": "React to another user's score",
       "epic_id": "EPIC-004",
-      "requirement_ids": ["FR-015", "FR-017"],
+      "requirement_ids": [
+        "FR-015",
+        "FR-017"
+      ],
       "user_story": {
         "as_a": "authenticated user",
         "i_want": "to like another user's score and remove my like",
@@ -272,13 +595,34 @@
       },
       "scope": "MVP_CORE",
       "acceptance_criteria": [
-        {"id": "AC-023", "given": "an authenticated user views another user's score", "when": "they choose to like it", "then": "their reaction is shown as applied"},
-        {"id": "AC-024", "given": "an authenticated user has liked another user's score", "when": "they remove the like", "then": "their reaction is no longer shown as applied"},
-        {"id": "AC-025", "given": "an unauthenticated user attempts to react", "when": "the action is submitted", "then": "the reaction is not applied and authentication is required"}
+        {
+          "id": "AC-023",
+          "given": "an authenticated user views another user's score",
+          "when": "they choose to like it",
+          "then": "their reaction is shown as applied"
+        },
+        {
+          "id": "AC-024",
+          "given": "an authenticated user has liked another user's score",
+          "when": "they remove the like",
+          "then": "their reaction is no longer shown as applied"
+        },
+        {
+          "id": "AC-025",
+          "given": "an unauthenticated user attempts to react",
+          "when": "the action is submitted",
+          "then": "the reaction is not applied and authentication is required"
+        }
       ],
-      "business_rule_ids": ["BR-010"],
-      "edge_case_ids": ["EDGE-012"],
-      "dependency_ids": ["DEP-003"],
+      "business_rule_ids": [
+        "BR-010"
+      ],
+      "edge_case_ids": [
+        "EDGE-012"
+      ],
+      "dependency_ids": [
+        "DEP-003"
+      ],
       "open_question_ids": [],
       "priority": null,
       "story_points": null,
@@ -286,13 +630,25 @@
       "sprint": null,
       "assigned_developers": [],
       "status": "DEFINED",
-      "traceability": {"p01_elements": ["NEED-005", "SUCCESS-008"], "hu_ids": ["HU09"]}
+      "traceability": {
+        "p01_elements": [
+          "NEED-005",
+          "SUCCESS-008"
+        ],
+        "hu_ids": [
+          "HU09"
+        ]
+      }
     },
     {
       "id": "US-010",
       "title": "Comment on another user's score",
       "epic_id": "EPIC-004",
-      "requirement_ids": ["FR-016", "FR-017"],
+      "requirement_ids": [
+        "FR-016",
+        "FR-017",
+        "FR-028"
+      ],
       "user_story": {
         "as_a": "authenticated user",
         "i_want": "to comment on another user's score",
@@ -300,13 +656,46 @@
       },
       "scope": "MVP_CORE",
       "acceptance_criteria": [
-        {"id": "AC-026", "given": "an authenticated user views another user's score", "when": "they submit a valid comment", "then": "the comment is associated with that score and is visible in its detail context"},
-        {"id": "AC-027", "given": "an unauthenticated user attempts to comment", "when": "the action is submitted", "then": "the comment is not created and authentication is required"},
-        {"id": "AC-028", "given": "a user has submitted a comment", "when": "they attempt to edit or delete it", "then": "the action is not available in MVP 1"}
+        {
+          "id": "AC-026",
+          "given": "an authenticated user views another user's score",
+          "when": "they submit a valid comment",
+          "then": "the comment is associated with that score and is visible in its detail context"
+        },
+        {
+          "id": "AC-027",
+          "given": "an unauthenticated user attempts to comment",
+          "when": "the action is submitted",
+          "then": "the comment is not created and authentication is required"
+        },
+        {
+          "id": "AC-028",
+          "given": "a user has submitted a comment",
+          "when": "they attempt to edit or delete it",
+          "then": "the action is not available in MVP 1",
+          "status": "SUPERSEDED",
+          "superseded_by": "AC-029",
+          "superseded_reason": "DEC-211"
+        },
+        {
+          "id": "AC-029",
+          "given": "an authenticated user authored a comment",
+          "when": "they delete it",
+          "then": "the comment, and its audio if it is a voice comment, is no longer available; other users cannot delete it",
+          "source": "DEC-211 (added in v3.0)"
+        }
       ],
-      "business_rule_ids": ["BR-011"],
-      "edge_case_ids": ["EDGE-013"],
-      "dependency_ids": ["DEP-003"],
+      "business_rule_ids": [
+        "BR-011",
+        "BR-019"
+      ],
+      "edge_case_ids": [
+        "EDGE-013",
+        "EDGE-029"
+      ],
+      "dependency_ids": [
+        "DEP-003"
+      ],
       "open_question_ids": [],
       "priority": null,
       "story_points": null,
@@ -314,7 +703,897 @@
       "sprint": null,
       "assigned_developers": [],
       "status": "DEFINED",
-      "traceability": {"p01_elements": ["NEED-005", "SUCCESS-008"], "hu_ids": ["HU10"]}
+      "traceability": {
+        "p01_elements": [
+          "NEED-005",
+          "SUCCESS-008"
+        ],
+        "hu_ids": [
+          "HU10"
+        ],
+        "decision_ids": [
+          "DEC-211"
+        ]
+      }
+    },
+    {
+      "id": "US-011",
+      "title": "Dictate a score by voice",
+      "epic_id": "EPIC-005",
+      "requirement_ids": [
+        "FR-018",
+        "FR-019",
+        "FR-020",
+        "FR-021",
+        "FR-025",
+        "FR-029",
+        "FR-030",
+        "FR-043"
+      ],
+      "user_story": {
+        "as_a": "music student or music teacher",
+        "i_want": "to dictate notes and bars in Spanish through the microphone",
+        "so_that": "they are written as ABC notation in the editor without typing them"
+      },
+      "scope": "MVP_CORE",
+      "acceptance_criteria": [
+        {
+          "id": "AC-030",
+          "given": "an authenticated user is on the score create or edit page and has been informed that the audio is sent to an external service",
+          "when": "they press the microphone button and dictate \"Compas cuatro cuartos, Do negra, Re corchea, Mi corchea\" within 30 seconds",
+          "then": "the recording is transcribed",
+          "source": "AC-011-01; DEC-201, DEC-214, DEC-215"
+        },
+        {
+          "id": "AC-031",
+          "given": "the transcription uses only the supported vocabulary",
+          "when": "the result returns to the page",
+          "then": "ABC notation equivalent to `M:4/4` and `C D/2 E/2` is inserted into the content field, completed as defined by BR-025, the format is set to ABC, and nothing is published",
+          "source": "AC-011-02; DEC-205; BR-013, BR-025"
+        },
+        {
+          "id": "AC-032",
+          "given": "the recording is unintelligible or uses words outside the vocabulary",
+          "when": "the interpretation fails",
+          "then": "the message \"No se pudo interpretar el dictado musical\" is shown and the content field is unchanged",
+          "source": "AC-011-03"
+        },
+        {
+          "id": "AC-033",
+          "given": "a user opens the dictation option",
+          "when": "the option is displayed",
+          "then": "the supported vocabulary is visible to the user",
+          "source": "DEC-205"
+        },
+        {
+          "id": "AC-034",
+          "given": "a recording is in progress",
+          "when": "it reaches 30 seconds or 2 MB",
+          "then": "recording stops or is rejected with a clear message",
+          "source": "DEC-213"
+        },
+        {
+          "id": "AC-035",
+          "given": "microphone permission is denied or unavailable",
+          "when": "the user tries to dictate",
+          "then": "a clear message is shown and the rest of the form remains usable",
+          "source": "NFR-005; EDGE-014"
+        },
+        {
+          "id": "AC-036",
+          "given": "content produced by dictation is in the field",
+          "when": "the user publishes",
+          "then": "the MVP 1 publication rules are applied",
+          "source": "DEC-218; FR-025"
+        }
+      ],
+      "business_rule_ids": [
+        "BR-013",
+        "BR-017",
+        "BR-018",
+        "BR-022",
+        "BR-024",
+        "BR-025"
+      ],
+      "edge_case_ids": [
+        "EDGE-014",
+        "EDGE-015",
+        "EDGE-016",
+        "EDGE-017",
+        "EDGE-018"
+      ],
+      "dependency_ids": [
+        "DEP-004",
+        "DEP-008",
+        "DEP-010"
+      ],
+      "open_question_ids": [
+        "Q-021",
+        "Q-023"
+      ],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {
+        "p01_elements": [
+          "NEED-007",
+          "JTBD-005",
+          "IND-201"
+        ],
+        "hu_ids": [
+          "HU11"
+        ],
+        "backlog_ac_ids": [
+          "AC-011-01",
+          "AC-011-02",
+          "AC-011-03"
+        ],
+        "decision_ids": [
+          "DEC-201",
+          "DEC-205",
+          "DEC-208",
+          "DEC-213",
+          "DEC-214",
+          "DEC-215",
+          "DEC-218"
+        ],
+        "team_backlog": {
+          "moscow": "Must",
+          "story_points": 5,
+          "adjusted_by": [
+            "DEC-208"
+          ],
+          "adjusted_story_points": 8
+        }
+      }
+    },
+    {
+      "id": "US-012",
+      "title": "Leave a voice comment",
+      "epic_id": "EPIC-004",
+      "requirement_ids": [
+        "FR-026",
+        "FR-027",
+        "FR-028",
+        "FR-029",
+        "FR-030",
+        "FR-043"
+      ],
+      "user_story": {
+        "as_a": "member of the Notara community",
+        "i_want": "to record spoken observations on other users' scores",
+        "so_that": "I can leave quick feedback published as text and audio"
+      },
+      "scope": "MVP_SUPPORTING",
+      "acceptance_criteria": [
+        {
+          "id": "AC-037",
+          "given": "an authenticated user views another user's score",
+          "when": "they record a voice note of up to 30 seconds and confirm sending",
+          "then": "a comment is created with the transcribed text and a link to its recorded audio",
+          "source": "AC-012-01, AC-012-02; DEC-201"
+        },
+        {
+          "id": "AC-038",
+          "given": "a score has a voice comment",
+          "when": "a user opens the score detail",
+          "then": "they can read the comment text and play its audio",
+          "source": "HU12"
+        },
+        {
+          "id": "AC-039",
+          "given": "the transcription fails or is empty",
+          "when": "the user confirms sending",
+          "then": "no comment is created, a clear message is shown, and the user can retry or write a text comment",
+          "source": "NFR-005; EDGE-030"
+        },
+        {
+          "id": "AC-040",
+          "given": "a user views their own score",
+          "when": "the comment options are displayed",
+          "then": "the voice comment option is not available",
+          "source": "BR-027"
+        },
+        {
+          "id": "AC-041",
+          "given": "an unauthenticated user views a score",
+          "when": "they try to record a voice comment",
+          "then": "recording is not available and authentication is required",
+          "source": "FR-043"
+        },
+        {
+          "id": "AC-042",
+          "given": "the author of a voice comment deletes it",
+          "when": "deletion completes",
+          "then": "the comment and its audio are no longer available",
+          "source": "DEC-211, DEC-214"
+        }
+      ],
+      "business_rule_ids": [
+        "BR-017",
+        "BR-018",
+        "BR-019",
+        "BR-022",
+        "BR-027"
+      ],
+      "edge_case_ids": [
+        "EDGE-014",
+        "EDGE-015",
+        "EDGE-018",
+        "EDGE-028",
+        "EDGE-029",
+        "EDGE-030"
+      ],
+      "dependency_ids": [
+        "DEP-005",
+        "DEP-008",
+        "DEP-009",
+        "DEP-010"
+      ],
+      "open_question_ids": [
+        "Q-022"
+      ],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {
+        "p01_elements": [
+          "NEED-008",
+          "JTBD-006",
+          "IND-202"
+        ],
+        "hu_ids": [
+          "HU12"
+        ],
+        "backlog_ac_ids": [
+          "AC-012-01",
+          "AC-012-02"
+        ],
+        "decision_ids": [
+          "DEC-201",
+          "DEC-211",
+          "DEC-213",
+          "DEC-214",
+          "DEC-215"
+        ],
+        "team_backlog": {
+          "moscow": "Should",
+          "story_points": 3
+        }
+      }
+    },
+    {
+      "id": "US-013",
+      "title": "Listen to the spoken solfege",
+      "epic_id": "EPIC-006",
+      "requirement_ids": [
+        "FR-031",
+        "FR-032",
+        "FR-033",
+        "FR-036",
+        "FR-037",
+        "FR-043",
+        "FR-044"
+      ],
+      "user_story": {
+        "as_a": "music student",
+        "i_want": "to hear a synthesized voice pronounce the notes in time",
+        "so_that": "I can practice sight-reading and intonation"
+      },
+      "scope": "MVP_CORE",
+      "acceptance_criteria": [
+        {
+          "id": "AC-043",
+          "given": "an authenticated user views a score with valid ABC",
+          "when": "they press \"Escuchar Solfeo\"",
+          "then": "a synthesized Spanish voice pronounces the note names (\"Do, Re, Mi...\") in score order",
+          "source": "AC-013-01; DEC-202, DEC-206; BR-026"
+        },
+        {
+          "id": "AC-044",
+          "given": "the solfege audio is received",
+          "when": "the page gets it",
+          "then": "playback starts in the application's player",
+          "source": "AC-013-02"
+        },
+        {
+          "id": "AC-045",
+          "given": "the voice engine supports pauses",
+          "when": "the solfege is generated",
+          "then": "pauses reflect relative note durations; otherwise the pace is constant",
+          "source": "DEC-206; FR-032"
+        },
+        {
+          "id": "AC-046",
+          "given": "a user views a plain-text score",
+          "when": "the listening options are displayed",
+          "then": "they are disabled with \"Disponible solo para partituras en ABC\"",
+          "source": "DEC-207"
+        },
+        {
+          "id": "AC-047",
+          "given": "a valid ABC score contains elements that cannot be rendered",
+          "when": "the user requests the solfege",
+          "then": "a clear message is shown and no server error occurs",
+          "source": "DEC-207"
+        },
+        {
+          "id": "AC-048",
+          "given": "a user has requested 20 new syntheses today",
+          "when": "they request solfege that is not stored",
+          "then": "no synthesis is made, a clear message is shown, and stored audio remains available",
+          "source": "DEC-213"
+        }
+      ],
+      "business_rule_ids": [
+        "BR-015",
+        "BR-017",
+        "BR-022",
+        "BR-026"
+      ],
+      "edge_case_ids": [
+        "EDGE-021",
+        "EDGE-022",
+        "EDGE-023"
+      ],
+      "dependency_ids": [
+        "DEP-007",
+        "DEP-008",
+        "DEP-010"
+      ],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {
+        "p01_elements": [
+          "NEED-009",
+          "JTBD-007",
+          "IND-203"
+        ],
+        "hu_ids": [
+          "HU13"
+        ],
+        "backlog_ac_ids": [
+          "AC-013-01",
+          "AC-013-02"
+        ],
+        "decision_ids": [
+          "DEC-202",
+          "DEC-206",
+          "DEC-207",
+          "DEC-213",
+          "DEC-215"
+        ],
+        "team_backlog": {
+          "moscow": "Must",
+          "story_points": 5
+        }
+      }
+    },
+    {
+      "id": "US-014",
+      "title": "Listen to the audio tutor",
+      "epic_id": "EPIC-006",
+      "requirement_ids": [
+        "FR-033",
+        "FR-034",
+        "FR-036",
+        "FR-037",
+        "FR-043",
+        "FR-044"
+      ],
+      "user_story": {
+        "as_a": "hobbyist user",
+        "i_want": "to hear a short spoken summary of the score's technical content",
+        "so_that": "I understand its clef, meter and difficulty before practicing it"
+      },
+      "scope": "MVP_SUPPORTING",
+      "acceptance_criteria": [
+        {
+          "id": "AC-049",
+          "given": "an authenticated user views a score with valid ABC",
+          "when": "they press \"Tutor Auditivo\"",
+          "then": "a spoken locution states the clef, the meter and the estimated difficulty (e.g. \"Partitura en clave de Sol, compas de 4/4, dificultad estimada: media\")",
+          "source": "AC-014-01; DEC-212; BR-028"
+        },
+        {
+          "id": "AC-050",
+          "given": "the tutor locution is generated",
+          "when": "the difficulty is stated",
+          "then": "it is computed with BR-014 and announced as \"dificultad estimada\"",
+          "source": "DEC-212; BR-014"
+        },
+        {
+          "id": "AC-051",
+          "given": "a user views a plain-text score or an ABC score that cannot be rendered",
+          "when": "they look for the tutor",
+          "then": "the option is disabled with \"Disponible solo para partituras en ABC\", or a clear message is shown",
+          "source": "DEC-207"
+        }
+      ],
+      "business_rule_ids": [
+        "BR-014",
+        "BR-015",
+        "BR-017",
+        "BR-022",
+        "BR-028"
+      ],
+      "edge_case_ids": [
+        "EDGE-021",
+        "EDGE-022",
+        "EDGE-023"
+      ],
+      "dependency_ids": [
+        "DEP-007",
+        "DEP-008",
+        "DEP-010"
+      ],
+      "open_question_ids": [
+        "Q-024",
+        "Q-025"
+      ],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {
+        "p01_elements": [
+          "NEED-010",
+          "JTBD-008",
+          "IND-203"
+        ],
+        "hu_ids": [
+          "HU14"
+        ],
+        "backlog_ac_ids": [
+          "AC-014-01"
+        ],
+        "decision_ids": [
+          "DEC-202",
+          "DEC-207",
+          "DEC-212",
+          "DEC-213",
+          "DEC-215"
+        ],
+        "team_backlog": {
+          "moscow": "Should",
+          "story_points": 3
+        }
+      }
+    },
+    {
+      "id": "US-015",
+      "title": "Play the score with an instrument",
+      "epic_id": "EPIC-006",
+      "requirement_ids": [
+        "FR-035",
+        "FR-036",
+        "FR-037"
+      ],
+      "user_story": {
+        "as_a": "user",
+        "i_want": "to hear the instrument sound performing the score",
+        "so_that": "I know exactly how the melody should sound"
+      },
+      "scope": "MVP_CORE",
+      "acceptance_criteria": [
+        {
+          "id": "AC-052",
+          "given": "a user views a score with valid ABC",
+          "when": "they press \"Reproducir Piano\"",
+          "then": "the notes are played with a piano sound generated in the browser, without calling an external audio service",
+          "source": "AC-015-01; DEC-203"
+        },
+        {
+          "id": "AC-053",
+          "given": "a user views a plain-text score or an ABC score that cannot be rendered",
+          "when": "they look for instrument playback",
+          "then": "the option is disabled with \"Disponible solo para partituras en ABC\", or a clear message is shown",
+          "source": "DEC-207"
+        },
+        {
+          "id": "AC-054",
+          "given": "a user plays a score with the instrument",
+          "when": "playback runs",
+          "then": "it does not count toward the daily synthesis limit",
+          "source": "DEC-213 (applies to voice syntheses)"
+        }
+      ],
+      "business_rule_ids": [
+        "BR-015"
+      ],
+      "edge_case_ids": [
+        "EDGE-021",
+        "EDGE-022"
+      ],
+      "dependency_ids": [
+        "DEP-010"
+      ],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {
+        "p01_elements": [
+          "NEED-011",
+          "JTBD-009",
+          "IND-204"
+        ],
+        "hu_ids": [
+          "HU15"
+        ],
+        "backlog_ac_ids": [
+          "AC-015-01"
+        ],
+        "decision_ids": [
+          "DEC-203",
+          "DEC-207"
+        ],
+        "team_backlog": {
+          "moscow": "Must",
+          "story_points": 3
+        }
+      }
+    },
+    {
+      "id": "US-016",
+      "title": "Reuse synthesized audio",
+      "epic_id": "EPIC-007",
+      "requirement_ids": [
+        "FR-038",
+        "FR-039"
+      ],
+      "user_story": {
+        "as_a": "system administrator (operator perspective; no product role)",
+        "i_want": "audio already generated by the voice provider to be stored and reused",
+        "so_that": "monthly credits are not exceeded and duplicate requests are avoided"
+      },
+      "scope": "MVP_SUPPORTING",
+      "acceptance_criteria": [
+        {
+          "id": "AC-055",
+          "given": "a score requests its solfege audio for the first time",
+          "when": "the provider returns the audio",
+          "then": "it is stored, identified by score content, voice and language",
+          "source": "AC-016-01; DEC-210"
+        },
+        {
+          "id": "AC-056",
+          "given": "the same audio is already stored",
+          "when": "another user requests it",
+          "then": "the stored audio is returned without calling the provider",
+          "source": "AC-016-02"
+        },
+        {
+          "id": "AC-057",
+          "given": "a score's content was edited after its audio was stored",
+          "when": "the audio is requested again",
+          "then": "new audio is generated and the old one is not served",
+          "source": "DEC-210; EDGE-027"
+        },
+        {
+          "id": "AC-058",
+          "given": "storing a generated audio fails",
+          "when": "the request completes",
+          "then": "the user still receives the audio",
+          "source": "P00 RISK-008 mitigation; EDGE-026"
+        }
+      ],
+      "business_rule_ids": [
+        "BR-018",
+        "BR-021"
+      ],
+      "edge_case_ids": [
+        "EDGE-026",
+        "EDGE-027"
+      ],
+      "dependency_ids": [
+        "DEP-008",
+        "DEP-009",
+        "DEP-010"
+      ],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {
+        "p01_elements": [
+          "OPS-002",
+          "IND-205"
+        ],
+        "hu_ids": [
+          "HU16"
+        ],
+        "backlog_ac_ids": [
+          "AC-016-01",
+          "AC-016-02"
+        ],
+        "decision_ids": [
+          "DEC-210",
+          "DEC-214"
+        ],
+        "team_backlog": {
+          "moscow": "Must",
+          "story_points": 3
+        }
+      }
+    },
+    {
+      "id": "US-017",
+      "title": "Fall back to a free voice",
+      "epic_id": "EPIC-007",
+      "requirement_ids": [
+        "FR-040",
+        "FR-041"
+      ],
+      "user_story": {
+        "as_a": "project developer (operator perspective; no product role)",
+        "i_want": "the system to switch to a free voice library when the commercial voice service fails or has no credits",
+        "so_that": "audio stays available during project demonstrations"
+      },
+      "scope": "MVP_SUPPORTING",
+      "acceptance_criteria": [
+        {
+          "id": "AC-059",
+          "given": "the commercial voice provider rejects the request for lack of credits (402) or rate limiting (429)",
+          "when": "the platform handles the rejection",
+          "then": "the fallback voice generates the audio and the user receives no server error",
+          "source": "AC-017-01; DEC-202"
+        },
+        {
+          "id": "AC-060",
+          "given": "the commercial voice provider is unavailable",
+          "when": "audio is requested",
+          "then": "the fallback voice generates the audio",
+          "source": "HU17 story (\"falle\")"
+        },
+        {
+          "id": "AC-061",
+          "given": "both the commercial and the fallback voice fail",
+          "when": "audio is requested",
+          "then": "a clear message is shown and no server error occurs",
+          "source": "NFR-005; EDGE-025"
+        },
+        {
+          "id": "AC-062",
+          "given": "the fallback voice produced an audio",
+          "when": "the user plays it",
+          "then": "the user is not told which voice was used and the event is logged",
+          "source": "DEC-216"
+        },
+        {
+          "id": "AC-063",
+          "given": "the platform runs in development or automated testing",
+          "when": "audio is requested",
+          "then": "the fallback voice is used by default",
+          "source": "DEC-202; NFR-006"
+        }
+      ],
+      "business_rule_ids": [
+        "BR-023"
+      ],
+      "edge_case_ids": [
+        "EDGE-024",
+        "EDGE-025"
+      ],
+      "dependency_ids": [
+        "DEP-008",
+        "DEP-010"
+      ],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {
+        "p01_elements": [
+          "OPS-001",
+          "IND-206"
+        ],
+        "hu_ids": [
+          "HU17"
+        ],
+        "backlog_ac_ids": [
+          "AC-017-01"
+        ],
+        "decision_ids": [
+          "DEC-202",
+          "DEC-209",
+          "DEC-216"
+        ],
+        "team_backlog": {
+          "moscow": "Should",
+          "story_points": 2,
+          "adjusted_by": [
+            "DEC-209"
+          ],
+          "adjusted_moscow": "Must"
+        }
+      }
+    },
+    {
+      "id": "US-018",
+      "title": "Download the solfege as MP3",
+      "epic_id": "EPIC-006",
+      "requirement_ids": [
+        "FR-036",
+        "FR-042",
+        "FR-044"
+      ],
+      "user_story": {
+        "as_a": "music student",
+        "i_want": "to download the synthesized audio to my device",
+        "so_that": "I can listen to it without an internet connection"
+      },
+      "scope": "MVP_SUPPORTING",
+      "acceptance_criteria": [
+        {
+          "id": "AC-064",
+          "given": "the spoken solfege of an `.abc` score has been synthesized",
+          "when": "the user clicks \"Descargar MP3\"",
+          "then": "the browser downloads an `.mp3` file containing the spoken solfege",
+          "source": "AC-018-01 as reworded by DEC-204"
+        },
+        {
+          "id": "AC-065",
+          "given": "a user views a plain-text score",
+          "when": "they look for the download",
+          "then": "it is not available, as for the other listening options",
+          "source": "DEC-207"
+        }
+      ],
+      "business_rule_ids": [
+        "BR-015",
+        "BR-016",
+        "BR-017"
+      ],
+      "edge_case_ids": [
+        "EDGE-021",
+        "EDGE-023"
+      ],
+      "dependency_ids": [
+        "DEP-006",
+        "DEP-008",
+        "DEP-010"
+      ],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {
+        "p01_elements": [
+          "NEED-012",
+          "JTBD-010",
+          "IND-207"
+        ],
+        "hu_ids": [
+          "HU18"
+        ],
+        "backlog_ac_ids": [
+          "AC-018-01"
+        ],
+        "decision_ids": [
+          "DEC-204",
+          "DEC-207"
+        ],
+        "team_backlog": {
+          "moscow": "Could",
+          "story_points": 2
+        }
+      }
+    },
+    {
+      "id": "US-019",
+      "title": "Load a score from an .abc file",
+      "epic_id": "EPIC-005",
+      "requirement_ids": [
+        "FR-022",
+        "FR-023",
+        "FR-024",
+        "FR-025"
+      ],
+      "user_story": {
+        "as_a": "music student, hobbyist musician or music teacher",
+        "i_want": "to load an `.abc` file from my device when creating or editing a score",
+        "so_that": "its content is shown as text in the score field without copying and pasting it"
+      },
+      "scope": "MVP_SUPPORTING",
+      "acceptance_criteria": [
+        {
+          "id": "AC-066",
+          "given": "a user is on the score create or edit page",
+          "when": "they select a file with the `.abc` extension",
+          "then": "the format changes to ABC and the file text appears in the content field with its line breaks, editable before publishing",
+          "source": "AC-019-01; DEC-217"
+        },
+        {
+          "id": "AC-067",
+          "given": "the content field already has content",
+          "when": "the user loads a file",
+          "then": "confirmation is requested before replacing it, and cancelling keeps the existing content",
+          "source": "AC-019-02"
+        },
+        {
+          "id": "AC-068",
+          "given": "the file is not `.abc`, is empty, is not readable text or exceeds 1,000 characters",
+          "when": "the user tries to load it",
+          "then": "a clear message is shown and the current content is not modified",
+          "source": "AC-019-03"
+        },
+        {
+          "id": "AC-069",
+          "given": "loaded content is in the field",
+          "when": "the user publishes",
+          "then": "the MVP 1 validations apply and only the text is kept; the file is not stored",
+          "source": "AC-019-04; DEC-217, DEC-218"
+        }
+      ],
+      "business_rule_ids": [
+        "BR-020",
+        "BR-024"
+      ],
+      "edge_case_ids": [
+        "EDGE-019",
+        "EDGE-020"
+      ],
+      "dependency_ids": [
+        "DEP-004",
+        "DEP-010"
+      ],
+      "open_question_ids": [],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {
+        "p01_elements": [
+          "NEED-013",
+          "JTBD-011",
+          "IND-209"
+        ],
+        "hu_ids": [
+          "HU19"
+        ],
+        "backlog_ac_ids": [
+          "AC-019-01",
+          "AC-019-02",
+          "AC-019-03",
+          "AC-019-04"
+        ],
+        "decision_ids": [
+          "DEC-217",
+          "DEC-218"
+        ],
+        "team_backlog": {
+          "moscow": "Should",
+          "story_points": 2
+        }
+      }
     }
   ]
 }

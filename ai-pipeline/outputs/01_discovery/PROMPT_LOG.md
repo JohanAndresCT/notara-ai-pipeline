@@ -132,3 +132,54 @@ Artefacto generado:
 
 P02 readiness:
 READY_WITH_ASSUMPTIONS
+
+---
+
+# MVP 2 — Sprint 2 (Audio, Speech & TTS/STT)
+
+## 01. Discovery (MVP 2): adaptación de prompts
+
+- `prompts/01_discovery/P01_product_discovery.md` → v2.0: modo incremental; voz y audio (HU11–HU18) dentro del alcance por CR-001; las prohibiciones de audio/voz quedan solo para el MVP 1; OMR e imágenes siguen excluidos; agrega el Anexo A con el CR-001 completo (advertencia P00 VAL-211).
+- `prompts/01_discovery/P01_validation.md` → v2.0 (re-codificado a UTF-8): valida cobertura HU11–HU18, preservación de IDs del MVP 1, PDEC como PROPOSAL, fidelidad al backlog y el anexo CR-001.
+
+## 01. Discovery (MVP 2)
+
+Ejecuta P01 v2.0 con:
+#ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md (v2.1)
+#ai-pipeline/outputs/00_context/CONTEXT_VALIDATION.md (PASS_WITH_WARNINGS)
+#ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md
+#ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md (v1.0, MVP 1)
+
+Resultado: PRODUCT_VISION.md v2.0 — READY_WITH_ASSUMPTIONS.
+
+## 01. Discovery (MVP 2): Validation
+
+Ejecuta P01_validation.md v2.0 sobre PRODUCT_VISION.md v2.0.
+
+## MVP 2 V2.0 Result: PASS_WITH_WARNINGS (0 HIGH, 0 MEDIUM, 4 LOW)
+
+- DISC-VAL-201: reetiquetar como ASSUMPTION que el ABC dictado debe cumplir las reglas del MVP 1.
+- DISC-VAL-202: RELEASE_PLAN.md sin HU11–HU18; dar el backlog como entrada a P02/P03.
+- DISC-VAL-203: dos numeraciones de SUCCESS (P00 vs. P01); usar IND-2NN en P02.
+- DISC-VAL-204: convención FACT/ASSUMPTION en los JTBD.
+
+P02 readiness: READY_WITH_ASSUMPTIONS.
+Decisiones del equipo antes de cerrar P02: PDEC-204 (MP3), PDEC-206 (solfeo), Q-016, Q-017, Q-018, Q-008, Q-013.
+
+## 01. Discovery (MVP 2): v2.1 con decisiones y HU19
+
+PRODUCT_VISION.md v2.1: aplica DEC-201..DEC-218, agrega HU19 (NEED-013, JTBD-011, recorrido A', IND-209)
+y el Anexo B con CR-002; corrige DISC-VAL-201 y DISC-VAL-204.
+
+## MVP 2 V2.1 Result (run 2): PASS_WITH_WARNINGS (0 HIGH, 0 MEDIUM, 2 LOW)
+
+- DISC-VAL-202: RELEASE_PLAN.md sin HU11–HU19; P02/P03 deben leer el backlog y DECISIONS_MVP2.md.
+- DISC-VAL-203: dos numeraciones SUCCESS; P02 usa IND-2NN.
+
+P02 readiness: READY_WITH_ASSUMPTIONS.
+
+## 01. Discovery (MVP 2): v2.2 — corrección de redacción
+
+Tras P02 (REQ-VAL-202, REQ-VAL-203): USER-002, NEED-010 y JTBD-008 dicen clef; Q-002 y Q-006 como resueltas en el MVP 1; entrada P00 v2.3. Sin cambio de alcance.
+
+## MVP 2 V2.2 Result (run 3): PASS_WITH_WARNINGS (2 LOW sin cambios)
