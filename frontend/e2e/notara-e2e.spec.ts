@@ -30,6 +30,17 @@ async function publishScore(page: Page, title: string) {
 }
 
 test.describe("Notara E2E", () => {
+  test("ABC placeholder contains separate lines", async ({ page }) => {
+    await registerUser(page);
+    await page.goto("/scores/new");
+    await page.getByRole("button", { name: /Notación ABC/i }).click();
+
+    await expect(page.getByLabel("Tu partitura *")).toHaveAttribute(
+      "placeholder",
+      "X:1\nT:Mañana en Sol\nM:4/4\nL:1/8\nK:G\nGABc d2 B2",
+    );
+  });
+
   test("registro, login, logout y acceso anónimo a rutas protegidas", async ({ page }) => {
     const token = uniqueToken();
     const name = `Usuario ${token}`;

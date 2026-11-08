@@ -73,7 +73,7 @@ export default function ScoreCreatePage() {
           </div>
           <div className={`field content-field ${errors.content ? "has-error" : ""}`}>
             <label htmlFor="score-content">Tu partitura <b>*</b></label>
-            <textarea id="score-content" name="content" maxLength={1000} required rows={8} placeholder={format === "ABC" ? "X:1&#10;T:Mañana en Sol&#10;M:4/4&#10;L:1/8&#10;K:G&#10;GABc d2 B2" : "Escribe aquí tu idea musical..."} aria-invalid={Boolean(errors.content)} aria-describedby={errors.content?.length ? "score-content-error" : undefined} />
+            <textarea id="score-content" name="content" maxLength={1000} required rows={8} placeholder={format === "ABC" ? "X:1\nT:Mañana en Sol\nM:4/4\nL:1/8\nK:G\nGABc d2 B2" : "Escribe aquí tu idea musical..."} aria-invalid={Boolean(errors.content)} aria-describedby={errors.content?.length ? "score-content-error" : undefined} />
             <div className="field-help"><span>Mantenla clara y fácil de leer.</span><strong>Máximo 1.000 caracteres</strong></div>
             {errors.content?.length ? <FieldError id="score-content-error" text={errors.content[0]} /> : null}
           </div>
