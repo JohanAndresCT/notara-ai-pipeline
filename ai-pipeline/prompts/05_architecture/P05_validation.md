@@ -1,6 +1,6 @@
 # P05 - Software Architecture Validation
 
-**Version:** 2.0
+**Version:** 2.1
 **Stage:** P05 - Architecture
 **Type:** Validation Prompt
 **Project:** Notara
@@ -13,6 +13,7 @@
 |---|---|
 | 1.0 | Prompt files were empty when MVP 1 was validated; validation was done directly against P00-P04. |
 | 2.0 | Validation prompt for the MVP 2 architecture addendum. |
+| 2.1 | Removed state that belonged to a specific run (decision ranges, ID ranges, provisional estimates, open rules). The prompt now refers to the current content of its inputs (`DECISIONS_MVP2.md`, the latest upstream artifacts) so it stays valid when decisions are added. |
 
 ## 1. Purpose
 
@@ -26,9 +27,9 @@ Act as a **Senior Architecture Reviewer**. Do not edit inputs. Findings use `ARC
 
 1. Inputs present; P02-P04 results acceptable; upstream warnings carried.
 2. As-built baseline accurate (spot-check code, settings, deployment).
-3. Coverage: FR-018-FR-044 and NFR-004-NFR-010 each have a design response; US-011-US-019 mapped.
-4. P04 handoff needs satisfied or conflict reported; UX-VAL-203 (timeouts) addressed.
-5. Decisions respected (DEC-201-DEC-218); external services limited to decided ones; deviations reported as conflicts.
+3. Coverage: every MVP 2 FR and NFR in the latest requirements has a design response; every MVP 2 story is mapped.
+4. P04 handoff needs satisfied or conflict reported; open P04 findings that affect architecture addressed.
+5. Every decision in `DECISIONS_MVP2.md` respected; external services limited to decided ones; deviations reported as conflicts; conflicts resolved by later decisions shown as resolved.
 6. ADRs give rationale, alternatives, trade-offs, status and revisit triggers.
 7. Data model and API: ownership, deletion, quotas, cache, error codes consistent with UX messages.
 8. Security and privacy: secrets, upload validation, protected media, retention, logging without personal content.

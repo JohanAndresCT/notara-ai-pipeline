@@ -147,3 +147,30 @@ Automated checks found every FR-001-FR-044 and AC-001-AC-069 referenced, with no
 ## 12. Final Decision
 
 **`PASS_WITH_WARNINGS`.** The UX specification may proceed to P05 - Architecture. Track UX-VAL-201 to UX-VAL-205 and the UX-PROP approvals.
+
+## Addendum — Run 2 (UX v2.1, prompt v2.1)
+
+**Date:** 2026-11-08 · **Trigger:** decisions DEC-219-DEC-229 and requirements v3.1 · **Validator prompt:** `P04_validation.md` v2.1
+
+**Result:** `PASS_WITH_WARNINGS` (0 HIGH, 0 MEDIUM, 1 LOW) · **P05 readiness:** YES
+
+### Automated checks
+
+| Check | Result |
+|---|---|
+| Every FR, NFR and AC of requirements v3.1 referenced | Yes (including FR-045, FR-046, AC-070-AC-072) |
+| Messages defined and used | All; new M-17 defined and used in FLOW-011 and FLOW-013 |
+| UX proposals approved | All seven (DEC-225) |
+| UX open questions | None (UX-Q-001-003 resolved by DEC-229, DEC-226, DEC-227) |
+| M-11 names the provider | Yes (DEC-226) |
+| Tutor content | Clef, meter, estimated difficulty, plus key and tempo when defined (DEC-227) |
+
+### Status of run 1 findings
+
+| ID | Status |
+|---|---|
+| UX-VAL-201 (MEDIUM) | **Resolved** — dictation rules approved (DEC-229). |
+| UX-VAL-202 (LOW) | **Resolved** — UX proposals approved (DEC-225). Note for P06: UX-PROP-006 adds a confirmation to the comment deletion already delivered in MVP 1. |
+| UX-VAL-203 (LOW) | **Partially resolved** — initial timeouts set (DEC-221) and mapped to M-07/M-15; no "Cancelar" option during processing is defined. Remains LOW. |
+| UX-VAL-204 (LOW) | Resolved earlier. |
+| UX-VAL-205 (LOW) | **Resolved** — DEC-226. |

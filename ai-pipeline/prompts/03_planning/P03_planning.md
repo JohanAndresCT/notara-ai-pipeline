@@ -1,6 +1,6 @@
 # P03 - Prioritization and Delivery Planning
 
-**Version:** 2.0
+**Version:** 2.1
 **Stage:** P03 - Planning
 **Type:** Generation Prompt
 **Project:** Notara
@@ -14,6 +14,7 @@
 |---|---|
 | 1.0 | Prioritization of MVP 1 (HU01-HU10); no points, sprints or developers. |
 | 2.0 | Incremental mode for MVP 2 (HU11-HU19). Team-provided Story Points, MoSCoW, release and sprint from the Sprint 2 backlog and the decision log are approved sources and may be used; provisional estimates must be flagged. Developers stay unassigned until the team provides them (Q-010). Planned backlog paths updated from `artifacts/` to `outputs/`. |
+| 2.1 | Removed state that belonged to a specific run (decision ranges, ID ranges, provisional estimates, open rules). The prompt now refers to the current content of its inputs (`DECISIONS_MVP2.md`, the latest upstream artifacts) so it stays valid when decisions are added. |
 
 ## 1. Purpose
 
@@ -26,7 +27,7 @@ P03 decides what is delivered first, what can be dropped under pressure and what
 ```text
 ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md and CONTEXT_VALIDATION.md
 ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md      (SP, MoSCoW, HU11-HU19)
-ai-pipeline/outputs/00_context/DECISIONS_MVP2.md              (DEC-201-DEC-218)
+ai-pipeline/outputs/00_context/DECISIONS_MVP2.md              (all DEC-2NN)
 ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md and PRODUCT_VISION_VALIDATION.md
 ai-pipeline/outputs/02_requirements/REQUIREMENTS.md, product_backlog.json, REQUIREMENTS_VALIDATION.md
 ai-pipeline/outputs/03_planning/PRIORITIZATION.md and product_backlog.json (previous version, MVP 1)
@@ -45,9 +46,9 @@ You must not add features, move OMR or other exclusions into scope, invent estim
 ## 4. Planning baseline
 
 - **MVP 1 (HU01-HU10):** delivered (tag `v1.0.0`); keep its priorities as the baseline and mark it delivered. MVP 1 decisions Q-001-Q-006 remain, except comment deletion, now governed by DEC-211 (supersedes P03 DEC-002).
-- **MVP 2 (HU11-HU19):** US-011-US-019, FR-018-FR-044, NFR-004-NFR-010, as refined by DEC-201-DEC-218.
-- **Team estimates (approved source):** HU11 8 SP (DEC-208), HU12 3, HU13 5, HU14 3, HU15 3, HU16 3, HU17 2 (Must by DEC-209), HU18 2, HU19 2; total 31 SP. Must 21 SP, Should 8 SP, Could 2 SP.
-- **Provisional estimates:** US-011 and US-014 depend on PROPOSAL rules BR-013, BR-014, BR-025 (P02 REQ-VAL-201).
+- **MVP 2:** the MVP 2 stories, FRs and NFRs in the latest `REQUIREMENTS.md`, as refined by every decision in `DECISIONS_MVP2.md`.
+- **Team estimates (approved source):** Story Points and MoSCoW from `SPRINT_2_BACKLOG_INPUT.md`, adjusted only by decisions in `DECISIONS_MVP2.md`. Compute totals per priority from those values; do not copy totals from a previous run.
+- **Provisional estimates:** an estimate is provisional only while a rule it depends on is still PROPOSAL in the latest `REQUIREMENTS.md`; otherwise it is a team estimate.
 - **Reference load:** MVP 1 delivered 31 SP in one two-week sprint with a five-person team (RELEASE_PLAN.md), evaluated `NEEDS_ITERATION`.
 
 ## 5. Priority model
@@ -85,7 +86,7 @@ Planned index: MVP 1 items kept with `delivery_status: "DELIVERED"`; MVP 2 items
 ## 10. Self-review
 
 - All HU01-HU19 have priority and phase; MVP 1 marked delivered.
-- Sum of SP and per-priority totals correct; provisional estimates flagged.
+- Sum of SP and per-priority totals recomputed from the sources; provisional estimates flagged only when their rules are still PROPOSAL.
 - Dependencies respected; external-dependency risk considered.
 - Cut line and drop order explicit; P0 never dropped.
 - Preconditions listed with owner stage.

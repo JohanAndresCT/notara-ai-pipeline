@@ -6,11 +6,12 @@
 |---|---|---|
 | 1.0 | MVP 1 | Pre-implementation architecture proposal (React/TS + Django/DRF + PostgreSQL, same-origin session auth). ADR-001-ADR-005. |
 | 2.0 | MVP 2 | Records the MVP 1 as-built baseline and its deviations from 1.0. Adds the MVP 2 addendum for voice and audio: `voice` module with provider adapters, synchronous processing with bounded timeouts, protected audio storage, synthesized-audio cache, daily quota, single ABC reader for solfege, tutor and piano, voice comments, configuration and testing. ADR-006-ADR-015. |
+| 2.1 | MVP 2 | Second decision batch: CONFLICT-ARCH-201-203 resolved (DEC-219, DEC-220, DEC-223); timeouts accepted as initial values (DEC-221); transcription quota added to `VoiceQuota` (DEC-222); tutor header kept (DEC-224); tutor adds key and tempo (DEC-227). ADR approval by TEAM-002 and storage verification remain. |
 
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 2.0
+- **Version:** 2.1
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P05 - Architecture
 - **Status:** `READY_WITH_WARNINGS`
@@ -164,9 +165,9 @@ User (browser: Chrome, Edge, Firefox; HTTPS)
 
 | Entity | Change | Constraints |
 |---|---|---|
-| `Comment` | Add `kind` (`TEXT`/`VOICE`, default `TEXT`), `audio` (`FileField`, `upload_to="voice_comments/%Y/%m/"`, nullable), `audio_mime` (short char), `audio_duration_ms` (nullable int). | `VOICE` requires `audio`. Audio file deleted on comment deletion and on cascaded deletion (a `post_delete` signal also covers administrative user deletion; see Q-022). `body` limit: see CONFLICT-ARCH-202. |
+| `Comment` | Add `kind` (`TEXT`/`VOICE`, default `TEXT`), `audio` (`FileField`, `upload_to="voice_comments/%Y/%m/"`, nullable), `audio_mime` (short char), `audio_duration_ms` (nullable int). | `VOICE` requires `audio`. Audio file deleted on comment deletion and on cascaded deletion (a `post_delete` signal also covers administrative user deletion; see Q-022). `body` limit: 500 for `TEXT`, 1,000 for `VOICE` (DEC-220); transcripts never truncated. |
 | `SynthesizedAudio` (new) | `key` (sha256 hex, unique), `kind` (`SOLFEGE`/`TUTOR`), `language`, `voice_id`, `engine` (`ELEVENLABS`/`EDGE`), `file` (`audio_cache/`), `size_bytes`, `created_at`. | Unique `key`; lookup is an indexed equality query (O(1) for the user, AC-016-02). Not linked to users (not personal data, DEC-214). |
-| `VoiceQuota` (new) | `user`, `day` (date, UTC), `syntheses` (int). | Unique `(user, day)`; incremented atomically with `F()` inside a transaction, only on cache miss. |
+| `VoiceQuota` (new) | `user`, `day` (date, UTC), `syntheses` (int), `transcriptions` (int). | Unique `(user, day)`; counters incremented atomically with `F()` inside a transaction: `syntheses` only on cache miss (DEC-213), `transcriptions` on every accepted STT call (DEC-222). Over a limit: `DAILY_LIMIT_REACHED` / `TRANSCRIPTION_LIMIT_REACHED` (429). |
 | Dictation audio | **No model.** Processed in memory or a temporary file deleted in `finally`. | NFR-004. |
 | `Score` | No schema change. | `playback` is computed on read. |
 
@@ -178,11 +179,11 @@ New endpoints use only `/api/v1/` (ADR-013). All require an authenticated sessio
 
 | Method and route | Request | Success | Error codes (HTTP) → UX message |
 |---|---|---|---|
-| `POST /api/v1/audio/stt/` | multipart: `audio` (≤ 2 MB; `audio/webm`, `audio/ogg`, `audio/wav`, `audio/mp4`), `title` (optional, for BR-025) | `200 {transcript, meter, abc_line, abc_document}` | `AUDIO_TOO_LARGE` (413) → M-05b; `AUDIO_INVALID` (400) → M-01; `DICTATION_UNINTERPRETABLE` (422) → M-01; `STT_UNAVAILABLE` (503) → M-07 |
+| `POST /api/v1/audio/stt/` | multipart: `audio` (≤ 2 MB; `audio/webm`, `audio/ogg`, `audio/wav`, `audio/mp4`), `title` (optional, for BR-025) | `200 {transcript, meter, abc_line, abc_document}` | `AUDIO_TOO_LARGE` (413) → M-05b; `AUDIO_INVALID` (400) → M-01; `DICTATION_UNINTERPRETABLE` (422) → M-01; `TRANSCRIPTION_LIMIT_REACHED` (429) → M-17; `STT_UNAVAILABLE` (503) → M-07 |
 | `GET /api/v1/scores/{id}/` *(changed)* | — | Adds `playback: {playable, reason, meter, tempo_bpm, events:[{pitch, start, duration}]}`; `reason` ∈ `NOT_ABC`, `UNSUPPORTED_ELEMENTS`, `null` | — (M-02 when `NOT_ABC`, M-03 when `UNSUPPORTED_ELEMENTS`) |
 | `POST /api/v1/scores/{id}/audio/solfege/` | — | `200 audio/mpeg` body | `NOT_ABC` (409) → M-02; `ABC_UNSUPPORTED` (422) → M-03; `DAILY_LIMIT_REACHED` (429) → M-10; `AUDIO_UNAVAILABLE` (503) → M-15 |
 | `POST /api/v1/scores/{id}/audio/tutor/` | — | `200 audio/mpeg` body + header `X-Notara-Tutor-Text` (URL-encoded summary, UX-PROP-005) | Same as solfege |
-| `POST /api/v1/scores/{id}/comments/` *(changed)* | JSON `{body}` (text, unchanged) **or** multipart `audio` (voice) | `201` comment with `kind`, `body`, `audio_url` when voice | `AUDIO_TOO_LARGE` (413) → M-05b; `TRANSCRIPTION_FAILED` (422) → M-09; `STT_UNAVAILABLE` (503) → M-09; `OWN_SCORE` (403) |
+| `POST /api/v1/scores/{id}/comments/` *(changed)* | JSON `{body}` (text, unchanged) **or** multipart `audio` (voice) | `201` comment with `kind`, `body`, `audio_url` when voice | `AUDIO_TOO_LARGE` (413) → M-05b; `TRANSCRIPTION_FAILED` (422) → M-09; `TRANSCRIPTION_LIMIT_REACHED` (429) → M-17; `STT_UNAVAILABLE` (503) → M-09; `OWN_SCORE` (403) |
 | `GET /api/v1/comments/{id}/audio/` | — | `200` audio `FileResponse` with stored MIME, `X-Content-Type-Options: nosniff` | `404` if no audio |
 | `DELETE /api/v1/scores/{id}/comments/{comment_id}/` *(changed)* | — | `200`; removes comment and audio file after commit | Existing ownership errors |
 
@@ -205,7 +206,7 @@ New endpoints use only `/api/v1/` (ADR-013). All require an authenticated sessio
 2. `abc_reader.read(content)` produces events, or `ABC_UNSUPPORTED`.
 3. The server builds `spoken_text`:
    - **Solfege:** Spanish fixed-do names with "sostenido"/"bemol" and "silencio". Pauses between notes are proportional to duration: break markup for ElevenLabs, punctuation for Edge (DEC-206).
-   - **Tutor:** "Partitura en clave de …, compás de …, dificultad estimada: …", plus the tempo if `Q:` is present.
+   - **Tutor:** "Partitura en clave de …, compás de …, dificultad estimada: …", plus the key (`K:`) and the tempo (`Q:`) when present (DEC-227).
 4. Cache lookup by the primary voice key returns a hit if one exists (no quota used).
 5. On a miss, the quota is checked (`DAILY_LIMIT_REACHED` if 20 are used), then the primary voice synthesizes within `TTS_TIMEOUT`.
 6. On a primary failure (402, 429, 5xx, timeout, network), the fallback is tried:
@@ -275,7 +276,7 @@ The author deletes the comment; `transaction.on_commit` removes the audio file. 
 |---|---|---|
 | `STT_ENGINE` | `whisper` (`fake` in CI) | Transcription engine. |
 | `OPENAI_API_KEY` | — | Whisper. |
-| `VOICE_PRIMARY_ENGINE` | `edge` in development; `elevenlabs` for demos; `fake` in CI | DEC-202 / CONFLICT-ARCH-201. |
+| `VOICE_PRIMARY_ENGINE` | `edge` in development; `elevenlabs` for demos; `fake` in CI and automated tests | DEC-202 as amended by DEC-219. |
 | `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID` | — | Primary voice. |
 | `EDGE_TTS_VOICE` | Spanish neural voice | Fallback voice. |
 | `VOICE_DAILY_LIMIT` | `20` | DEC-213. |
@@ -322,16 +323,16 @@ The author deletes the comment; `transaction.on_commit` removes the audio file. 
 | ADR-011 | Voice comments as an extension of `Comment` (`kind`, `audio`), not a new entity. | One entity to list, delete and authorize (P04 handoff 4). | `Comment` gains nullable fields. | PROPOSAL |
 | ADR-012 | Daily quota as a `VoiceQuota(user, day)` counter incremented only on cache miss. | Cheap, atomic, auditable. | UTC day boundary. Revisit if the team wants a rolling window. | PROPOSAL |
 | ADR-013 | New endpoints only under `/api/v1/`; legacy `/api/` routes frozen (not extended, not removed in MVP 2); new code uses `Reaction`, not `Like`. | Resolves PRE-007 for MVP 2 without a risky cleanup mid-sprint. | Duplication persists. Revisit with a cleanup CR after MVP 2 that removes legacy routes and `Like`. | PROPOSAL |
-| ADR-014 | Threaded Gunicorn workers (2 × 4 threads), worker timeout 75 s, provider timeouts 25 s / 20 s, Nginx read timeout 90 s. | Slow providers cannot block the API; fallback fits inside the worker timeout (20 + 20 < 75). | More concurrent DB connections (8). Revisit after staging measurements (Q-012). | PROPOSAL |
-| ADR-015 | Engine selection by environment (`fake` / `edge` / `elevenlabs`; `fake` / `whisper`). | NFR-010; credits protected (DEC-202). | Real-provider behavior must be checked outside CI. | PROPOSAL; changes DEC-202 for CI (CONFLICT-ARCH-201) |
+| ADR-014 | Threaded Gunicorn workers (2 × 4 threads), worker timeout 75 s, provider timeouts 25 s / 20 s, Nginx read timeout 90 s. | Slow providers cannot block the API; fallback fits inside the worker timeout (20 + 20 < 75). | More concurrent DB connections (8). Revisit after staging measurements (Q-012). | DECISION for initial values (DEC-221); architecture approval pending (TEAM-002) |
+| ADR-015 | Engine selection by environment (`fake` / `edge` / `elevenlabs`; `fake` / `whisper`). | NFR-010; credits protected (DEC-202). | Real-provider behavior must be checked outside CI. | DECISION (DEC-219); architecture approval pending (TEAM-002) |
 
 ## 15. Conflicts with Upstream Artifacts
 
 | ID | Conflict | Sources | Proposed resolution | Status |
 |---|---|---|---|---|
-| CONFLICT-ARCH-201 | DEC-202 makes `edge-tts` the default voice in CI, but `edge-tts` calls an online Microsoft service, so CI would depend on an external provider, against NFR-010. | DEC-202; NFR-010; AC-063 | Use a `fake` engine in CI; keep `edge-tts` as the default in local development. Amend DEC-202 and AC-063 wording ("development") accordingly. | Needs team confirmation |
-| CONFLICT-ARCH-202 | `Comment.body` is limited to 500 characters (as built), but a 30-second Spanish transcription can exceed it. Rejecting a valid recording would be confusing; truncating changes the user's words. | `scores/models.py`; FR-026; DEC-213 | Allow voice-comment transcripts up to 1,000 characters (text comments keep 500), or keep 500 and reject with M-09. Recommendation: 1,000 for `VOICE`. | Needs team decision (new Q-026) |
-| CONFLICT-ARCH-203 | Backlog AC-012-02 mentions a `.wav` file; browsers record `webm`/`ogg` natively. Converting needs FFmpeg. | Backlog AC-012-02; ADR-006 | Store the recorded container as received (whitelisted MIME); `.wav` accepted if sent. | PROPOSAL; low impact |
+| CONFLICT-ARCH-201 | DEC-202 makes `edge-tts` the default voice in CI, but `edge-tts` calls an online Microsoft service, so CI would depend on an external provider, against NFR-010. | DEC-202; NFR-010; AC-063 | Use a `fake` engine in CI; keep `edge-tts` as the default in local development. Amend DEC-202 and AC-063 wording ("development") accordingly. | Resolved by DEC-219 |
+| CONFLICT-ARCH-202 | `Comment.body` is limited to 500 characters (as built), but a 30-second Spanish transcription can exceed it. Rejecting a valid recording would be confusing; truncating changes the user's words. | `scores/models.py`; FR-026; DEC-213 | Allow voice-comment transcripts up to 1,000 characters (text comments keep 500), or keep 500 and reject with M-09. Recommendation: 1,000 for `VOICE`. | Resolved by DEC-220 (1,000 for voice comments) |
+| CONFLICT-ARCH-203 | Backlog AC-012-02 mentions a `.wav` file; browsers record `webm`/`ogg` natively. Converting needs FFmpeg. | Backlog AC-012-02; ADR-006 | Store the recorded container as received (whitelisted MIME); `.wav` accepted if sent. | Resolved by DEC-223 |
 | CONFLICT-ARCH-204 | P04 handoff 5 says piano playback needs "no server calls". ADR-010 delivers events inside the detail response the page already loads, so no additional call happens. | UX_SPEC section 14 | Satisfied; recorded for clarity. | Resolved by design |
 
 ## 16. Risks, Assumptions, and Decisions Needed
@@ -341,7 +342,7 @@ The author deletes the comment; `transaction.on_commit` removes the audio file. 
 | ARCH-RISK-001-004 | MVP 1 risks (stack fit, hosting, comment/registration rules, ABC interpretation). | — | Resolved by delivery (stack, Railway, 500-char comments); ARCH-RISK-004 now applies to the ABC reader subset. |
 | ARCH-RISK-201 | `/data` persistence on Railway unverified. | High for voice comments | PRE-005 before HU12/HU16 in production; S3-compatible fallback (ADR-008). |
 | ARCH-RISK-202 | Provider latency unknown; synchronous calls hold threads. | Medium | Timeouts, threaded workers, staging measurement (Q-012). |
-| ARCH-RISK-203 | Transcription has no quota; repeated dictation could consume OpenAI credits. | Medium | Propose a daily transcription cap (e.g. reuse `VoiceQuota` with a second counter); team decision (Q-027). |
+| ARCH-RISK-203 | Transcription could consume OpenAI credits. | Low | Mitigated by DEC-222 (20 transcriptions per user per day, `VoiceQuota.transcriptions`). |
 | ARCH-RISK-204 | The ABC reader supports a subset; valid MVP 1 scores with chords, tuplets, ties, voices or grace notes get M-03. | Medium | Document the subset; dictation output is always inside it; extend after MVP 2. |
 | ARCH-RISK-205 | Provider data handling (retention, training use) for user audio is not reviewed. | Medium | Team reviews OpenAI terms; M-11 wording (UX-Q-002). |
 | ARCH-RISK-206 | Piano sample licence and size. | Low | Use a CC-licensed sample set with attribution, or fall back to `PolySynth`. |
@@ -349,8 +350,8 @@ The author deletes the comment; `transaction.on_commit` removes the audio file. 
 | ARCH-ASSUM-201 | ElevenLabs accepts pause markup for pacing; `edge-tts` does not accept custom SSML, so punctuation is used. | Medium | Verify in a P06 spike; DEC-206 already allows constant pace. |
 | ARCH-ASSUM-202 | Threaded workers are safe for the current code (no thread-unsafe globals). | Low | Review in P06; tests run under the same config. |
 | ARCH-DECISION-201 | Approve ADR-006-ADR-015. | — | Team / technical lead (TEAM-002). |
-| ARCH-DECISION-202 | Resolve CONFLICT-ARCH-201 and CONFLICT-ARCH-202 (Q-026). | — | Team. |
-| ARCH-DECISION-203 | Transcription cap (Q-027). | — | Team. |
+| ARCH-DECISION-202 | Resolve CONFLICT-ARCH-201 and CONFLICT-ARCH-202. | — | Resolved by DEC-219, DEC-220. |
+| ARCH-DECISION-203 | Transcription cap. | — | Resolved by DEC-222. |
 
 ## 17. Requirement Traceability
 
@@ -367,7 +368,9 @@ The author deletes the comment; `transaction.on_commit` removes the audio file. 
 | FR-040, FR-041 / US-017 / FLOW-019 | Primary→fallback in `VoiceService`; `voice_fallback` log; `AUDIO_UNAVAILABLE`. |
 | FR-042 / US-018 / FLOW-017 | Client download of the MP3 body. |
 | FR-043 | Session auth on all new endpoints. |
-| FR-044 | `VoiceQuota`; `DAILY_LIMIT_REACHED`. |
+| FR-044 | `VoiceQuota.syntheses`; `DAILY_LIMIT_REACHED`. |
+| FR-045 / AC-070, AC-072 | `VoiceQuota.transcriptions`; `TRANSCRIPTION_LIMIT_REACHED` (DEC-222). |
+| FR-046 / AC-071 | `Comment.body` up to 1,000 characters for `VOICE` (DEC-220). |
 | NFR-004-NFR-010 | Section 12. |
 | UX handoff 1-6 | Sections 9 and 10; error codes mapped to M-01-M-16; deletion compatible with SCR-011. |
 | UX-VAL-203 | Timeouts in ADR-014 lead to `STT_UNAVAILABLE`/`AUDIO_UNAVAILABLE` (M-07/M-15). |

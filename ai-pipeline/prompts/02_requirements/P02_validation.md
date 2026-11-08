@@ -1,6 +1,6 @@
 # P02 - Requirements Validation
 
-**Version:** 2.0
+**Version:** 2.1
 **Stage:** P02 - Requirements Engineering
 **Type:** Validation Prompt
 **Project:** Notara
@@ -13,6 +13,7 @@
 |---|---|
 | 1.0 | Validation of the MVP 1 requirements. |
 | 2.0 | Incremental validation for MVP 2: coverage of HU11-HU19, reflection of DEC-201-DEC-218, preservation and superseding of MVP 1 IDs, conflict reporting, `team_backlog` source data allowed while planning fields stay null. |
+| 2.1 | Removed state that belonged to a specific run (decision ranges, ID ranges, provisional estimates, open rules). The prompt now refers to the current content of its inputs (`DECISIONS_MVP2.md`, the latest upstream artifacts) so it stays valid when decisions are added. |
 
 ## 1. Purpose
 
@@ -35,9 +36,9 @@ Severity: `CRITICAL` (blocks planning or contradicts the approved product), `HIG
 
 1. **Structure:** required Markdown sections, change log, superseded-items table; JSON shape and validity.
 2. **MVP 1 preservation:** all MVP 1 IDs present; superseded items marked with the replacing ID and decision; MVP 1 content rules unchanged.
-3. **Coverage:** each HU11-HU19 has FR(s), one US (US-0NN = HU ID), Given/When/Then ACs covering happy path, validation, failure, limits and authorization where relevant.
+3. **Coverage:** each MVP 2 story (HU11 onward) has FR(s), one US (US-0NN = HU ID), Given/When/Then ACs covering happy path, validation, failure, limits and authorization where relevant.
 4. **Fidelity:** each backlog AC is covered or its change is justified by a decision; no story narrowed or widened without a source.
-5. **Decisions:** each DEC-201-DEC-218 with behavioral effect appears in an FR, NFR or BR; decision text not distorted.
+5. **Decisions:** each decision in `DECISIONS_MVP2.md` with behavioral effect appears in an FR, NFR or BR; decision text not distorted; decisions added after a previous run are applied and the change is logged.
 6. **Delegated definitions:** rules P02 had to define (difficulty, vocabulary) are concrete, labeled PROPOSAL and linked to an open question.
 7. **Conflicts:** conflicts between backlog ACs, decisions, MVP 1 rules and existing capabilities are reported, not resolved silently.
 8. **NFRs:** supported by sources; no invented targets; unspecified targets marked REQUIRES_DECISION.
@@ -56,7 +57,7 @@ Severity: `CRITICAL` (blocks planning or contradicts the approved product), `HIG
 ## 3. Structural Validation (3.1 REQUIREMENTS.md, 3.2 product_backlog.json)
 ## 4. MVP 1 Preservation
 ## 5. MVP 2 Coverage and Fidelity (per HU)
-## 6. Decision Reflection (DEC-201-DEC-218)
+## 6. Decision Reflection (all DEC-2NN)
 ## 7. Acceptance Criteria Audit
 ## 8. Business Rules, Edge Cases and Dependencies
 ## 9. Scope and Exclusions

@@ -136,3 +136,33 @@ The as-built baseline was verified against the repository. Every FR-018-FR-044 a
 ## 11. Final Decision
 
 **`PASS_WITH_WARNINGS`.** The architecture addendum may proceed to P06 under the review gates above.
+
+## Addendum — Run 2 (architecture v2.1, prompt v2.1)
+
+**Date:** 2026-11-08 · **Trigger:** decisions DEC-219-DEC-229 · **Validator prompt:** `P05_validation.md` v2.1
+
+**Result:** `PASS_WITH_WARNINGS` (0 HIGH, 2 MEDIUM, 1 LOW) · **P06 readiness:** `YES_WITH_REVIEW_GATES`
+
+### Automated checks
+
+| Check | Result |
+|---|---|
+| Every MVP 2 FR (FR-018-FR-046) and NFR (NFR-004-NFR-010) has a design response | Yes |
+| Conflicts with upstream | None open (CONFLICT-ARCH-201-203 resolved by DEC-219, DEC-220, DEC-223; 204 resolved by design) |
+| UX messages with server outcomes mapped | M-01, M-02, M-03, M-05b, M-06, M-07, M-09, M-10, M-15, M-16, M-17 (M-04, M-08, M-12-M-14 are client-only) |
+| Transcription quota | `VoiceQuota.transcriptions`, `TRANSCRIPTION_LIMIT_REACHED` (DEC-222) |
+| Voice-comment text limit | 1,000 for `VOICE` (DEC-220) |
+| CI engines | `fake` in CI and automated tests (DEC-219) |
+| As-built baseline still accurate | Yes (`Comment.body` 500 in code; Gunicorn without `gthread`) |
+| ADRs still awaiting architect approval | 10 (ADR-006-ADR-015) |
+
+### Status of run 1 findings
+
+| ID | Status |
+|---|---|
+| ARCH-VAL-201 (MEDIUM) | **Reduced, still open** — conflicts resolved by decisions; approval of ADR-006-ADR-015 by TEAM-002 is still pending. |
+| ARCH-VAL-202 (MEDIUM) | **Open** — Railway `/data` persistence not verified (PRE-005). |
+| ARCH-VAL-203 (LOW) | **Resolved** — DEC-224. |
+| ARCH-VAL-204 (LOW) | **Resolved** — DEC-222. |
+| ARCH-VAL-205 (LOW) | **Open** — timeouts accepted as initial values (DEC-221) but not measured. |
+| ARCH-VAL-206 (LOW) | **Resolved** — Q-026 and Q-027 recorded and resolved in `DECISIONS_MVP2.md`. |

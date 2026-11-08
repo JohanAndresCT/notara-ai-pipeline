@@ -1,6 +1,6 @@
 # P02 - Requirements Engineering
 
-**Version:** 2.0
+**Version:** 2.1
 **Stage:** P02 - Requirements Engineering
 **Type:** Generation Prompt
 **Project:** Notara
@@ -14,6 +14,7 @@
 |---|---|
 | 1.0 | Requirements for MVP 1 (HU01-HU10). Audio, voice, OMR excluded. |
 | 2.0 | Incremental mode for MVP 2. HU11-HU19 in scope (CR-001, CR-002). Adds the Sprint 2 backlog and the MVP 2 decision log as inputs (P01 warning DISC-VAL-202). Exclusions on audio and voice apply only to MVP 1 content; OMR and image uploads stay excluded. Team-provided MoSCoW and Story Points are recorded as source data, not as P02 planning. |
+| 2.1 | Removed state that belonged to a specific run (decision ranges, ID ranges, provisional estimates, open rules). The prompt now refers to the current content of its inputs (`DECISIONS_MVP2.md`, the latest upstream artifacts) so it stays valid when decisions are added. |
 
 ## 1. Purpose
 
@@ -26,11 +27,11 @@ This stage defines **what Notara must do and under which conditions**, not how i
 Read before generating:
 
 ```text
-ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md            (v2.1 or later)
+ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md            (latest version)
 ai-pipeline/outputs/01_discovery/PRODUCT_VISION_VALIDATION.md
-ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md             (v2.2 or later)
+ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md             (latest version)
 ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md      (HU11-HU19, AC-0NN-0N)
-ai-pipeline/outputs/00_context/DECISIONS_MVP2.md              (DEC-201-DEC-218)
+ai-pipeline/outputs/00_context/DECISIONS_MVP2.md              (all DEC-2NN, every batch)
 ai-pipeline/outputs/02_requirements/REQUIREMENTS.md           (previous version, MVP 1)
 ai-pipeline/outputs/02_requirements/product_backlog.json      (previous version, MVP 1)
 ai-pipeline/prompts/system/SYSTEM_PROMPT.md
@@ -61,7 +62,7 @@ You must not invent musical rules, roles, moderation, account recovery, performa
 
 - **Users:** USER-001-USER-003; no differentiated roles.
 - **MVP 1 content rules** (unchanged): `.abc` and plain text; non-empty; at most 1,000 characters; basic ABC validation (`X:`, `T:`, `M:`, `L:`, `K:` and a musical line); free plain text; line breaks and format shown; title, instrument, description and content required.
-- **MVP 2 capabilities:** HU11 dictation, HU12 voice comments, HU13 spoken solfege, HU14 audio tutor, HU15 instrument playback, HU16 audio cache, HU17 voice fallback, HU18 MP3 download, HU19 `.abc` file loading, as refined by DEC-201-DEC-218.
+- **MVP 2 capabilities:** HU11 dictation, HU12 voice comments, HU13 spoken solfege, HU14 audio tutor, HU15 instrument playback, HU16 audio cache, HU17 voice fallback, HU18 MP3 download, HU19 `.abc` file loading, as refined by every decision in `DECISIONS_MVP2.md`.
 - **Excluded:** OMR, image uploads, differentiated roles, sung solfege, mixed voice+instrument MP3, server-side instrument synthesis, storing loaded files, languages other than Spanish.
 
 ## 6. Classification
@@ -85,7 +86,7 @@ Final status: `READY`, `READY_WITH_ASSUMPTIONS`, `BLOCKED`.
 
 ## 8. Boundary
 
-Do not specify languages, frameworks, endpoints, schemas, storage layout, infrastructure, screen layouts or test automation. Decisions that name a provider (DEC-201-DEC-203) may be cited as constraints, not designed.
+Do not specify languages, frameworks, endpoints, schemas, storage layout, infrastructure, screen layouts or test automation. Decisions that name a provider may be cited as constraints, not designed.
 
 ## 9. Outputs
 
@@ -112,7 +113,7 @@ Valid JSON with the version 1.0 shape (`backlog_metadata`, `epics`, `items`). Ea
 - Inputs read; P01 status respected.
 - MVP 1 IDs preserved; superseded items marked.
 - HU11-HU19 each covered by at least one FR, one US and testable ACs.
-- Every DEC-201-DEC-218 that affects behavior is reflected in an FR, NFR or BR.
+- Every decision in `DECISIONS_MVP2.md` that affects behavior is reflected in an FR, NFR or BR.
 - Conflicts between backlog ACs, decisions and MVP 1 rules are reported.
 - Delegated definitions written as PROPOSAL with a question.
 - No technology design or planning values.

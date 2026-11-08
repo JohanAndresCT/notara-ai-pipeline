@@ -208,3 +208,14 @@ P03 readiness: READY_WITH_ASSUMPTIONS.
 ## Post-validación
 
 REQ-VAL-202 y REQ-VAL-203 corregidas aguas arriba (P00 v2.3, P01 v2.2). CONFLICT-202 y CONFLICT-204 en REQUIREMENTS.md marcados como corregidos/sincronizados. El informe de validación P02 se conserva tal como se emitió.
+
+## MVP 2 — Actualización por decisiones DEC-219..DEC-229 (v3.1)
+
+REQUIREMENTS.md y product_backlog.json → v3.1: BR-013, BR-014, BR-025 aprobadas como versión inicial; Q-021..Q-025 resueltas;
+FR-045 (20 transcripciones/día), FR-046 (transcripción de voz hasta 1.000), BR-029, BR-030; AC-029, AC-049, AC-063 reformulados;
+AC-070..AC-072 nuevos (72 AC). Verificación automática: sin duplicados ni referencias rotas; Markdown y JSON coinciden.
+Hallazgos resueltos: REQ-VAL-201 (reglas aprobadas). El informe de validación se conserva tal como se emitió.
+
+## Re-validación (run 2) — prompts v2.1
+
+Prompts P02 v2.1: sin estado fijo de una ejecución (rangos DEC, versiones). Validación sobre requisitos v3.1: PASS_WITH_WARNINGS (0 HIGH, 0 MEDIUM, 2 LOW: REQ-VAL-205, REQ-VAL-206). REQ-VAL-201..204 resueltos.

@@ -1,7 +1,7 @@
 {
   "backlog_metadata": {
     "project": "Notara",
-    "version": "3.0",
+    "version": "3.1",
     "stage": "P02",
     "status": "READY_WITH_ASSUMPTIONS",
     "source": "ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md (v2.1)",
@@ -16,7 +16,7 @@
       "CR-001",
       "CR-002"
     ],
-    "notes": "MVP 1 items US-001-US-010 preserved; US-010 amended by DEC-211 (AC-028 superseded by AC-029). Planning fields stay null; team MoSCoW and Story Points are recorded under traceability.team_backlog as source data."
+    "notes": "MVP 1 items US-001-US-010 preserved; US-010 amended by DEC-211 (AC-028 superseded by AC-029). Planning fields stay null; team MoSCoW and Story Points are recorded under traceability.team_backlog as source data. v3.1: DEC-219-DEC-229 applied (AC-029, AC-049, AC-063 reworded; AC-070-AC-072 added; FR-045, FR-046; BR-029, BR-030)."
   },
   "epics": [
     {
@@ -680,9 +680,9 @@
         {
           "id": "AC-029",
           "given": "an authenticated user authored a comment",
-          "when": "they delete it",
+          "when": "they confirm its deletion",
           "then": "the comment, and its audio if it is a voice comment, is no longer available; other users cannot delete it",
-          "source": "DEC-211 (added in v3.0)"
+          "source": "DEC-211 (added in v3.0); confirmation DEC-225 (v3.1)"
         }
       ],
       "business_rule_ids": [
@@ -712,7 +712,8 @@
           "HU10"
         ],
         "decision_ids": [
-          "DEC-211"
+          "DEC-211",
+          "DEC-225"
         ]
       }
     },
@@ -728,7 +729,8 @@
         "FR-025",
         "FR-029",
         "FR-030",
-        "FR-043"
+        "FR-043",
+        "FR-045"
       ],
       "user_story": {
         "as_a": "music student or music teacher",
@@ -785,6 +787,13 @@
           "when": "the user publishes",
           "then": "the MVP 1 publication rules are applied",
           "source": "DEC-218; FR-025"
+        },
+        {
+          "id": "AC-070",
+          "given": "a user has made 20 transcriptions today",
+          "when": "they try to dictate again",
+          "then": "no transcription is made, a clear message is shown and they can still type the content",
+          "source": "DEC-222; FR-045"
         }
       ],
       "business_rule_ids": [
@@ -838,7 +847,9 @@
           "DEC-213",
           "DEC-214",
           "DEC-215",
-          "DEC-218"
+          "DEC-218",
+          "DEC-222",
+          "DEC-229"
         ],
         "team_backlog": {
           "moscow": "Must",
@@ -860,7 +871,9 @@
         "FR-028",
         "FR-029",
         "FR-030",
-        "FR-043"
+        "FR-043",
+        "FR-045",
+        "FR-046"
       ],
       "user_story": {
         "as_a": "member of the Notara community",
@@ -910,6 +923,20 @@
           "when": "deletion completes",
           "then": "the comment and its audio are no longer available",
           "source": "DEC-211, DEC-214"
+        },
+        {
+          "id": "AC-071",
+          "given": "a voice comment's transcription is longer than 500 characters and at most 1,000",
+          "when": "it is published",
+          "then": "the full text is stored and shown without truncation",
+          "source": "DEC-220; FR-046"
+        },
+        {
+          "id": "AC-072",
+          "given": "a user has made 20 transcriptions today",
+          "when": "they try to send a voice comment",
+          "then": "it is not transcribed, a clear message is shown and they can still write a text comment",
+          "source": "DEC-222; FR-045"
         }
       ],
       "business_rule_ids": [
@@ -917,7 +944,9 @@
         "BR-018",
         "BR-019",
         "BR-022",
-        "BR-027"
+        "BR-027",
+        "BR-029",
+        "BR-030"
       ],
       "edge_case_ids": [
         "EDGE-014",
@@ -960,7 +989,10 @@
           "DEC-211",
           "DEC-213",
           "DEC-214",
-          "DEC-215"
+          "DEC-215",
+          "DEC-220",
+          "DEC-222",
+          "DEC-223"
         ],
         "team_backlog": {
           "moscow": "Should",
@@ -1103,7 +1135,7 @@
           "id": "AC-049",
           "given": "an authenticated user views a score with valid ABC",
           "when": "they press \"Tutor Auditivo\"",
-          "then": "a spoken locution states the clef, the meter and the estimated difficulty (e.g. \"Partitura en clave de Sol, compas de 4/4, dificultad estimada: media\")",
+          "then": "a spoken locution states the clef, the meter and the estimated difficulty, plus the key and the tempo when the ABC defines them (DEC-227) (e.g. \"Partitura en clave de Sol, compas de 4/4, dificultad estimada: media\")",
           "source": "AC-014-01; DEC-212; BR-028"
         },
         {
@@ -1165,7 +1197,9 @@
           "DEC-207",
           "DEC-212",
           "DEC-213",
-          "DEC-215"
+          "DEC-215",
+          "DEC-227",
+          "DEC-229"
         ],
         "team_backlog": {
           "moscow": "Should",
@@ -1381,10 +1415,10 @@
         },
         {
           "id": "AC-063",
-          "given": "the platform runs in development or automated testing",
+          "given": "the platform runs in local development",
           "when": "audio is requested",
-          "then": "the fallback voice is used by default",
-          "source": "DEC-202; NFR-006"
+          "then": "the free fallback voice is used by default; in automated testing a fake engine is used",
+          "source": "DEC-202 as amended by DEC-219; NFR-006, NFR-010"
         }
       ],
       "business_rule_ids": [
@@ -1419,7 +1453,8 @@
         "decision_ids": [
           "DEC-202",
           "DEC-209",
-          "DEC-216"
+          "DEC-216",
+          "DEC-219"
         ],
         "team_backlog": {
           "moscow": "Should",

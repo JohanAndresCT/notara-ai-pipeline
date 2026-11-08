@@ -89,3 +89,12 @@ Resultado: UX_SPEC.md v2.0 — READY_WITH_ASSUMPTIONS.
 
 P05 readiness: WITH CONSTRAINTS.
 
+## MVP 2 — Actualización por decisiones DEC-219..DEC-229 (v2.1)
+
+UX-PROP-001..007 aprobadas (DEC-225); M-11 nombra a OpenAI (DEC-226); tutor con tonalidad y tempo (DEC-227);
+UX-Q-001..003 resueltas; nuevo mensaje M-17 (límite de transcripciones, DEC-222); FR-045/FR-046 y AC-070..AC-072 trazados.
+Hallazgos resueltos: UX-VAL-201, UX-VAL-202, UX-VAL-205.
+
+## Re-validación (run 2) — prompts v2.1
+
+Prompts P04 v2.1. Validación sobre UX v2.1: PASS_WITH_WARNINGS (0 MEDIUM, 1 LOW: UX-VAL-203 sin opción de cancelar). P05 readiness: YES.

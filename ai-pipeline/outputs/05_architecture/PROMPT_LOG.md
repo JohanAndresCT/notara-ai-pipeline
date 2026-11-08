@@ -78,3 +78,13 @@ Resultado: ARCHITECTURE.md v2.0 — READY_WITH_WARNINGS.
 
 P06 readiness: YES_WITH_REVIEW_GATES (grupos 1a, 1b y 2 pueden empezar).
 
+## MVP 2 — Actualización por decisiones DEC-219..DEC-229 (v2.1)
+
+CONFLICT-ARCH-201..203 resueltos (DEC-219, DEC-220, DEC-223); timeouts iniciales aceptados (DEC-221);
+VoiceQuota con contador de transcripciones y código TRANSCRIPTION_LIMIT_REACHED (DEC-222); texto del tutor en cabecera (DEC-224).
+Hallazgos resueltos: ARCH-VAL-203, ARCH-VAL-204, ARCH-VAL-206 y la parte de conflictos de ARCH-VAL-201.
+Siguen: aprobación de ADR-006..ADR-015 por TEAM-002 y verificación de Railway (ARCH-VAL-202).
+
+## Re-validación (run 2) — prompts v2.1
+
+Prompts P05 v2.1. Validación sobre arquitectura v2.1: PASS_WITH_WARNINGS (2 MEDIUM: aprobación de ADRs por TEAM-002 y verificación de Railway; 1 LOW: timeouts sin medir). P06 readiness: YES_WITH_REVIEW_GATES.

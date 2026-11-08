@@ -149,3 +149,31 @@ All US, FR, NFR and PRE references resolve (automated check). Markdown and JSON 
 ## 11. Final Decision
 
 **`PASS_WITH_WARNINGS`.** The plan may proceed to P04 - UX/UI. Track PLAN-VAL-201 to PLAN-VAL-205, and update the plan with dates, owners and re-estimates when PRE-002, PRE-003 and PRE-006 close.
+
+## Addendum — Run 2 (planning v2.1, prompt v2.1)
+
+**Date:** 2026-11-08 · **Trigger:** decisions DEC-219-DEC-229 and requirements v3.1 · **Validator prompt:** `P03_validation.md` v2.1
+
+**Result:** `PASS_WITH_WARNINGS` (0 HIGH, 1 MEDIUM, 3 LOW) · **P04 readiness:** WITH CONSTRAINTS
+
+### Automated checks
+
+| Check | Result |
+|---|---|
+| Story Points total / P0 / P1 / P2 (recomputed from JSON) | 31 / 21 / 8 / 2 |
+| Provisional estimates | None. No rule behind any estimate is still PROPOSAL in requirements v3.1. |
+| Requirement IDs in planned JSON = P02 | Yes |
+| Acceptance-criteria IDs in planned JSON = P02 | **Found mismatch** (AC-070-AC-072 missing) and **corrected during this run** (PLAN-VAL-206) |
+| Developers assigned | None |
+| Preconditions | Resolved: PRE-002, PRE-003, PRE-008; initial limits: PRE-009. Open: PRE-001, PRE-004, PRE-005, PRE-006, PRE-007, PRE-010. |
+
+### Findings
+
+| ID | Severity | Status |
+|---|---|---|
+| PLAN-VAL-201 | MEDIUM | **Reduced, still open** — estimates are no longer provisional, but the plan is not a sprint commitment until ratification (PRE-001), keys and budget (PRE-004), storage (PRE-005) and dates and owners (PRE-006) are settled. |
+| PLAN-VAL-202 | LOW | Open — US-019 early in the sequence does not mean higher priority. |
+| PLAN-VAL-203 | LOW | Open — US-012 → US-011 dependency remains ASSUMED. |
+| PLAN-VAL-204 | LOW | Open — PRE-007 handled by P05 ADR-013 (pending TEAM-002 approval). |
+| PLAN-VAL-205 | LOW | Resolved earlier (paths). |
+| PLAN-VAL-206 | LOW | **New, corrected** — the planned backlog lacked AC-070-AC-072 after requirements v3.1; synchronized with P02 in this run. |

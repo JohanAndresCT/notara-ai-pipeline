@@ -1,6 +1,6 @@
 # P05 - Software Architecture Design
 
-**Version:** 2.0
+**Version:** 2.1
 **Stage:** P05 - Architecture
 **Type:** Generation Prompt
 **Project:** Notara
@@ -13,20 +13,21 @@
 | Version | Change |
 |---|---|
 | 1.0 | Architecture proposal for MVP 1 before implementation. |
-| 2.0 | Incremental mode for MVP 2. The delivered MVP 1 code and deployment are the baseline ("as built"); MVP 2 is designed as an addendum with ADRs for external voice services, audio storage, synchronous processing limits, usage quotas and the ABC reader. External services are allowed only as decided in DEC-201-DEC-203. |
+| 2.0 | Incremental mode for MVP 2. The delivered MVP 1 code and deployment are the baseline ("as built"); MVP 2 is designed as an addendum with ADRs for external voice services, audio storage, synchronous processing limits, usage quotas and the ABC reader. External services are allowed only as decided in `DECISIONS_MVP2.md`. |
+| 2.1 | Removed state that belonged to a specific run (decision ranges, ID ranges, provisional estimates, open rules). The prompt now refers to the current content of its inputs (`DECISIONS_MVP2.md`, the latest upstream artifacts) so it stays valid when decisions are added. |
 
 ## 1. Purpose
 
-Design the smallest maintainable architecture change that lets the delivered Notara system satisfy the MVP 2 requirements (FR-018-FR-044, NFR-004-NFR-010), the plan (P03) and the UX handoff (P04 section 14), and record it as an addendum to the MVP 1 architecture.
+Design the smallest maintainable architecture change that lets the delivered Notara system satisfy the MVP 2 requirements (every MVP 2 FR and NFR in the latest `REQUIREMENTS.md`), the plan (P03) and the UX handoff (P04 section 14), and record it as an addendum to the MVP 1 architecture.
 
 The result is a proposal for human review. It does not claim code exists.
 
 ## 2. Inputs
 
 ```text
-ai-pipeline/outputs/02_requirements/REQUIREMENTS.md (v3.0) and validation
-ai-pipeline/outputs/03_planning/PRIORITIZATION.md (v2.0) and validation (PRE-001-PRE-010)
-ai-pipeline/outputs/04_ux/UX_SPEC.md (v2.0) and validation (handoff needs, UX-VAL-203)
+ai-pipeline/outputs/02_requirements/REQUIREMENTS.md (latest) and validation
+ai-pipeline/outputs/03_planning/PRIORITIZATION.md (latest) and validation (open preconditions)
+ai-pipeline/outputs/04_ux/UX_SPEC.md (latest) and validation (handoff needs and findings)
 ai-pipeline/outputs/00_context/DECISIONS_MVP2.md
 ai-pipeline/outputs/05_architecture/ARCHITECTURE.md (v1.0)
 Repository: backend/, frontend/, Dockerfile, docker/, deploy/, .github/workflows/
@@ -44,7 +45,7 @@ You must not add product capabilities, add microservices, queues or providers be
 ## 4. Process
 
 1. **As-built baseline:** summarize the delivered stack, modules, API style, storage, deployment, workers and timeouts, and the deviations from v1.0.
-2. **Drivers:** extract MVP 2 functional drivers, the UX handoff needs, decisions, NFRs and P03 preconditions that are technical (PRE-005, PRE-007, PRE-009).
+2. **Drivers:** extract MVP 2 functional drivers, the UX handoff needs, decisions, NFRs and P03 preconditions that are technical and still open.
 3. **Context:** update the system context with the external voice services and trust boundaries.
 4. **Decisions:** record ADRs for provider integration, processing model (synchronous vs. asynchronous), audio storage and serving, cache, quotas, ABC reading for solfege/tutor/piano, voice comments, API versioning, runtime and timeouts, configuration and testing.
 5. **Components, data, interfaces:** describe new modules, model changes, endpoints, request/response outcomes and error codes that the UX messages need.
@@ -64,10 +65,10 @@ You must not add product capabilities, add microservices, queues or providers be
 
 ## 7. Self-review
 
-- Every FR-018-FR-044 and NFR-004-NFR-010 has a design response.
+- Every MVP 2 FR and NFR in the latest requirements has a design response.
 - Every P04 handoff need is satisfied or a conflict is reported.
 - External services limited to decided ones; keys server-side only.
-- Error outcomes allow the UX messages (M-01-M-16) without server errors.
+- Error outcomes allow every UX message in the latest `UX_SPEC.md` catalogue without server errors.
 - Personal-data lifecycle (DEC-214) and quotas (DEC-213) are enforced server-side.
 - Deployment changes needed (workers, timeouts, env vars, storage) are explicit.
 - No quantitative targets invented; unknowns visible.

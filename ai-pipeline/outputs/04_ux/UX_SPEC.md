@@ -6,11 +6,12 @@
 |---|---|---|
 | 1.0 | MVP 1 | Screens SCR-001-SCR-009 and flows FLOW-001-FLOW-010 for HU01-HU10. Status READY; validation PASS. |
 | 2.0 | MVP 2 | Adds regions REG-001-REG-008 and dialogs SCR-010-SCR-011 to existing screens; flows FLOW-011-FLOW-019 for HU11-HU19; FLOW-010 amended for comment deletion (DEC-211); interaction states, message catalogue, accessibility rules and UX proposals. Corrects AC references of FLOW-008-FLOW-010 from version 1.0. |
+| 2.1 | MVP 2 | Second decision batch: UX-PROP-001-007 approved (DEC-225); M-11 names OpenAI (DEC-226); tutor adds key and tempo when defined (DEC-227); dictation vocabulary approved as initial version (DEC-229); new message M-17 for the daily transcription limit (DEC-222). |
 
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 2.0
+- **Version:** 2.1
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P04 - UX/UI
 - **Status:** `READY_WITH_ASSUMPTIONS`
@@ -83,6 +84,8 @@ HU16 (audio store) and HU17 (fallback voice) have no UI. Their only UX effect is
 | FR-042 | USER_FACING | MP3 download control. | HU18 |
 | FR-043 | UX_SUPPORTING | Audio regions require authentication. | DEC-213 |
 | FR-044 | USER_FACING | Daily-limit message. | DEC-213 |
+| FR-045 | USER_FACING | Daily transcription-limit message (M-17). | DEC-222 |
+| FR-046 | USER_FACING | Voice-comment transcript shown in full (up to 1,000 characters). | DEC-220 |
 | NFR-004 | UX_CONSTRAINT | Notice wording; no "saved recordings" UI for dictation. | DEC-214 |
 | NFR-005 | UX_CONSTRAINT | Audio failure never blocks typing, publishing or reading. | PRINCIPLE-008 |
 | NFR-006 | NON_UX | Cost control. | DEC-202 |
@@ -212,6 +215,7 @@ MVP 1 navigation is unchanged: `SCR-001 -> SCR-002 or SCR-003 -> SCR-004 -> SCR-
   - **Permission denied, no microphone or insecure context:** M-04; the rest of the form keeps working (AC-035).
   - **Result would exceed 1,000 characters:** M-06; content unchanged (EDGE-017).
   - **Transcription service unavailable:** M-07; the user can type instead (EDGE-018).
+  - **Daily transcription limit reached:** M-17 (AC-070, DEC-222).
   - **Recording over 2 MB:** M-05b (AC-034).
   - **Plain-text format with content:** "Dictar" is disabled with the visible hint M-13 (UX-PROP-001).
 - **Traceability:** US-011; FR-018..FR-021, FR-025, FR-029, FR-030, FR-043; AC-030..AC-036; DEC-205, DEC-213-DEC-215, DEC-218.
@@ -241,11 +245,11 @@ MVP 1 navigation is unchanged: `SCR-001 -> SCR-002 or SCR-003 -> SCR-004 -> SCR-
   1. Activate. Recording starts with the 0:30 countdown and "Detener".
   2. Review: duration shown, "Escuchar" preview (UX-PROP-003), "Enviar" and "Descartar".
   3. "Enviar" shows the processing state "Transcribiendo…".
-  4. The comment appears in the list as REG-006 (transcribed text plus play control).
+  4. The comment appears in the list as REG-006 (transcribed text plus play control). The full transcript is shown, up to 1,000 characters, without truncation (AC-071, DEC-220).
 - **Alternatives/errors:**
   - **Transcription fails or is empty:** M-09; nothing is published; options "Reintentar" or "Escribir comentario" (AC-039).
   - **Permission denied:** M-04.
-  - **Limits:** M-05 and M-05b.
+  - **Limits:** M-05 and M-05b; daily transcription limit M-17 (AC-072).
   - **Own score:** REG-005 is not shown (AC-040).
   - **Unauthenticated:** not shown (AC-041).
 - **Traceability:** US-012; FR-026..FR-030, FR-043; AC-037..AC-042; DEC-201, DEC-211, DEC-213, DEC-214.
@@ -268,7 +272,7 @@ MVP 1 navigation is unchanged: `SCR-001 -> SCR-002 or SCR-003 -> SCR-004 -> SCR-
 
 #### FLOW-015 - Listen to the Audio Tutor (HU14, P1)
 
-- **Main path:** press "Tutor Auditivo". After the processing state "Preparando explicación…", the spoken summary plays automatically in REG-004 (clef, meter, "dificultad estimada"). The same summary is shown as text under the player (UX-PROP-005).
+- **Main path:** press "Tutor Auditivo". After the processing state "Preparando explicación…", the spoken summary plays automatically in REG-004 (clef, meter, "dificultad estimada", and key and tempo when the ABC defines them, DEC-227). The same summary is shown as text under the player (UX-PROP-005).
 - **Alternatives/errors:** as FLOW-014 (M-02, M-03, M-10, M-15).
 - **Traceability:** US-014; FR-033, FR-034, FR-036, FR-037, FR-044; AC-049..AC-051; DEC-212; BR-014, BR-028.
 
@@ -392,7 +396,8 @@ Only one audio plays at a time. Starting a new playback stops the previous one (
 | M-08d | El archivo supera los 1.000 caracteres. | REG-002 | UX-PROP |
 | M-09 | No se pudo transcribir tu comentario. Puedes intentarlo de nuevo o escribirlo. | REG-005 | UX-PROP (EDGE-030) |
 | M-10 | Alcanzaste el límite diario de 20 audios nuevos. Los audios ya generados siguen disponibles. | REG-003 | UX-PROP (DEC-213) |
-| M-11 | Tu audio se enviará a un servicio externo para transcribirlo y no se guardará después de la transcripción. *(For voice comments: "Tu audio se enviará a un servicio externo para transcribirlo y se publicará junto con el texto.")* | REG-008 | UX-PROP (DEC-214); see UX-Q-002 |
+| M-11 | Tu audio se enviará a un servicio externo (OpenAI) para transcribirlo y no se guardará después de la transcripción. *(For voice comments: "Tu audio se enviará a un servicio externo (OpenAI) para transcribirlo y se publicará junto con el texto.")* | REG-008 | DECISION (DEC-214, DEC-226) |
+| M-17 | Alcanzaste el límite diario de 20 transcripciones. Puedes escribir el contenido. | REG-001, REG-005 | UX-PROP (DEC-222) |
 | M-12 | Dictado insertado. Revísalo antes de publicar. | REG-001 | UX-PROP |
 | M-13 | El dictado genera notación ABC. Cambia el formato a ABC o vacía el campo para dictar. | REG-001 disabled | UX-PROP-001 |
 | M-14 | Archivo cargado. Revísalo antes de publicar. | REG-002 | UX-PROP |
@@ -405,17 +410,17 @@ No screens or controls for OMR, image uploads, roles, account recovery, comment 
 
 ## 12. UX Proposals, Assumptions and Open Questions
 
-### UX Proposals (pending approval)
+### UX Proposals (approved by DEC-225)
 
-| ID | Proposal | Reason | Affects |
-|---|---|---|---|
-| UX-PROP-001 | Disable "Dictar" when the format is plain text and the field has content (M-13). | Avoid mixing ABC with plain text; dictation always produces ABC. | FLOW-011 |
-| UX-PROP-002 | Only one audio plays at a time. | Avoid overlapping solfege, piano and comments. | REG-004 |
-| UX-PROP-003 | Voice comments can be previewed before sending. | Backlog requires a confirmation step (AC-012-01); preview makes it meaningful. | FLOW-013 |
-| UX-PROP-004 | Disable an audio button while its request is processing. | Prevent duplicate syntheses that count toward the limit. | FLOW-014, FLOW-015 |
-| UX-PROP-005 | Show the tutor locution also as text. | Accessibility; the content is short. | FLOW-015 |
-| UX-PROP-006 | Confirm before deleting an own comment (SCR-011). | Delivered MVP 1 code deletes immediately; voice-comment audio deletion is irreversible. | FLOW-010 |
-| UX-PROP-007 | Enable "Descargar MP3" only after the solfege has been generated in the view (M-16). | Matches AC-064 ("ya fue sintetizada") and avoids a hidden extra synthesis. | FLOW-017 |
+| ID | Proposal | Reason | Affects | Status |
+|---|---|---|---|---|
+| UX-PROP-001 | Disable "Dictar" when the format is plain text and the field has content (M-13). | Avoid mixing ABC with plain text; dictation always produces ABC. | FLOW-011 | Approved (DEC-225) |
+| UX-PROP-002 | Only one audio plays at a time. | Avoid overlapping solfege, piano and comments. | REG-004 | Approved (DEC-225) |
+| UX-PROP-003 | Voice comments can be previewed before sending. | Backlog requires a confirmation step (AC-012-01); preview makes it meaningful. | FLOW-013 | Approved (DEC-225) |
+| UX-PROP-004 | Disable an audio button while its request is processing. | Prevent duplicate syntheses that count toward the limit. | FLOW-014, FLOW-015 | Approved (DEC-225) |
+| UX-PROP-005 | Show the tutor locution also as text. | Accessibility; the content is short. | FLOW-015 | Approved (DEC-225) |
+| UX-PROP-006 | Confirm before deleting an own comment (SCR-011). | Delivered MVP 1 code deletes immediately; voice-comment audio deletion is irreversible. | FLOW-010 | Approved (DEC-225) |
+| UX-PROP-007 | Enable "Descargar MP3" only after the solfege has been generated in the view (M-16). | Matches AC-064 ("ya fue sintetizada") and avoids a hidden extra synthesis. | FLOW-017 | Approved (DEC-225) |
 
 ### Assumptions
 
@@ -430,9 +435,9 @@ No screens or controls for OMR, image uploads, roles, account recovery, comment 
 
 | ID | Question | Affects | Status |
 |---|---|---|---|
-| UX-Q-001 | BR-013 vocabulary and BR-025 header completion are PROPOSAL (P02 Q-021, Q-023); the vocabulary help text depends on them. | REG-008, FLOW-011 | Open (PRE-002) |
-| UX-Q-002 | Should M-11 name the provider (OpenAI) for transparency, or keep "servicio externo"? | M-11 | Open |
-| UX-Q-003 | Tutor content: clef, meter and difficulty only, or also key and tempo (P02 Q-025)? | FLOW-015 | Open (PRE-003) |
+| UX-Q-001 | BR-013 vocabulary and BR-025 header completion are PROPOSAL (P02 Q-021, Q-023); the vocabulary help text depends on them. | REG-008, FLOW-011 | Resolved by DEC-229 (initial version) |
+| UX-Q-002 | Should M-11 name the provider (OpenAI) for transparency, or keep "servicio externo"? | M-11 | Resolved by DEC-226 (names OpenAI) |
+| UX-Q-003 | Tutor content: clef, meter and difficulty only, or also key and tempo (P02 Q-025)? | FLOW-015 | Resolved by DEC-227 |
 
 ## 13. Requirements and MVP Coverage Matrix
 
@@ -440,8 +445,8 @@ No screens or controls for OMR, image uploads, roles, account recovery, comment 
 |---|---|---|---|---|
 | HU01-HU09 / FR-001..FR-015 | FLOW-001..FLOW-009 | SCR-001..SCR-009 | Delivered | COVERED (v1.0) |
 | HU10 / FR-016, FR-028 | FLOW-010 | SCR-005, REG-007, SCR-011 | Delivered + amended | COVERED |
-| HU11 / FR-018..FR-021, FR-025, FR-029, FR-030 | FLOW-011, FLOW-018 | SCR-006/007, REG-001, REG-008 | P0 | COVERED |
-| HU12 / FR-026..FR-030 | FLOW-013, FLOW-018 | SCR-005, REG-005, REG-006, REG-007 | P1 | COVERED |
+| HU11 / FR-018..FR-021, FR-025, FR-029, FR-030, FR-045 | FLOW-011, FLOW-018 | SCR-006/007, REG-001, REG-008 | P0 | COVERED |
+| HU12 / FR-026..FR-030, FR-045, FR-046 | FLOW-013, FLOW-018 | SCR-005, REG-005, REG-006, REG-007 | P1 | COVERED |
 | HU13 / FR-031..FR-033, FR-036, FR-037, FR-044 | FLOW-014 | SCR-005, REG-003, REG-004 | P0 | COVERED |
 | HU14 / FR-033, FR-034 | FLOW-015 | SCR-005, REG-003, REG-004 | P1 | COVERED |
 | HU15 / FR-035 | FLOW-016 | SCR-005, REG-003 | P0 | COVERED |
@@ -470,6 +475,6 @@ P05 must not infer layouts from this specification.
 
 ## 15. Status and Next Actions
 
-- **Status:** `READY_WITH_ASSUMPTIONS`. Seven UX-PROP items and three open questions remain. Two of the questions depend on upstream PROPOSAL rules (PRE-002, PRE-003).
+- **Status:** `READY_WITH_ASSUMPTIONS`. The UX proposals and questions are resolved by DEC-225-DEC-229; the remaining assumptions are UX-ASSUM-001-004 and team ratification (Q-020).
 - **Next stage:** P05 - Architecture.
 - **Next actions:** validate with `P04_validation.md` v2.0; take UX-PROP-001-007 and UX-Q-001-003 to the team together with PRE-001-PRE-003.

@@ -1,6 +1,6 @@
 # P03 - Prioritization and Delivery Planning Validation
 
-**Version:** 2.0
+**Version:** 2.1
 **Stage:** P03 - Planning
 **Type:** Validation Prompt
 **Project:** Notara
@@ -13,6 +13,7 @@
 |---|---|
 | 1.0 | Validation of the MVP 1 plan. |
 | 2.0 | Incremental validation for MVP 2: team SP/MoSCoW/release/sprint allowed as approved sources; checks HU11-HU19 priorities, totals, provisional estimates, dependency order, external-dependency risk, cut line, preconditions and JSON consistency. |
+| 2.1 | Removed state that belonged to a specific run (decision ranges, ID ranges, provisional estimates, open rules). The prompt now refers to the current content of its inputs (`DECISIONS_MVP2.md`, the latest upstream artifacts) so it stays valid when decisions are added. |
 
 ## 1. Purpose
 
@@ -27,8 +28,8 @@ Act as a **P03 Prioritization Validator**. Do not edit inputs, reprioritize, or 
 1. **Inputs:** P00-P02 artifacts present; P02 result `PASS`/`PASS_WITH_WARNINGS`; P02 findings that affect planning carried.
 2. **Structure:** sections of P03 v2.0 present (including Capacity and Cut Line, Preconditions, Change Log).
 3. **MVP 1 baseline:** HU01-HU10 marked delivered; DEC-002 shown as superseded by DEC-211.
-4. **Priorities:** each HU11-HU19 has priority and rationale grounded in value, dependency, risk, feasibility or opportunity cost; MoSCoW deviations justified.
-5. **Estimates:** SP match the team source and decisions; totals correct (31 / Must 21 / Should 8 / Could 2); provisional estimates flagged (US-011, US-014).
+4. **Priorities:** each MVP 2 story has priority and rationale grounded in value, dependency, risk, feasibility or opportunity cost; MoSCoW deviations justified.
+5. **Estimates:** SP match the team source and decisions; totals recomputed and correct; an estimate is flagged provisional if and only if a rule it depends on is still PROPOSAL in the latest requirements.
 6. **Sequence:** respects DEP-004-DEP-010; high-uncertainty and externally dependent work handled explicitly; work without external dependency identified.
 7. **Cut line:** committed vs. target vs. stretch, drop order, P0 never dropped.
 8. **Preconditions:** team decisions and verifications listed with the stage that needs them.

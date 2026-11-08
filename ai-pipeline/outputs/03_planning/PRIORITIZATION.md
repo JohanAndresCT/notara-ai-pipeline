@@ -6,11 +6,12 @@
 |---|---|---|
 | 1.0 | MVP 1 | Priorities for HU01-HU10; status READY; delivered as tag `v1.0.0`. |
 | 2.0 | MVP 2 | Incremental plan for HU11-HU19 (US-011-US-019): priorities, delivery groups, team Story Points (31 SP), capacity cut line, drop order and preconditions. MVP 1 kept as delivered baseline; P03 DEC-002 superseded by DEC-211. |
+| 2.1 | MVP 2 | Second decision batch (DEC-219-DEC-229): PRE-002, PRE-003 and PRE-008 resolved; PRE-009 has initial limits (DEC-221); US-011 and US-014 estimates no longer depend on unapproved rules (team estimates stand; confirm at sprint planning). |
 
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 2.0
+- **Version:** 2.1
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P03 - Planning
 - **Status:** `READY_WITH_ASSUMPTIONS`
@@ -34,7 +35,7 @@ MVP 2 must demonstrate one product promise: **a user can dictate a score, publis
 The team's load is **31 SP**, the same nominal load that MVP 1 delivered in one sprint. MVP 2 is riskier, though:
 - It is the first release with paid external services and user audio data.
 - MVP 1 ended with an evaluation of `NEEDS_ITERATION`.
-- The estimate for US-011 (8 SP) is provisional.
+- The estimate for US-011 (8 SP) rests on dictation rules approved only as initial versions (DEC-229).
 
 For these reasons the plan **commits only the P0 slice**, targets P1, treats P2 as stretch, and gives an explicit drop order.
 
@@ -67,7 +68,7 @@ For these reasons the plan **commits only the P0 slice**, targets P1, treats P2 
 
 | ID | Capability | User Value | Priority | Rationale |
 |---|---|---|---|---|
-| US-011 / HU11 | Dictate a score by voice | Enter a melody without typing notation (NEED-007). | P0 | Must; the defining input of MVP 2; highest uncertainty (vocabulary, transcription quality), so it must start early. Estimate 8 SP is **provisional** (BR-013, BR-025). |
+| US-011 / HU11 | Dictate a score by voice | Enter a melody without typing notation (NEED-007). | P0 | Must; the defining input of MVP 2; highest uncertainty (vocabulary, transcription quality), so it must start early. Estimate 8 SP (team, DEC-208); rules BR-013/BR-025 approved as initial versions (DEC-229). |
 | US-013 / HU13 | Spoken solfege | Hear note names to practice sight-reading (NEED-009). | P0 | Must; the defining output of MVP 2; depends on US-016 and US-017 for cost and availability. |
 | US-015 / HU15 | Instrument playback | Hear how the melody sounds (NEED-011). | P0 | Must; runs in the browser with no provider (DEC-203), so it carries no external risk and gives early listening value. |
 
@@ -81,7 +82,7 @@ MVP 1 Core (HU01, HU02, HU04, HU07-HU10) remains delivered. The MVP 1 content ru
 | US-017 / HU17 | Fallback voice | Audio still works when the provider fails (OPS-001). | P0 | Must by DEC-209; also the default voice in development and CI (DEC-202), which unblocks US-013 before paid keys exist. |
 | US-019 / HU19 | Load `.abc` file | Bring existing scores without copy-paste (NEED-013). | P1 | Should; 2 SP, frontend only, no provider or storage (DEC-217). Scheduled early because it is independent, not because it outranks P0. Fix DEFECT-001 in the same change. |
 | US-012 / HU12 | Voice comments | Quick spoken feedback (NEED-008). | P1 | Should; reuses transcription from US-011 but adds storage (Q-009), personal data (DEC-214) and a lifecycle question (Q-022). |
-| US-014 / HU14 | Audio tutor | Understand clef, meter and difficulty (NEED-010). | P1 | Should; depends on US-016/US-017 and on PROPOSAL BR-014 (difficulty rule) and Q-025. Estimate 3 SP is **provisional**. |
+| US-014 / HU14 | Audio tutor | Understand clef, meter and difficulty (NEED-010). | P1 | Should; depends on US-016/US-017 and on BR-014 (difficulty rule, approved as initial version by DEC-229); tutor content set by DEC-227 (adds key and tempo when defined). |
 | US-018 / HU18 | MP3 download | Offline practice (NEED-012). | P2 | Could; depends on US-013; first item dropped under pressure. |
 
 MVP 1 Supporting (HU03, HU05, HU06) remains delivered.
@@ -128,8 +129,8 @@ See section 6.1 (PRE-001-PRE-009). They are not development work, but several de
 | 2a | US-017 Fallback voice (P0, 2 SP) | Decided provider pair (DEC-202) | Free voice available for development, CI and demos. |
 | 2b | US-016 Audio store (P0, 3 SP) | US-017; PRE-005 storage verification (DEP-009) | Reuse of synthesized audio; protects credits. |
 | 2c | US-013 Spoken solfege (P0, 5 SP) | US-016, US-017 (DEP-007); ABC scores | Core listening promise. |
-| 3 | US-011 Dictation (P0, 8 SP provisional) | US-004, US-005 (DEP-004); PRE-002 vocabulary and header rules; PRE-004 transcription key | Core input promise; started early to surface risk. |
-| 4a | US-014 Audio tutor (P1, 3 SP provisional) | US-016, US-017; PRE-003 difficulty rule | Spoken summary of clef, meter, estimated difficulty. |
+| 3 | US-011 Dictation (P0, 8 SP) | US-004, US-005 (DEP-004); PRE-004 transcription key (PRE-002 resolved by DEC-229) | Core input promise; started early to surface risk. |
+| 4a | US-014 Audio tutor (P1, 3 SP) | US-016, US-017 (PRE-003 resolved by DEC-229, DEC-227) | Spoken summary of clef, meter, estimated difficulty. |
 | 4b | US-012 Voice comments (P1, 3 SP) | US-010 and DEC-211 (DEP-005); transcription from US-011; PRE-005 storage | Spoken community feedback. |
 | 5 | US-018 MP3 download (P2, 2 SP) | US-013 (DEP-006) | Offline practice. |
 
@@ -151,14 +152,14 @@ The **minimum coherent validation slice** is 1a, 2a, 2b, 2c and 3: dictate → p
 | ID | Precondition | Needed by | Owner / Source | Status |
 |---|---|---|---|---|
 | PRE-001 | Ratify DEC-201-DEC-218 with TEAM-002-TEAM-005. | P04, P05; all MVP 2 groups | Team; Q-020 | Open |
-| PRE-002 | Approve dictation vocabulary BR-013 and header completion BR-025. | US-011 estimate and UX (P04) | Team; Q-021, Q-023; REQ-VAL-201 | Open |
-| PRE-003 | Approve difficulty rule BR-014 and tutor content (key/tempo). | US-014 | Team; Q-024, Q-025 | Open |
+| PRE-002 | Approve dictation vocabulary BR-013 and header completion BR-025. | US-011 estimate and UX (P04) | Team; Q-021, Q-023; REQ-VAL-201 | Resolved by DEC-229 (initial version) |
+| PRE-003 | Approve difficulty rule BR-014 and tutor content (key/tempo). | US-014 | Team; Q-024, Q-025 | Resolved by DEC-229, DEC-227 |
 | PRE-004 | Provider keys, credits, budget and global monthly cap. | US-011, US-012 (transcription); US-013, US-014 with the commercial voice | Team; Q-011 | Open |
 | PRE-005 | Verify that the Railway volume persists files across deployments. | US-016, US-012 in production | TEAM-005 / P05; Q-009 | Open |
 | PRE-006 | Sprint 2 dates and story owners. | Sprint commitment | Team; Q-010 | Open |
 | PRE-007 | Decide the API route prefix (`/api/` vs `/api/v1/`) and the duplicated `Like`/`Reaction` models before adding MVP 2 endpoints. | P05, P06 | P05 architecture; P00 RISK-011 | Open |
-| PRE-008 | Decide the account-deletion gap in the retention rule. | US-012 closure | Team; Q-022 | Open |
-| PRE-009 | Latency targets. | P05, P07 | Team; Q-012 | Open |
+| PRE-008 | Decide the account-deletion gap in the retention rule. | US-012 closure | Team; Q-022 | Resolved by DEC-228 |
+| PRE-009 | Latency targets. | P05, P07 | Team; Q-012 | Initial limits set by DEC-221; targets open |
 | PRE-010 | Decide whether MVP 1 `NEEDS_ITERATION` items enter Sprint 2 capacity. | Sprint commitment | Team; P10 evaluation | Open |
 
 ### 6.2 Dependencies, Decisions and Risks
@@ -179,13 +180,13 @@ The **minimum coherent validation slice** is 1a, 2a, 2b, 2c and 3: dictate → p
 | RISK-010 | Credit consumption by users. | High | P00 | US-016 P0; FR-044 limit |
 | RISK-011 | MVP 1 debt (duplicate routes and models) spreading to new endpoints. | Medium | P00 | PRE-007 |
 | RISK-014 | Decisions reversed at ratification. | Medium | P00 | PRE-001 before P04/P05 |
-| PLAN-RISK-001 | Provisional estimates (US-011 8 SP, US-014 3 SP) may grow when BR-013, BR-014 and BR-025 are approved. | Medium | P02 REQ-VAL-201 | Re-estimate after PRE-002/PRE-003 |
+| PLAN-RISK-001 | US-011 (8 SP) and US-014 (3 SP) rely on rules approved only as initial versions; changes after real dictation tests may require re-estimation. | Low | P02 REQ-VAL-201; DEC-229 | Reduced; confirm estimates at sprint planning |
 | PLAN-RISK-002 | Most MVP 2 stories have a user-facing part (US-011-US-015, US-018, US-019); MVP 1 concentrated frontend load on one role (35%, RELEASE_PLAN.md). Frontend capacity may be the bottleneck. | Medium | RELEASE_PLAN.md section 6 | Consider when owners are assigned (PRE-006); P03 does not assign people |
 | PLAN-RISK-003 | MVP 1 closed as `NEEDS_ITERATION`; its improvement items compete for the same sprint capacity. | Medium | P10 MVP_EVALUATION | PRE-010 |
 | DEC-001 | Newest-first feed, 10 per page. | Medium | MVP 1 | Approved |
 | DEC-002 | Comments cannot be edited or deleted in MVP 1. | Low | MVP 1 | **Superseded by DEC-211** (deletion by author allowed; editing excluded) |
 | DEC-003 | Account recovery excluded. | Low | MVP 1 | Approved |
-| DEC-201-DEC-218 | MVP 2 decisions. | — | `DECISIONS_MVP2.md` | Approved by TEAM-001; ratification pending |
+| DEC-201-DEC-229 | MVP 2 decisions (two batches). | — | `DECISIONS_MVP2.md` | Approved by TEAM-001; ratification pending (PRE-001) |
 
 ## 7. Capacity and Cut Line
 
@@ -205,17 +206,17 @@ The **minimum coherent validation slice** is 1a, 2a, 2b, 2c and 3: dictate → p
 
 P0 stories are never dropped. If a P0 story is at risk, re-scope its acceptance criteria with the team, for example by narrowing the vocabulary in BR-013, rather than drop the story.
 
-**Estimate status:** 20 SP are team estimates. 11 SP are provisional (US-011, 8 SP; US-014, 3 SP) until PRE-002 and PRE-003 are resolved.
+**Estimate status:** all 31 SP are team estimates. The rules behind US-011 and US-014 are approved as initial versions (DEC-229); confirm both estimates at sprint planning.
 
 ## 8. Requirements-to-Priority Traceability
 
 | Requirement | Priority / Phase | Decision Basis | Notes |
 |---|---|---|---|
 | FR-001-FR-017 / HU01-HU10 | Delivered / MVP 1 | Version 1.0 plan | FR-016 extended by FR-028 (DEC-211). |
-| FR-018-FR-021, FR-025, FR-029, FR-030, FR-043 / US-011 | P0 / group 3 | Must; core input; risk discovery | Provisional 8 SP; DIRECT to HU11, REFINED by DEC-205/208. |
+| FR-018-FR-021, FR-025, FR-029, FR-030, FR-043, FR-045 / US-011 | P0 / group 3 | Must; core input; risk discovery | 8 SP (team); DIRECT to HU11, REFINED by DEC-205/208. |
 | FR-026-FR-028 / US-012 | P1 / group 4b | Should; external dependencies | DIRECT to HU12; REFINED by DEC-211/214. |
 | FR-031-FR-033, FR-044 / US-013 | P0 / group 2c | Must; core output | DIRECT to HU13; REFINED by DEC-206. |
-| FR-034 / US-014 | P1 / group 4a | Should; PROPOSAL rule | DIRECT to HU14; REFINED by DEC-212; provisional 3 SP. |
+| FR-034 / US-014 | P1 / group 4a | Should; rule approved as initial version | DIRECT to HU14; REFINED by DEC-212; 3 SP (team); DEC-227, DEC-229. |
 | FR-035 / US-015 | P0 / group 1a | Must; no external dependency | DIRECT to HU15; REFINED by DEC-203. |
 | FR-036, FR-037 | P0 / groups 1a, 2c | Cross-cutting for listening features | DEC-207. |
 | FR-038, FR-039 / US-016 | P0 / group 2b | Must enabler; cost | DIRECT to HU16; REFINED by DEC-210. |

@@ -1,6 +1,6 @@
 # P04 - UX Design Validation
 
-**Version:** 2.0
+**Version:** 2.1
 **Stage:** P04 - UX/UI
 **Type:** Validation Prompt
 **Project:** Notara
@@ -13,6 +13,7 @@
 |---|---|
 | 1.0 | Validation of the MVP 1 UX specification. |
 | 2.0 | Incremental validation for MVP 2: flows, states, messages, accessibility and responsive rules for HU11-HU19; MVP 1 preservation and DEC-211 amendment; UX proposals labeled. |
+| 2.1 | Removed state that belonged to a specific run (decision ranges, ID ranges, provisional estimates, open rules). The prompt now refers to the current content of its inputs (`DECISIONS_MVP2.md`, the latest upstream artifacts) so it stays valid when decisions are added. |
 
 ## 1. Purpose
 
@@ -26,11 +27,11 @@ Act as a **Senior UX Validation Auditor**. Do not edit inputs or add capabilitie
 
 1. Inputs present; P02/P03 results acceptable; upstream warnings carried.
 2. Structure includes the v2.0 sections.
-3. Requirement classification for FR-018-FR-044 and NFR-004-NFR-010 is reasonable.
-4. Each HU11-HU19 has a flow with main path, alternatives and errors; each user-facing AC is reachable in a flow.
+3. Requirement classification for every MVP 2 FR and NFR in the latest requirements is reasonable.
+4. Each MVP 2 story has a flow with main path, alternatives and errors; each user-facing AC is reachable in a flow.
 5. States: every asynchronous audio action defines idle, processing, success, error, disabled and limit states as applicable.
 6. Messages: decision/backlog copy reproduced exactly; new copy labeled UX-PROP.
-7. Decisions respected: Spanish, 30 s / 2 MB, notice before recording, `.abc`-only listening, 20/day limit, silent fallback, voice-only MP3, local file reading, comment deletion by author.
+7. Every decision in `DECISIONS_MVP2.md` that affects the UI is respected (e.g. Spanish only, recording limits, notice wording, `.abc`-only listening, daily limits, silent fallback, voice-only MP3, local file reading, comment deletion).
 8. MVP 1 preserved; amendments justified (DEC-211); corrections recorded.
 9. Accessibility and responsive rules cover the new regions.
 10. Exclusions not designed; no technical or visual decisions.

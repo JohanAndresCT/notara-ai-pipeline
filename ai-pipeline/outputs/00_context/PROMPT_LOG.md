@@ -177,3 +177,12 @@ y pidió agregar la carga de archivos `.abc` como nueva HU del MVP 2.
 Tras P02 (REQ-VAL-202, REQ-VAL-203): HU14 "clave" = clef (no key) en §3 y MVP-014; Q-002 y Q-006 sincronizadas con su resolución del MVP 1. Sin cambio de alcance.
 
 ## MVP 2 V2.3 Result (run 4): PASS_WITH_WARNINGS (2 LOW sin cambios: VAL-212, VAL-213)
+
+## MVP 2 — Segundo lote de decisiones (DEC-219..DEC-229)
+
+Johan pidió dejar listas las decisiones recomendadas tras P05. Se registraron en `DECISIONS_MVP2.md` §3:
+DEC-219 motores falsos en CI (enmienda DEC-202), DEC-220 transcripción de voz hasta 1.000 caracteres,
+DEC-221 tiempos de espera iniciales, DEC-222 20 transcripciones por día, DEC-223 audio en webm/ogg,
+DEC-224 texto del tutor en cabecera, DEC-225 UX-PROP-001..007 aprobadas, DEC-226 aviso nombra a OpenAI,
+DEC-227 tutor con tonalidad y tempo si existen, DEC-228 sin borrado de cuenta, DEC-229 BR-013/014/025 como versión inicial.
+Siguen abiertos: Q-009 (Railway), Q-010, Q-011, Q-012, Q-020 y la aprobación de ADRs por TEAM-002.

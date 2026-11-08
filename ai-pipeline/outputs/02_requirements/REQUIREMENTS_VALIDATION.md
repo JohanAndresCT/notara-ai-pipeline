@@ -189,3 +189,37 @@ P03 can plan with:
 ## 16. Auditor Integrity Statement
 
 This report did not modify `REQUIREMENTS.md`, `product_backlog.json`, P00/P01 artifacts, the backlog input or the decision log. No requirement was added, no conflict was resolved and no planning value was assigned by the validator.
+
+## Addendum — Run 2 (requirements v3.1, prompt v2.1)
+
+**Date:** 2026-11-08 · **Trigger:** second decision batch DEC-219-DEC-229 applied to the requirements · **Validator prompt:** `P02_validation.md` v2.1 (no run-specific state)
+
+**Result:** `PASS_WITH_WARNINGS` (0 HIGH, 0 MEDIUM, 2 LOW) · **P03 readiness:** `READY_WITH_ASSUMPTIONS`
+
+### Automated checks
+
+| Check | Result |
+|---|---|
+| Duplicate definitions | None |
+| Unresolved references | None (CONFLICT-001 is a P01 reference) |
+| MVP 1 identifiers missing | None |
+| Acceptance criteria, Markdown = JSON | Identical (72) |
+| Planning fields null in all 19 items | Yes |
+| PROPOSAL rules left in BR-013, BR-014, BR-025 | None (initial versions, DEC-229) |
+| Decisions reflected | 27 of 29. DEC-224 (tutor text transport) and DEC-226 (notice wording) have no requirement-level effect; they are reflected in P05 and P04. |
+| Open questions | Q-009, Q-010, Q-011, Q-012, Q-020 (team inputs or verifications) |
+
+### Status of run 1 findings
+
+| ID | Status |
+|---|---|
+| REQ-VAL-201 (MEDIUM) | **Resolved** — BR-013, BR-014, BR-025 approved as initial versions (DEC-229); AC-031 and AC-050 now rest on approved rules. |
+| REQ-VAL-202 (MEDIUM) | **Resolved** — "clef" wording corrected in P00 v2.3 and P01 v2.2. |
+| REQ-VAL-203 (LOW) | **Resolved** — Q-002/Q-006 synced in P00 v2.3. |
+| REQ-VAL-204 (LOW) | **Resolved** — DEC-228 (no account deletion; cascade covers administrative deletion). |
+| REQ-VAL-205 (LOW) | Open — AC-059 still cites provider status codes from the backlog. |
+| REQ-VAL-206 (LOW) | Open — AC-063 (reworded by DEC-219) remains a configuration criterion; verify in P07/P08. |
+
+### New content checked
+
+FR-045 (20 transcriptions per day), FR-046 (voice transcripts up to 1,000 characters, never truncated), BR-029, BR-030, AC-070-AC-072 are testable, traced to DEC-220, DEC-222 and DEC-223, and linked in both Markdown and JSON. The tutor content change (DEC-227) widens AC-049 slightly (key and tempo when defined); it comes from an approved decision and is recorded in the change log.

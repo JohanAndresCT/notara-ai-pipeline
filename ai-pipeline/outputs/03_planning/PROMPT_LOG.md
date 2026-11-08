@@ -152,3 +152,11 @@ Resultado: PRIORITIZATION.md v2.0 y product_backlog.json v2.0 — READY_WITH_ASS
 
 P04 readiness: WITH CONSTRAINTS.
 
+## MVP 2 — Actualización por decisiones DEC-219..DEC-229 (v2.1)
+
+PRE-002, PRE-003 y PRE-008 resueltas; PRE-009 con límites iniciales (DEC-221). US-011 y US-014 dejan de ser provisionales
+(31 SP de estimación del equipo; confirmar en la planificación del sprint). PLAN-VAL-201 se reduce: siguen abiertos PRE-001, PRE-004, PRE-005, PRE-006.
+
+## Re-validación (run 2) — prompts v2.1
+
+Prompts P03 v2.1: totales y provisionales se recalculan desde las fuentes. Validación sobre plan v2.1: PASS_WITH_WARNINGS (1 MEDIUM, 3 LOW). Se detectó y corrigió PLAN-VAL-206 (faltaban AC-070..072 en el backlog planificado).
