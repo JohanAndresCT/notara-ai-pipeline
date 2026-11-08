@@ -46,3 +46,15 @@ The initial idea is to develop the product as a web application (responsive).
 * David Urrego — Backend
 * Alejandro Rodríguez — Database
 * Alejandro Zamorano — Tester / DevOps
+
+---
+
+## MVP 2 Input (Sprint 2 — Audio, Speech & TTS/STT)
+
+MVP 1 was delivered (tag `v1.0.0`). For MVP 2 the team input is the Sprint 2 product backlog, stored verbatim in:
+
+`ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md`
+
+It defines 8 user stories (HU11–HU18 / US-011–US-018, 26 SP) for the epic "Integración de Servicios de Voz y Audio (STT & TTS)": voice dictation of scores to ABC, voice comments, spoken/sung solfège, an audio tutor summary, instrument (MIDI) playback, a cache of synthesized audio, a voice fallback, and MP3 download. Image recognition (OMR) remains planned for MVP 3.
+
+The MVP 1 section above is kept unchanged as the historical input of MVP 1.

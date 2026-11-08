@@ -105,3 +105,54 @@ MVP-003 → HU04
 
 ## V2.0.0 Result: READY_WITH_ASSUMPTIONS
 El proyecto puede avanzar a P01 — Discovery. Las decisiones principales del MVP están suficientemente definidas y las incertidumbres restantes no impiden comprender ni delimitar el producto.
+
+---
+
+# MVP 2 — Sprint 2 (Audio, Speech & TTS/STT)
+
+## 00. Context (MVP 2): adaptación de prompts e insumos
+
+- `prompts/00_context/P00_project_context.md` → v2.0: se eliminó el ejemplo pre-llenado con JPG/PNG (nunca fue el alcance real del MVP 1, que usa `.abc` y texto plano) y se añadió el modo incremental (preservar IDs, superseder sin borrar, CR obligatorio, tecnologías del backlog como PROPOSAL, IDs de decisión con fuente).
+- `prompts/00_context/P00_validation.md` → v2.0: valida contra el MVP 1 y el backlog del Sprint 2.
+- Nuevo insumo: `outputs/00_context/SPRINT_2_BACKLOG_INPUT.md` (copia literal del backlog del Sprint 2).
+- `INITIAL_PROJECT_INPUT.md`: se añadió la sección "MVP 2 Input" sin modificar la del MVP 1.
+
+## 00. Context (MVP 2): Validation
+
+Usa el archivo ai-pipeline/prompts/00_context/P00_validation.md (v2.0)
+para validar ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md (v2.0)
+contra ai-pipeline/outputs/00_context/INITIAL_PROJECT_INPUT.md
+y ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md.
+
+Aplica también las reglas de ai-pipeline/prompts/system/SYSTEM_PROMPT.md.
+
+## MVP 2 V2.0 Result: FAIL (1 HIGH, 3 MEDIUM, 6 LOW)
+
+Correcciones requeridas antes de P01:
+
+1. VAL-201 (HIGH): DEC-01..DEC-07 no existen en el backlog ni en otro artefacto. Crear tabla "Proposed Decisions" con IDs sin colisión con P03 (DEC-001..003).
+2. VAL-202: actualizar la deuda del MVP 1 (CSRF y N+1 ya corregidos en 689e25e y 6bea185).
+3. VAL-203: HU14 pide "clave, métrica y dificultad"; el contexto cambió "dificultad" por "unit note length" sin marcarlo PROPOSAL.
+4. VAL-204: el borrado de comentarios contradice P03 DEC-002 (Approved) y no se reporta.
+
+Siguiente paso: generar PROJECT_CONTEXT v2.1 y re-validar.
+
+## 00. Context (MVP 2): regeneración v2.1
+
+Ejecuta la etapa P00 (prompt v2.0, modo incremental) aplicando las
+correcciones VAL-201..VAL-210 de CONTEXT_VALIDATION.md sobre
+ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md (v2.0 → v2.1).
+
+Cambios principales: tabla "Proposed Decisions" PDEC-201..PDEC-210 en lugar de
+DEC-01..DEC-07; deuda MVP 1 verificada contra el repo; HU14 con "dificultad";
+desviación de P03 DEC-002 reportada (Q-017); nuevas Q-016, Q-018, ASM-009, ASM-010,
+EXT-005, EXT-006.
+
+## MVP 2 V2.1 Result: PASS_WITH_WARNINGS (0 HIGH, 0 MEDIUM, 2 LOW)
+
+- VAL-211 (LOW): escribir CR-001 completo (campos del SYSTEM_PROMPT §11) en P01/P02.
+- VAL-212 (LOW): RELEASE_PLAN.md no incluye HU11–HU18.
+
+Estado del contexto: READY_WITH_ASSUMPTIONS. Puede avanzar a P01 — Discovery.
+Decisiones del equipo pendientes: PDEC-201..PDEC-210 (Q-007), fechas y responsables (Q-010),
+presupuesto y llaves de API (Q-011).

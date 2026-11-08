@@ -1,425 +1,175 @@
 # P00 — Project Context Validation
 
-**Version:** 1.0  
+**Version:** 2.0  
 **Stage:** P00 — Context Definition  
 **Type:** Validation Prompt  
 **Project:** Notara  
-**Input Artifact A:** `ai-pipeline/outputs/00_context/INITIAL_PROJECT_INPUT.md`  
-**Input Artifact B:** `ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md`  
+**Input Artifact A:** `ai-pipeline/outputs/00_context/INITIAL_PROJECT_INPUT.md` (MVP 1 team input)  
+**Input Artifact B:** `ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md` (MVP 2 team input)  
+**Input Artifact C:** `ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md` (artifact under validation)  
+**Input Artifact D (optional):** Previous context version (tag `v1.0.0`), `ai-pipeline/prompts/system/RELEASE_PLAN.md`, `ai-pipeline/outputs/03_planning/PRIORITIZATION.md`, `ai-pipeline/outputs/10_evaluation/MVP_EVALUATION.md`, and the repository state  
 **Output Artifact:** `ai-pipeline/outputs/00_context/CONTEXT_VALIDATION.md`  
-**Related Generation Prompt:** `ai-pipeline/prompts/00_context/P00_project_context.md`  
+**Related Generation Prompt:** `ai-pipeline/prompts/00_context/P00_project_context.md` (v2.0)  
 **Global Rules:** `ai-pipeline/prompts/system/SYSTEM_PROMPT.md`
+
+---
+
+## Change Log
+
+| Version | Change |
+|---|---|
+| 1.0 | Validation of the MVP 1 context against the initial input. |
+| 2.0 | Incremental validation for MVP 2: adds the Sprint 2 backlog as a team input, checks preservation of MVP 1 identifiers, Change Request registration, PROPOSAL labeling of backlog technologies, sourced decision IDs, and repository-verifiable facts. Removes MVP 1-only checks about image uploads. |
 
 ---
 
 ## 1. Purpose
 
-Validate that `PROJECT_CONTEXT.md` faithfully transforms the initial project idea into a clear, consistent, traceable, and bounded context for the next pipeline stage.
+Validate that `PROJECT_CONTEXT.md` faithfully and traceably transforms the team inputs (MVP 1 initial input + MVP 2 Sprint 2 backlog) into a clear, consistent and bounded context for P01 — Discovery, without inventing information or prematurely designing the solution.
 
-The validator must determine whether the context:
-
-* Represents the Comunidad Musical idea faithfully.
-* Clearly identifies the problem and intended users.
-* Describes the proposed solution without over-designing it.
-* Defines a realistic MVP 1 scope.
-* Separates MVP features, future considerations, and out-of-scope items.
-* Distinguishes facts, assumptions, and unknowns.
-* Avoids unsupported information.
-* Identifies relevant risks and open questions.
-* Avoids premature architecture or implementation decisions.
-* Is internally consistent.
-* Provides enough information to proceed to P01 — Discovery.
-
-This is a validation prompt, not a product-design prompt. Do not redesign the product, expand the MVP, or silently resolve contradictions.
+This is a validation prompt, not a product-design prompt. Do not redesign the product, expand or shrink the release, or silently resolve contradictions.
 
 ---
 
-## 2. Inputs
+## 2. Role
 
-### Required
+Act as a **Senior Software Engineering Process Auditor and Product Context Validator**.
 
-#### Input A — Original Project Input
-
-Read:
-
-```text
-ai-pipeline/outputs/00_context/INITIAL_PROJECT_INPUT.md
-```
-
-This file is the team's original idea, requirements, users, platform, features, and constraints.
-
-#### Input B — Generated Project Context
-
-Read:
-
-```text
-ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md
-```
-
-### Optional
-
-#### Input C — Global System Prompt
-
-Read when available:
-
-```text
-ai-pipeline/prompts/system/SYSTEM_PROMPT.md
-```
-
-Use it to verify compliance with project-wide pipeline rules.
+You are not authorized to add requirements, change scope, select technologies, design architecture, invent users or rules, resolve contradictions silently, convert assumptions or proposals into facts, remove inconvenient information, or approve unsupported claims.
 
 ---
 
-## 3. Role
+## 3. Core Validation Principle
 
-Act as a:
+> Does `PROJECT_CONTEXT.md` faithfully and sufficiently transform Inputs A and B (with the MVP 1 baseline) into a structured context, preserving MVP 1, adding MVP 2 traceably, and without inventing information?
 
-> Senior Software Engineering Process Auditor and Product Context Validator.
-
-You are not the Product Owner and you are not authorized to:
-
-* Add requirements.
-* Expand the MVP.
-* Select technologies.
-* Design architecture.
-* Invent users or business rules.
-* Resolve contradictions silently.
-* Convert assumptions into facts.
-* Remove inconvenient information.
-* Approve unsupported claims.
-
-When information is missing, report it as missing. When information is ambiguous, report the ambiguity. When information conflicts, report the conflict.
+Evaluate: (1) internal quality, (2) traceability to the inputs, (3) accuracy of repository-verifiable facts. An internally coherent artifact that contains unsupported information must not receive a full pass.
 
 ---
 
-## 4. Core Validation Principle
+## 4. Validation Rules
 
-Answer this question:
+### 4.1 Structural completeness
 
-> Does `PROJECT_CONTEXT.md` faithfully and sufficiently transform `INITIAL_PROJECT_INPUT.md` into a structured project context without inventing information or prematurely designing the solution?
+Sections 1–16 must exist (Project Identification … Generation Metadata). In incremental mode a Change Log (§0) and a Change Request reference are also required. An explicit `UNKNOWN` is not an empty section.
 
-Evaluate both:
+### 4.2 Incremental integrity (MVP 1 preservation)
 
-1. Internal quality.
-2. Traceability to the original input.
+* All MVP 1 IDs remain (`MVP-001`–`MVP-010`, `FUT-*`, `OOS-*`, `ASM-001`–`ASM-003`, `Q-001`–`Q-006`, `RISK-001`–`RISK-005`, `SUCCESS-001`–`SUCCESS-007`).
+* Items that changed status are marked superseded, not deleted or renumbered.
+* MVP 1 facts stay consistent with the MVP 1 approved artifacts (Release Plan, P03 decisions). A divergence between an approved decision and delivered behavior must be reported, not hidden.
 
-An internally coherent artifact that contains unsupported information must not receive a full pass.
+### 4.3 MVP 2 scope traceability
+
+* Each HU11–HU18 maps to exactly one `MVP-0NN` feature.
+* Story Points and MoSCoW match Input B. Any change (re-estimation, re-prioritization) is labeled PROPOSAL.
+* The context's description of each story does not narrow or widen the backlog statement without labeling it as PROPOSAL and listing it as a pending decision.
+
+### 4.4 Change Request
+
+A `CR-XXX` explains why voice/audio moves from future scope (MVP 1 `FUT-*` / `OOS-*`) into MVP 2, per SYSTEM_PROMPT §7 and §11. Check that its ID does not collide with an existing CR.
+
+### 4.5 Technologies and external services
+
+* Technologies named in Input B (Whisper, Deepgram, ElevenLabs, Azure, Google, Tone.js, FluidSynth, `edge-tts`, PyDub/FFmpeg) are PROPOSAL until approved.
+* Where Input B lists alternatives, the context lists them; reducing them to one choice is a PROPOSAL.
+* External services are listed with purpose and status, and the need for an ADR / architecture addendum is stated.
+* MVP 1 technologies may be FACT only if verifiable in the repository.
+
+### 4.6 Decision IDs and sources
+
+Every cited `DEC-*`, `ADR-*`, `CR-*` must exist in an input artifact or be defined inside the context (for example a Proposed Decisions table). Flag unsourced IDs and IDs that collide with existing ones in other artifacts.
+
+### 4.7 Fact / Proposal / Assumption / Unknown
+
+Facts must be supported by an input or the repository. Proposals and assumptions must be labeled. Unknowns must not be presented as facts and material unknowns must appear as open questions.
+
+### 4.8 Repository-verifiable facts
+
+Spot-check claims about the stack, deployment, tags, storage and "open findings" against the current repository. Findings reported as open that were already fixed are a traceability problem.
+
+### 4.9 Contradiction detection (MVP 2)
+
+Check at least:
+
+* 26 SP in one sprint with unknown dates.
+* Backlog alternatives vs. a single provider.
+* HU15 browser-side playback vs. HU18 MP3 "Voz TTS + Instrumento".
+* HU13 "hablado/cantado" vs. spoken-only proposal.
+* HU17 "Offline" title vs. `edge-tts` requiring network.
+* Paid APIs vs. unknown budget.
+* Plain-text scores vs. ABC-only audio features.
+* HU16 "como administrador del sistema" vs. "no differentiated role management".
+* Stories with no acceptance-criteria failure path (e.g. HU13–HU15 on invalid ABC).
+
+### 4.10 Platform, team, risks, questions, success, scope summary, status
+
+* Platform: microphone/HTTPS needs recorded; browsers unknown.
+* Team: five members, roles; Sprint 2 dates and ownership UNKNOWN if not given; no invented skills.
+* Risks: scope/timeline, external API dependency and cost, dictation quality, storage persistence, personal data in voice recordings, credit abuse, MVP 1 debt.
+* Open questions: provider approval, limits, budget/keys, dates/ownership, retention, language, latency.
+* Success criteria: qualitative, traceable to MVP-011–MVP-018, no unverified metrics.
+* Scope summary agrees with detailed sections.
+* Status: `READY`, `READY_WITH_ASSUMPTIONS` or `BLOCKED` is justified.
 
 ---
 
-## 5. Validation Rules
+## 5. Traceability Audit
 
-### 5.1 Structural Completeness
-
-Verify that `PROJECT_CONTEXT.md` contains these sections:
-
-1. Project Identification
-2. Problem
-3. Proposed Solution
-4. Target Users
-5. Initial Product Scope
-6. User Value
-7. Platform and Environment
-8. Team Context
-9. Technical Context
-10. Assumptions
-11. Unknowns and Open Questions
-12. Initial Risks
-13. Initial Success Definition
-14. Scope Summary
-15. Context Status
-16. Generation Metadata
-
-Also verify the required prompt sections when present:
-
-* Purpose.
-* Input.
-* Role.
-* Objectives.
-* Analysis Process.
-* Constraints.
-* Output Rules.
-* Validation Checklist.
-* Failure Conditions.
-* Final Response Format.
-
-An explicitly marked `UNKNOWN` value is not an empty section.
-
-Report missing sections, empty sections, misplaced information, and inconsistent duplicate sections.
-
-### 5.2 Project Identification
-
-Verify that the context identifies the project or working name, purpose, current stage, and relevant version information. `Comunidad Musical` may remain a working name.
-
-### 5.3 Problem Validation
-
-Verify that the problem is understandable, specific, connected to music students or hobbyist musicians, and not merely a feature or technology.
-
-Check that the context distinguishes:
-
-* The difficulty of using professional notation software for short ideas.
-* The need to share short musical exercises or ideas.
-* The known qualitative impact.
-* Any impact or metric that remains unknown.
-
-### 5.4 Proposed Solution Validation
-
-Verify that the solution addresses the problem at a high level and does not introduce unsupported architecture, APIs, integrations, or implementation details.
-
-Confirm that MVP 1 is clearly distinguished from:
-
-* MVP 2 voice-based input.
-* MVP 3 image recognition or OMR.
-* Audio generation or playback not included in MVP 1.
-
-### 5.5 Target User Validation
-
-Verify that primary and secondary users are supported by the original input:
-
-* Music students.
-* Hobbyist musicians.
-* Music teachers.
-
-Flag invented demographics, skills, organizations, purchasing authority, or mandatory roles.
-
-### 5.6 MVP Scope Validation
-
-Verify that the scope is bounded, realistic, and traceable to the original input and the Release Plan:
-
-* HU01–HU03: access and profile.
-* HU04–HU06: score content management.
-* HU07–HU10: dashboard, exploration, reactions, and comments.
-
-Verify the separation between:
-
-* Initial MVP features.
-* Future considerations.
-* Out-of-scope functionality.
-
-### 5.7 Scope Creep Detection
-
-For every feature not present in the original input or Release Plan, classify it as:
-
-* Supported.
-* Reasonable assumption.
-* Unsupported.
-* Contradictory.
-
-Pay special attention to administration, moderation, notifications, analytics, payments, mobile applications, AI, external APIs, and additional platforms.
-
-### 5.8 Fact / Assumption / Unknown Validation
-
-Verify that:
-
-* Facts are supported by the original input or Release Plan.
-* Assumptions are explicitly labeled.
-* Unknown information is not presented as fact.
-* Assumptions do not silently become requirements.
-* Material unknowns are recorded as open questions.
-
-### 5.9 Contradiction Detection
-
-Check contradictions within the context and between the context and original input, including:
-
-* “Listen to a score” versus image-only MVP 1.
-* Manual upload versus future voice or OMR input.
-* The two-week timeline versus the ten-story scope.
-* Web platform versus unsupported mobile or desktop applications.
-* MVP, future, and out-of-scope classifications.
-
-Never silently resolve a contradiction.
-
-### 5.10 Platform and Environment Validation
-
-Verify that the responsive web application is represented at the appropriate certainty level and that expected usage environment is marked unknown when not confirmed.
-
-Do not require a final technology stack at P00.
-
-### 5.11 Technical Context Validation
-
-Verify that frontend, backend, database, hosting, storage, and external services are not presented as selected unless explicitly confirmed.
-
-ABC notation, voice processing, OMR, and audio libraries must remain proposed or future-phase considerations if they are not MVP 1 requirements.
-
-Flag database schemas, API contracts, deployment architecture, and source code as premature details.
-
-### 5.12 Team Context Validation
-
-Verify the known five-person team, roles, academic setting, two-week timeline, and contribution distribution when those facts are documented.
-
-Do not invent technical skills. Mark them unknown when they have not been supplied.
-
-### 5.13 Risks Validation
-
-Verify that obvious risks relevant to this project are addressed, especially:
-
-* Scope and timeline pressure.
-* Unselected technology stack.
-* Ambiguity between MVP 1 and later phases.
-* Image upload validation, storage, and security.
-* Audio/listening value contradiction.
-* Testing and deployment ownership.
-
-Do not require every possible risk.
-
-### 5.14 Open Questions Validation
-
-Verify that material unresolved questions are recorded and prioritized, including:
-
-* Technical stack.
-* Audio/listening expectation.
-* Image size and validation rules.
-* Confirmation of dashboard and feed/detail scope.
-* Notifications.
-* Evaluation of academic benefit.
-
-Do not invent questions merely to increase the list.
-
-### 5.15 Success Definition Validation
-
-Verify that success criteria are qualitative, understandable, traceable to MVP features, and do not claim unverified adoption, performance, or learning outcomes.
-
-### 5.16 Scope Summary Validation
-
-Verify that Included in MVP, Excluded from MVP, and Pending Decisions agree with the detailed sections. A feature must not simultaneously be MVP, future, and out of scope unless the different phase is explicitly explained.
-
-### 5.17 Context Status Validation
-
-Verify that the selected status is justified:
-
-* `READY`: sufficient information and no blocking contradictions.
-* `READY_WITH_ASSUMPTIONS`: usable context with non-blocking assumptions.
-* `BLOCKED`: essential information is missing or the project cannot be meaningfully understood.
-
-Do not classify the artifact as blocked merely because non-critical details are unknown.
-
----
-
-## 6. Traceability Audit
-
-Create a table comparing important statements in the original input and context:
+Produce a table:
 
 | Statement | Source | Classification | Status |
 |---|---|---|---|
-| Example statement | Original input | FACT | Supported |
-| Example statement | Generated interpretation | ASSUMPTION | Explicitly labeled |
-| Example statement | No source | Unsupported | Problem |
 
-Prioritize the problem, target users, solution, MVP features, constraints, technical requirements, and external dependencies.
+Prioritize problem, users, MVP 2 features, constraints, technologies, external dependencies and decisions.
 
 ---
 
-## 7. Severity Levels
+## 6. Severity Levels
 
-### CRITICAL
-
-The artifact cannot safely proceed. Examples include an absent core problem, unidentified MVP, major unsupported information, or a fundamental contradiction.
-
-### HIGH
-
-A significant issue must be corrected before proceeding, such as an unclear primary user, ambiguous MVP boundary, unlabeled major assumption, or unsupported requirement.
-
-### MEDIUM
-
-The artifact can potentially proceed, but clarification or correction is recommended, such as missing risks or minor traceability gaps.
-
-### LOW
-
-Minor wording, duplication, or formatting issue that does not materially affect the stage.
+* **CRITICAL** — cannot proceed (no problem, no release scope, fundamental contradiction, major fabricated content).
+* **HIGH** — must be corrected before downstream work relies on it (unsourced decision presented as basis, unlabeled major assumption, ambiguous release boundary, unsupported requirement).
+* **MEDIUM** — can proceed but correction recommended (traceability gaps, stale facts, missing risks).
+* **LOW** — wording, duplication, formatting.
 
 ---
 
-## 8. Validation Decision
+## 7. Validation Decision
 
-Produce exactly one overall result:
-
-### PASS
-
-The context satisfies the P00 contract and can proceed.
-
-### PASS_WITH_WARNINGS
-
-The context can proceed, but non-blocking issues remain documented.
-
-### FAIL
-
-The context requires correction before the pipeline proceeds.
-
-### BLOCKED
-
-The validator cannot reliably evaluate the context because essential input is unavailable or contradictory.
-
-Decision rules:
+Exactly one: `PASS`, `PASS_WITH_WARNINGS`, `FAIL`, `BLOCKED`.
 
 ```text
-IF critical issue exists
-    → BLOCKED or FAIL
-ELSE IF high-severity issue prevents reliable downstream work
-    → FAIL
-ELSE IF non-blocking issues remain
-    → PASS_WITH_WARNINGS
-ELSE
-    → PASS
+IF critical issue exists              → BLOCKED or FAIL
+ELSE IF high issue prevents reliable downstream work → FAIL
+ELSE IF non-blocking issues remain    → PASS_WITH_WARNINGS
+ELSE                                  → PASS
 ```
 
 ---
 
-## 9. Output Format
+## 8. Output Format
 
-Write the validation result to:
-
-```text
-ai-pipeline/outputs/00_context/CONTEXT_VALIDATION.md
-```
-
-Use this structure:
+Write to `ai-pipeline/outputs/00_context/CONTEXT_VALIDATION.md`:
 
 ```markdown
 # P00 — Context Validation Report
 
-**Project:** Comunidad Musical
-**Input Artifact:** `ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md`
-**Original Input:** `ai-pipeline/outputs/00_context/INITIAL_PROJECT_INPUT.md`
+**Project:** Notara
+**Release:** MVP 2 — Sprint 2
+**Input Artifact:** `ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md` (version)
+**Team Inputs:** `INITIAL_PROJECT_INPUT.md`, `SPRINT_2_BACKLOG_INPUT.md`
 **Validator Role:** Senior Software Engineering Process Auditor and Product Context Validator
 
 ## 1. Overall Result
-
-PASS | PASS_WITH_WARNINGS | FAIL | BLOCKED
-
 ## 2. Executive Summary
-
-Brief summary of the validation outcome.
-
 ## 3. Structural Validation
-
-Document required sections, missing sections, and empty sections.
-
 ## 4. Section-by-Section Findings
-
-Use findings with stable IDs and severity.
-
 ## 5. Scope and Traceability Audit
-
-Include the traceability table and MVP scope analysis.
-
 ## 6. Findings
-
 | ID | Severity | Finding | Evidence | Recommendation |
-|---|---|---|---|---|
-
 ## 7. Context Status Assessment
-
-Explain whether READY, READY_WITH_ASSUMPTIONS, or BLOCKED is justified.
-
 ## 8. Required Actions
-
-List only actions needed before the next stage.
-
 ## 9. Validation Metadata
-
-**Validator:** P00 — Context Validation Prompt
-**Prompt Version:** 1.0
-**Output:** `ai-pipeline/outputs/00_context/CONTEXT_VALIDATION.md`
 ```
 
-Do not modify `INITIAL_PROJECT_INPUT.md` or `PROJECT_CONTEXT.md` while generating the report. Report required changes instead.
+Do not modify `INITIAL_PROJECT_INPUT.md`, `SPRINT_2_BACKLOG_INPUT.md` or `PROJECT_CONTEXT.md` while generating the report. Report required changes instead.
