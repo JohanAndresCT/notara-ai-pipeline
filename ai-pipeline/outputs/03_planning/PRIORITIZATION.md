@@ -1,59 +1,65 @@
 # Prioritization and Delivery Plan
 
+## 0. Change Log
+
+| Version | Release | Summary |
+|---|---|---|
+| 1.0 | MVP 1 | Priorities for HU01-HU10; status READY; delivered as tag `v1.0.0`. |
+| 2.0 | MVP 2 | Incremental plan for HU11-HU19 (US-011-US-019): priorities, delivery groups, team Story Points (31 SP), capacity cut line, drop order and preconditions. MVP 1 kept as delivered baseline; P03 DEC-002 superseded by DEC-211. |
+
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 1.0
+- **Version:** 2.0
+- **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P03 - Planning
-- **Status:** `READY`
+- **Status:** `READY_WITH_ASSUMPTIONS`
 - **Source Artifacts:**
-  - `ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md`
-  - `ai-pipeline/outputs/00_context/CONTEXT_VALIDATION.md`
-  - `ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md`
-  - `ai-pipeline/outputs/01_discovery/PRODUCT_VISION_VALIDATION.md`
-  - `ai-pipeline/outputs/02_requirements/REQUIREMENTS.md`
-  - `ai-pipeline/outputs/02_requirements/REQUIREMENTS_VALIDATION.md`
-  - `ai-pipeline/prompts/system/SYSTEM_PROMPT.md`
+  - `ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md` (v2.3), `CONTEXT_VALIDATION.md`
+  - `ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md` (HU11-HU19, SP, MoSCoW)
+  - `ai-pipeline/outputs/00_context/DECISIONS_MVP2.md` (DEC-201-DEC-218)
+  - `ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md` (v2.2), `PRODUCT_VISION_VALIDATION.md`
+  - `ai-pipeline/outputs/02_requirements/REQUIREMENTS.md` (v3.0), `product_backlog.json` (v3.0), `REQUIREMENTS_VALIDATION.md`
+  - `ai-pipeline/outputs/03_planning/PRIORITIZATION.md` and `product_backlog.json` v1.0 (MVP 1)
+  - `ai-pipeline/prompts/system/RELEASE_PLAN.md` (MVP 1 load reference), `SYSTEM_PROMPT.md`
 - **Validation Statuses:**
-  - P00: `PASS_WITH_WARNINGS` with warnings reconciled by later approved
-    decisions.
-  - P01: `PASS`
-  - P02: `PASS`
+  - P00: `PASS_WITH_WARNINGS` (run 4; VAL-212, VAL-213)
+  - P01: `PASS_WITH_WARNINGS` (run 3; DISC-VAL-202, DISC-VAL-203)
+  - P02: `PASS_WITH_WARNINGS` (REQ-VAL-201 and REQ-VAL-202 MEDIUM; REQ-VAL-202 and REQ-VAL-203 corrected upstream)
 
 ## 2. Executive Summary
 
-Notara MVP 1 must demonstrate one coherent product promise: an authenticated
-user can publish a short textual score, another user can discover and read it,
-filter scores by instrument, and provide lightweight feedback through a
-reaction or comment.
+MVP 2 must demonstrate one product promise: **a user can dictate a score, publish it, and listen to it.** The P0 slice delivers exactly that: dictation (US-011), spoken solfege (US-013) and instrument playback (US-015), together with the two enablers that keep audio affordable and available, the audio store (US-016) and the fallback voice (US-017). P0 totals 21 SP. Voice comments, the audio tutor and `.abc` file loading are P1, 8 SP. The MP3 download is the only P2 item, 2 SP.
 
-The plan prioritizes the product flow rather than isolated features. P0
-contains the capabilities required to establish identity, publish valid
-textual content, discover it, and support community feedback. P1 contains
-supporting profile and ownership capabilities that protect the quality and
-control of published content. P2 and P3 contain future or explicitly excluded
-capabilities and are not part of MVP 1.
+The team's load is **31 SP**, the same nominal load that MVP 1 delivered in one sprint. MVP 2 is riskier, though:
+- It is the first release with paid external services and user audio data.
+- MVP 1 ended with an evaluation of `NEEDS_ITERATION`.
+- The estimate for US-011 (8 SP) is provisional.
 
-The plan is `READY` because the P02 requirements are version 2.0, the
-requirements validation is `PASS`, the ten approved user capabilities are
-traceable, and the remaining risks are bounded and visible. No framework,
-architecture, implementation task, developer assignment, Story Point,
-release, or sprint commitment is introduced.
+For these reasons the plan **commits only the P0 slice**, targets P1, treats P2 as stretch, and gives an explicit drop order.
+
+**Sequencing:**
+- Stories with no external dependency (US-015, US-019) start first, so the team is not blocked while keys, budget and storage are confirmed.
+- The voice-output chain runs US-017 → US-016 → US-013. US-017 comes first because the free fallback voice lets development proceed without paid credits (DEC-202).
+- Dictation (US-011), the highest-uncertainty item, starts in parallel and early, so problems surface early.
+
+**Status:** `READY_WITH_ASSUMPTIONS`. Sprint dates, owners, budget, decision ratification and three PROPOSAL rules are still team inputs (section 6.1). No technology beyond the decided constraints, no developer assignment and no date has been introduced.
 
 ## 3. Product Priorities at a Glance
 
 | Priority | Item / Capability | Why It Matters | Source / Requirement | Status |
 |---|---|---|---|---|
-| P0 | Registration and authentication | Establishes the identity boundary for all protected actions. | HU01-HU02, MVP-001..002, FR-001..002, FR-017 | MVP Core |
-| P0 | Publish valid `.abc` or plain-text score | Delivers Notara's central text-first sharing value. | HU04, MVP-004, FR-005..009 | MVP Core |
-| P0 | Feed, detail, and instrument filtering | Makes published content discoverable and readable. | HU07-HU08, MVP-007..008, FR-012..014 | MVP Core |
-| P0 | Reactions and comments | Completes the lightweight community-feedback promise. | HU09-HU10, MVP-009..010, FR-015..016 | MVP Core |
-| P1 | Profile and password change | Supports identity maintenance without expanding the core flow. | HU03, MVP-003, FR-003..004 | MVP Supporting |
-| P1 | Edit and delete own publications | Provides ownership control and protects content lifecycle. | HU05-HU06, MVP-005..006, FR-010..011 | MVP Supporting |
-| P2 | Advanced ABC capabilities | Not needed to prove the minimal textual-sharing promise. | Q-001, P01/P02 scope | Deferred |
-| P2 | Additional feed ordering | The approved newest-first feed is sufficient for MVP validation. | Q-003, FR-012 | Deferred |
-| P3 | Voice input and OMR | Reserved for later product phases and outside MVP 1. | FUT-001..002, OOS-001..002 | Future |
-| P3 | Audio, images, roles, account recovery, comment management | Explicitly outside the approved MVP boundary. | OOS-003..005, Q-004..005 | Out of Scope |
+| — | MVP 1 capabilities (HU01-HU10) | Delivered baseline; P0/P1 as in version 1.0. | US-001-US-010; FR-001-FR-017 | Delivered (`v1.0.0`) |
+| P0 | Dictate a score by voice | Core input promise of MVP 2; highest uncertainty. | US-011; FR-018-FR-021, FR-025, FR-029, FR-030, FR-043 | MVP Core |
+| P0 | Spoken solfege | Core listening promise; learning use case for students. | US-013; FR-031-FR-033, FR-036, FR-037, FR-044 | MVP Core |
+| P0 | Instrument playback | Core listening promise without external cost. | US-015; FR-035-FR-037 | MVP Core |
+| P0 | Audio store (cache) | Protects credits; Must in the backlog. | US-016; FR-038, FR-039 | MVP Supporting (enabler) |
+| P0 | Fallback voice | Keeps audio available in demos; free voice for development. | US-017; FR-040, FR-041 | MVP Supporting (enabler, Must by DEC-209) |
+| P1 | Load score from `.abc` file | Closes MVP 1 scope gap; cheap and independent. | US-019; FR-022-FR-025 | MVP Supporting |
+| P1 | Voice comments | Extends community feedback to voice. | US-012; FR-026-FR-030 | MVP Supporting |
+| P1 | Audio tutor | Helps users understand a score before practicing. | US-014; FR-034 | MVP Supporting |
+| P2 | MP3 download | Convenience for offline practice. | US-018; FR-042 | MVP Supporting (stretch) |
+| P3 | OMR, sung solfege, mixed MP3, other languages | Excluded or future. | P00 FUT-002, FUT-004, FUT-005; OOS-* | Future / Out of Scope |
 
 ## 4. MVP Focus
 
@@ -61,171 +67,206 @@ release, or sprint commitment is introduced.
 
 | ID | Capability | User Value | Priority | Rationale |
 |---|---|---|---|---|
-| MVP-001 / HU01 | Registration | Lets a visitor become a participant in the Notara community. | P0 | Required before authenticated publication and interaction. |
-| MVP-002 / HU02 | Login and logout | Provides controlled access to protected product actions. | P0 | Unlocks the main user journey and enforces the authentication boundary. |
-| MVP-004 / HU04 | Publish `.abc` or plain-text score | Lets users share a short musical idea without complex notation software. | P0 | It is the central product value and depends on authentication. |
-| MVP-007 / HU07 | Dashboard and instrument filtering | Helps users find relevant personal and community content. | P0 | Connects publication to discovery and implements a validated user need. |
-| MVP-008 / HU08 | Feed and score detail | Makes textual scores readable and usable by the community. | P0 | Required to verify that publication creates visible product value. |
-| MVP-009 / HU09 | Reactions | Provides a lightweight feedback signal on a score. | P0 | Completes the minimum community interaction promise. |
-| MVP-010 / HU10 | Comments | Enables direct lightweight feedback on another user's score. | P0 | Complements reactions and is part of the approved core flow. |
+| US-011 / HU11 | Dictate a score by voice | Enter a melody without typing notation (NEED-007). | P0 | Must; the defining input of MVP 2; highest uncertainty (vocabulary, transcription quality), so it must start early. Estimate 8 SP is **provisional** (BR-013, BR-025). |
+| US-013 / HU13 | Spoken solfege | Hear note names to practice sight-reading (NEED-009). | P0 | Must; the defining output of MVP 2; depends on US-016 and US-017 for cost and availability. |
+| US-015 / HU15 | Instrument playback | Hear how the melody sounds (NEED-011). | P0 | Must; runs in the browser with no provider (DEC-203), so it carries no external risk and gives early listening value. |
 
-The P0 slice must preserve the approved content rules: `.abc` and plain text,
-non-empty content, a maximum of 1,000 characters, minimal ABC validation with
-`X:`, `T:`, `M:`, `L:`, and `K:` fields plus a valid musical line, required
-publication metadata, readable display, preserved line breaks, and visible
-format distinction.
+MVP 1 Core (HU01, HU02, HU04, HU07-HU10) remains delivered. The MVP 1 content rules apply unchanged to dictated and loaded content (DEC-218).
 
 ### MVP Supporting
 
 | ID | Capability | User Value | Priority | Rationale |
 |---|---|---|---|---|
-| MVP-003 / HU03 | Profile and password change | Lets authenticated users maintain identity information. | P1 | Important for account control, but not required to demonstrate score sharing. |
-| MVP-005 / HU05 | Edit own publication | Lets authors correct or maintain their own content. | P1 | Depends on publication and ownership rules; supports content lifecycle. |
-| MVP-006 / HU06 | Delete own publication | Lets authors remove content they own. | P1 | Depends on publication and ownership rules; supports user control. |
+| US-016 / HU16 | Audio store | Avoids paying twice for the same audio (OPS-002). | P0 | Must enabler; without it US-013 and US-014 can exhaust credits (RISK-010). Needs persistent storage (Q-009). |
+| US-017 / HU17 | Fallback voice | Audio still works when the provider fails (OPS-001). | P0 | Must by DEC-209; also the default voice in development and CI (DEC-202), which unblocks US-013 before paid keys exist. |
+| US-019 / HU19 | Load `.abc` file | Bring existing scores without copy-paste (NEED-013). | P1 | Should; 2 SP, frontend only, no provider or storage (DEC-217). Scheduled early because it is independent, not because it outranks P0. Fix DEFECT-001 in the same change. |
+| US-012 / HU12 | Voice comments | Quick spoken feedback (NEED-008). | P1 | Should; reuses transcription from US-011 but adds storage (Q-009), personal data (DEC-214) and a lifecycle question (Q-022). |
+| US-014 / HU14 | Audio tutor | Understand clef, meter and difficulty (NEED-010). | P1 | Should; depends on US-016/US-017 and on PROPOSAL BR-014 (difficulty rule) and Q-025. Estimate 3 SP is **provisional**. |
+| US-018 / HU18 | MP3 download | Offline practice (NEED-012). | P2 | Could; depends on US-013; first item dropped under pressure. |
 
-P1 items should be included when capacity allows after the P0 flow is coherent.
-They must not displace the minimum publication, discovery, and feedback path
-without an explicit product decision.
+MVP 1 Supporting (HU03, HU05, HU06) remains delivered.
 
 ### Future / Deferred
 
 | ID | Capability | Reason for Deferral | Priority |
 |---|---|---|---|
-| FUT-001 | Voice-based input | Reserved for MVP 2 and not required for textual score sharing. | P3 |
-| FUT-002 | Image recognition / OMR | Reserved for MVP 3 and materially expands the product scope. | P3 |
-| FUT-003 | Audio playback or sharing | Not part of the current text-first product promise; requires future approval. | P3 |
-| DEFER-001 | Advanced ABC features | Q-001 approves only the minimal syntax subset for MVP 1. | P2 |
-| DEFER-002 | Additional feed sorting | Q-003 approves newest-first ordering without additional options. | P2 |
+| FUT-002 | Image recognition / OMR | Reserved for MVP 3. | P3 |
+| FUT-004 | Sung solfege with rhythmic synchronization | DEC-206. | P3 |
+| FUT-005 | Single MP3 mixing voice and instrument | DEC-204. | P3 |
+| FUT-006 | Email verification, account recovery | Not in the MVP 2 backlog. | P3 |
+| DEFER-001 | Advanced ABC features | Q-001 minimal subset still applies; dictation vocabulary is one octave (ASM-012). | P2 |
+| DEFER-002 | Additional feed sorting | Q-003 newest-first still applies. | P2 |
+| DEFER-003 | Fallback for transcription | Not in the backlog; EDGE-018 defines a clear message instead. | P3 |
 
 ### Out of Scope
 
 | ID | Excluded Item | Reason |
 |---|---|---|
-| OOS-001 | Voice input in MVP 1 | Explicitly reserved for MVP 2. |
-| OOS-002 | OMR in MVP 1 | Explicitly reserved for MVP 3. |
-| OOS-003 | Image uploads | Not part of the validated textual MVP. |
-| OOS-004 | Audio playback or sharing in MVP 1 | The MVP promise is viewing textual score content. |
-| OOS-005 | Differentiated roles or administration | P01 and P02 define one shared user capability model. |
-| OOS-006 | Comment editing or deletion | Excluded by Q-004. |
-| OOS-007 | Account recovery | Excluded by Q-005; password change remains in HU03. |
-| OOS-008 | Feed ordering beyond newest-first | Excluded by Q-003. |
+| OOS-002 | OMR in MVP 2 | MVP 3. |
+| OOS-003 | Image uploads | HU19 loads text files only. |
+| OOS-005 | Differentiated roles | HU16/HU17 are enablers, not roles. |
+| OOS-006 | Comment editing | DEC-211 ratifies deletion only. |
+| OOS-007 | Account recovery | Q-005. |
+| OOS-008 | Server-side instrument synthesis | DEC-203. |
+| OOS-009 | Storing loaded `.abc` files; other file formats | DEC-217. |
+| OOS-010 | Languages other than Spanish | DEC-215. |
 
 ## 5. Delivery Sequence
 
-### Phase 1 - Foundation / MVP Validation
+Delivery groups are product groupings within Sprint 2, not technical tasks or dates. Groups 1-3 can run in parallel when people are available.
 
-This is a product delivery grouping, not a technical sprint assignment.
+### Phase 0 - Preconditions (team decisions, before or at sprint start)
 
-| Order | Work Item | Depends On | Value Delivered |
-|---|---|---|---|
-| 1 | Registration and login/logout (HU01-HU02) | None | Establishes the user identity boundary. |
-| 2 | Profile baseline and password change (HU03) | HU01-HU02 | Provides account context; may be completed after the core authentication path if capacity is constrained. |
-| 3 | Score publication with metadata and content validation (HU04) | HU02; FR-017 | Delivers the first publishable `.abc` or plain-text score. |
-| 4 | Feed, detail view, newest-first ordering, pagination, and instrument filter (HU07-HU08) | HU04; Q-003 | Makes published scores discoverable and readable. |
-| 5 | Reactions and comments (HU09-HU10) | HU08; authenticated user | Completes the community feedback flow. |
-| 6 | Edit and delete own publication (HU05-HU06) | HU04; ownership boundary | Adds author control after the publish flow is stable. |
+See section 6.1 (PRE-001-PRE-009). They are not development work, but several delivery groups depend on them.
 
-The minimum coherent validation slice is items 1, 3, 4, and 5. Item 2 is
-supporting and items 6 provides ownership control; both remain in MVP 1 but
-should not compromise the core flow under the one-sprint constraint.
-
-### Phase 2 - Expansion / Post-MVP
+### Phase 1 - MVP 2 Delivery (Sprint 2)
 
 | Order | Work Item | Depends On | Value Delivered |
 |---|---|---|---|
-| 1 | Review evidence from MVP 1 and decide whether advanced ABC support is needed. | MVP 1 usage and validation evidence | Supports a controlled decision about richer score syntax. |
-| 2 | Evaluate voice-based input for MVP 2. | Approved post-MVP product decision | Explores a new input mode without changing MVP 1. |
-| 3 | Evaluate OMR/image recognition for MVP 3. | Approved post-MVP product decision and evidence | Explores image-based score entry without expanding the current plan. |
-| 4 | Reassess audio, additional ordering, account recovery, and comment management. | Human approval and new requirements evidence | Prevents unapproved features from entering the current release. |
+| 1a | US-015 Instrument playback (P0, 3 SP) | Published ABC scores (US-004, US-008) | First listening value with no external dependency. |
+| 1b | US-019 Load `.abc` file + DEFECT-001 (P1, 2 SP) | US-004, US-005 (DEP-004) | Closes the MVP 1 gap; independent of keys and storage. |
+| 2a | US-017 Fallback voice (P0, 2 SP) | Decided provider pair (DEC-202) | Free voice available for development, CI and demos. |
+| 2b | US-016 Audio store (P0, 3 SP) | US-017; PRE-005 storage verification (DEP-009) | Reuse of synthesized audio; protects credits. |
+| 2c | US-013 Spoken solfege (P0, 5 SP) | US-016, US-017 (DEP-007); ABC scores | Core listening promise. |
+| 3 | US-011 Dictation (P0, 8 SP provisional) | US-004, US-005 (DEP-004); PRE-002 vocabulary and header rules; PRE-004 transcription key | Core input promise; started early to surface risk. |
+| 4a | US-014 Audio tutor (P1, 3 SP provisional) | US-016, US-017; PRE-003 difficulty rule | Spoken summary of clef, meter, estimated difficulty. |
+| 4b | US-012 Voice comments (P1, 3 SP) | US-010 and DEC-211 (DEP-005); transcription from US-011; PRE-005 storage | Spoken community feedback. |
+| 5 | US-018 MP3 download (P2, 2 SP) | US-013 (DEP-006) | Offline practice. |
 
-No item in Phase 2 is an MVP 1 commitment.
+The **minimum coherent validation slice** is 1a, 2a, 2b, 2c and 3: dictate → publish → listen with solfege and instrument, with cost and availability protected.
+
+### Phase 2 - Expansion / Post-MVP 2
+
+| Order | Work Item | Depends On | Value Delivered |
+|---|---|---|---|
+| 1 | Address MVP 1 `NEEDS_ITERATION` findings not covered by Sprint 2 (e.g. P10 EVAL-001 security concern). | Team decision (PRE-010) | Reduces carried risk. |
+| 2 | Revisit dictation vocabulary (octaves, dotted notes) with evidence from US-011 use. | Q-021; usage evidence | Richer dictation. |
+| 3 | Evaluate sung solfege and mixed MP3. | FUT-004, FUT-005; new decision | Richer listening. |
+| 4 | OMR / image recognition. | MVP 3 decision | Next product phase. |
 
 ## 6. Dependencies, Decisions, and Risks
 
+### 6.1 Preconditions
+
+| ID | Precondition | Needed by | Owner / Source | Status |
+|---|---|---|---|---|
+| PRE-001 | Ratify DEC-201-DEC-218 with TEAM-002-TEAM-005. | P04, P05; all MVP 2 groups | Team; Q-020 | Open |
+| PRE-002 | Approve dictation vocabulary BR-013 and header completion BR-025. | US-011 estimate and UX (P04) | Team; Q-021, Q-023; REQ-VAL-201 | Open |
+| PRE-003 | Approve difficulty rule BR-014 and tutor content (key/tempo). | US-014 | Team; Q-024, Q-025 | Open |
+| PRE-004 | Provider keys, credits, budget and global monthly cap. | US-011, US-012 (transcription); US-013, US-014 with the commercial voice | Team; Q-011 | Open |
+| PRE-005 | Verify that the Railway volume persists files across deployments. | US-016, US-012 in production | TEAM-005 / P05; Q-009 | Open |
+| PRE-006 | Sprint 2 dates and story owners. | Sprint commitment | Team; Q-010 | Open |
+| PRE-007 | Decide the API route prefix (`/api/` vs `/api/v1/`) and the duplicated `Like`/`Reaction` models before adding MVP 2 endpoints. | P05, P06 | P05 architecture; P00 RISK-011 | Open |
+| PRE-008 | Decide the account-deletion gap in the retention rule. | US-012 closure | Team; Q-022 | Open |
+| PRE-009 | Latency targets. | P05, P07 | Team; Q-012 | Open |
+| PRE-010 | Decide whether MVP 1 `NEEDS_ITERATION` items enter Sprint 2 capacity. | Sprint commitment | Team; P10 evaluation | Open |
+
+### 6.2 Dependencies, Decisions and Risks
+
 | ID | Dependency / Risk / Decision Needed | Impact | Owner / Source | Status |
 |---|---|---|---|---|
-| DEP-001 | Authentication must precede protected publication, reaction, comment, profile, and ownership actions. | High | FR-017 / P02 | Confirmed |
-| DEP-002 | Valid score content and required metadata must precede publication and discovery. | High | FR-005..009 / Q-001 | Confirmed |
-| DEP-003 | Publication must exist before feed, detail, reactions, or comments can deliver value. | High | FR-009, FR-012..016 | Confirmed |
-| RISK-001 | One two-week sprint creates pressure across ten approved capabilities. | High | P00 team constraint | Visible; protect P0 slice first |
-| RISK-002 | Minimal ABC validation may create implementation and UX clarification risk. | Medium | FR-008 / Q-001 | Bounded by approved subset |
-| RISK-003 | Readability and line-break preservation must work across approved responsive contexts. | Medium | NFR-001..002 / Q-002 | Validate in P04 and later testing |
-| RISK-004 | Ownership rules must remain clear for editing and deleting publications. | Medium | NFR-003 / HU05-HU06 | Confirmed product boundary |
-| DEC-001 | Newest-first feed with 10 publications per page and no extra sorting. | Medium | Q-003 / FR-012 | Approved |
-| DEC-002 | Comments cannot be edited or deleted in MVP 1. | Low | Q-004 | Approved |
-| DEC-003 | Account recovery is excluded; password change remains available. | Low | Q-005 / HU03 | Approved |
+| DEP-004 | Dictation and file loading extend create/edit (US-004, US-005). | Medium | P02 | Confirmed |
+| DEP-005 | Voice comments extend comments and need BR-019. | Medium | P02 | Confirmed |
+| DEP-006 | MP3 needs the solfege audio (US-013). | Low | P02 | Confirmed |
+| DEP-007 | Solfege and tutor rely on US-016 and US-017. | High | P02 | Confirmed |
+| DEP-008 | Transcription and synthesis need provider access and budget. | High | P02; PRE-004 | Open |
+| DEP-009 | Voice comments and the audio store need persistent storage. | High | P02; PRE-005 | Open |
+| DEP-010 | Decision-refined items need ratification. | Medium | P02; PRE-001 | Open |
+| RISK-001 | 31 SP in one sprint with unknown dates; equal to the MVP 1 load but with first external integrations. | High | P00 | Mitigated by the cut line (section 7) |
+| RISK-006 | Provider outages or exhausted credits. | High | P00 | Mitigated by US-016 and US-017 at P0 |
+| RISK-007 | Dictation may reject natural phrasing. | High | P00 | US-011 early in the sprint; PRE-002 |
+| RISK-008 | Storage persistence unverified. | High | P00 | PRE-005 before US-016/US-012 go to production |
+| RISK-010 | Credit consumption by users. | High | P00 | US-016 P0; FR-044 limit |
+| RISK-011 | MVP 1 debt (duplicate routes and models) spreading to new endpoints. | Medium | P00 | PRE-007 |
+| RISK-014 | Decisions reversed at ratification. | Medium | P00 | PRE-001 before P04/P05 |
+| PLAN-RISK-001 | Provisional estimates (US-011 8 SP, US-014 3 SP) may grow when BR-013, BR-014 and BR-025 are approved. | Medium | P02 REQ-VAL-201 | Re-estimate after PRE-002/PRE-003 |
+| PLAN-RISK-002 | Most MVP 2 stories have a user-facing part (US-011-US-015, US-018, US-019); MVP 1 concentrated frontend load on one role (35%, RELEASE_PLAN.md). Frontend capacity may be the bottleneck. | Medium | RELEASE_PLAN.md section 6 | Consider when owners are assigned (PRE-006); P03 does not assign people |
+| PLAN-RISK-003 | MVP 1 closed as `NEEDS_ITERATION`; its improvement items compete for the same sprint capacity. | Medium | P10 MVP_EVALUATION | PRE-010 |
+| DEC-001 | Newest-first feed, 10 per page. | Medium | MVP 1 | Approved |
+| DEC-002 | Comments cannot be edited or deleted in MVP 1. | Low | MVP 1 | **Superseded by DEC-211** (deletion by author allowed; editing excluded) |
+| DEC-003 | Account recovery excluded. | Low | MVP 1 | Approved |
+| DEC-201-DEC-218 | MVP 2 decisions. | — | `DECISIONS_MVP2.md` | Approved by TEAM-001; ratification pending |
 
-## 7. Requirements-to-Priority Traceability
+## 7. Capacity and Cut Line
+
+| Band | Stories | Story Points | Commitment |
+|---|---|---:|---|
+| Committed (P0) | US-011, US-013, US-015, US-016, US-017 | 21 | Must be delivered for MVP 2 to exist. |
+| Target (P1) | US-012, US-014, US-019 | 8 | Planned; dropped in order below if needed. |
+| Stretch (P2) | US-018 | 2 | Only if P0 and P1 are complete. |
+| **Total** | 9 stories | **31** | Equal to the MVP 1 load (31 SP, RELEASE_PLAN.md). |
+
+**Drop order under capacity pressure** (first dropped first):
+
+1. US-018 MP3 download (P2, Could).
+2. US-012 Voice comments (P1). It has the most external dependencies (storage, personal data, Q-022).
+3. US-014 Audio tutor (P1). It depends on an unapproved rule (BR-014).
+4. US-019 Load `.abc` file (P1). It is kept longest because it is cheap, independent and closes an MVP 1 gap.
+
+P0 stories are never dropped. If a P0 story is at risk, re-scope its acceptance criteria with the team, for example by narrowing the vocabulary in BR-013, rather than drop the story.
+
+**Estimate status:** 20 SP are team estimates. 11 SP are provisional (US-011, 8 SP; US-014, 3 SP) until PRE-002 and PRE-003 are resolved.
+
+## 8. Requirements-to-Priority Traceability
 
 | Requirement | Priority / Phase | Decision Basis | Notes |
 |---|---|---|---|
-| FR-001 / HU01 / MVP-001 | P0 / Phase 1 | Entry point for participation and authentication. | Directly supports the main flow. |
-| FR-002, FR-017 / HU02 / MVP-002 | P0 / Phase 1 | Required identity boundary for protected actions. | Direct dependency for HU04, HU09, and HU10. |
-| FR-003..FR-004 / HU03 / MVP-003 | P1 / Phase 1 | Supports account control but does not create the core community value. | Supporting capability. |
-| FR-005..FR-009 / HU04 / MVP-004 | P0 / Phase 1 | Core text-first publishing promise and primary user need. | Includes `.abc`, plain text, metadata, length, and validation rules. |
-| FR-010 / HU05 / MVP-005 | P1 / Phase 1 | Ownership and content lifecycle control. | Depends on valid publication and authentication. |
-| FR-011 / HU06 / MVP-006 | P1 / Phase 1 | Ownership and content lifecycle control. | Depends on valid publication and authentication. |
-| FR-012..FR-013 / HU07 / MVP-007 | P0 / Phase 1 | Discovery and instrument relevance are central user needs. | Preserves newest-first and 10-item pagination. |
-| FR-014 / HU08 / MVP-008 | P0 / Phase 1 | Required to read and evaluate published textual scores. | Preserves line breaks and format distinction. |
-| FR-015 / HU09 / MVP-009 | P0 / Phase 1 | Provides lightweight community feedback. | Depends on a discoverable score. |
-| FR-016 / HU10 / MVP-010 | P0 / Phase 1 | Provides direct lightweight community feedback. | Comment editing and deletion remain excluded. |
-| NFR-001 | P0 / All Phase 1 groups | Readable textual content is part of the product promise. | Cross-cutting product constraint. |
-| NFR-002 | P0 / All Phase 1 groups | Responsive behavior is required for the approved MVP flows. | Chrome, Edge, Firefox at 360, 768, and 1280 px. |
-| NFR-003 | P0/P1 / All protected flows | Authentication and ownership boundaries protect product behavior. | Product-level constraint, not an architecture decision. |
+| FR-001-FR-017 / HU01-HU10 | Delivered / MVP 1 | Version 1.0 plan | FR-016 extended by FR-028 (DEC-211). |
+| FR-018-FR-021, FR-025, FR-029, FR-030, FR-043 / US-011 | P0 / group 3 | Must; core input; risk discovery | Provisional 8 SP; DIRECT to HU11, REFINED by DEC-205/208. |
+| FR-026-FR-028 / US-012 | P1 / group 4b | Should; external dependencies | DIRECT to HU12; REFINED by DEC-211/214. |
+| FR-031-FR-033, FR-044 / US-013 | P0 / group 2c | Must; core output | DIRECT to HU13; REFINED by DEC-206. |
+| FR-034 / US-014 | P1 / group 4a | Should; PROPOSAL rule | DIRECT to HU14; REFINED by DEC-212; provisional 3 SP. |
+| FR-035 / US-015 | P0 / group 1a | Must; no external dependency | DIRECT to HU15; REFINED by DEC-203. |
+| FR-036, FR-037 | P0 / groups 1a, 2c | Cross-cutting for listening features | DEC-207. |
+| FR-038, FR-039 / US-016 | P0 / group 2b | Must enabler; cost | DIRECT to HU16; REFINED by DEC-210. |
+| FR-040, FR-041 / US-017 | P0 / group 2a | Must by DEC-209 | REFINED (Should → Must). |
+| FR-042 / US-018 | P2 / group 5 | Could | DIRECT to HU18; REFINED by DEC-204. |
+| FR-022-FR-024 / US-019 | P1 / group 1b | Should; independent | DIRECT to HU19 (CR-002). |
+| NFR-004 Privacy | P0/P1 / groups 3, 4b | Applies to recordings | DEC-214. |
+| NFR-005 Reliability | P0 / all MVP 2 groups | Text flows must not break | PRINCIPLE-008. |
+| NFR-006 Cost control | P0 / groups 2a-2c | Credits | DEC-202, DEC-213. |
+| NFR-007 Language | P0 / groups 2c, 3, 4 | Spanish only | DEC-215. |
+| NFR-008 Platform | P0 / groups 3, 4b | Recording needs HTTPS and support | NFR-002 matrix. |
+| NFR-009 Performance | BLOCKED | Targets not defined | PRE-009. |
+| NFR-010 Testability | P0 / all MVP 2 groups | Tests without paid providers | P00 RISK-006. |
 
-## 8. Assumptions and Unknowns
+## 9. Assumptions and Unknowns
 
 | ID | Item | Classification | Why It Affects Prioritization |
 |---|---|---|---|
-| ASSUM-001 | The approved minimal ABC subset is sufficient to demonstrate MVP value. | ASSUMED | Keeps publication bounded while retaining the central score-sharing flow. |
-| ASSUM-002 | Readable plain text with preserved line breaks is sufficient for MVP score viewing. | ASSUMED | Supports a text-first product without audio or rendering expansion. |
-| ASSUM-003 | The five-person team and one two-week sprint are the active delivery constraints. | DIRECT | Requires protection of the P0 slice and deferral of optional scope. |
-| ASSUM-004 | P04 can refine presentation details without changing approved product scope. | ASSUMED | Enables UX work while preserving P02 decisions. |
-| UNKNOWN-001 | Actual adoption, learning outcomes, and community impact are not measured. | UNKNOWN | Prioritization relies on validated product intent rather than outcome metrics. |
-| UNKNOWN-002 | No additional feed sorting, account recovery, or comment-management behavior is approved. | RESOLVED / EXCLUDED | These are not blockers because Q-003 through Q-005 define the MVP boundary. |
+| ASSUM-001 | The approved minimal ABC subset is sufficient. | ASSUMED (MVP 1) | Still bounds dictated and loaded content (DEC-218). |
+| ASSUM-002 | Readable text with preserved line breaks is sufficient. | ASSUMED (MVP 1) | Also applies to loaded files. |
+| ASSUM-003 | Five-person team and one two-week sprint. | DIRECT | Basis for the cut line. |
+| ASSUM-004 | P04 can refine presentation without changing scope. | ASSUMED | Enables UX for recording, listening and file loading. |
+| ASSUM-005 | MVP 1 load (31 SP) is a usable reference for Sprint 2 capacity. | ASSUMED | MVP 2 risk is higher, so only P0 is committed. |
+| ASSUM-006 | The free fallback voice is good enough for development and CI. | ASSUMED | Lets group 2 start before paid keys (DEC-202). |
+| UNKNOWN-001 | Sprint dates and owners. | UNKNOWN | No commitment by date or person (PRE-006). |
+| UNKNOWN-002 | Budget and global cap. | UNKNOWN | Commercial-voice use in demos (PRE-004). |
+| UNKNOWN-003 | Adoption and learning outcomes. | UNKNOWN | Priorities rely on product intent, not metrics. |
 
-## 9. Key Constraints
+## 10. Key Constraints
 
-- MVP 1 is an academic responsive web product for textual scores.
-- Supported score formats are `.abc` and plain text.
-- Content must be non-empty and no longer than 1,000 characters.
-- Minimal ABC validation requires `X:`, `T:`, `M:`, `L:`, and `K:` fields plus
-  a valid musical line.
-- Published content must preserve line breaks and distinguish its format.
-- The feed is newest-first with 10 publications per page and no additional
-  ordering options.
-- Initial responsive validation covers current Chrome, Edge, and Firefox at
-  360 px, 768 px, and 1280 px.
-- Comment editing/deletion and account recovery are excluded from MVP 1.
-- Voice, OMR, images, audio, and differentiated roles are not MVP 1 scope.
-- The plan must remain feasible for a five-person team and one two-week sprint.
-- P03 does not select technologies, architecture, implementation details,
-  developers, Story Points, sprints, or release dates.
+- MVP 1 content rules unchanged; they apply to dictated and loaded content.
+- Listening features only for `.abc` scores; Spanish only; recordings ≤ 30 s and ≤ 2 MB; 20 new syntheses per user per day.
+- Decided providers: Whisper, ElevenLabs with `edge-tts` fallback, Tone.js in the browser; these are constraints, not P03 design.
+- 31 SP in one sprint, five-person team, dates unknown.
+- P03 assigns no developers, dates or workload, and designs no technology.
 
-## 10. Final Recommendation
+## 11. Final Recommendation
 
-Proceed with the P0 slice as the primary MVP validation target:
+1. **Resolve the preconditions first.** PRE-001 (ratification), PRE-002 (dictation rules), PRE-004 (keys and budget) and PRE-006 (dates and owners) should be settled at or before sprint start.
+2. **Start without waiting.** Begin with US-015 and US-019, which depend on nothing external, together with US-017, whose free voice unblocks audio work.
+3. **Start dictation early.** Begin US-011 early and in parallel, because it carries the most uncertainty.
+4. **Build the voice-output chain in order:** US-017 → US-016 → US-013.
+5. **Commit the P0 slice (21 SP).** Deliver P1 in the order US-019 (already early), US-014, US-012, and treat US-018 as stretch.
+6. **Re-estimate once rules are approved.** Re-estimate US-011 and US-014 when PRE-002 and PRE-003 close, and re-check the cut line.
 
-1. Registration and authentication.
-2. Valid publication of `.abc` or plain-text scores.
-3. Feed, detail, newest-first ordering, pagination, and instrument filtering.
-4. Reactions and comments.
+## 12. Status and Next Actions
 
-Include profile/password change and publication ownership controls as P1
-supporting capabilities when capacity permits. If the one-sprint constraint
-requires a trade-off, defer P1 before removing any P0 capability. Do not add
-future or excluded features to compensate for incomplete core value.
-
-## 11. Status and Next Actions
-
-- **Status:** `READY`
+- **Status:** `READY_WITH_ASSUMPTIONS`
 - **Next stage:** P04 - UX/UI
-- **Required next actions:**
-  1. Validate this artifact with `ai-pipeline/prompts/03_planning/P03_validation.md`.
-  2. Use the P0 flow as the primary UX/UI journey.
-  3. Preserve Q-001 through Q-006 as approved product decisions.
-  4. Carry the listed responsive, readability, ABC, dependency, and ownership
-     risks into P04 and subsequent validation.
-- **Human decisions required before proceeding:** None for the approved P03
-  scope. Any new product capability or change to Q-001 through Q-006 requires
-  explicit approval and traceability update.
+- **Next actions:**
+  1. Validate this plan with `P03_validation.md` v2.0.
+  2. In P04, design the P0 journeys first: dictation (with notice, vocabulary and errors), listening options on score detail (including disabled state for plain text), then file loading and voice comments.
+  3. Take PRE-001-PRE-010 to the team; update this plan with dates and owners when PRE-006 closes.
+- **Human decisions required:** PRE-001-PRE-010. None blocks P04 design work, but PRE-001 and PRE-002 should close before P04 is finalized.

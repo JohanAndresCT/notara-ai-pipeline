@@ -123,3 +123,32 @@ La planificación validada P03 (`PASS`) es la fuente de prioridad y secuencia.
 - `ai-pipeline/outputs/02_requirements/REQUIREMENTS_VALIDATION.md`
 - `ai-pipeline/outputs/03_planning/PRIORITIZATION.md`
 - `ai-pipeline/prompts/system/SYSTEM_PROMPT.md`
+
+---
+
+# MVP 2 — Sprint 2 (Audio, Speech & TTS/STT)
+
+## 03. Planning (MVP 2): adaptación de prompts
+
+- `prompts/03_planning/P03_planning.md` → v2.0: modo incremental; SP, MoSCoW, release y sprint del backlog del equipo y de DECISIONS_MVP2.md se aceptan como fuente aprobada; estimaciones provisionales marcadas; desarrolladores sin asignar hasta Q-010; rutas `artifacts/` → `outputs/`.
+- `prompts/03_planning/P03_validation.md` → v2.0: valida prioridades HU11–HU19, totales, provisionales, secuencia, riesgo de dependencias externas, línea de corte, precondiciones y JSON.
+
+## 03. Planning (MVP 2)
+
+Resultado: PRIORITIZATION.md v2.0 y product_backlog.json v2.0 — READY_WITH_ASSUMPTIONS.
+- P0 (21 SP, comprometido): US-011 dictado (8, provisional), US-013 solfeo (5), US-015 instrumento (3), US-016 caché (3), US-017 respaldo (2).
+- P1 (8 SP, objetivo): US-019 archivo .abc (2), US-012 comentarios de voz (3), US-014 tutor (3, provisional).
+- P2 (2 SP, extra): US-018 MP3.
+- Secuencia: 1a US-015 y 1b US-019 (sin dependencias externas) → 2a US-017 → 2b US-016 → 2c US-013; 3 US-011 en paralelo y temprano; 4 US-014, US-012; 5 US-018.
+- Orden de recorte: US-018 → US-012 → US-014 → US-019; P0 nunca se recorta.
+- Precondiciones PRE-001..PRE-010 (ratificación, reglas BR, llaves/presupuesto, volumen Railway, fechas/responsables, prefijo de rutas, borrado de cuenta, latencia, ítems NEEDS_ITERATION del MVP 1).
+
+## 03. Planning (MVP 2): Validation
+
+## MVP 2 V2.0 Result: PASS_WITH_WARNINGS (0 HIGH, 1 MEDIUM, 4 LOW)
+
+- PLAN-VAL-201 (MEDIUM): no es compromiso de sprint hasta resolver PRE-001, PRE-002, PRE-004, PRE-006; 11 SP provisionales.
+- PLAN-VAL-202..205 (LOW): US-019 temprano no implica prioridad; dependencia US-012→US-011 asumida; PRE-007 queda para P05; rutas artifacts/ corregidas.
+
+P04 readiness: WITH CONSTRAINTS.
+
