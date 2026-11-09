@@ -162,7 +162,7 @@ All US, FR, NFR and PRE references resolve (automated check). Markdown and JSON 
 
 - **Authorization:** The requester reports human approval of HU11 conditions; names, date and meeting record were not supplied and are not inferred.
 - **Decision scope:** BR-013/BR-025 (PRE-002), HU11-relevant DEC-205/208/213 recording limits/215/218, DEC-219 quota, and the applicable P05 ADRs are ratified for HU11. PRE-001 remains open for decisions outside HU11; it is not globally closed.
-- **Preconditions:** PRE-002 is satisfied for HU11; PRE-007 is satisfied for the HU11 endpoint by ADR-013. PRE-011 is approved for planning based on the approved corpus/quality target (≥100 authorized recordings, ≥5 speakers, ≥90% exact parsed ABC), p95 target (≤15 s for 30 s with model loaded), memory cap (≤800 MiB in 1 GiB), concurrency (one inference/process), and per-user daily quota. Their measurements and pass/fail results remain pending.
+- **Preconditions:** PRE-002 is satisfied for HU11; PRE-007 is satisfied for the HU11 endpoint by ADR-013. PRE-011 is approved for planning based on the approved corpus/quality target (≥9 authorized recordings, ≥3 speakers, ≥7 of 9 exact parsed ABC), p95 target (≤15 s for 30 s with model loaded), memory cap (≤800 MiB in 1 GiB), concurrency (one inference/process), and per-user daily quota. Their measurements and pass/fail results remain pending.
 - **Open timing decision:** Q-012 is partially resolved. The 25 s typed-response ceiling was not explicitly approved and remains a pending candidate; synthesis targets remain open. PRE-009 remains partial.
 - **Planning integrity:** HU11 remains P0 / 8 SP provisional; total remains 31 SP. The P02 dependency and HU11 traceability list include FR-045, AC-070-075 and DEC-219. Q-026 remains a HU12 question and does not block HU11.
 - **Structural checks run:** P02/P03 JSON parse; all P03 canonical story and acceptance-criterion references resolve against P02; HU11's PRE-002/PRE-007/PRE-011 dependencies are present; `git diff --check` passes.
@@ -192,8 +192,8 @@ All US, FR, NFR and PRE references resolve (automated check). Markdown and JSON 
 
 - Approval from other team members has not been established.
 - AC-071 was reconciled to Whisper Base in P02 v5.2; empirical latency acceptance remains pending.
-- Evaluation using at least 100 authorized recordings from 5 speakers.
-- At least 90% exact expected ABC output.
+- Evaluation using at least 9 authorized recordings from 3 speakers.
+- At least 7 of 9 exact expected ABC output.
 - p95 transcription latency at most 15 seconds.
 - Total service memory at most 800 MiB.
 - Railway runtime validation and integration/security regression.

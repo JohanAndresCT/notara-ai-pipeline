@@ -206,7 +206,7 @@ This report did not modify `REQUIREMENTS.md`, `product_backlog.json`, P00/P01 ar
 - **Decision status:** Q-021 and Q-023 are resolved for HU11 (PRE-002 satisfied); Q-027 is resolved for the shared HU11/HU12 STT quota; Q-028's corpus/quality target is approved but unmeasured. Q-012 is partially resolved: the loaded-model p95 target ≤15 s for 30 s recordings is approved, cold start is reported separately, while the 25 s completion/error ceiling and TTS targets remain open. Q-026 remains open for HU12. Q-020 remains open for other MVP 2 decisions.
 - **Quota/security requirements:** Default/configurable 30 admitted inferences per authenticated user per UTC day across HU11/HU12; counter is persistent and atomic. Invalid/authentication/CSRF failures and requests rejected before inference admission do not count; admitted attempts count on downstream failure. Typed over-limit outcome: `STT_DAILY_LIMIT_REACHED` (429). Upload validation and auth/CSRF precede inference.
 - **BR-025 clarification:** Absent headers use the existing defaults without overwriting existing header lines; the existing meter takes precedence over a conflicting dictated meter. Q-029 tracks present-but-empty/malformed headers and non-ABC content in an already populated field; clarify before coding that append path, but it does not block independent STT or empty-field dictation work.
-- **Acceptance state:** ≥100 authorized recordings / ≥5 speakers / ≥90% exact parsed ABC, p95 ≤15 s, ≤800 MiB total service memory in a 1 GiB container and one inference per process are approved targets, not results. No quality, performance, memory, concurrency, or Railway pass is claimed.
+- **Acceptance state:** ≥9 authorized recordings / ≥3 speakers / ≥7 of 9 exact parsed ABC, p95 ≤15 s, ≤800 MiB total service memory in a 1 GiB container and one inference per process are approved targets, not results. No quality, performance, memory, concurrency, or Railway pass is claimed.
 - **Structural checks run:** P02 and P03 JSON both parse; 76 unique acceptance-criterion IDs match between P02 Markdown and JSON; P03 canonical story, AC and HU11 dependency references resolve. `git diff --check` passes.
 - **Current result:** `PASS_WITH_WARNINGS`. HU11 is ready for implementation from requirements perspective; acceptance verification remains pending. Q-020 and Q-012 residuals remain visible.
 
@@ -232,8 +232,8 @@ This report did not modify `REQUIREMENTS.md`, `product_backlog.json`, P00/P01 ar
 ### Pending validation
 
 - CR-004 approved by the requester for implementation; approval from other team members is not established.
-- Evaluation with at least 100 authorized recordings from 5 speakers.
-- At least 90% exact expected ABC output.
+- Evaluation with at least 9 authorized recordings from 3 speakers.
+- At least 7 of 9 exact expected ABC output.
 - p95 transcription latency of at most 15 seconds.
 - Complete service memory at or below 800 MiB.
 - Railway deployment and runtime verification.

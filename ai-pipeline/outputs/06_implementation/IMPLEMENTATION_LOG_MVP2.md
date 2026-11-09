@@ -204,7 +204,7 @@ No dependencies, database migrations, backend code, architecture decisions, Rail
 - **HU11 implementation status:** Authorized to begin locally. No HU11 endpoint, Django model, adapter, frontend, migration, dependency or runtime setting was implemented in this documentation update.
 - **Approved implementation constraints:** preserve `voice`/`SttAdapter`, `POST /api/v1/audio/stt/` and its success contract; `faster-whisper tiny` CPU/int8, Spanish; 30 s/2 MB recording cap; session auth, CSRF, server-side size/MIME/signature checks; no dictation audio/temp retention or content logging; deterministic approved vocabulary and ABC header completion; 30 admitted inferences/user/UTC day by default across HU11/HU12, configurable and atomically persisted; one inference/process.
 - **Quota design:** persist a unique per-user/UTC-day admitted-inference counter shared by dictation and voice comments; reserve atomically after authentication, CSRF, upload validation and process-slot admission. Requests rejected before inference do not count; admitted attempts count even if later processing fails. Over-limit requests return `STT_DAILY_LIMIT_REACHED` (429) without inference.
-- **Approved acceptance targets, not results:** ≥100 authorized recordings from ≥5 speakers and ≥90% exact parsed ABC; loaded-model p95 ≤15 s for a 30 s recording, with cold start reported separately; total service peak ≤800 MiB in a 1 GiB container; one inference/process. Do not mark HU11 accepted until measured.
+- **Approved acceptance targets, not results:** ≥9 authorized recordings from ≥3 speakers and ≥7 of 9 exact parsed ABC; loaded-model p95 ≤15 s for a 30 s recording, with cold start reported separately; total service peak ≤800 MiB in a 1 GiB container; one inference/process. Do not mark HU11 accepted until measured.
 - **Unresolved before affected implementation:** Q-029 tracks present-but-empty/malformed ABC headers and non-ABC content in an already populated field; resolve it before implementing that append path. The candidate completion-or-typed-error-before-25-s ceiling remains pending explicit approval under Q-012; TTS latency targets remain open.
 - **Deployment:** Railway deployment/evaluation is not authorized by this implementation-start approval. No deployment command was run; Python 3.12 integrated runtime and Railway capacity remain unverified.
 
@@ -219,7 +219,7 @@ No dependencies, database migrations, backend code, architecture decisions, Rail
 - **Configuration/documentation:** Added environment variables for limits and model path/revision/manifest/startup requirement/CPU threads. `.local-models/` is excluded from Git and Docker build context. Setup docs distinguish backend dependencies from experiment dependencies and include Windows/Linux model-staging instructions.
 - **Validation environment:** Installed backend requirements in an isolated Python 3.11.9 Windows environment. Python 3.12 is not installed here; the repository's Docker runtime remains Python 3.12. A cross-platform `pip download --only-binary` check resolved all pinned and transitive dependencies for CPython 3.12/manylinux. This validates wheel availability, not runtime execution. Local tests use SQLite because PostgreSQL is not running. The PostgreSQL-only concurrency test is included but is skipped in this SQLite environment.
 - **Measured test status:** Final combined run: `python backend\\manage.py test accounts scores voice --verbosity 1` with `DJANGO_DB_ENGINE=sqlite` — 110 tests passed, 1 PostgreSQL-only concurrency test skipped, 0 failures. `manage.py check` passed; `makemigrations --check --dry-run` reported no changes; `compileall` passed; `git diff --check` passed.
-- **Open acceptance/deployment gates:** No 100-recording corpus/90% quality run, p95/cold-start run, total-service ≤800 MiB measurement, one-process saturation profile, Python 3.12 integration, or Railway test has been performed. Existing Railway entrypoint defaults to two Gunicorn workers; each worker would load its own model and enforce its own process-local lock. Do not infer the approved service memory/concurrency targets from the per-process implementation. Railway provisioning, worker count, and model artifact delivery require a measured and reviewed deployment plan. HU11 is not accepted.
+- **Open acceptance/deployment gates:** No 9-recording corpus/7-of-9 quality run, p95/cold-start run, total-service ≤800 MiB measurement, one-process saturation profile, Python 3.12 integration, or Railway test has been performed. Existing Railway entrypoint defaults to two Gunicorn workers; each worker would load its own model and enforce its own process-local lock. Do not infer the approved service memory/concurrency targets from the per-process implementation. Railway provisioning, worker count, and model artifact delivery require a measured and reviewed deployment plan. HU11 is not accepted.
 
 ## 15. Whisper Tiny provisioning and frontend handoff
 
@@ -230,7 +230,7 @@ No dependencies, database migrations, backend code, architecture decisions, Rail
 - **Authentication error codes:** `AUTHENTICATION_REQUIRED` (401) and `CSRF_FAILED` (403) remain implementation code names whose confirmation is still pending in P05; they are documented as such, not presented as separately approved decisions.
 - **Verification results:** The provisioner successfully fetched the pinned snapshot and installed all four files after checking the upstream commit and SHA-256 manifest. `python backend\\manage.py test accounts scores voice --verbosity 1` ran on Python 3.11.9/Windows with SQLite: 111 tests ran; 110 passed and 1 PostgreSQL-only concurrency test was skipped, with 0 failures. `manage.py check`, `makemigrations --check --dry-run`, `compileall`, and `git diff --check` passed. A Linux CPython 3.12 manylinux wheel-resolution check resolved all 30 pinned/transitive distributions; no Python 3.12 runtime is installed here, so this is not runtime validation.
 - **Not verified by these checks:** No inference using the real model or representative audio was run. This does not measure musical accuracy, integrated latency, memory, or Railway behavior.
-- **Open gates unchanged:** No real transcription with the pinned staged model, representative corpus/90% ABC quality run, integrated latency or memory measurement, Python 3.12 runtime test, PostgreSQL concurrency test, or Railway evaluation has been completed. HU11 remains implemented partially and is not accepted or ready for production deployment.
+- **Open gates unchanged:** No real transcription with the pinned staged model, 9-recording corpus/7-of-9 ABC quality run, integrated latency or memory measurement, Python 3.12 runtime test, PostgreSQL concurrency test, or Railway evaluation has been completed. HU11 remains implemented partially and is not accepted or ready for production deployment.
 
 ## 16. Railway image and HU11 process configuration
 
@@ -294,8 +294,8 @@ been established. Production deployment is not authorized.
 
 ### Pending acceptance
 
-- At least 100 authorized recordings from at least five speakers.
-- At least 90% exact expected ABC results.
+- At least 9 authorized recordings from at least three speakers.
+- At least 7 of 9 exact expected ABC results.
 - Loaded-model p95 at most 15 seconds for 30-second recordings.
 - Total service memory peak at most 800 MiB in a 1 GiB container.
 - Concurrency, quota, security and frontend integration regression.

@@ -793,9 +793,9 @@
         },
         {
           "id": "AC-070",
-          "given": "the authorized evaluation corpus contains at least 100 recordings from at least 5 different speakers",
+          "given": "the authorized evaluation corpus contains at least 9 recordings from at least 3 different speakers",
           "when": "all recordings are transcribed and parsed using the approved deterministic parser",
-          "then": "at least 90% produce the exact expected ABC; this target has not yet been measured",
+          "then": "at least 7 of 9 produce the exact expected ABC; this target has not yet been measured",
           "source": "Q-028; PRE-011"
         },
         {

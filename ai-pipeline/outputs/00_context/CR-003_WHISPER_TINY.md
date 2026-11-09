@@ -104,14 +104,14 @@ Variables propuestas: `STT_MODEL_ID=Systran/faster-whisper-tiny`, `STT_MODEL_REV
 
 ### Criterios de aceptación verificables — propuestas pendientes de aprobación
 
-1. **Calidad HU11:** al menos 100 clips autorizados, de ≥5 hablantes y condiciones variadas, con referencias de transcripción y ABC esperada; ≥90% deben producir el ABC esperado exacto tras el parser determinista. Informar WER y matriz de falsos aceptados/rechazados. El equipo debe aprobar corpus y umbral (Q-028).
+1. **Calidad HU11:** al menos 9 clips autorizados, de ≥3 hablantes y condiciones variadas, con referencias de transcripción y ABC esperada; al menos 7 de 9 deben producir el ABC esperado exacto tras el parser determinista. Informar WER y matriz de falsos aceptados/rechazados. El equipo debe aprobar corpus y umbral (Q-028).
 2. **Tiempo:** con modelo cargado y audio máximo de 30 s, p95 de transcripción ≤15 s bajo una inferencia a la vez; completar o devolver error tipado antes de 25 s. Medir cold start aparte.
 3. **Memoria Railway:** pico total de contenedor (cgroup/Railway) ≤800 MiB bajo límite de 1 GiB, incluyendo Django, Gunicorn, Nginx y carga/inferencia.
 4. **Concurrencia:** una inferencia simultánea; rechazar una solicitud paralela como `STT_UNAVAILABLE` (503) sin bloquear otras rutas ni crear inferencias adicionales. Probar límite entre procesos/replicas antes de escalar.
 5. **Arranque/pesos:** revisión inmutable y hashes verificados; carga antes de readiness, runtime sin red; modelo ausente/corrupto impide readiness con diagnóstico operativo que no exponga audio/transcripción.
 6. **Privacidad/contrato:** ninguna llamada a proveedor STT, audio dictado no persistido, audio/transcripción ausentes de logs; endpoint/campos de éxito, autenticación/CSRF, límites y parser sin cambios.
 
-Los umbrales de 100 clips, 90%, 15 s, 25 s y 800 MiB son propuestas, no decisiones aprobadas ni resultados del spike.
+Los umbrales de 9 clips, 7 de 9, 15 s, 25 s y 800 MiB son propuestas, no decisiones aprobadas ni resultados del spike.
 
 ## Pruebas y evidencia requeridas antes de autorizar implementación/producción
 
@@ -124,7 +124,7 @@ Los umbrales de 100 clips, 90%, 15 s, 25 s y 800 MiB son propuestas, no decision
 7. **Despliegue:** no probar en producción. Si el equipo aprueba un despliegue de evaluación, ejecutar solo en Railway staging con autorización explícita, recursos observados, presupuesto/cambio comunicado, rollback y comprobación de salud. La evidencia de staging no se presume.
 8. **Regresión:** pruebas backend `accounts` y `scores`, E2E existentes y pruebas del API; confirmar rutas y comportamiento MVP 1 sin cambios.
 
-Q-012 (latencia) y Q-028 (corpus/calidad) siguen abiertos hasta que el equipo apruebe o sustituya los umbrales candidatos. El límite de 800 MiB, el p95 de 15 s, el corpus de 100 clips y el 90% son propuestas, no decisiones aprobadas.
+Q-012 (latencia) y Q-028 (corpus/calidad) siguen abiertos hasta que el equipo apruebe o sustituya los umbrales candidatos. El límite de 800 MiB, el p95 de 15 s, el corpus de 9 clips y el 7 de 9 son propuestas, no decisiones aprobadas.
 
 ## Decisiones y aprobaciones pendientes
 

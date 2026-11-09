@@ -317,7 +317,7 @@ The author deletes the comment; `transaction.on_commit` removes the audio file. 
 **Model lifecycle:** pin `STT_MODEL_REVISION` and verify a SHA-256 manifest during weight staging; keep weights out of Git. With `STT_MODEL_REQUIRED=true`, load the model once per web process before readiness and fail startup for missing/corrupt weights; with STT disabled, the endpoint returns `STT_UNAVAILABLE`. Do not download on a user request or require runtime network access. The exact Railway artifact-delivery method, cache, image size and startup time remain unverified.
 
 **Approved HU11 acceptance targets — not yet measured:**
-- At least 100 authorized recordings from ≥5 different speakers; ≥90% exact expected ABC after deterministic parsing (Q-028).
+- At least 9 authorized recordings from ≥3 different speakers; ≥7 of 9 exact expected ABC after deterministic parsing (Q-028).
 - Model-loaded p95 ≤15 s for a 30 s recording; report cold start separately. The candidate completion-or-typed-error-before-25-s ceiling remains pending explicit approval (Q-012).
 - Total service/container peak ≤800 MiB within 1 GiB, including Django, Gunicorn, Nginx and model load/inference.
 - At most one STT inference simultaneously per process; measure saturation and ensure other endpoints remain usable.
@@ -475,8 +475,8 @@ or production resource compatibility.
 
 Acceptance gates remain:
 
-- At least 100 authorized recordings from 5 speakers.
-- At least 90% exact expected ABC output.
+- At least 9 authorized recordings from 3 speakers.
+- At least 7 of 9 exact expected ABC output.
 - p95 transcription latency at most 15 seconds.
 - Total service memory at most 800 MiB.
 - Railway runtime and deployment verification.

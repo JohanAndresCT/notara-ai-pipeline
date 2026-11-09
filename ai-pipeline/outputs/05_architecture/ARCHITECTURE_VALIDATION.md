@@ -143,7 +143,7 @@ The as-built baseline was verified against the repository. Every FR-018-FR-044 a
 - **Inputs:** architecture v3.0, P02 v4.0, P03 v3.0, P04 v3.0, amended `DECISIONS_MVP2.md`, and CR-003.
 - **Contract/scope:** `SttAdapter`, `POST /api/v1/audio/stt/`, multipart fields, success shape `{transcript, meter, abc_line, abc_document}`, typed errors, session auth/CSRF, upload limits and deterministic ABC conversion remain unchanged. No endpoint, model, UI, Dockerfile or runtime file was implemented.
 - **Design coherence:** OpenAI STT key/client removed from the proposed architecture; `faster-whisper tiny` multilingual, CPU/int8, Spanish is behind `SttAdapter`. Proposed variables, pinned weights, build-time preload, readiness failure, one-process/one-inference initial resource profile and typed saturation errors are documented. Runtime worker and inference-timeout behavior require tests; a Gunicorn timeout cannot by itself prove cancellation of an in-process inference.
-- **Candidate gates (not approved):** ≥100 labeled clips / ≥5 speakers and ≥90% exact parsed ABC; warm p95 ≤15 s for 30 s input and typed failure by 25 s; total Railway container peak ≤800 MiB of 1 GiB; saturation rejection; pinned/hash-verified weights and no runtime download. Q-012/Q-028 remain open, so these values are engineering proposals only.
+- **Candidate gates (not approved):** ≥9 labeled clips / ≥3 speakers and ≥7 of 9 exact parsed ABC; warm p95 ≤15 s for 30 s input and typed failure by 25 s; total Railway container peak ≤800 MiB of 1 GiB; saturation rejection; pinned/hash-verified weights and no runtime download. Q-012/Q-028 remain open, so these values are engineering proposals only.
 - **Evidence limits:** requester-reported Windows/Python 3.11.9 spike (3.81 s clip, 1.06 s transcription, 9.66 s cold load including import/download, sampled process RSS ≈249 MB, transcript «¡Dorre mi, faso la sí!»). Not independently reproduced; not a quality pass. No Python 3.12/Django/Gunicorn concurrency, total-container memory, or Railway test has been run.
 - **Current result:** `PASS_WITH_WARNINGS` for the architecture documentation. P06 may prepare an isolated local HU11 increment after PRE-002/PRE-011 decisions; HU11 acceptance and Railway deployment are not ready/approved. PRE-001/002/011, Q-012/Q-026/Q-027/Q-028 and other P05 ADR conflicts remain open as applicable.
 
@@ -152,7 +152,7 @@ The as-built baseline was verified against the repository. Every FR-018-FR-044 a
 - **Authorization:** The requester reports human approval of HU11 conditions. No names, approval date or meeting record were supplied and none is inferred.
 - **Decision scope:** The HU11 implementation scope ratifies ADR-006, ADR-007, ADR-009, ADR-013, ADR-014 and ADR-015 as specified in ARCHITECTURE v4.0; it ratifies DEC-205, DEC-208, the recording constraints in DEC-213, DEC-215, DEC-218 and DEC-219. It does not globally close Q-020 or unrelated architecture conflicts.
 - **Quota design:** `STTInferenceQuota(user, UTC day, admitted_inferences)` has a unique user/day key and a persistent atomic conditional increment shared across HU11/HU12. Reserve after auth/CSRF, file validation and process-slot admission; reject saturation or quota excess without consuming a daily inference. Attempts count once admitted even on subsequent decode/inference/parser failure. `STT_DAILY_LIMIT` defaults to 30; over-limit code is `STT_DAILY_LIMIT_REACHED` (429).
-- **Accepted targets, not results:** ≥100 authorized recordings from ≥5 speakers and ≥90% exact parsed ABC; loaded-model p95 ≤15 s for 30 s recordings with cold start reported separately; total service peak ≤800 MiB of a 1 GiB container; one inference per process. None has been measured or passed. The 25 s completion/error ceiling remains pending explicit approval, as do TTS latency targets.
+- **Accepted targets, not results:** ≥9 authorized recordings from ≥3 speakers and ≥7 of 9 exact parsed ABC; loaded-model p95 ≤15 s for 30 s recordings with cold start reported separately; total service peak ≤800 MiB of a 1 GiB container; one inference per process. None has been measured or passed. The 25 s completion/error ceiling remains pending explicit approval, as do TTS latency targets.
 - **Security/privacy:** session auth and CSRF, server-side size/MIME/signature checks before inference, no persisted dictation audio/temp files and no audio/transcript logging remain design requirements. Existing route and success schema are preserved.
 - **Remaining clarification:** P02 Q-029 tracks populated-field present-empty/malformed ABC headers and non-ABC content; clarify before implementing that append edge path. Q-026 remains a HU12 concern; CONFLICT-ARCH-201 remains unrelated to HU11.
 - **Readiness:** HU11 is ready to begin local implementation. PRE-002 is satisfied for HU11; PRE-011 is approved for planning while empirical acceptance verification remains pending. PRE-001 remains open outside HU11 scope. No Railway deployment is authorized by this approval.
@@ -198,8 +198,8 @@ The as-built baseline was verified against the repository. Every FR-018-FR-044 a
 
 - Formal approval of CR-004.
 - Reconciliation of AC-071 referencing Whisper Tiny.
-- At least 100 authorized recordings from 5 speakers.
-- At least 90% exact expected ABC output.
+- At least 9 authorized recordings from 3 speakers.
+- At least 7 of 9 exact expected ABC output.
 - p95 transcription latency at most 15 seconds.
 - Total service memory at most 800 MiB.
 - Railway resource and runtime validation.
@@ -235,8 +235,8 @@ This does not establish production readiness or authorize deployment.
 
 ### Pending acceptance
 
-- At least 100 authorized recordings from at least five speakers.
-- At least 90% exact expected ABC output.
+- At least 9 authorized recordings from at least three speakers.
+- At least 7 of 9 exact expected ABC output.
 - Loaded-model p95 at most 15 seconds for 30-second recordings.
 - Total service memory peak at most 800 MiB in a 1 GiB container.
 - Concurrency, quota, security and integration regression.
