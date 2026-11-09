@@ -176,8 +176,7 @@ Las variables existentes en Railway pueden sobrescribir
 los defaults del Dockerfile; antes de cualquier despliegue
 autorizado se deben revisar `STT_MODEL_ID`, `STT_MODEL_SIZE`,
 `STT_MODEL_DIR` y `STT_MODEL_REVISION` para evitar que
-apunten al modelo Tiny. La rama historica
-`mvp-2` conserva su nombre; no implica
+apunten al modelo Tiny. La rama `mvp-2` contiene Whisper Base; esto no implica
 que el modelo activo siga siendo Tiny.
 
 #### Pasos manuales de despliegue
