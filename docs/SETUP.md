@@ -177,16 +177,16 @@ los defaults del Dockerfile; antes de cualquier despliegue
 autorizado se deben revisar `STT_MODEL_ID`, `STT_MODEL_SIZE`,
 `STT_MODEL_DIR` y `STT_MODEL_REVISION` para evitar que
 apunten al modelo Tiny. La rama historica
-`feature/mvp2-whisper-tiny` conserva su nombre; no implica
+`mvp-2` conserva su nombre; no implica
 que el modelo activo siga siendo Tiny.
 
 #### Pasos manuales de despliegue
 
 Los cambios de esta guía y la imagen se encuentran en la rama de trabajo y no se han enviado a Railway. Antes de iniciar el rollout, el responsable debe aprobarlos y hacer commit/push; esta tarea no los realiza.
 
-1. Revisa y aprueba el diff y ejecuta CI para `feature/mvp2-whisper-tiny`. El build de la imagen debe tener acceso de red a Hugging Face; no requiere tokens ni secretos de descarga para este repositorio público.
+1. Revisa y aprueba el diff y ejecuta CI para `mvp-2`. El build de la imagen debe tener acceso de red a Hugging Face; no requiere tokens ni secretos de descarga para este repositorio público.
 2. No cambies el volumen `/data/media`, las variables de PostgreSQL, secretos, dominio, frontend o configuración de Nginx. Confirma el límite de 1 GiB/2 vCPU y configura una sola réplica.
-3. En Railway, abre el servicio web existente y confirma que usa el Dockerfile raíz, el contexto del repositorio y `/` como raíz del servicio. En el momento aprobado para el rollout, selecciona `feature/mvp2-whisper-tiny` como rama del servicio.
+3. En Railway, abre el servicio web existente y confirma que usa el Dockerfile raíz, el contexto del repositorio y `/` como raíz del servicio. Actualmente el servicio se despliega mediante Railway CLI desde el repositorio local. Antes de desplegar, confirma que estas en la rama `mvp-2` y que los cambios estan aprobados.
 4. Verifica las variables anteriores (Railway puede sobrescribir los defaults de la imagen), guarda los cambios y lanza manualmente un nuevo deployment. No se debe promover el servicio hasta que el build registre `Provisioned and SHA-256 verified Systran/faster-whisper-base@ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66`.
 5. Espera al health check y comprueba `/api/v1/health/`, los logs de Gunicorn y migraciones, y los flujos existentes de autenticación, cuentas, partituras y frontend. Realiza las pruebas funcionales de STT con el procedimiento y corpus aprobados; no uses la respuesta de health como evidencia de calidad o capacidad.
 6. Observa memoria máxima del servicio, arranque frío, latencia con modelo cargado y saturación de concurrencia antes de aceptar HU11. Si el arranque excede el timeout del health check, el modelo no pasa hash, o se supera la cuota de memoria aprobada, revierte al deployment anterior y no amplíes réplicas.
