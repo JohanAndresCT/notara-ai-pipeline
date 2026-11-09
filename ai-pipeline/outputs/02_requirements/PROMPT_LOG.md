@@ -219,3 +219,7 @@ Hallazgos resueltos: REQ-VAL-201 (reglas aprobadas). El informe de validación s
 ## Re-validación (run 2) — prompts v2.1
 
 Prompts P02 v2.1: sin estado fijo de una ejecución (rangos DEC, versiones). Validación sobre requisitos v3.1: PASS_WITH_WARNINGS (0 HIGH, 0 MEDIUM, 2 LOW: REQ-VAL-205, REQ-VAL-206). REQ-VAL-201..204 resueltos.
+
+## Merge `mvp-2` → `pipeline/mvp2-p00-context` (2026-11-09)
+
+Se tomó como base la versión de `mvp-2` (CR-003, CR-004, implementación de HU11) y se reaplicó el segundo lote de decisiones renumerado como DEC-230..DEC-238. Retiradas: antigua DEC-222 (20/día; gana DEC-219 con 30/día) y antigua DEC-226 (aviso con OpenAI; obsoleto tras CR-003). Validaciones re-ejecutadas: PASS_WITH_WARNINGS.

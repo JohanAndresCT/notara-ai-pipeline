@@ -2,9 +2,20 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+from voice.model_config import MODEL_REVISION
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR.parent / ".env")
+
+
+def _project_path(value: str, default: Path | None = None) -> str:
+    if not value:
+        return str(default.resolve()) if default is not None else ""
+    candidate = Path(value)
+    if not candidate.is_absolute():
+        candidate = BASE_DIR.parent / candidate
+    return str(candidate.resolve())
+
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret-key-change-me")
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
@@ -35,6 +46,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "accounts.apps.AccountsConfig",
     "scores.apps.ScoresConfig",
+    "voice.apps.VoiceConfig",
 ]
 
 MIDDLEWARE = [
@@ -99,6 +111,43 @@ if not MEDIA_ROOT.is_absolute():
     MEDIA_ROOT = BASE_DIR.parent / MEDIA_ROOT
 STATIC_ROOT = Path(os.getenv("STATIC_ROOT", BASE_DIR.parent / "staticfiles"))
 PROFILE_PHOTO_MAX_BYTES = int(os.getenv("PROFILE_PHOTO_MAX_BYTES", 5 * 1024 * 1024))
+STT_DAILY_LIMIT = int(os.getenv("STT_DAILY_LIMIT", "30"))
+STT_MODEL_ID = os.getenv(
+    "STT_MODEL_ID",
+    "Systran/faster-whisper-base",
+).strip()
+STT_MODEL_SIZE = os.getenv("STT_MODEL_SIZE", "base").strip()
+STT_MODEL_DIR = _project_path(os.getenv("STT_MODEL_DIR", "").strip())
+STT_MODEL_REVISION = os.getenv("STT_MODEL_REVISION", MODEL_REVISION).strip()
+STT_MODEL_MANIFEST = _project_path(
+    os.getenv("STT_MODEL_MANIFEST", "").strip(),
+    BASE_DIR / "voice" / "model_sha256.json",
+)
+STT_MODEL_REQUIRED = os.getenv("STT_MODEL_REQUIRED", "false").lower() == "true"
+STT_DEVICE = os.getenv("STT_DEVICE", "cpu").strip()
+STT_COMPUTE_TYPE = os.getenv("STT_COMPUTE_TYPE", "int8").strip()
+STT_LANGUAGE = os.getenv("STT_LANGUAGE", "es").strip()
+STT_CPU_THREADS = int(os.getenv("STT_CPU_THREADS", "2"))
+STT_MAX_CONCURRENT = int(os.getenv("STT_MAX_CONCURRENT", "1"))
+AUDIO_MAX_BYTES = int(os.getenv("AUDIO_MAX_BYTES", str(2 * 1024 * 1024)))
+AUDIO_MAX_SECONDS = int(os.getenv("AUDIO_MAX_SECONDS", "30"))
+if STT_DAILY_LIMIT < 1:
+    raise ValueError("STT_DAILY_LIMIT must be a positive integer.")
+if AUDIO_MAX_BYTES < 1 or AUDIO_MAX_SECONDS < 1:
+    raise ValueError("STT audio limits must be positive integers.")
+if STT_CPU_THREADS < 1:
+    raise ValueError("STT_CPU_THREADS must be a positive integer.")
+if STT_MODEL_ID != "Systran/faster-whisper-base" or STT_MODEL_SIZE != "base":
+    raise ValueError("HU11 requires the multilingual Systran/faster-whisper-base model.")
+if STT_MODEL_REVISION != MODEL_REVISION:
+    raise ValueError(f"HU11 model revision is pinned to {MODEL_REVISION}.")
+if STT_DEVICE != "cpu" or STT_COMPUTE_TYPE != "int8" or STT_LANGUAGE != "es":
+    raise ValueError("HU11 requires CPU/int8 inference with language=es.")
+if STT_MAX_CONCURRENT != 1:
+    raise ValueError("HU11 supports exactly one concurrent inference per process.")
+if STT_MODEL_REQUIRED and not STT_MODEL_DIR:
+    raise ValueError("STT_MODEL_DIR is required when STT_MODEL_REQUIRED is true.")
+CSRF_FAILURE_VIEW = "voice.csrf.csrf_failure"
 STORAGES = {
     "default": {
         "BACKEND": os.getenv(

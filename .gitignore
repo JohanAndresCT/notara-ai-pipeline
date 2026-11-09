@@ -8,6 +8,7 @@ venv/
 .env*
 db.sqlite3
 media/
+.local-models/
 
 # Node
 node_modules/
@@ -39,3 +40,10 @@ logs/
 /.figma/design-context/
 /.plugins/
 /.opencode-skills/
+
+/whisper-base-clean/
+/whisper-base-temp/
+/whisper-base-manifest.json
+/revision_cr004.txt
+
+docker/experiments/whisper_tiny/.venv/

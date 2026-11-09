@@ -186,3 +186,7 @@ DEC-221 tiempos de espera iniciales, DEC-222 20 transcripciones por día, DEC-22
 DEC-224 texto del tutor en cabecera, DEC-225 UX-PROP-001..007 aprobadas, DEC-226 aviso nombra a OpenAI,
 DEC-227 tutor con tonalidad y tempo si existen, DEC-228 sin borrado de cuenta, DEC-229 BR-013/014/025 como versión inicial.
 Siguen abiertos: Q-009 (Railway), Q-010, Q-011, Q-012, Q-020 y la aprobación de ADRs por TEAM-002.
+
+## Merge `mvp-2` → `pipeline/mvp2-p00-context` (2026-11-09)
+
+Se tomó como base la versión de `mvp-2` (CR-003, CR-004, implementación de HU11) y se reaplicó el segundo lote de decisiones renumerado como DEC-230..DEC-238. Retiradas: antigua DEC-222 (20/día; gana DEC-219 con 30/día) y antigua DEC-226 (aviso con OpenAI; obsoleto tras CR-003). Validaciones re-ejecutadas: PASS_WITH_WARNINGS.

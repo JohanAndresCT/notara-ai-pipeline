@@ -5,9 +5,9 @@
 - **Validator:** P03 Prioritization Validator (prompt v2.0)
 - **Project:** Notara
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
-- **Planning Version:** `PRIORITIZATION.md` 2.0; planned `product_backlog.json` 2.0
+- **Planning Version:** `PRIORITIZATION.md` 4.0; `product_backlog.json` 4.0 (HU11 authorization addendum below; earlier validations preserved)
 - **Validation Date:** 2026-11-08
-- **Upstream Artifact Statuses:** P00 `PASS_WITH_WARNINGS` (run 4); P01 `PASS_WITH_WARNINGS` (run 3); P02 `PASS_WITH_WARNINGS` (requirements v3.0)
+- **Upstream Artifact Statuses:** P00 `PASS_WITH_WARNINGS` (run 4); P01 `PASS_WITH_WARNINGS` (run 3); P02 `PASS_WITH_WARNINGS` (requirements v5.0)
 - **Overall Result:** `PASS_WITH_WARNINGS`
 - **P04 Readiness:** WITH CONSTRAINTS
 
@@ -37,7 +37,7 @@ The plan is evidence-based and bounded. It is traceable to P02 and preserves MVP
 | `SPRINT_2_BACKLOG_INPUT.md` | Yes | Team input | Yes | SP and MoSCoW source |
 | `DECISIONS_MVP2.md` | Yes | Team input (ratification pending) | Yes | DEC-208, DEC-209 adjust estimates |
 | `PRODUCT_VISION.md` v2.2 / validation | Yes | PASS_WITH_WARNINGS | Yes | Core trio HU11/HU13/HU15 preserved |
-| `REQUIREMENTS.md` v3.0 / `product_backlog.json` v3.0 / validation | Yes | PASS_WITH_WARNINGS | Yes | REQ-VAL-201 carried as PLAN-RISK-001 and PRE-002/PRE-003 |
+| `REQUIREMENTS.md` v5.0 / `product_backlog.json` v5.0 / validation | Yes | PASS_WITH_WARNINGS | Yes | HU11 approved rules, quota, targets and empirical gates reflected |
 | Previous P03 v1.0 | Yes (Git) | PASS | Yes | MVP 1 baseline |
 | `RELEASE_PLAN.md` | Yes | MVP 1 only | Yes | Load reference: 31 SP |
 | `SYSTEM_PROMPT.md` | Yes | — | Yes | — |
@@ -52,7 +52,7 @@ The plan is evidence-based and bounded. It is traceable to P02 and preserves MVP
 | Priorities at a Glance | Yes | Yes | |
 | MVP Core / Supporting / Future / Out of Scope | Yes | Yes | |
 | Delivery Sequence (Phase 0, 1, 2) | Yes | Yes | |
-| Preconditions (6.1) | Yes | Yes | PRE-001-PRE-010 |
+| Preconditions (6.1) | Yes | Yes | PRE-001-PRE-011 |
 | Dependencies, Decisions, Risks (6.2) | Yes | Yes | DEC-002 marked superseded |
 | Capacity and Cut Line (7) | Yes | Yes | |
 | Requirements-to-Priority Traceability | Yes | Yes | |
@@ -128,7 +128,7 @@ All US, FR, NFR and PRE references resolve (automated check). Markdown and JSON 
 | ID | Item | Classification | Impact | Required Action |
 |---|---|---|---|---|
 | DEP-004-DEP-010 | P02 dependencies reflected in the sequence | DIRECT | High | None |
-| PRE-001-PRE-010 | Team decisions and verifications | DIRECT (from P00-P02 open items and P10) | High | Resolve per "needed by" column |
+| PRE-001-PRE-011 | Team decisions and verifications | DIRECT (from P00-P02 open items, CR-003 and P10) | High | Resolve per "needed by" column |
 | RISK-001 | Load equal to MVP 1 with higher risk | DIRECT | High | Cut line applied |
 | PLAN-RISK-001 | Provisional estimates | REFINED (REQ-VAL-201) | Medium | Re-estimate after PRE-002/PRE-003 |
 | PLAN-RISK-002 | Frontend capacity bottleneck | ASSUMED (RELEASE_PLAN.md MVP 1 load) | Medium | Consider at assignment |
@@ -150,30 +150,73 @@ All US, FR, NFR and PRE references resolve (automated check). Markdown and JSON 
 
 **`PASS_WITH_WARNINGS`.** The plan may proceed to P04 - UX/UI. Track PLAN-VAL-201 to PLAN-VAL-205, and update the plan with dates, owners and re-estimates when PRE-002, PRE-003 and PRE-006 close.
 
-## Addendum — Run 2 (planning v2.1, prompt v2.1)
+## 12. CR-003 Revalidation Addendum
 
-**Date:** 2026-11-08 · **Trigger:** decisions DEC-219-DEC-229 and requirements v3.1 · **Validator prompt:** `P03_validation.md` v2.1
+- **Approval record:** CR-003 and the DEC-201 amendment are approved as reported by the requester; no approval date or individual approver names were supplied.
+- **Inputs:** P02 v4.0, P03 v3.0 and CR-003. This addendum supersedes the earlier OpenAI-key dependency for HU11/HU12; it does not change the original capacity estimate.
+- **Dependency checks:** PRE-004 now covers ElevenLabs/TTS keys, budget and cap only. US-011 no longer depends on PRE-004; it retains create/edit dependencies and requires PRE-002 plus PRE-011. Markdown and P03 JSON preserve priority P0, estimate 8 SP (provisional), and total 31 SP.
+- **Risk/readiness:** musical accuracy, CPU saturation, process/replica model duplication and Railway memory/latency remain unvalidated risks. The Python 3.11.9 Windows spike does not establish Python 3.12 integration or Railway capacity.
+- **Current result:** `PASS_WITH_WARNINGS`; PRE-001/002/011, Q-012/Q-028 and other planning decisions remain open. No sprint commitment or production readiness is inferred.
 
-**Result:** `PASS_WITH_WARNINGS` (0 HIGH, 1 MEDIUM, 3 LOW) · **P04 readiness:** WITH CONSTRAINTS
+## 13. HU11 Authorization Revalidation Addendum
 
-### Automated checks
+- **Authorization:** The requester reports human approval of HU11 conditions; names, date and meeting record were not supplied and are not inferred.
+- **Decision scope:** BR-013/BR-025 (PRE-002), HU11-relevant DEC-205/208/213 recording limits/215/218, DEC-219 quota, and the applicable P05 ADRs are ratified for HU11. PRE-001 remains open for decisions outside HU11; it is not globally closed.
+- **Preconditions:** PRE-002 is satisfied for HU11; PRE-007 is satisfied for the HU11 endpoint by ADR-013. PRE-011 is approved for planning based on the approved corpus/quality target (≥9 authorized recordings, ≥3 speakers, ≥7 of 9 exact parsed ABC), p95 target (≤15 s for 30 s with model loaded), memory cap (≤800 MiB in 1 GiB), concurrency (one inference/process), and per-user daily quota. Their measurements and pass/fail results remain pending.
+- **Open timing decision:** Q-012 is partially resolved. The 25 s typed-response ceiling was not explicitly approved and remains a pending candidate; synthesis targets remain open. PRE-009 remains partial.
+- **Planning integrity:** HU11 remains P0 / 8 SP provisional; total remains 31 SP. The P02 dependency and HU11 traceability list include FR-045, AC-070-075 and DEC-219. Q-026 remains a HU12 question and does not block HU11.
+- **Structural checks run:** P02/P03 JSON parse; all P03 canonical story and acceptance-criterion references resolve against P02; HU11's PRE-002/PRE-007/PRE-011 dependencies are present; `git diff --check` passes.
+- **Readiness:** HU11 is authorized to begin implementation locally. Do not treat acceptance criteria as passed or authorize Railway deployment until the empirical gates and separate deployment authorization are complete. Q-029 requires clarification before implementing the populated-field malformed/present-empty ABC append path, but does not block independent STT or empty-field dictation work.
+- **Result:** `PASS_WITH_WARNINGS`; no implementation or performance/quality result is claimed.
+
+## 14. CR-004 Revalidation Addendum
+
+- **Date:** 2026-11-09
+- **Planning Version:** 4.2
+- **Requirements Version:** 5.2
+- **Change Request:** CR-004 (APPROVED FOR IMPLEMENTATION BY REQUESTER)
+- **Affected Stories:** US-011 (HU11), US-012 (HU12)
+- **Result:** PASS_WITH_WARNINGS ? documentation alignment only
+- **Deployment Authorization:** NOT GRANTED
+
+### Verified planning consistency
+
+- P03 planning metadata and backlog reference version 4.2.
+- P02 requirements and canonical backlog reference version 5.2.
+- CR-004 is traceable to the requester-approved Whisper Base implementation.
+- CR-003 remains the historical approved STT decision.
+- Priorities, Story Points, capacity and delivery sequence are unchanged.
+- MVP 1 remains the delivered baseline.
+
+### Outstanding conditions
+
+- Approval from other team members has not been established.
+- AC-071 was reconciled to Whisper Base in P02 v5.2; empirical latency acceptance remains pending.
+- Evaluation using at least 9 authorized recordings from 3 speakers.
+- At least 7 of 9 exact expected ABC output.
+- p95 transcription latency at most 15 seconds.
+- Total service memory at most 800 MiB.
+- Railway runtime validation and integration/security regression.
+- Existing sprint ownership, dates and budget preconditions.
+
+### Conclusion
+
+P03 is synchronized with requester-approved CR-004 implementation documentation.
+This addendum does not constitute empirical acceptance,
+sprint commitment approval or production deployment authorization.
+
+## Addendum — Merge reconciliation run (planning v4.3)
+
+**Date:** 2026-11-09 · **Trigger:** merge of `mvp-2` (CR-003, CR-004, HU11 implementation) into `pipeline/mvp2-p00-context`, with the second decision batch reconciled as DEC-230-DEC-238 · **Validator prompt:** v2.1 of this stage
+
+**Result:** `PASS_WITH_WARNINGS` · **P04 readiness:** WITH CONSTRAINTS
 
 | Check | Result |
 |---|---|
-| Story Points total / P0 / P1 / P2 (recomputed from JSON) | 31 / 21 / 8 / 2 |
-| Provisional estimates | None. No rule behind any estimate is still PROPOSAL in requirements v3.1. |
-| Requirement IDs in planned JSON = P02 | Yes |
-| Acceptance-criteria IDs in planned JSON = P02 | **Found mismatch** (AC-070-AC-072 missing) and **corrected during this run** (PLAN-VAL-206) |
+| Story Points total / P0 / P1 / P2 | 31 / 21 / 8 / 2 |
+| Provisional estimates | US-011 (8 SP) only, kept provisional by DEC-208; US-014 is a team estimate (BR-014 approved, DEC-238) |
+| Planned JSON vs P02 (requirements and acceptance criteria) | Identical, including FR-046 and AC-077 |
+| Preconditions | Resolved: PRE-003, PRE-008 (plus `mvp-2` resolutions for PRE-002, PRE-007 for HU11). Open: PRE-004, PRE-005, PRE-006, PRE-010; PRE-001, PRE-009, PRE-011 partially resolved |
 | Developers assigned | None |
-| Preconditions | Resolved: PRE-002, PRE-003, PRE-008; initial limits: PRE-009. Open: PRE-001, PRE-004, PRE-005, PRE-006, PRE-007, PRE-010. |
 
-### Findings
-
-| ID | Severity | Status |
-|---|---|---|
-| PLAN-VAL-201 | MEDIUM | **Reduced, still open** — estimates are no longer provisional, but the plan is not a sprint commitment until ratification (PRE-001), keys and budget (PRE-004), storage (PRE-005) and dates and owners (PRE-006) are settled. |
-| PLAN-VAL-202 | LOW | Open — US-019 early in the sequence does not mean higher priority. |
-| PLAN-VAL-203 | LOW | Open — US-012 → US-011 dependency remains ASSUMED. |
-| PLAN-VAL-204 | LOW | Open — PRE-007 handled by P05 ADR-013 (pending TEAM-002 approval). |
-| PLAN-VAL-205 | LOW | Resolved earlier (paths). |
-| PLAN-VAL-206 | LOW | **New, corrected** — the planned backlog lacked AC-070-AC-072 after requirements v3.1; synchronized with P02 in this run. |
+PLAN-VAL-201 (MEDIUM) remains: the plan is not a sprint commitment until ratification, TTS keys, storage, dates and owners are settled.

@@ -12,6 +12,7 @@ frontend/playwright-report
 frontend/test-results
 backend/staticfiles
 media
+.local-models
 db.sqlite3
 ai-pipeline
 artifacts

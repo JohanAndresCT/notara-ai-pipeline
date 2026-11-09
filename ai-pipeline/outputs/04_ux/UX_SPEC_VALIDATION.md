@@ -5,7 +5,7 @@
 - **Validator:** P04 - UX Design Validation Prompt v2.0 (Senior UX Validation Auditor)
 - **Project:** Notara
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
-- **UX Specification Version:** 2.0
+- **UX Specification Version:** 4.0 (CR-003 and HU11 authorization addenda below; original run preserved)
 - **Validation Date:** 2026-11-08
 - **Upstream Statuses:** P02 `PASS_WITH_WARNINGS`; P03 `PASS_WITH_WARNINGS` (P04 readiness WITH CONSTRAINTS)
 - **Overall Result:** `PASS_WITH_WARNINGS`
@@ -33,8 +33,8 @@ Automated checks found every FR-001-FR-044 and AC-001-AC-069 referenced, with no
 
 | Input | Present | Status | Notes |
 |---|---|---|---|
-| `REQUIREMENTS.md` v3.0 / validation | Yes | PASS_WITH_WARNINGS | REQ-VAL-201 carried as UX-Q-001 |
-| `PRIORITIZATION.md` v2.0 / validation | Yes | PASS_WITH_WARNINGS | P0 journeys designed first, as requested |
+| `REQUIREMENTS.md` v4.0 / validation | Yes | PASS_WITH_WARNINGS | REQ-VAL-201 carried as UX-Q-001; CR-003 notice/retention reflected |
+| `PRIORITIZATION.md` v3.0 / validation | Yes | PASS_WITH_WARNINGS | P0 journeys designed first; CR-003 local-STT gates reflected |
 | `PRODUCT_VISION.md` v2.2 | Yes | PASS_WITH_WARNINGS | Journeys A, A', B, C, D mapped to FLOW-011-FLOW-019 |
 | `DECISIONS_MVP2.md` | Yes | Team input | DEC-201-DEC-218 |
 | `UX_SPEC.md` v1.0 | Yes (Git) | PASS | MVP 1 baseline |
@@ -105,7 +105,7 @@ Automated checks found every FR-001-FR-044 and AC-001-AC-069 referenced, with no
 | DEC-207 `.abc` only + message | REG-003 disabled with M-02; M-03 | PASS |
 | DEC-211 comment deletion | FLOW-010, REG-007 | PASS |
 | DEC-213 limits | Countdown, M-05/M-05b, M-10 | PASS |
-| DEC-214 notice, no dictation recordings kept | M-11, NFR-004 rule | PASS |
+| DEC-214/CR-003 notice, no dictation recordings kept | M-11 discloses Notara backend and hosting infrastructure; NFR-004 | PASS_WITH_WARNINGS — copy aligned; legal/privacy review remains |
 | DEC-215 Spanish | Cross-cutting rule | PASS |
 | DEC-216 silent fallback | FLOW-019, cross-cutting rule | PASS |
 | DEC-217 local file reading | FLOW-012; P05 handoff item 5 | PASS |
@@ -136,7 +136,7 @@ Automated checks found every FR-001-FR-044 and AC-001-AC-069 referenced, with no
 | UX-VAL-202 | LOW | Proposals | Seven UX-PROP items need approval. UX-PROP-006 (confirm before deleting a comment) changes delivered MVP 1 behavior, which deletes immediately. | Section 12; `frontend/src/ScoreDetailPage.tsx` `handleCommentDelete` | Approve UX-PROP-001-007 with the team; treat UX-PROP-006 as an explicit change to US-010 behavior in P06. |
 | UX-VAL-203 | LOW | Interaction gap | Processing states have no cancel option or timeout behavior. With no latency target (NFR-009), a long wait has no defined exit. | Section 7.2; NFR-009 REQUIRES_DECISION | Define a timeout leading to M-07/M-15 in P05 once Q-012 is answered; consider a "Cancelar" during processing. |
 | UX-VAL-204 | LOW | MVP 1 correction | Version 1.0 cited wrong AC ranges for FLOW-008-FLOW-010; v1.0 validation did not detect it. | v1.0 FLOW-008-FLOW-010; v2.0 corrections | Resolved in v2.0; recorded for traceability. |
-| UX-VAL-205 | LOW | Wording | Whether M-11 names the provider (OpenAI) is open (UX-Q-002). | Section 10, UX-Q-002 | Team decision; no impact on architecture. |
+| UX-VAL-205 | LOW | Wording | The original v2.0 report left OpenAI/provider wording unresolved (UX-Q-002). | Section 10, UX-Q-002 | Resolved in the CR-003 revalidation addendum; hosting/privacy review remains. |
 
 ## 11. P05 Readiness
 
@@ -148,29 +148,75 @@ Automated checks found every FR-001-FR-044 and AC-001-AC-069 referenced, with no
 
 **`PASS_WITH_WARNINGS`.** The UX specification may proceed to P05 - Architecture. Track UX-VAL-201 to UX-VAL-205 and the UX-PROP approvals.
 
-## Addendum — Run 2 (UX v2.1, prompt v2.1)
+## 13. CR-003 Revalidation Addendum
 
-**Date:** 2026-11-08 · **Trigger:** decisions DEC-219-DEC-229 and requirements v3.1 · **Validator prompt:** `P04_validation.md` v2.1
+- **Approval record:** CR-003 and the DEC-201 amendment are approved as reported by the requester; no approval date or individual approver names were supplied.
+- **UX update:** UX_SPEC v3.0 updates M-11 for separate dictation and voice-comment retention, discloses upload to Notara's backend and hosting-provider processing, and does not promise on-device processing. Existing flows, route assumptions, recording limits and error states remain unchanged.
+- **Question status:** UX-Q-002 is resolved by CR-003. The initial UX-VAL-205 provider-wording finding is closed by this wording; review by the privacy/legal owner is still required. UX-VAL-201 and UX-PROP approvals remain open.
+- **Current result:** `PASS_WITH_WARNINGS`; privacy wording matches amended DEC-214, while hosting-provider terms and applicable privacy obligations remain to be reviewed. No UI was implemented or tested in this documentation change.
 
-**Result:** `PASS_WITH_WARNINGS` (0 HIGH, 0 MEDIUM, 1 LOW) · **P05 readiness:** YES
+## 14. HU11 Authorization Revalidation Addendum
 
-### Automated checks
+- **Inputs:** UX_SPEC v4.0, P02 v5.0, P03 v4.0 and the requester-reported HU11 authorization recorded in `DECISIONS_MVP2.md`.
+- **UX updates:** FLOW-011 now reflects approved BR-013/BR-025 behavior and the `STT_DAILY_LIMIT_REACHED` response; M-17 displays the configurable daily transcription limit. The supported vocabulary/help and existing M-11 privacy disclosure remain aligned.
+- **Decision status:** UX-Q-001 is resolved for HU11. UX-Q-004 / P02 Q-029 tracks malformed or present-but-empty ABC headers in existing content; it blocks only that append edge path. Q-026 remains scoped to HU12 and does not block HU11.
+- **Traceability:** FLOW-011/FLOW-013 and M-17 cover the shared quota through FR-045, AC-070-076 and DEC-219. No frontend or UI behavior was implemented or browser-tested.
+- **Acceptance:** quality, p95, memory and concurrency values are approved targets only; no empirical test result is claimed. The 25 s completion/error ceiling remains pending explicit approval.
+- **Result:** `PASS_WITH_WARNINGS`; no UX contradiction was found for the approved HU11 flow, subject to the populated-field edge clarification and empirical acceptance tests.
+
+## 15. CR-004 Revalidation Addendum
+
+- **Date:** 2026-11-09
+- **UX Specification Version:** 4.2
+- **Requirements Version:** 5.2
+- **Planning Version:** 4.2
+- **Change Request:** CR-004 (APPROVED FOR IMPLEMENTATION BY REQUESTER)
+- **Affected Stories:** US-011 (HU11), US-012 (HU12)
+- **Result:** `PASS_WITH_WARNINGS` - documentation alignment only
+- **Production Authorization:** NOT GRANTED
+
+### Documentation review
+
+- CR-004 authorizes implementing Whisper Base instead of Whisper Tiny.
+- Authorization is from the requester; other team approval is not established.
+- Existing recording and voice-comment flows remain applicable.
+- No new screens, navigation paths or UX messages are required.
+- Privacy notices continue describing backend processing.
+- Recording limits, daily quota and accessibility requirements remain unchanged.
+- AC-071 references Whisper Base in P02 v5.2.
+- CR-003 remains the historical approved STT decision.
+- MVP 1 UX remains unchanged.
+
+### Pending verification
+
+- Empirical STT quality, latency and memory acceptance.
+- Frontend regression tests for HU11 and HU12.
+- Verification of recording permissions, error states and quota messages.
+- Security and quota integration tests.
+- Railway runtime and end-to-end integration validation.
+- Review of the temporary `/test-whisper` interface before production.
+- Any additional team approval required by the project process.
+
+### Conclusion
+
+P04 documentation is aligned with CR-004 implementation
+authorization from the requester.
+
+This addendum does not certify implemented frontend behavior,
+empirical model acceptance or production readiness.
+
+## Addendum — Merge reconciliation run (UX v4.3)
+
+**Date:** 2026-11-09 · **Trigger:** merge of `mvp-2` (CR-003, CR-004, HU11 implementation) into `pipeline/mvp2-p00-context`, with the second decision batch reconciled as DEC-230-DEC-238 · **Validator prompt:** v2.1 of this stage
+
+**Result:** `PASS_WITH_WARNINGS` · **P05 readiness:** YES
 
 | Check | Result |
 |---|---|
-| Every FR, NFR and AC of requirements v3.1 referenced | Yes (including FR-045, FR-046, AC-070-AC-072) |
-| Messages defined and used | All; new M-17 defined and used in FLOW-011 and FLOW-013 |
-| UX proposals approved | All seven (DEC-225) |
-| UX open questions | None (UX-Q-001-003 resolved by DEC-229, DEC-226, DEC-227) |
-| M-11 names the provider | Yes (DEC-226) |
-| Tutor content | Clef, meter, estimated difficulty, plus key and tempo when defined (DEC-227) |
+| Every FR, NFR and AC of requirements v5.3 referenced | Yes |
+| Messages defined and used | All (M-17 from `mvp-2` kept) |
+| UX proposals | All seven approved (DEC-235) |
+| M-11 | Keeps the `mvp-2` wording (audio sent to Notara's servers, CR-003); the former OpenAI wording is not applied |
+| Open UX questions | UX-Q-004 (populated-field dictation edge case, P02 Q-029) |
 
-### Status of run 1 findings
-
-| ID | Status |
-|---|---|
-| UX-VAL-201 (MEDIUM) | **Resolved** — dictation rules approved (DEC-229). |
-| UX-VAL-202 (LOW) | **Resolved** — UX proposals approved (DEC-225). Note for P06: UX-PROP-006 adds a confirmation to the comment deletion already delivered in MVP 1. |
-| UX-VAL-203 (LOW) | **Partially resolved** — initial timeouts set (DEC-221) and mapped to M-07/M-15; no "Cancelar" option during processing is defined. Remains LOW. |
-| UX-VAL-204 (LOW) | Resolved earlier. |
-| UX-VAL-205 (LOW) | **Resolved** — DEC-226. |
+UX-VAL-203 (LOW, no "Cancelar" during processing) remains.

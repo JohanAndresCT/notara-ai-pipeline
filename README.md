@@ -70,7 +70,7 @@ ai-pipeline/        Prompts y artefactos del pipeline (P00-P09)
 
 ```powershell
 $env:DJANGO_DB_ENGINE = "sqlite"
-python backend\manage.py test accounts scores
+python backend\manage.py test accounts scores voice
 cd frontend; pnpm typecheck; pnpm test:e2e
 ```
 

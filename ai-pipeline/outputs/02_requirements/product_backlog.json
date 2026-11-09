@@ -1,7 +1,7 @@
 {
   "backlog_metadata": {
     "project": "Notara",
-    "version": "3.1",
+    "version": "5.3",
     "stage": "P02",
     "status": "READY_WITH_ASSUMPTIONS",
     "source": "ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md (v2.1)",
@@ -10,13 +10,18 @@
     "additional_sources": [
       "ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md",
       "ai-pipeline/outputs/00_context/DECISIONS_MVP2.md",
-      "ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md (v2.2)"
+      "ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md (v2.2)",
+      "ai-pipeline/outputs/00_context/CR-003_WHISPER_TINY.md",
+      "ai-pipeline/outputs/00_context/CR-004_WHISPER_BASE.md"
     ],
     "change_requests": [
       "CR-001",
-      "CR-002"
+      "CR-002",
+      "CR-003",
+      "CR-004"
     ],
-    "notes": "MVP 1 items US-001-US-010 preserved; US-010 amended by DEC-211 (AC-028 superseded by AC-029). Planning fields stay null; team MoSCoW and Story Points are recorded under traceability.team_backlog as source data. v3.1: DEC-219-DEC-229 applied (AC-029, AC-049, AC-063 reworded; AC-070-AC-072 added; FR-045, FR-046; BR-029, BR-030)."
+    "notes": "MVP 1 items US-001-US-010 preserved; US-010 amended by DEC-211 (AC-028 superseded by AC-029). CR-003 amends DEC-201/DEC-214 for local STT and updated notice. HU11 authorization resolves BR-013/025 and approves quality/performance/resource targets and a configurable 30/day STT quota (DEC-219); empirical acceptance and Railway evidence remain pending. Planning fields stay null; team MoSCoW and Story Points remain source data. CR-004 supersedes the CR-003 Tiny model selection with Systran/faster-whisper-base for HU11/HU12. The requester approved implementation on 2026-11-09; approval by other team members is not established. Corpus-based quality testing, latency/memory verification and Railway validation remain pending. Historical CR-003 is preserved; the AC-071 model reference is reconciled without changing its latency threshold.",
+    "merge_note": "v5.3: merge reconciliation with pipeline/mvp2-p00-context; DEC-230-DEC-238 applied (AC-029, AC-049, AC-063 reworded; AC-077, FR-046, BR-030, BR-031 added)."
   },
   "epics": [
     {
@@ -154,7 +159,8 @@
         ],
         "hu_ids": [
           "HU01"
-        ]
+        ],
+        "decision_ids": []
       }
     },
     {
@@ -213,7 +219,8 @@
         ],
         "hu_ids": [
           "HU02"
-        ]
+        ],
+        "decision_ids": []
       }
     },
     {
@@ -273,7 +280,8 @@
         ],
         "hu_ids": [
           "HU03"
-        ]
+        ],
+        "decision_ids": []
       }
     },
     {
@@ -350,7 +358,8 @@
         ],
         "hu_ids": [
           "HU04"
-        ]
+        ],
+        "decision_ids": []
       }
     },
     {
@@ -403,7 +412,8 @@
         ],
         "hu_ids": [
           "HU05"
-        ]
+        ],
+        "decision_ids": []
       }
     },
     {
@@ -456,7 +466,8 @@
         ],
         "hu_ids": [
           "HU06"
-        ]
+        ],
+        "decision_ids": []
       }
     },
     {
@@ -517,7 +528,8 @@
         ],
         "hu_ids": [
           "HU07"
-        ]
+        ],
+        "decision_ids": []
       }
     },
     {
@@ -577,7 +589,8 @@
         ],
         "hu_ids": [
           "HU08"
-        ]
+        ],
+        "decision_ids": []
       }
     },
     {
@@ -637,7 +650,8 @@
         ],
         "hu_ids": [
           "HU09"
-        ]
+        ],
+        "decision_ids": []
       }
     },
     {
@@ -682,7 +696,7 @@
           "given": "an authenticated user authored a comment",
           "when": "they confirm its deletion",
           "then": "the comment, and its audio if it is a voice comment, is no longer available; other users cannot delete it",
-          "source": "DEC-211 (added in v3.0); confirmation DEC-225 (v3.1)"
+          "source": "DEC-211 (added in v3.0); confirmation DEC-235"
         }
       ],
       "business_rule_ids": [
@@ -713,7 +727,7 @@
         ],
         "decision_ids": [
           "DEC-211",
-          "DEC-225"
+          "DEC-235"
         ]
       }
     },
@@ -741,10 +755,10 @@
       "acceptance_criteria": [
         {
           "id": "AC-030",
-          "given": "an authenticated user is on the score create or edit page and has been informed that the audio is sent to an external service",
+          "given": "an authenticated user is on the score create or edit page and has been informed that audio is sent to Notara's backend and hosting infrastructure may process the request",
           "when": "they press the microphone button and dictate \"Compas cuatro cuartos, Do negra, Re corchea, Mi corchea\" within 30 seconds",
           "then": "the recording is transcribed",
-          "source": "AC-011-01; DEC-201, DEC-214, DEC-215"
+          "source": "AC-011-01; DEC-201, DEC-214, DEC-215; CR-003"
         },
         {
           "id": "AC-031",
@@ -790,10 +804,45 @@
         },
         {
           "id": "AC-070",
-          "given": "a user has made 20 transcriptions today",
-          "when": "they try to dictate again",
-          "then": "no transcription is made, a clear message is shown and they can still type the content",
-          "source": "DEC-222; FR-045"
+          "given": "the authorized evaluation corpus contains at least 9 recordings from at least 3 different speakers",
+          "when": "all recordings are transcribed and parsed using the approved deterministic parser",
+          "then": "at least 7 of 9 produce the exact expected ABC; this target has not yet been measured",
+          "source": "Q-028; PRE-011"
+        },
+        {
+          "id": "AC-071",
+          "given": "the CR-004 approved multilingual Whisper Base model is loaded and the approved evaluation includes 30-second recordings",
+          "when": "transcription is measured over the approved evaluation run",
+          "then": "p95 is no more than 15 seconds and cold-start time is reported separately",
+          "source": "Q-012; PRE-011"
+        },
+        {
+          "id": "AC-072",
+          "given": "the complete service runs in a 1 GiB container under the approved HU11 test profile",
+          "when": "model load and inference are measured",
+          "then": "total service memory remains at or below 800 MiB and no more than one STT inference runs simultaneously per process",
+          "source": "PRE-011; requester authorization"
+        },
+        {
+          "id": "AC-073",
+          "given": "an authenticated user has reached the configured daily STT limit",
+          "when": "another valid request is submitted",
+          "then": "the service returns `STT_DAILY_LIMIT_REACHED` (429) without starting inference",
+          "source": "FR-045; DEC-219"
+        },
+        {
+          "id": "AC-074",
+          "given": "concurrent requests approach the user's daily quota",
+          "when": "inference admission is attempted",
+          "then": "the persistent per-user/UTC-day counter is reserved atomically; invalid/authentication/CSRF failures and requests rejected before inference admission do not count, while an admitted attempt counts even if transcription or parsing fails",
+          "source": "FR-045; BR-029; DEC-219"
+        },
+        {
+          "id": "AC-075",
+          "given": "an unauthenticated request, missing/invalid CSRF token, oversized audio, or an audio file with a disallowed type or signature is submitted",
+          "when": "the STT endpoint validates the request",
+          "then": "it rejects it before inference, returns a typed error, and does not consume quota",
+          "source": "FR-030, FR-043, FR-045; NFR-003; DEC-219"
         }
       ],
       "business_rule_ids": [
@@ -802,14 +851,16 @@
         "BR-018",
         "BR-022",
         "BR-024",
-        "BR-025"
+        "BR-025",
+        "BR-029"
       ],
       "edge_case_ids": [
         "EDGE-014",
         "EDGE-015",
         "EDGE-016",
         "EDGE-017",
-        "EDGE-018"
+        "EDGE-018",
+        "EDGE-031"
       ],
       "dependency_ids": [
         "DEP-004",
@@ -817,8 +868,8 @@
         "DEP-010"
       ],
       "open_question_ids": [
-        "Q-021",
-        "Q-023"
+        "Q-012",
+        "Q-029"
       ],
       "priority": null,
       "story_points": null,
@@ -848,8 +899,7 @@
           "DEC-214",
           "DEC-215",
           "DEC-218",
-          "DEC-222",
-          "DEC-229"
+          "DEC-219"
         ],
         "team_backlog": {
           "moscow": "Must",
@@ -858,7 +908,11 @@
             "DEC-208"
           ],
           "adjusted_story_points": 8
-        }
+        },
+        "change_request_ids": [
+          "CR-003",
+          "CR-004"
+        ]
       }
     },
     {
@@ -887,7 +941,7 @@
           "given": "an authenticated user views another user's score",
           "when": "they record a voice note of up to 30 seconds and confirm sending",
           "then": "a comment is created with the transcribed text and a link to its recorded audio",
-          "source": "AC-012-01, AC-012-02; DEC-201"
+          "source": "AC-012-01, AC-012-02; DEC-201; DEC-214, CR-003"
         },
         {
           "id": "AC-038",
@@ -925,18 +979,18 @@
           "source": "DEC-211, DEC-214"
         },
         {
-          "id": "AC-071",
+          "id": "AC-076",
+          "given": "the same user has made STT requests through dictation and voice-comment transcription",
+          "when": "daily usage is counted",
+          "then": "both flows share one persistent per-user/UTC-day quota and cannot each consume a separate limit",
+          "source": "FR-045; DEC-219"
+        },
+        {
+          "id": "AC-077",
           "given": "a voice comment's transcription is longer than 500 characters and at most 1,000",
           "when": "it is published",
           "then": "the full text is stored and shown without truncation",
-          "source": "DEC-220; FR-046"
-        },
-        {
-          "id": "AC-072",
-          "given": "a user has made 20 transcriptions today",
-          "when": "they try to send a voice comment",
-          "then": "it is not transcribed, a clear message is shown and they can still write a text comment",
-          "source": "DEC-222; FR-045"
+          "source": "DEC-231; FR-046"
         }
       ],
       "business_rule_ids": [
@@ -946,7 +1000,8 @@
         "BR-022",
         "BR-027",
         "BR-029",
-        "BR-030"
+        "BR-030",
+        "BR-031"
       ],
       "edge_case_ids": [
         "EDGE-014",
@@ -954,7 +1009,8 @@
         "EDGE-018",
         "EDGE-028",
         "EDGE-029",
-        "EDGE-030"
+        "EDGE-030",
+        "EDGE-031"
       ],
       "dependency_ids": [
         "DEP-005",
@@ -963,7 +1019,8 @@
         "DEP-010"
       ],
       "open_question_ids": [
-        "Q-022"
+        "Q-022",
+        "Q-026"
       ],
       "priority": null,
       "story_points": null,
@@ -990,14 +1047,19 @@
           "DEC-213",
           "DEC-214",
           "DEC-215",
-          "DEC-220",
-          "DEC-222",
-          "DEC-223"
+          "DEC-219",
+          "DEC-231",
+          "DEC-233",
+          "DEC-237"
         ],
         "team_backlog": {
           "moscow": "Should",
           "story_points": 3
-        }
+        },
+        "change_request_ids": [
+          "CR-003",
+          "CR-004"
+        ]
       }
     },
     {
@@ -1135,7 +1197,7 @@
           "id": "AC-049",
           "given": "an authenticated user views a score with valid ABC",
           "when": "they press \"Tutor Auditivo\"",
-          "then": "a spoken locution states the clef, the meter and the estimated difficulty, plus the key and the tempo when the ABC defines them (DEC-227) (e.g. \"Partitura en clave de Sol, compas de 4/4, dificultad estimada: media\")",
+          "then": "a spoken locution states the clef, the meter and the estimated difficulty, plus the key and the tempo when the ABC defines them (DEC-236) (e.g. \"Partitura en clave de Sol, compas de 4/4, dificultad estimada: media\")",
           "source": "AC-014-01; DEC-212; BR-028"
         },
         {
@@ -1198,8 +1260,8 @@
           "DEC-212",
           "DEC-213",
           "DEC-215",
-          "DEC-227",
-          "DEC-229"
+          "DEC-236",
+          "DEC-238"
         ],
         "team_backlog": {
           "moscow": "Should",
@@ -1418,7 +1480,7 @@
           "given": "the platform runs in local development",
           "when": "audio is requested",
           "then": "the free fallback voice is used by default; in automated testing a fake engine is used",
-          "source": "DEC-202 as amended by DEC-219; NFR-006, NFR-010"
+          "source": "DEC-202 as amended by DEC-230; NFR-006, NFR-010"
         }
       ],
       "business_rule_ids": [
@@ -1454,7 +1516,7 @@
           "DEC-202",
           "DEC-209",
           "DEC-216",
-          "DEC-219"
+          "DEC-230"
         ],
         "team_backlog": {
           "moscow": "Should",

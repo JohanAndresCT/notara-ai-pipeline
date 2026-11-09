@@ -160,3 +160,7 @@ PRE-002, PRE-003 y PRE-008 resueltas; PRE-009 con límites iniciales (DEC-221). 
 ## Re-validación (run 2) — prompts v2.1
 
 Prompts P03 v2.1: totales y provisionales se recalculan desde las fuentes. Validación sobre plan v2.1: PASS_WITH_WARNINGS (1 MEDIUM, 3 LOW). Se detectó y corrigió PLAN-VAL-206 (faltaban AC-070..072 en el backlog planificado).
+
+## Merge `mvp-2` → `pipeline/mvp2-p00-context` (2026-11-09)
+
+Se tomó como base la versión de `mvp-2` (CR-003, CR-004, implementación de HU11) y se reaplicó el segundo lote de decisiones renumerado como DEC-230..DEC-238. Retiradas: antigua DEC-222 (20/día; gana DEC-219 con 30/día) y antigua DEC-226 (aviso con OpenAI; obsoleto tras CR-003). Validaciones re-ejecutadas: PASS_WITH_WARNINGS.

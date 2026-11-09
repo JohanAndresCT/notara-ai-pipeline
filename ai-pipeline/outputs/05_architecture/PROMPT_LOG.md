@@ -88,3 +88,7 @@ Siguen: aprobación de ADR-006..ADR-015 por TEAM-002 y verificación de Railway 
 ## Re-validación (run 2) — prompts v2.1
 
 Prompts P05 v2.1. Validación sobre arquitectura v2.1: PASS_WITH_WARNINGS (2 MEDIUM: aprobación de ADRs por TEAM-002 y verificación de Railway; 1 LOW: timeouts sin medir). P06 readiness: YES_WITH_REVIEW_GATES.
+
+## Merge `mvp-2` → `pipeline/mvp2-p00-context` (2026-11-09)
+
+Se tomó como base la versión de `mvp-2` (CR-003, CR-004, implementación de HU11) y se reaplicó el segundo lote de decisiones renumerado como DEC-230..DEC-238. Retiradas: antigua DEC-222 (20/día; gana DEC-219 con 30/día) y antigua DEC-226 (aviso con OpenAI; obsoleto tras CR-003). Validaciones re-ejecutadas: PASS_WITH_WARNINGS.
