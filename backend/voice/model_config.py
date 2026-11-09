@@ -1,5 +1,5 @@
-MODEL_REPOSITORY = "Systran/faster-whisper-tiny"
-MODEL_REVISION = "d90ca5fe260221311c53c58e660288d3deb8d356"
+MODEL_REPOSITORY = "Systran/faster-whisper-base"
+MODEL_REVISION = "ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66"
 MODEL_FILES = (
     "config.json",
     "model.bin",

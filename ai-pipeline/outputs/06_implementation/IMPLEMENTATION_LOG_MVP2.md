@@ -240,3 +240,68 @@ No dependencies, database migrations, backend code, architecture decisions, Rail
 - **Deployment guide:** `docs/SETUP.md` records Railway variables and manual rollout steps. No secrets were changed and no commit, push, or deployment was performed.
 - **Validation limitation:** Docker is unavailable in this environment, so the final multi-stage Linux image build, `app` filesystem permissions inside the image, startup health loop, and runtime memory were not empirically tested here. Prior local model RSS is not evidence that the full Railway service meets the 800 MiB target. Python 3.12 Linux wheel resolution and application tests do not replace a Docker build/runtime test.
 - **Rollout gates:** Run a successful image build and CI, verify one-replica/1-worker configuration and app-readable model files, then measure cold start, loaded-model p95, total service peak memory and STT saturation on Railway before accepting HU11. No Railway deployment has been run.
+
+## 17. CR-004 - Whisper Base Implementation
+
+**Date:** 2026-11-09
+
+**Authorization:** The requester approved CR-004 for local
+implementation. Approval from other team members has not
+been established. Production deployment is not authorized.
+
+### Model migration
+
+- Replaced Whisper Tiny with multilingual Whisper Base as the active STT model.
+- Repository: `Systran/faster-whisper-base`.
+- Pinned revision: `ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66`.
+- CPU inference with `int8` computation remains the selected profile.
+- The SHA-256 manifest covers four model files.
+- `model.bin` size: 145,217,532 bytes.
+- Model provisioning verifies the pinned revision and file hashes.
+- Runtime requests do not download model weights.
+
+### Modified implementation
+
+- `backend/voice/model_config.py`: active model selection.
+- `backend/voice/model_sha256.json`: Base model integrity manifest.
+- `backend/voice/provision_model.py`: model provisioning.
+- `backend/notara_backend/settings.py`: STT configuration defaults.
+- `.env.example`: updated environment configuration.
+- `Dockerfile`: build-time Base provisioning.
+- `backend/voice/dictation.py`: deterministic parser refinements.
+- `backend/voice/tests.py`: regression tests.
+
+### Local verification
+
+- Windows development environment with Python 3.11.9.
+- Django test discovery: 113 tests.
+- Results: 112 passed, one PostgreSQL-only test skipped, zero failures.
+- Voice test subset: 23 discovered, one skipped.
+- Local sample `acc.aac` was compared with Tiny and Base.
+- Tiny transcript: `?Dorre mi, faso la s?!`
+- Base transcript: `Do, re, mi, fa, sol, la, si.`
+- This single comparison is not representative quality acceptance.
+- The pinned Base model files were verified against the SHA-256 manifest.
+- Docker and PostgreSQL runtime integration were not tested locally.
+
+### Preserved contracts
+
+- `POST /api/v1/audio/stt/` remains the STT endpoint.
+- The `SttAdapter` boundary remains unchanged.
+- The deterministic ABC parser remains responsible for musical conversion.
+- Session authentication, CSRF, recording limits and quota requirements remain applicable.
+- Existing MVP 1 behavior and historical CR-003 records are preserved.
+
+### Pending acceptance
+
+- At least 100 authorized recordings from at least five speakers.
+- At least 90% exact expected ABC results.
+- Loaded-model p95 at most 15 seconds for 30-second recordings.
+- Total service memory peak at most 800 MiB in a 1 GiB container.
+- Concurrency, quota, security and frontend integration regression.
+- Python 3.12/Docker image execution.
+- PostgreSQL concurrency verification.
+- Railway runtime, cold start, memory and latency measurements.
+- Separate production deployment authorization.
+
+**Status:** IMPLEMENTED LOCALLY; ACCEPTANCE PENDING.

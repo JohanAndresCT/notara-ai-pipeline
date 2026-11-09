@@ -168,3 +168,39 @@ All US, FR, NFR and PRE references resolve (automated check). Markdown and JSON 
 - **Structural checks run:** P02/P03 JSON parse; all P03 canonical story and acceptance-criterion references resolve against P02; HU11's PRE-002/PRE-007/PRE-011 dependencies are present; `git diff --check` passes.
 - **Readiness:** HU11 is authorized to begin implementation locally. Do not treat acceptance criteria as passed or authorize Railway deployment until the empirical gates and separate deployment authorization are complete. Q-029 requires clarification before implementing the populated-field malformed/present-empty ABC append path, but does not block independent STT or empty-field dictation work.
 - **Result:** `PASS_WITH_WARNINGS`; no implementation or performance/quality result is claimed.
+
+## 14. CR-004 Revalidation Addendum
+
+- **Date:** 2026-11-09
+- **Planning Version:** 4.2
+- **Requirements Version:** 5.2
+- **Change Request:** CR-004 (APPROVED FOR IMPLEMENTATION BY REQUESTER)
+- **Affected Stories:** US-011 (HU11), US-012 (HU12)
+- **Result:** PASS_WITH_WARNINGS ? documentation alignment only
+- **Deployment Authorization:** NOT GRANTED
+
+### Verified planning consistency
+
+- P03 planning metadata and backlog reference version 4.2.
+- P02 requirements and canonical backlog reference version 5.2.
+- CR-004 is traceable to the requester-approved Whisper Base implementation.
+- CR-003 remains the historical approved STT decision.
+- Priorities, Story Points, capacity and delivery sequence are unchanged.
+- MVP 1 remains the delivered baseline.
+
+### Outstanding conditions
+
+- Approval from other team members has not been established.
+- AC-071 was reconciled to Whisper Base in P02 v5.2; empirical latency acceptance remains pending.
+- Evaluation using at least 100 authorized recordings from 5 speakers.
+- At least 90% exact expected ABC output.
+- p95 transcription latency at most 15 seconds.
+- Total service memory at most 800 MiB.
+- Railway runtime validation and integration/security regression.
+- Existing sprint ownership, dates and budget preconditions.
+
+### Conclusion
+
+P03 is synchronized with requester-approved CR-004 implementation documentation.
+This addendum does not constitute empirical acceptance,
+sprint commitment approval or production deployment authorization.

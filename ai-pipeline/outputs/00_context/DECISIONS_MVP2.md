@@ -4,7 +4,7 @@
 **Release:** MVP 2 — Sprint 2 (Audio, Voice and TTS/STT)
 **Date:** 2026-11-08
 **Decided by:** Johan Andrés Ceballos Tabarez (TEAM-001), who delegated the choice to the pipeline's recommendation ("respecto a decisiones toma las que consideres mejor").
-**Ratification:** Pending confirmation by the rest of the team (TEAM-002 to TEAM-005) for MVP 2 decisions generally. CR-003 and the HU11-scoped decisions recorded in section 5 are approved based on the requester's authorization; this does not ratify unrelated MVP 2 decisions.
+**Ratification:** Pending confirmation by the rest of the team (TEAM-002 to TEAM-005) for MVP 2 decisions generally. CR-003, CR-004 and the HU11-scoped decisions recorded in section 5 are approved based on the requester's authorization; this does not ratify unrelated MVP 2 decisions.
 **Type:** Team input artifact (source for P00 v2.2 and P01 v2.1)
 
 > `DEC-2NN` identifiers belong to MVP 2. They do not collide with the MVP 1 decisions `DEC-001`–`DEC-003` in `outputs/03_planning/PRIORITIZATION.md`.
@@ -13,7 +13,7 @@
 
 | ID | Replaces | Decision | Affects | Rationale |
 |---|---|---|---|---|
-| DEC-201 | PDEC-201 | **Amended by approved CR-003:** local `faster-whisper` multilingual `tiny`, CPU/`int8`, language `es`, behind `SttAdapter` for dictation and voice comments. No OpenAI/Deepgram STT API or fallback. The prior OpenAI API selection is retained here as history, not as the current STT choice. | HU11, HU12 | Removes the OpenAI STT credit dependency while preserving the adapter boundary; quality and Railway capacity remain unvalidated. |
+| DEC-201 | PDEC-201 | **Amended by approved CR-003 and subsequently CR-004:** local `faster-whisper` multilingual `base`, CPU/`int8`, language `es`, behind `SttAdapter` for dictation and voice comments. CR-003's Tiny selection is retained as historical context, superseded by CR-004. No OpenAI/Deepgram STT API or fallback. | HU11, HU12 | Removes the external STT API dependency while improving the local dictation result observed in the evaluation sample; general quality and Railway capacity remain unvalidated. |
 | DEC-202 | PDEC-202 | Commercial TTS: **ElevenLabs**. Fallback: **`edge-tts`**. Azure and Google are not used. `edge-tts` is the default voice in development and CI; ElevenLabs is enabled by configuration for demos. | HU13, HU14, HU17 | The free ElevenLabs tier is small (to verify against current pricing); keeping it for demos protects credits. |
 | DEC-203 | PDEC-203 | Instrument playback runs **in the browser with Tone.js**. No server-side FluidSynth. | HU15 | Meets "sin consumir APIs externas" without new server infrastructure. |
 | DEC-204 | PDEC-204 | The **MP3 download contains the synthesized solfège voice only**. Voice + instrument mixing is deferred (FUT-005). AC-018-01 is reworded accordingly. | HU18 | Mixing requires server-side instrument synthesis for a Could story. |
@@ -69,3 +69,37 @@
 - **Abuse protection:** DEC-219 resolves Q-027 with a configurable daily limit of 30 admitted STT inferences per authenticated user across HU11 and HU12, persisted per UTC day and reserved atomically before inference. Authentication/CSRF failures, invalid files, and requests rejected before inference admission do not consume quota; admitted attempts count even if inference/parsing fails. The over-limit response is `STT_DAILY_LIMIT_REACHED` (429).
 - **Security and privacy:** Require session authentication and CSRF, enforce upload size/type/signature validation before inference, retain no dictation audio or temporary files, and never log audio or transcripts. The one-inference-per-process bound and daily quota are required CPU-abuse controls.
 - **Empirical state:** Corpus results, p95, cold start, complete-service memory, concurrency, pinned-weight operation, Python 3.12 integration and Railway remain unverified. Approval authorizes implementation and planning only, not acceptance or deployment.
+
+## 6. Approved amendment record - CR-004 (Whisper Base)
+
+- **Date:** 2026-11-09.
+- **Status:** Approved for implementation by the requester.
+- **Approval record:** The requester confirmed authorization
+  of the Whisper Base migration. Individual approver names
+  and meeting minutes were not supplied and are not inferred.
+- **Reference:** `CR-004_WHISPER_BASE.md`.
+- **Affected decision:** DEC-201.
+- **Affected stories:** HU11 and potentially HU12.
+- **Approved change:** Replace multilingual Whisper Tiny
+  with `Systran/faster-whisper-base`, preserving
+  faster-whisper, CPU/int8, Spanish language and the
+  existing SttAdapter boundary.
+- **Pinned revision:** `ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66`.
+- **Model integrity:** The four model files were verified
+  against the SHA-256 manifest.
+- **Local evidence:** Base loaded successfully using CPU/int8.
+  The evaluation sample produced `Do, re, mi, fa, sol, la, si.`
+  compared with the incorrect Tiny transcription.
+- **Backend tests:** 113 discovered, 1 skipped, 0 failures.
+- **Limitations:** The single audio comparison does not establish
+  general transcription quality. Latency, memory, concurrency,
+  Railway compatibility and full production integration remain
+  unverified.
+- **Contracts:** No changes to HU11/HU12 API contracts,
+  authentication, CSRF, quotas, privacy or ABC vocabulary
+  are authorized by this amendment.
+- **Deployment:** Production deployment remains pending
+  completion of the acceptance criteria and deployment checks.
+- **Historical record:** CR-003 remains preserved as the
+  previous approved decision. CR-004 supersedes its Tiny
+  model selection without changing unrelated decisions.

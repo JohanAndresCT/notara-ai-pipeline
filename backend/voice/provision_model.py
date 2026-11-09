@@ -36,7 +36,7 @@ def provision_model(model_dir: Path, manifest_path: Path = DEFAULT_MANIFEST) -> 
 
     model_dir.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(
-        prefix="notara-whisper-tiny-",
+        prefix="notara-whisper-base-",
         dir=model_dir.parent,
     ) as temporary_directory:
         temporary_path = Path(temporary_directory)
@@ -64,7 +64,7 @@ def provision_model(model_dir: Path, manifest_path: Path = DEFAULT_MANIFEST) -> 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Download and verify the pinned Notara Whisper Tiny model."
+        description="Download and verify the pinned Notara Whisper Base model."
     )
     parser.add_argument("--model-dir", required=True, type=Path)
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)

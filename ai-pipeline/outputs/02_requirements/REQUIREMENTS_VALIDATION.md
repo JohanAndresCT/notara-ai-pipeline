@@ -209,3 +209,45 @@ This report did not modify `REQUIREMENTS.md`, `product_backlog.json`, P00/P01 ar
 - **Acceptance state:** ≥100 authorized recordings / ≥5 speakers / ≥90% exact parsed ABC, p95 ≤15 s, ≤800 MiB total service memory in a 1 GiB container and one inference per process are approved targets, not results. No quality, performance, memory, concurrency, or Railway pass is claimed.
 - **Structural checks run:** P02 and P03 JSON both parse; 76 unique acceptance-criterion IDs match between P02 Markdown and JSON; P03 canonical story, AC and HU11 dependency references resolve. `git diff --check` passes.
 - **Current result:** `PASS_WITH_WARNINGS`. HU11 is ready for implementation from requirements perspective; acceptance verification remains pending. Q-020 and Q-012 residuals remain visible.
+
+## CR-004 Validation Addendum - 2026-11-09
+
+- **Requirements Version:** 5.2
+- **Backlog Version:** 5.1
+- **Change Request:** CR-004 (APPROVED FOR IMPLEMENTATION BY REQUESTER)
+- **Affected Stories:** US-011 (HU11), US-012 (HU12)
+- **Result:** PASS_WITH_WARNINGS - local implementation evidence available; production acceptance pending
+- **Deployment Authorization:** NOT GRANTED
+
+### Verified evidence
+
+- Whisper Base model and pinned revision configured locally.
+- Model manifest integrity verification passed.
+- Local CPU/int8 model loading succeeded.
+- One musical-note audio sample produced an improved transcription.
+- Django voice tests: 23 executed, 1 skipped, no failures.
+- Existing backlog structure preserved: 7 epics and 19 stories.
+- CR-003 historical decision retained.
+
+### Pending validation
+
+- CR-004 approved by the requester for implementation; approval from other team members is not established.
+- Evaluation with at least 100 authorized recordings from 5 speakers.
+- At least 90% exact expected ABC output.
+- p95 transcription latency of at most 15 seconds.
+- Complete service memory at or below 800 MiB.
+- Railway deployment and runtime verification.
+- Security, quota and full integration regression checks.
+
+### Identified conflict
+
+AC-071 still explicitly refers to multilingual Whisper Tiny.
+This criterion must be reconciled with the approved CR-004
+model selection. Its quality threshold remains pending
+empirical validation.
+
+### Conclusion
+
+CR-004 is approved for implementation by the requester.
+Whisper Base has not passed production acceptance. No
+production deployment is authorized by this addendum.

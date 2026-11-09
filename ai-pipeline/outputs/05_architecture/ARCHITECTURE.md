@@ -9,28 +9,33 @@
 | 3.0 | MVP 2 | Applies approved CR-003: local `faster-whisper tiny` STT behind `SttAdapter`; preserves `/api/v1/audio/stt/` and ABC conversion, revises privacy/configuration/runtime gates. No Django, endpoint, frontend or deployment implementation is added. |
 | 4.0 | MVP 2 | Applies HU11 authorization: ratifies applicable STT implementation ADRs, atomic daily per-user quota, security gates and quality/performance/resource acceptance targets. Measurements and Railway readiness remain pending. |
 
+| 4.1 | MVP 2 | Records the CR-004 migration candidate from Whisper Tiny to Whisper Base. |
+| 4.2 | MVP 2 | Records CR-004 migration to Whisper Base, pinned revision and SHA-256 verification. Runtime acceptance and production deployment remain pending. |
+
+| 4.3 | MVP 2 | Reconciles requester-approved CR-004 implementation, active Whisper Base architecture, ADR-006 and upstream versions. Production acceptance remains pending. |
+
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 4.0
+- **Version:** 4.3
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P05 - Architecture
 - **Status:** `READY_WITH_WARNINGS`
 - **Sources:**
-  - `REQUIREMENTS.md` v5.0, `PRIORITIZATION.md` v4.0, `UX_SPEC.md` v4.0 and their validations
-  - `DECISIONS_MVP2.md` (CR-003 amendment and HU11 authorization), `CR-003_WHISPER_TINY.md`
+  - `REQUIREMENTS.md` v5.2, `PRIORITIZATION.md` v4.2, `UX_SPEC.md` v4.2 and their validations
+  - `DECISIONS_MVP2.md` (CR-003 amendment and HU11 authorization), `CR-003_WHISPER_TINY.md`, `CR-004_WHISPER_BASE.md` (approved by requester for implementation)
   - `ARCHITECTURE.md` v1.0
   - The repository on 2026-11-08: `backend/`, `frontend/`, `Dockerfile`, `docker/nginx.conf.template`, `deploy/entrypoint.sh`, `.github/workflows/ci.yml`
 - **Upstream validation:** P02 `PASS_WITH_WARNINGS`; P03 `PASS_WITH_WARNINGS`; P04 `PASS_WITH_WARNINGS` (P05 readiness WITH CONSTRAINTS)
 - **Labels:** FACT (verified in repository or approved source), DECISION (`DEC-2NN`), PROPOSAL (this architecture, pending review), ASSUMPTION, UNKNOWN.
-- **Nature:** approved STT technology change with implementation details remaining proposals. No HU11 endpoint/model/UI or Railway deployment exists.
+- **Nature:** requester-approved STT model migration for local implementation. Existing implementation is subject to acceptance tests; no Railway deployment is authorized.
 
 ## 2. Executive Summary
 
 MVP 2 keeps the delivered shape: one same-origin web application (React client and Django API behind Nginx) plus PostgreSQL, deployed as one container on Railway. It adds no service, queue or worker process. Instead it makes four changes inside the monolith.
 
 **1. A `voice` backend module** keeps STT and TTS behind backend adapters:
-- local `faster-whisper` multilingual `tiny` transcribes speech on CPU/int8 (DEC-201 as amended by CR-003);
+- local `faster-whisper` multilingual `base` transcribes speech on CPU/int8 (DEC-201 as amended by CR-004);
 - ElevenLabs is the primary text-to-speech voice;
 - `edge-tts` is the fallback voice.
 
@@ -57,7 +62,7 @@ The browser never calls a provider and never sees a key.
 - deletion of audio together with its comment;
 - a silent fallback, logged without personal content.
 
-**Status `READY_WITH_WARNINGS`.** CR-003 approves the STT engine change; local quality, total memory, concurrency and Railway operation are not validated. Other MVP 2 conflicts and review gates remain open:
+**Status `READY_WITH_WARNINGS`.** CR-004 authorizes Whisper Base implementation; local quality, total memory, concurrency and Railway operation are not validated. Other MVP 2 conflicts and review gates remain open:
 - `edge-tts` in CI against NFR-010;
 - the 500-character comment limit against 30-second transcriptions.
 
@@ -109,7 +114,7 @@ User (browser: Chrome, Edge, Firefox; HTTPS)
 | Nginx (static SPA, /api proxy)                                                  |
 |   -> Gunicorn (threaded workers) -> Django                                      |
 |        accounts | scores | community (comments) | voice (NEW) | abc_reader (NEW)|
-|        local STT: faster-whisper multilingual tiny / CPU int8; preloaded [CR-003]|
+|        local STT: faster-whisper multilingual base / CPU int8; preloaded [CR-004]|
 |        default_storage -> /data/media (profile_photos/, voice_comments/,        |
 |                                        audio_cache/)                           |
 +------------------------------------|-------------------------------------------+
@@ -129,7 +134,7 @@ User (browser: Chrome, Edge, Firefox; HTTPS)
 
 | Concern | Decision | Rationale | Alternatives | Status |
 |---|---|---|---|---|
-| STT | `faster-whisper` multilingual `tiny`, CPU/`int8`, Spanish (`language=es`), loaded locally behind `SttAdapter`. | DEC-201 as amended by CR-003; removes paid STT API/key and keeps provider boundary. | OpenAI/Deepgram APIs and STT fallback are not used. | DECISION; runtime gates open |
+| STT | `faster-whisper` multilingual `base`, CPU/`int8`, Spanish (`language=es`), loaded locally behind `SttAdapter`. | DEC-201 as amended by CR-004; removes paid STT API/key and keeps provider boundary. | OpenAI/Deepgram APIs and STT fallback are not used. | DECISION; runtime gates open |
 | TTS primary | ElevenLabs HTTP API, MP3 output, one Spanish voice ID from configuration. | DEC-202; supports pause markup for pacing (to verify, ARCH-ASSUM-201). | Azure, Google (discarded). | DECISION |
 | TTS fallback / dev | `edge-tts` Python package, Spanish neural voice from configuration, MP3 output. | DEC-202; free; already Python. | gTTS (lower quality). | DECISION; CI use is a conflict (CONFLICT-ARCH-201) |
 | HTTP client | `httpx` for ElevenLabs only (timeouts, easy mocking). | STT inference is local; no HTTP STT client. | Vendor SDKs. | PROPOSAL |
@@ -281,10 +286,10 @@ The author deletes the comment; `transaction.on_commit` removes the audio file. 
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `STT_MODEL_ID` | `Systran/faster-whisper-tiny` | Multilingual model repository. |
-| `STT_MODEL_REVISION` | Required; no value approved | Immutable model revision/commit; pin before image build. |
-| `STT_MODEL_DIR` | Empty (STT disabled) | Local preloaded weights; runtime must not download. |
-| `STT_MODEL_SIZE` | `tiny` | Multilingual size, not `tiny.en`. |
+| `STT_MODEL_ID` | `Systran/faster-whisper-base` | Requester-approved CR-004 multilingual model repository. |
+| `STT_MODEL_REVISION` | `ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66` | Pinned Whisper Base revision; production approval pending. |
+| `STT_MODEL_DIR` | `/opt/notara/models/whisper-base` (Docker) | Build-time provisioned weights; runtime must not download. |
+| `STT_MODEL_SIZE` | `base` | Requester-approved CR-004 multilingual model size. |
 | `STT_DEVICE` | `cpu` | Inference device. |
 | `STT_COMPUTE_TYPE` | `int8` | CPU quantization. |
 | `STT_LANGUAGE` | `es` | Explicit Spanish recognition language. |
@@ -349,7 +354,7 @@ All targets above are approved for HU11 acceptance, not evidence that they pass.
 
 | ID | Decision | Benefit | Trade-off / revisit trigger | Status |
 |---|---|---|---|---|
-| ADR-006 | STT and TTS remain behind adapters in `voice`; HU11 STT uses the approved local `faster-whisper tiny` model, while TTS provider keys remain server-side. | No STT vendor call/key; provider swap and fake testing remain isolated. | Inference consumes service CPU/memory; revisit if quality, resource or latency gates fail. | Ratified for HU11 implementation; TTS unchanged |
+| ADR-006 | STT and TTS remain behind adapters in `voice`; HU11 STT uses the requester-approved local `faster-whisper base` model, while TTS provider keys remain server-side. | No STT vendor call/key; provider swap and fake testing remain isolated. | Inference consumes service CPU/memory; revisit if quality, resource or latency gates fail. | Ratified for HU11 implementation; TTS unchanged |
 | ADR-007 | HU11 uses synchronous processing with bounded local inference and typed failures; no job queue. | No new services on Railway; simple typed UX outcomes. | CPU-bound inference occupies a thread; verify responsiveness and timeout behavior against approved targets. | Ratified for HU11; measurements pending |
 | ADR-008 | Audio files in `default_storage` under `/data/media`, served only by authenticated views. | Reuses the profile-photo pattern; storage backend already pluggable. | Depends on volume persistence (PRE-005). Revisit: move to S3-compatible storage if `/data` is not persistent. | PROPOSAL |
 | ADR-009 | Dictation parsing in the backend (`dictation` module), deterministic, approved closed vocabulary. | Single source of truth; testable; no LLM cost (DEC-205). | Vocabulary changes need a deploy. Revisit if Q-021 vocabulary is expanded. | Ratified for HU11 |
@@ -433,6 +438,53 @@ Implementation order follows the P03 delivery groups:
 6. **Cross-cutting:** runtime changes (Gunicorn, Nginx), environment variables, fake engines in CI, tests listed in section 12.
 
 For HU11, its applicable ADRs, PRE-002 and PRE-011 planning targets are now approved. Before implementing the populated-field malformed/present-empty ABC edge path, resolve Q-029. HU11 acceptance still requires measured PRE-011 evidence; the 25 s ceiling remains pending Q-012 approval. CONFLICT-ARCH-201, CONFLICT-ARCH-202/Q-026, PRE-004 (TTS), and PRE-005 (HU12/HU16 storage) remain outside HU11 scope.
+
+### CR-004 - Approved Whisper Base architecture amendment
+
+**Status:** APPROVED BY REQUESTER FOR LOCAL IMPLEMENTATION. Production deployment
+and runtime acceptance remain pending.
+
+**Affected stories:** HU11 and potentially HU12.
+
+The approved migration replaces the local Whisper Tiny
+STT model with Whisper Base while retaining the existing
+STT adapter, endpoint contracts and ABC parser.
+
+Model configuration:
+
+- Repository: `Systran/faster-whisper-base`
+- Size: `base`
+- Revision: `ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66`
+- Container directory: `/opt/notara/models/whisper-base`
+- Runtime target: CPU with INT8 inference
+
+The Docker build provisions the pinned model and verifies
+its four files against the SHA-256 manifest. Production
+runtime must not depend on downloading the model.
+
+Local evidence:
+
+- Model manifest verification completed.
+- Model loaded successfully with CPU/INT8.
+- Backend tests: 113 discovered, 1 skipped, 0 failures.
+- One local audio sample was compared against Tiny.
+- Frontend production build completed successfully.
+
+This evidence does not establish general STT quality
+or production resource compatibility.
+
+Acceptance gates remain:
+
+- At least 100 authorized recordings from 5 speakers.
+- At least 90% exact expected ABC output.
+- p95 transcription latency at most 15 seconds.
+- Total service memory at most 800 MiB.
+- Railway runtime and deployment verification.
+- Full integration, security and quota regression.
+- AC-071 reconciled to Whisper Base in P02 v5.2; empirical latency acceptance remains pending.
+
+The historical CR-003 architecture decision remains
+documented. MVP 1 remains unchanged.
 
 ## 19. Status and Next Actions
 

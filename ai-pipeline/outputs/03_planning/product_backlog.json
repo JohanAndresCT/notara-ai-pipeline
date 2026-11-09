@@ -1,18 +1,19 @@
 {
   "backlog_metadata": {
     "project": "Notara",
-    "version": "4.0",
+    "version": "4.2",
     "stage": "P03",
     "release": "MVP 2 - Sprint 2",
     "status": "READY_WITH_ASSUMPTIONS",
     "purpose": "Prioritized planning index for MVP 2, with MVP 1 kept as delivered baseline.",
     "source_artifacts": [
       "ai-pipeline/outputs/03_planning/PRIORITIZATION.md",
-      "ai-pipeline/outputs/02_requirements/REQUIREMENTS.md (v5.0)",
+      "ai-pipeline/outputs/02_requirements/REQUIREMENTS.md (v5.2)",
       "ai-pipeline/outputs/02_requirements/product_backlog.json",
       "ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md",
       "ai-pipeline/outputs/00_context/DECISIONS_MVP2.md",
-      "ai-pipeline/outputs/00_context/CR-003_WHISPER_TINY.md"
+      "ai-pipeline/outputs/00_context/CR-003_WHISPER_TINY.md",
+      "ai-pipeline/outputs/00_context/CR-004_WHISPER_BASE.md"
     ],
     "canonical_story_source": "ai-pipeline/outputs/02_requirements/product_backlog.json",
     "capacity": {
@@ -38,7 +39,7 @@
     ],
     "assignment_note": "assigned_developers stays empty until the team provides owners (Q-010 / PRE-006).",
     "previous_version": "1.0 (MVP 1; source paths updated from artifacts/ to ai-pipeline/outputs/)",
-    "notes": "CR-003 changes only the STT engine; priority, Story Points, capacity and MVP 1 baseline are unchanged. The requester has ratified HU11-specific decisions and applicable ADRs: PRE-002 is satisfied and PRE-011 is approved for planning, with empirical acceptance verification pending. PRE-001 remains open for other MVP 2 scope; HU11 no longer depends on a paid STT key."
+    "notes": "CR-003 changes only the STT engine; priority, Story Points, capacity and MVP 1 baseline are unchanged. The requester has ratified HU11-specific decisions and applicable ADRs: PRE-002 is satisfied and PRE-011 is approved for planning, with empirical acceptance verification pending. PRE-001 remains open for other MVP 2 scope; HU11 no longer depends on a paid STT key. CR-004 approves Whisper Base for HU11/HU12 implementation per requester authorization on 2026-11-09. Other team approvals are not established; empirical acceptance and Railway validation remain pending. Planning priorities, Story Points, capacity, dependencies and the MVP 1 baseline remain unchanged. CR-003 remains the historical approved decision."
   },
   "items": [
     {

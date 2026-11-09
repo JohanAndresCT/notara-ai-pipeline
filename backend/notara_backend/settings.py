@@ -114,9 +114,9 @@ PROFILE_PHOTO_MAX_BYTES = int(os.getenv("PROFILE_PHOTO_MAX_BYTES", 5 * 1024 * 10
 STT_DAILY_LIMIT = int(os.getenv("STT_DAILY_LIMIT", "30"))
 STT_MODEL_ID = os.getenv(
     "STT_MODEL_ID",
-    "Systran/faster-whisper-tiny",
+    "Systran/faster-whisper-base",
 ).strip()
-STT_MODEL_SIZE = os.getenv("STT_MODEL_SIZE", "tiny").strip()
+STT_MODEL_SIZE = os.getenv("STT_MODEL_SIZE", "base").strip()
 STT_MODEL_DIR = _project_path(os.getenv("STT_MODEL_DIR", "").strip())
 STT_MODEL_REVISION = os.getenv("STT_MODEL_REVISION", MODEL_REVISION).strip()
 STT_MODEL_MANIFEST = _project_path(
@@ -137,8 +137,8 @@ if AUDIO_MAX_BYTES < 1 or AUDIO_MAX_SECONDS < 1:
     raise ValueError("STT audio limits must be positive integers.")
 if STT_CPU_THREADS < 1:
     raise ValueError("STT_CPU_THREADS must be a positive integer.")
-if STT_MODEL_ID != "Systran/faster-whisper-tiny" or STT_MODEL_SIZE != "tiny":
-    raise ValueError("HU11 requires the multilingual Systran/faster-whisper-tiny model.")
+if STT_MODEL_ID != "Systran/faster-whisper-base" or STT_MODEL_SIZE != "base":
+    raise ValueError("HU11 requires the multilingual Systran/faster-whisper-base model.")
 if STT_MODEL_REVISION != MODEL_REVISION:
     raise ValueError(f"HU11 model revision is pinned to {MODEL_REVISION}.")
 if STT_DEVICE != "cpu" or STT_COMPUTE_TYPE != "int8" or STT_LANGUAGE != "es":

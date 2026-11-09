@@ -9,10 +9,12 @@
 | 3.0 | MVP 2 | Applies CR-003: HU11/HU12 use local STT, no STT provider key; PRE-004 is limited to commercial TTS. Adds quality/resource gate PRE-011 without changing priority or Story Points. |
 | 4.0 | MVP 2 | Records HU11-specific human approvals: PRE-002 satisfied, PRE-011 approved for planning with empirical checks pending, and HU11-scoped decisions/ADRs ratified. Q-020 remains open for other MVP 2 scope. |
 
+| 4.2 | MVP 2 | Records requester-approved CR-004 implementation of Whisper Base for HU11/HU12. Empirical acceptance and Railway validation remain pending; priorities, Story Points, capacity and MVP 1 baseline unchanged. |
+
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 3.0
+- **Version:** 4.2
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P03 - Planning
 - **Status:** `READY_WITH_ASSUMPTIONS`
@@ -21,8 +23,9 @@
   - `ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md` (HU11-HU19, SP, MoSCoW)
   - `ai-pipeline/outputs/00_context/DECISIONS_MVP2.md` (DEC-201-DEC-219)
   - `ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md` (v2.2), `PRODUCT_VISION_VALIDATION.md`
-  - `ai-pipeline/outputs/02_requirements/REQUIREMENTS.md` (v5.0), `product_backlog.json` (v5.0), `REQUIREMENTS_VALIDATION.md`
+  - `ai-pipeline/outputs/02_requirements/REQUIREMENTS.md` (v5.2), `product_backlog.json` (v5.2), `REQUIREMENTS_VALIDATION.md`
   - `ai-pipeline/outputs/00_context/CR-003_WHISPER_TINY.md` (approved per requester authorization)
+  - `ai-pipeline/outputs/00_context/CR-004_WHISPER_BASE.md` (approved by requester for implementation; acceptance pending)
   - `ai-pipeline/outputs/03_planning/PRIORITIZATION.md` and `product_backlog.json` v1.0 (MVP 1)
   - `ai-pipeline/prompts/system/RELEASE_PLAN.md` (MVP 1 load reference), `SYSTEM_PROMPT.md`
 - **Validation Statuses:**
@@ -253,7 +256,7 @@ P0 stories are never dropped. If a P0 story is at risk, re-scope its acceptance 
 
 - MVP 1 content rules unchanged; they apply to dictated and loaded content.
 - Listening features only for `.abc` scores; Spanish only; recordings ≤ 30 s and ≤ 2 MB; 20 new syntheses per user per day; HU11 STT quota 30 admitted inferences/user/UTC day by default (DEC-219).
-- Decided engines: local `faster-whisper tiny` for STT (CR-003), ElevenLabs with `edge-tts` fallback for TTS, Tone.js in the browser; these are constraints, not P03 design.
+- Decided engines: local `faster-whisper base` for STT (CR-004; CR-003 retained historically), ElevenLabs with `edge-tts` fallback for TTS, Tone.js in the browser; these are constraints, not P03 design.
 - 31 SP in one sprint, five-person team, dates unknown.
 - P03 assigns no developers, dates or workload, and designs no technology.
 
@@ -265,6 +268,20 @@ P0 stories are never dropped. If a P0 story is at risk, re-scope its acceptance 
 4. **Build the voice-output chain in order:** US-017 → US-016 → US-013.
 5. **Commit the P0 slice (21 SP).** Deliver P1 in the order US-019 (already early), US-014, US-012, and treat US-018 as stretch.
 6. **Re-estimate if implementation evidence changes scope.** PRE-002 is now satisfied for HU11; retain the provisional 8 SP estimate unless new evidence warrants a team re-estimate.
+
+### CR-004 - Approved for implementation
+
+CR-004 replaces Whisper Tiny with `Systran/faster-whisper-base`
+for HU11/HU12, as authorized by the requester on 2026-11-09.
+Approval from other team members has not been established.
+
+Priorities, Story Points, capacity, delivery sequence and the
+MVP 1 baseline remain unchanged.
+
+Corpus-based quality, latency, memory, security and Railway
+validation remain pending. Production deployment is not authorized.
+
+CR-003 remains preserved as the historical STT decision.
 
 ## 12. Status and Next Actions
 

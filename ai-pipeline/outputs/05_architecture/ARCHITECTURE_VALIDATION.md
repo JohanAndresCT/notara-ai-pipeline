@@ -164,3 +164,87 @@ The as-built baseline was verified against the repository. Every FR-018-FR-044 a
 - **Scope boundary:** The endpoint accepts audio and optional title and composes a new ABC document for an empty content field. It does not merge an existing field; Q-029 remains open for that append path.
 - **Runtime boundary:** Local weights are loaded only when `STT_MODEL_REQUIRED=true`, after hash/revision verification. No approved immutable model commit, staged weights, Python 3.12 run, PostgreSQL concurrency result, complete-service resource measurement, or Railway evidence is supplied by this increment.
 - **Review result:** `PASS_WITH_WARNINGS` for contract and implementation traceability only; the acceptance targets remain unmeasured and Railway is not ready/authorized.
+
+## 15. CR-004 Revalidation Addendum
+
+- **Date:** 2026-11-09
+- **Architecture Version:** 4.1
+- **Requirements Version:** 5.1
+- **Planning Version:** 4.1
+- **UX Version:** 4.1
+- **Change Request:** CR-004 (PROPOSED)
+- **Affected Stories:** US-011 (HU11), US-012 (HU12)
+- **Result:** PASS_WITH_WARNINGS ? documentation alignment only
+- **Production Authorization:** NOT GRANTED
+
+### Architecture alignment
+
+- Whisper Base is the proposed replacement for Whisper Tiny.
+- Model repository and revision are pinned.
+- Local SHA-256 manifest verification succeeded.
+- Local CPU/INT8 model loading succeeded.
+- Docker configuration provisions the model during image build.
+- Existing STT endpoint and ABC conversion contracts are retained.
+- CR-003 remains the historical approved decision.
+- MVP 1 baseline remains unchanged.
+
+### Local test evidence
+
+- Django voice tests: 23 discovered, 1 skipped, 0 failures.
+- One local audio sample compared Tiny and Base.
+- Empirical acceptance has not been established.
+
+### Outstanding conditions
+
+- Formal approval of CR-004.
+- Reconciliation of AC-071 referencing Whisper Tiny.
+- At least 100 authorized recordings from 5 speakers.
+- At least 90% exact expected ABC output.
+- p95 transcription latency at most 15 seconds.
+- Total service memory at most 800 MiB.
+- Railway resource and runtime validation.
+- Integration, security and quota regression.
+- Review of temporary debug interfaces and bypasses.
+
+### Conclusion
+
+P05 documentation is aligned with proposed CR-004.
+This does not establish production readiness or authorize deployment.
+
+
+## 16. CR-004 Architecture v4.3 Revalidation
+
+- **Date:** 2026-11-09
+- **Architecture Version:** 4.3
+- **Requirements Version:** 5.2
+- **Planning Version:** 4.2
+- **UX Version:** 4.2
+- **Change Request:** CR-004 (APPROVED BY REQUESTER FOR LOCAL IMPLEMENTATION)
+- **Result:** `PASS_WITH_WARNINGS` - documentation consistency only
+- **Production Authorization:** NOT GRANTED
+
+### Architecture alignment
+
+- Whisper Base is the active STT model selected for HU11/HU12.
+- DEC-201 and ADR-006 reflect the CR-004 model selection.
+- CR-003 and prior Tiny measurements remain historical evidence.
+- The pinned revision and SHA-256 manifest are retained.
+- The STT adapter, endpoint contracts, deterministic ABC parser and MVP 1 baseline remain unchanged.
+- AC-071 references Whisper Base in P02 v5.2.
+- Other team members' approval has not been established.
+
+### Pending acceptance
+
+- At least 100 authorized recordings from at least five speakers.
+- At least 90% exact expected ABC output.
+- Loaded-model p95 at most 15 seconds for 30-second recordings.
+- Total service memory peak at most 800 MiB in a 1 GiB container.
+- Concurrency, quota, security and integration regression.
+- Python 3.12/Docker image compatibility and Railway runtime validation.
+- Separate authorization before production deployment.
+
+### Conclusion
+
+The architecture documents the requester-approved CR-004
+implementation. This review does not certify empirical
+acceptance, Railway readiness or production deployment.

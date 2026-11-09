@@ -9,18 +9,19 @@
 | 3.0 | MVP 2 | Incremental: HU11-HU19 (CR-001, CR-002) as US-011-US-019; DEC-201-DEC-218 applied; US-010 amended by DEC-211; new epics EPIC-005-EPIC-007; FR-018-FR-044, NFR-004-NFR-010, BR-013-BR-028, EDGE-014-EDGE-030, DEP-004-DEP-010, AC-029-AC-069. |
 | 4.0 | MVP 2 | Applies approved CR-003: local `faster-whisper tiny` STT; privacy notice and retention wording aligned; STT/TTS dependencies separated; open quality/performance gates recorded. No product story scope or MVP 1 behavior changed. |
 | 5.0 | MVP 2 | Records requester-reported HU11 approvals: BR-013/025, quality/performance/resource targets, daily STT quota, and security gates; adds FR-045, BR-029 and AC-070-076. Empirical acceptance remains pending; no MVP 1 behavior changed. |
+| 5.2 | MVP 2 | Records requester-approved CR-004 migration from Whisper Tiny to Base. Local implementation and test evidence documented; quality, performance, memory and Railway acceptance remain pending. |
 
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 5.0
+- **Version:** 5.2
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P02 - Requirements Engineering
 - **Status:** READY_WITH_ASSUMPTIONS
 - **Generated From:** `ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md` (v2.1; wording updated in v2.2)
 - **Additional Sources:** `PROJECT_CONTEXT.md` (v2.2; wording updated in v2.3), `SPRINT_2_BACKLOG_INPUT.md` (HU11-HU19), `DECISIONS_MVP2.md` (DEC-201-DEC-219, CR-003 and HU11 authorization), `CR-003_WHISPER_TINY.md`, requirements v2.0 (MVP 1)
 - **P01 Validation:** PASS_WITH_WARNINGS (run 2; DISC-VAL-202 and DISC-VAL-203 carried)
-- **Change Requests:** CR-001, CR-002, CR-003 (approved per requester authorization; approver names/date not provided)
+- **Change Requests:** CR-001, CR-002, CR-003 (approved per requester authorization); CR-004 (approved by requester for implementation; acceptance pending).
 
 > Evidence labels: FACT, DECISION (`DEC-2NN`), ASSUMPTION, PROPOSAL, UNKNOWN, CONFLICT. MVP 2 indicators are cited as `IND-2NN` (P01 CONFLICT-001 / DISC-VAL-203).
 
@@ -42,6 +43,22 @@ OMR/image recognition (MVP 3), image uploads, differentiated roles, account reco
 - DEC-201 and its DEC-214 privacy-notice amendment are approved under CR-003 per requester authorization. Other MVP 2 decisions remain subject to the existing ratification question Q-020 / DEP-010; no approvers/date are inferred.
 - Two definitions delegated to P02 are written as PROPOSAL rules: the dictation vocabulary (BR-013) and the estimated-difficulty rule (BR-014). The completion of dictated ABC (BR-025) is a PROPOSAL that resolves CONFLICT-201.
 - Five conflicts were found and are listed in section 10.3.
+
+
+### CR-004 - Approved STT model migration
+
+CR-004 replaces multilingual Whisper Tiny with
+`Systran/faster-whisper-base` behind the existing `SttAdapter`.
+A local audio sample improved from an incorrect musical-note
+transcription to `Do, re, mi, fa, sol, la, si.`
+
+This is limited evidence, not acceptance of HU11 quality.
+The previously approved corpus, exact-ABC quality threshold,
+latency, memory, security and deployment gates remain applicable.
+
+CR-003 is preserved as the historical approved decision. Its Tiny model selection is superseded by CR-004.
+CR-004 is approved by the requester for implementation. Runtime acceptance and Railway validation remain pending.
+No new functional requirements or API contracts are introduced.
 
 ## 3. Epics
 

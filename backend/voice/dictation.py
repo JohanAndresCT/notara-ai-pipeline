@@ -111,10 +111,14 @@ def parse(transcript: str) -> DictationResult:
                 note = ("^" if tokens[index] == "sostenido" else "_") + note
                 index += 1
 
-        if index >= len(tokens) or tokens[index] not in FIGURES:
+        if index < len(tokens) and tokens[index] in FIGURES:
+            music.append(note + FIGURES[tokens[index]])
+            index += 1
+        elif is_rest:
             raise Uninterpretable
-        music.append(note + FIGURES[tokens[index]])
-        index += 1
+        else:
+            # Las notas sin figura usan la negra por defecto.
+            music.append(note)
 
     if not music or all(token == "|" for token in music):
         raise Uninterpretable

@@ -32,16 +32,15 @@ Se leen desde el entorno o desde un archivo `.env` en la raíz del repositorio. 
 | `DJANGO_FILE_STORAGE_BACKEND` | Backend de almacenamiento | |
 | `PROFILE_PHOTO_MAX_BYTES` | Tamaño máximo de foto de perfil | Por defecto 5 MiB |
 | `STT_DAILY_LIMIT` | Intentos STT admitidos por usuario y día UTC | Por defecto 30 |
-| `STT_MODEL_ID`, `STT_MODEL_SIZE` | Identidad y tamaño del modelo | Solo se acepta `Systran/faster-whisper-tiny`, `tiny` |
+| `STT_MODEL_ID`, `STT_MODEL_SIZE` | Identidad y tamaño del modelo | Solo se acepta `Systran/faster-whisper-base`, `base` |
 | `STT_MODEL_DIR` | Directorio local con los pesos `faster-whisper` | Ruta relativa a la raíz del repositorio o absoluta; vacío desactiva STT |
-| `STT_MODEL_REVISION` | Commit completo del modelo | Fijado a `d90ca5fe260221311c53c58e660288d3deb8d356`; cualquier otra revisión falla |
+| `STT_MODEL_REVISION` | Commit completo del modelo | Fijado a `ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66`; cualquier otra revisión falla |
 | `STT_MODEL_MANIFEST` | Manifiesto versionado `backend/voice/model_sha256.json` | Verifica inventario, tamaños y SHA-256 antes de cargar |
 | `STT_MODEL_REQUIRED` | Hace fallar el arranque si el modelo no puede cargarse/verificarse | `false` por defecto; establecer `true` en el runtime STT |
 | `STT_DEVICE`, `STT_COMPUTE_TYPE`, `STT_LANGUAGE` | Parámetros de inferencia | Solo `cpu`, `int8`, `es` |
 | `STT_CPU_THREADS`, `STT_MAX_CONCURRENT` | Hilos CPU y concurrencia por proceso | Por defecto 2 hilos y exactamente 1 inferencia |
 | `GUNICORN_WORKERS`, `GUNICORN_THREADS` | Procesos e hilos HTTP | Con STT requerido en 1 GiB, exactamente 1 worker y 4 hilos; cuando STT no es requerido se conservan 2 workers por defecto |
 | `AUDIO_MAX_BYTES`, `AUDIO_MAX_SECONDS` | Límites de archivo de HU11 | Por defecto 2 MiB y 30 s |
-| `GUNICORN_WORKERS`, `GUNICORN_THREADS` | Procesos e hilos Gunicorn | STT requerido en 1 GiB: 1 worker/4 hilos; sin STT se preservan 2 workers síncronos |
 | `PORT` | Puerto del contenedor | Lo provee Railway |
 | `VITE_API_PROXY_TARGET` | Destino del proxy `/api` de Vite | Por defecto `http://127.0.0.1:8000` |
 | `VITE_API_BASE_URL` | Aparece en `.env.example` | No se encontró uso en `frontend/src` ni `vite.config.ts` |
@@ -78,12 +77,12 @@ Las dependencias de Django están en `backend\requirements.txt`; las de `experim
 
 El contrato de integración para frontend está en [API_STT_HU11.md](./API_STT_HU11.md).
 
-El backend usa el repositorio público `Systran/faster-whisper-tiny`, fijado al commit inmutable `d90ca5fe260221311c53c58e660288d3deb8d356`. El inventario y los SHA-256 esperados están versionados en [model_sha256.json](../backend/voice/model_sha256.json). La verificación requiere exactamente `config.json`, `model.bin`, `tokenizer.json` y `vocabulary.txt`; el verificador rechaza archivos faltantes, adicionales, con tamaño distinto o con SHA-256 distinto. El manifiesto de confianza se mantiene en el repositorio, no se genera a partir de los pesos descargados.
+El backend usa el repositorio público `Systran/faster-whisper-base`, fijado al commit inmutable `ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66`. El inventario y los SHA-256 esperados están versionados en [model_sha256.json](../backend/voice/model_sha256.json). La verificación requiere exactamente `config.json`, `model.bin`, `tokenizer.json` y `vocabulary.txt`; el verificador rechaza archivos faltantes, adicionales, con tamaño distinto o con SHA-256 distinto. El manifiesto de confianza se mantiene en el repositorio, no se genera a partir de los pesos descargados.
 
 La descarga ocurre solo al ejecutar explícitamente el aprovisionador. Requiere acceso a Hugging Face; no se ejecuta en el arranque de una solicitud HTTP. Ejecuta los comandos desde la raíz del repositorio y con las dependencias de `backend\requirements.txt` instaladas.
 
 ```powershell
-$env:STT_MODEL_DIR = [System.IO.Path]::GetFullPath(".local-models\whisper-tiny")
+$env:STT_MODEL_DIR = [System.IO.Path]::GetFullPath(".local-models\whisper-base")
 Push-Location backend
 python -m voice.provision_model --model-dir $env:STT_MODEL_DIR
 Pop-Location
@@ -96,7 +95,7 @@ python backend\manage.py runserver --noreload
 En Linux, desde la raíz y con el entorno virtual activo:
 
 ```sh
-export STT_MODEL_DIR="$PWD/.local-models/whisper-tiny"
+export STT_MODEL_DIR="$PWD/.local-models/whisper-base"
 (
   cd backend
   python -m voice.provision_model --model-dir "$STT_MODEL_DIR"
@@ -146,7 +145,7 @@ Para el procedimiento completo ver `ai-pipeline/artifacts/08_cicd/DEPLOYMENT_GUI
 
 ### Imagen Railway con HU11
 
-El Dockerfile aprovisiona `Systran/faster-whisper-tiny` durante el build, en `/opt/notara/models/whisper-tiny`. El build exige que Hugging Face responda al commit fijado y que los cuatro archivos coincidan con `backend/voice/model_sha256.json`; una discrepancia o descarga fallida aborta la construcción. El modelo queda propiedad de `app`, legible pero sin permiso de escritura. Django usa esa ruta y vuelve a verificar revisión y hashes al iniciar cada proceso. Las peticiones HTTP no descargan pesos. El modelo añade aproximadamente 80 MB de archivos a la imagen.
+El Dockerfile aprovisiona `Systran/faster-whisper-base` durante el build, en `/opt/notara/models/whisper-base`. El build exige que Hugging Face responda al commit fijado y que los cuatro archivos coincidan con `backend/voice/model_sha256.json`; una discrepancia o descarga fallida aborta la construcción. El modelo queda propiedad de `app`, legible pero sin permiso de escritura. Django usa esa ruta y vuelve a verificar revisión y hashes al iniciar cada proceso. Las peticiones HTTP no descargan pesos. El modelo añade aproximadamente 145 MB para `model.bin` (145,217,532 bytes); los dem?s archivos del modelo incrementan el tama?o total de la imagen.
 
 Con `STT_MODEL_REQUIRED=true`, Gunicorn debe usar un solo proceso: `VoiceConfig.ready()` carga una copia del modelo en cada worker y la exclusión mutua STT es local al proceso. El entrypoint rechaza más de un worker. `gthread` permite cuatro hilos HTTP y el permiso STT admite una sola inferencia; peticiones STT simultáneas adicionales reciben `STT_UNAVAILABLE`. Esta configuración evita copias redundantes del modelo y mantiene otras solicitudes HTTP atendibles durante una inferencia. Mantén una sola réplica Railway para ajustarte a una instancia de 1 GiB; escalar réplicas duplica el consumo y permite una inferencia simultánea por réplica.
 
@@ -160,16 +159,26 @@ Conserva las variables existentes `PORT`, `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_H
 |---|---|
 | `DJANGO_DEBUG` | `false` |
 | `STT_MODEL_REQUIRED` | `true` |
-| `STT_MODEL_DIR` | `/opt/notara/models/whisper-tiny` |
-| `STT_MODEL_REVISION` | `d90ca5fe260221311c53c58e660288d3deb8d356` |
+| `STT_MODEL_DIR` | `/opt/notara/models/whisper-base` |
+| `STT_MODEL_REVISION` | `ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66` |
 | `STT_MODEL_MANIFEST` | `/app/backend/voice/model_sha256.json` |
-| `STT_MODEL_ID`, `STT_MODEL_SIZE` | `Systran/faster-whisper-tiny`, `tiny` |
+| `STT_MODEL_ID`, `STT_MODEL_SIZE` | `Systran/faster-whisper-base`, `base` |
 | `STT_DEVICE`, `STT_COMPUTE_TYPE`, `STT_LANGUAGE` | `cpu`, `int8`, `es` |
 | `STT_CPU_THREADS`, `STT_MAX_CONCURRENT` | `2`, `1` |
 | `STT_DAILY_LIMIT`, `AUDIO_MAX_BYTES`, `AUDIO_MAX_SECONDS` | `30`, `2097152`, `30` |
-| `GUNICORN_WORKERS`, `GUNICORN_THREADS` | `1`, `4` |
 
 Estos valores ya están establecidos como defaults de imagen; indicarlos en Railway hace explícita la configuración operativa. No montes el volumen de medios sobre `/opt/notara` ni sobre la ruta del modelo; el único volumen existente debe continuar en `/data/media`.
+
+**CR-004 - Estado de despliegue (2026-11-09):**
+Whisper Base esta autorizado por el solicitante para
+implementacion local, pero no para despliegue en produccion.
+Las variables existentes en Railway pueden sobrescribir
+los defaults del Dockerfile; antes de cualquier despliegue
+autorizado se deben revisar `STT_MODEL_ID`, `STT_MODEL_SIZE`,
+`STT_MODEL_DIR` y `STT_MODEL_REVISION` para evitar que
+apunten al modelo Tiny. La rama historica
+`feature/mvp2-whisper-tiny` conserva su nombre; no implica
+que el modelo activo siga siendo Tiny.
 
 #### Pasos manuales de despliegue
 
@@ -178,7 +187,7 @@ Los cambios de esta guía y la imagen se encuentran en la rama de trabajo y no s
 1. Revisa y aprueba el diff y ejecuta CI para `feature/mvp2-whisper-tiny`. El build de la imagen debe tener acceso de red a Hugging Face; no requiere tokens ni secretos de descarga para este repositorio público.
 2. No cambies el volumen `/data/media`, las variables de PostgreSQL, secretos, dominio, frontend o configuración de Nginx. Confirma el límite de 1 GiB/2 vCPU y configura una sola réplica.
 3. En Railway, abre el servicio web existente y confirma que usa el Dockerfile raíz, el contexto del repositorio y `/` como raíz del servicio. En el momento aprobado para el rollout, selecciona `feature/mvp2-whisper-tiny` como rama del servicio.
-4. Verifica las variables anteriores (Railway puede sobrescribir los defaults de la imagen), guarda los cambios y lanza manualmente un nuevo deployment. No se debe promover el servicio hasta que el build registre `Provisioned and SHA-256 verified Systran/faster-whisper-tiny@d90ca5fe260221311c53c58e660288d3deb8d356`.
+4. Verifica las variables anteriores (Railway puede sobrescribir los defaults de la imagen), guarda los cambios y lanza manualmente un nuevo deployment. No se debe promover el servicio hasta que el build registre `Provisioned and SHA-256 verified Systran/faster-whisper-base@ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66`.
 5. Espera al health check y comprueba `/api/v1/health/`, los logs de Gunicorn y migraciones, y los flujos existentes de autenticación, cuentas, partituras y frontend. Realiza las pruebas funcionales de STT con el procedimiento y corpus aprobados; no uses la respuesta de health como evidencia de calidad o capacidad.
 6. Observa memoria máxima del servicio, arranque frío, latencia con modelo cargado y saturación de concurrencia antes de aceptar HU11. Si el arranque excede el timeout del health check, el modelo no pasa hash, o se supera la cuota de memoria aprobada, revierte al deployment anterior y no amplíes réplicas.
 

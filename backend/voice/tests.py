@@ -87,6 +87,15 @@ class DictationParserTests(TestCase):
             "X:1\nT:Tema de prueba\nM:4/4\nL:1/4\nK:C\nC D/2",
         )
 
+
+    def test_preserves_explicit_figures(self):
+        result = parse("Do blanca, Re negra, Mi corchea")
+        self.assertEqual(result.abc_line, "C2 D E/2")
+
+    def test_defaults_notes_without_figure_to_quarter_notes(self):
+        result = parse("Do, re, mi, fa, sol, la, si")
+        self.assertEqual(result.abc_line, "C D E F G A B")
+
     def test_rejects_words_outside_the_closed_vocabulary(self):
         with self.assertRaises(Uninterpretable):
             parse("Do negra, guitarra")
@@ -97,11 +106,11 @@ class DictationParserTests(TestCase):
 
 
 class ModelManifestTests(TestCase):
-    def test_committed_manifest_is_for_the_pinned_multilingual_tiny_model(self):
+    def test_committed_manifest_is_for_the_pinned_multilingual_base_model(self):
         manifest_path = Path(__file__).with_name("model_sha256.json")
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
 
-        self.assertEqual(manifest["repository"], "Systran/faster-whisper-tiny")
+        self.assertEqual(manifest["repository"], "Systran/faster-whisper-base")
         self.assertEqual(manifest["revision"], MODEL_REVISION)
         self.assertEqual(set(manifest["files"]), set(MODEL_FILES))
         for expected in manifest["files"].values():
@@ -121,7 +130,7 @@ class ModelManifestTests(TestCase):
 
             self.assertEqual(
                 manifest["repository"],
-                "Systran/faster-whisper-tiny",
+                "Systran/faster-whisper-base",
             )
             verify_manifest(model_path, manifest_path, MODEL_REVISION)
             model_file.write_bytes(b"x" * model_file.stat().st_size)

@@ -9,14 +9,16 @@
 | 3.0 | MVP 2 | Applies CR-003: M-11 discloses transmission to Notara's backend and hosting-infrastructure processing; provider-name question resolved without claiming on-device processing. |
 | 4.0 | MVP 2 | Applies HU11 authorization: approved dictation vocabulary/header completion, daily STT quota message and empirical acceptance targets; no UI implementation. |
 
+| 4.2 | MVP 2 | Records requester-approved CR-004 implementation of Whisper Base for HU11/HU12. Existing UX flows, messages, accessibility rules and MVP 1 remain unchanged. Empirical acceptance and production authorization remain pending. |
+
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 4.0
+- **Version:** 4.2
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P04 - UX/UI
 - **Status:** `READY_WITH_ASSUMPTIONS`
-- **Source Artifacts:** `REQUIREMENTS.md` v5.0 and validation; `PRIORITIZATION.md` v4.0 and validation; `PRODUCT_VISION.md` v2.2; `DECISIONS_MVP2.md` (CR-003 and HU11 authorization); `CR-003_WHISPER_TINY.md`; `UX_SPEC.md` v1.0.
+- **Source Artifacts:** `REQUIREMENTS.md` v5.2 and validation; `PRIORITIZATION.md` v4.2 and validation; `PRODUCT_VISION.md` v2.2; `DECISIONS_MVP2.md` (CR-003 and HU11 authorization); `CR-003_WHISPER_TINY.md`; `UX_SPEC.md` v1.0.
 - **Upstream Validation Statuses:** P00 `PASS_WITH_WARNINGS`; P01 `PASS_WITH_WARNINGS`; P02 `PASS_WITH_WARNINGS`; P03 `PASS_WITH_WARNINGS` (P04 readiness: WITH CONSTRAINTS).
 - **Labels:** FACT / DECISION (approved source), UX-PROP (interaction detail proposed by P04, pending approval), ASSUMED.
 
@@ -473,6 +475,31 @@ P05 must support:
 6. **Deletion confirmation:** comment deletion compatible with SCR-011.
 
 P05 must not infer layouts from this specification.
+
+### CR-004 - Whisper Base approved for implementation
+
+CR-004 replaces the historical Whisper Tiny model selection
+with `Systran/faster-whisper-base` for HU11 and HU12.
+The requester authorized this implementation on 2026-11-09.
+Approval from other team members has not been established.
+
+This backend model change introduces no new UX feature.
+Existing recording, permission, transcription, error-handling
+and voice-comment flows remain applicable.
+
+Recording limits, privacy notices, daily quota,
+accessibility rules and existing message identifiers
+remain unchanged unless separately approved.
+
+The frontend must not claim that transcription occurs
+on the user's device. Processing continues through
+Notara's backend and hosting infrastructure.
+
+CR-003 remains preserved as the historical STT decision.
+
+Empirical quality, latency, memory, frontend regression,
+security and Railway runtime validation remain pending.
+Production deployment is not authorized.
 
 ## 15. Status and Next Actions
 

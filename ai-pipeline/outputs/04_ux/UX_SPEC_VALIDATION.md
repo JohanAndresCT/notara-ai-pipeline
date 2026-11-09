@@ -163,3 +163,44 @@ Automated checks found every FR-001-FR-044 and AC-001-AC-069 referenced, with no
 - **Traceability:** FLOW-011/FLOW-013 and M-17 cover the shared quota through FR-045, AC-070-076 and DEC-219. No frontend or UI behavior was implemented or browser-tested.
 - **Acceptance:** quality, p95, memory and concurrency values are approved targets only; no empirical test result is claimed. The 25 s completion/error ceiling remains pending explicit approval.
 - **Result:** `PASS_WITH_WARNINGS`; no UX contradiction was found for the approved HU11 flow, subject to the populated-field edge clarification and empirical acceptance tests.
+
+## 15. CR-004 Revalidation Addendum
+
+- **Date:** 2026-11-09
+- **UX Specification Version:** 4.2
+- **Requirements Version:** 5.2
+- **Planning Version:** 4.2
+- **Change Request:** CR-004 (APPROVED FOR IMPLEMENTATION BY REQUESTER)
+- **Affected Stories:** US-011 (HU11), US-012 (HU12)
+- **Result:** `PASS_WITH_WARNINGS` - documentation alignment only
+- **Production Authorization:** NOT GRANTED
+
+### Documentation review
+
+- CR-004 authorizes implementing Whisper Base instead of Whisper Tiny.
+- Authorization is from the requester; other team approval is not established.
+- Existing recording and voice-comment flows remain applicable.
+- No new screens, navigation paths or UX messages are required.
+- Privacy notices continue describing backend processing.
+- Recording limits, daily quota and accessibility requirements remain unchanged.
+- AC-071 references Whisper Base in P02 v5.2.
+- CR-003 remains the historical approved STT decision.
+- MVP 1 UX remains unchanged.
+
+### Pending verification
+
+- Empirical STT quality, latency and memory acceptance.
+- Frontend regression tests for HU11 and HU12.
+- Verification of recording permissions, error states and quota messages.
+- Security and quota integration tests.
+- Railway runtime and end-to-end integration validation.
+- Review of the temporary `/test-whisper` interface before production.
+- Any additional team approval required by the project process.
+
+### Conclusion
+
+P04 documentation is aligned with CR-004 implementation
+authorization from the requester.
+
+This addendum does not certify implemented frontend behavior,
+empirical model acceptance or production readiness.

@@ -1,7 +1,7 @@
 {
   "backlog_metadata": {
     "project": "Notara",
-    "version": "5.0",
+    "version": "5.2",
     "stage": "P02",
     "status": "READY_WITH_ASSUMPTIONS",
     "source": "ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md (v2.1)",
@@ -11,14 +11,16 @@
       "ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md",
       "ai-pipeline/outputs/00_context/DECISIONS_MVP2.md",
       "ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md (v2.2)",
-      "ai-pipeline/outputs/00_context/CR-003_WHISPER_TINY.md"
+      "ai-pipeline/outputs/00_context/CR-003_WHISPER_TINY.md",
+      "ai-pipeline/outputs/00_context/CR-004_WHISPER_BASE.md"
     ],
     "change_requests": [
       "CR-001",
       "CR-002",
-      "CR-003"
+      "CR-003",
+      "CR-004"
     ],
-    "notes": "MVP 1 items US-001-US-010 preserved; US-010 amended by DEC-211 (AC-028 superseded by AC-029). CR-003 amends DEC-201/DEC-214 for local STT and updated notice. HU11 authorization resolves BR-013/025 and approves quality/performance/resource targets and a configurable 30/day STT quota (DEC-219); empirical acceptance and Railway evidence remain pending. Planning fields stay null; team MoSCoW and Story Points remain source data."
+    "notes": "MVP 1 items US-001-US-010 preserved; US-010 amended by DEC-211 (AC-028 superseded by AC-029). CR-003 amends DEC-201/DEC-214 for local STT and updated notice. HU11 authorization resolves BR-013/025 and approves quality/performance/resource targets and a configurable 30/day STT quota (DEC-219); empirical acceptance and Railway evidence remain pending. Planning fields stay null; team MoSCoW and Story Points remain source data. CR-004 supersedes the CR-003 Tiny model selection with Systran/faster-whisper-base for HU11/HU12. The requester approved implementation on 2026-11-09; approval by other team members is not established. Corpus-based quality testing, latency/memory verification and Railway validation remain pending. Historical CR-003 is preserved; the AC-071 model reference is reconciled without changing its latency threshold."
   },
   "epics": [
     {
@@ -798,7 +800,7 @@
         },
         {
           "id": "AC-071",
-          "given": "the multilingual `tiny` model is loaded and the approved evaluation includes 30-second recordings",
+          "given": "the CR-004 approved multilingual Whisper Base model is loaded and the approved evaluation includes 30-second recordings",
           "when": "transcription is measured over the approved evaluation run",
           "then": "p95 is no more than 15 seconds and cold-start time is reported separately",
           "source": "Q-012; PRE-011"
@@ -897,7 +899,8 @@
           "adjusted_story_points": 8
         },
         "change_request_ids": [
-          "CR-003"
+          "CR-003",
+          "CR-004"
         ]
       }
     },
@@ -1030,7 +1033,8 @@
           "story_points": 3
         },
         "change_request_ids": [
-          "CR-003"
+          "CR-003",
+          "CR-004"
         ]
       }
     },
