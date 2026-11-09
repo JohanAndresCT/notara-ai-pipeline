@@ -13,7 +13,23 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DJANGO_DB_ENGINE=postgresql \
     MEDIA_ROOT=/data/media \
-    STATIC_ROOT=/app/staticfiles
+    STATIC_ROOT=/app/staticfiles \
+    STT_DAILY_LIMIT=30 \
+    STT_MODEL_ID=Systran/faster-whisper-tiny \
+    STT_MODEL_SIZE=tiny \
+    STT_MODEL_DIR=/opt/notara/models/whisper-tiny \
+    STT_MODEL_REVISION=d90ca5fe260221311c53c58e660288d3deb8d356 \
+    STT_MODEL_MANIFEST=/app/backend/voice/model_sha256.json \
+    STT_MODEL_REQUIRED=true \
+    STT_DEVICE=cpu \
+    STT_COMPUTE_TYPE=int8 \
+    STT_LANGUAGE=es \
+    STT_CPU_THREADS=2 \
+    STT_MAX_CONCURRENT=1 \
+    AUDIO_MAX_BYTES=2097152 \
+    AUDIO_MAX_SECONDS=30 \
+    GUNICORN_WORKERS=1 \
+    GUNICORN_THREADS=4
 RUN apt-get update \
     && apt-get install -y --no-install-recommends nginx gettext-base gosu \
     && rm -rf /var/lib/apt/lists/* \
@@ -26,7 +42,13 @@ COPY --chown=app:app backend/ ./backend/
 COPY --from=frontend-build /workspace/frontend/dist/ /usr/share/nginx/html/
 COPY docker/nginx.conf.template /etc/nginx/templates/notara.conf.template
 COPY --chmod=755 deploy/entrypoint.sh /usr/local/bin/notara-entrypoint
-RUN DJANGO_DB_ENGINE=sqlite DJANGO_DEBUG=True python backend/manage.py collectstatic --noinput \
+RUN mkdir -p "$STT_MODEL_DIR" \
+    && cd /app/backend \
+    && python -m voice.provision_model --model-dir "$STT_MODEL_DIR" \
+    && cd /app \
+    && chmod -R a-w "$STT_MODEL_DIR" \
+    && chown -R app:app "$STT_MODEL_DIR" \
+    && DJANGO_DB_ENGINE=sqlite DJANGO_DEBUG=True python backend/manage.py collectstatic --noinput \
     && mkdir -p /data/media \
     && chown -R app:app /app /data
 ENTRYPOINT ["/usr/local/bin/notara-entrypoint"]

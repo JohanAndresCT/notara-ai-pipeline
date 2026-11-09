@@ -39,8 +39,9 @@ Se leen desde el entorno o desde un archivo `.env` en la raíz del repositorio. 
 | `STT_MODEL_REQUIRED` | Hace fallar el arranque si el modelo no puede cargarse/verificarse | `false` por defecto; establecer `true` en el runtime STT |
 | `STT_DEVICE`, `STT_COMPUTE_TYPE`, `STT_LANGUAGE` | Parámetros de inferencia | Solo `cpu`, `int8`, `es` |
 | `STT_CPU_THREADS`, `STT_MAX_CONCURRENT` | Hilos CPU y concurrencia por proceso | Por defecto 2 hilos y exactamente 1 inferencia |
+| `GUNICORN_WORKERS`, `GUNICORN_THREADS` | Procesos e hilos HTTP | Con STT requerido en 1 GiB, exactamente 1 worker y 4 hilos; cuando STT no es requerido se conservan 2 workers por defecto |
 | `AUDIO_MAX_BYTES`, `AUDIO_MAX_SECONDS` | Límites de archivo de HU11 | Por defecto 2 MiB y 30 s |
-| `GUNICORN_WORKERS` | Workers de Gunicorn | Solo `deploy/entrypoint.sh` |
+| `GUNICORN_WORKERS`, `GUNICORN_THREADS` | Procesos e hilos Gunicorn | STT requerido en 1 GiB: 1 worker/4 hilos; sin STT se preservan 2 workers síncronos |
 | `PORT` | Puerto del contenedor | Lo provee Railway |
 | `VITE_API_PROXY_TARGET` | Destino del proxy `/api` de Vite | Por defecto `http://127.0.0.1:8000` |
 | `VITE_API_BASE_URL` | Aparece en `.env.example` | No se encontró uso en `frontend/src` ni `vite.config.ts` |
@@ -142,3 +143,43 @@ Detalles en [TESTING.md](./TESTING.md).
 - **Sin verificar:** persistencia del volumen `/data`, copias de seguridad, rollback, protección del environment y redirección HTTP→HTTPS.
 
 Para el procedimiento completo ver `ai-pipeline/artifacts/08_cicd/DEPLOYMENT_GUIDE.md`.
+
+### Imagen Railway con HU11
+
+El Dockerfile aprovisiona `Systran/faster-whisper-tiny` durante el build, en `/opt/notara/models/whisper-tiny`. El build exige que Hugging Face responda al commit fijado y que los cuatro archivos coincidan con `backend/voice/model_sha256.json`; una discrepancia o descarga fallida aborta la construcción. El modelo queda propiedad de `app`, legible pero sin permiso de escritura. Django usa esa ruta y vuelve a verificar revisión y hashes al iniciar cada proceso. Las peticiones HTTP no descargan pesos. El modelo añade aproximadamente 80 MB de archivos a la imagen.
+
+Con `STT_MODEL_REQUIRED=true`, Gunicorn debe usar un solo proceso: `VoiceConfig.ready()` carga una copia del modelo en cada worker y la exclusión mutua STT es local al proceso. El entrypoint rechaza más de un worker. `gthread` permite cuatro hilos HTTP y el permiso STT admite una sola inferencia; peticiones STT simultáneas adicionales reciben `STT_UNAVAILABLE`. Esta configuración evita copias redundantes del modelo y mantiene otras solicitudes HTTP atendibles durante una inferencia. Mantén una sola réplica Railway para ajustarte a una instancia de 1 GiB; escalar réplicas duplica el consumo y permite una inferencia simultánea por réplica.
+
+El entrypoint espera hasta 90 segundos a que Gunicorn responda en `/api/v1/health/` antes de iniciar Nginx. Así no se enruta tráfico mientras Django valida y carga el modelo. Si Gunicorn falla al arrancar o termina inesperadamente, el contenedor termina. Las migraciones PostgreSQL siguen ejecutándose antes de iniciar Gunicorn; el volumen `/data/media` y Nginx conservan sus rutas actuales.
+
+#### Variables de servicio
+
+Conserva las variables existentes `PORT`, `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, `DJANGO_CSRF_TRUSTED_ORIGINS` y `POSTGRES_*` sin cambiar sus secretos ni valores de conexión. Establece o verifica en el servicio Railway:
+
+| Variable | Valor |
+|---|---|
+| `DJANGO_DEBUG` | `false` |
+| `STT_MODEL_REQUIRED` | `true` |
+| `STT_MODEL_DIR` | `/opt/notara/models/whisper-tiny` |
+| `STT_MODEL_REVISION` | `d90ca5fe260221311c53c58e660288d3deb8d356` |
+| `STT_MODEL_MANIFEST` | `/app/backend/voice/model_sha256.json` |
+| `STT_MODEL_ID`, `STT_MODEL_SIZE` | `Systran/faster-whisper-tiny`, `tiny` |
+| `STT_DEVICE`, `STT_COMPUTE_TYPE`, `STT_LANGUAGE` | `cpu`, `int8`, `es` |
+| `STT_CPU_THREADS`, `STT_MAX_CONCURRENT` | `2`, `1` |
+| `STT_DAILY_LIMIT`, `AUDIO_MAX_BYTES`, `AUDIO_MAX_SECONDS` | `30`, `2097152`, `30` |
+| `GUNICORN_WORKERS`, `GUNICORN_THREADS` | `1`, `4` |
+
+Estos valores ya están establecidos como defaults de imagen; indicarlos en Railway hace explícita la configuración operativa. No montes el volumen de medios sobre `/opt/notara` ni sobre la ruta del modelo; el único volumen existente debe continuar en `/data/media`.
+
+#### Pasos manuales de despliegue
+
+Los cambios de esta guía y la imagen se encuentran en la rama de trabajo y no se han enviado a Railway. Antes de iniciar el rollout, el responsable debe aprobarlos y hacer commit/push; esta tarea no los realiza.
+
+1. Revisa y aprueba el diff y ejecuta CI para `feature/mvp2-whisper-tiny`. El build de la imagen debe tener acceso de red a Hugging Face; no requiere tokens ni secretos de descarga para este repositorio público.
+2. No cambies el volumen `/data/media`, las variables de PostgreSQL, secretos, dominio, frontend o configuración de Nginx. Confirma el límite de 1 GiB/2 vCPU y configura una sola réplica.
+3. En Railway, abre el servicio web existente y confirma que usa el Dockerfile raíz, el contexto del repositorio y `/` como raíz del servicio. En el momento aprobado para el rollout, selecciona `feature/mvp2-whisper-tiny` como rama del servicio.
+4. Verifica las variables anteriores (Railway puede sobrescribir los defaults de la imagen), guarda los cambios y lanza manualmente un nuevo deployment. No se debe promover el servicio hasta que el build registre `Provisioned and SHA-256 verified Systran/faster-whisper-tiny@d90ca5fe260221311c53c58e660288d3deb8d356`.
+5. Espera al health check y comprueba `/api/v1/health/`, los logs de Gunicorn y migraciones, y los flujos existentes de autenticación, cuentas, partituras y frontend. Realiza las pruebas funcionales de STT con el procedimiento y corpus aprobados; no uses la respuesta de health como evidencia de calidad o capacidad.
+6. Observa memoria máxima del servicio, arranque frío, latencia con modelo cargado y saturación de concurrencia antes de aceptar HU11. Si el arranque excede el timeout del health check, el modelo no pasa hash, o se supera la cuota de memoria aprobada, revierte al deployment anterior y no amplíes réplicas.
+
+**Límites de la evidencia:** no se dispone de Docker en el entorno de desarrollo y no se ejecutó el build ni Railway. La observación previa de unos 249 MB RSS fue una muestra local de otro entorno; no demuestra el límite aprobado de 800 MiB de servicio en Railway. El aprovisionamiento durante build, la compatibilidad Linux/Python 3.12 y las mediciones de memoria/latencia aún deben confirmarse en CI y en un rollout controlado. HU11 no queda aceptada por estos cambios.
