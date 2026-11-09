@@ -1,0 +1,14 @@
+.venv/
+models/
+cache/
+results*.json
+*.wav
+*.webm
+*.ogg
+*.mp3
+*.m4a
+*.flac
+*.aac
+
+__pycache__/
+*.py[cod]
