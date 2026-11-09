@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.http import JsonResponse
-from django.urls import path
+from django.urls import include, path
 
 from accounts.views import (
     change_password_view,
@@ -28,6 +28,7 @@ def health_check(request):
 
 
 urlpatterns = [
+    path("api/v1/audio/", include("voice.urls")),
     path("admin/", admin.site.urls),
     path("api/health/", health_check, name="health-check"),
     path("api/csrf/", csrf_token_view, name="csrf-token"),

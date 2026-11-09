@@ -7,8 +7,8 @@
 - **Stage:** P02 - Requirements Engineering
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Validation Date:** 2026-11-08
-- **Requirements Version:** 3.0
-- **Backlog Version:** 3.0
+- **Requirements Version:** 5.0 (HU11 authorization revalidation addendum below; earlier runs preserved)
+- **Backlog Version:** 5.0
 - **Inputs:** `PRODUCT_VISION.md` v2.1 and its validation (PASS_WITH_WARNINGS); `PROJECT_CONTEXT.md` v2.2; `SPRINT_2_BACKLOG_INPUT.md`; `DECISIONS_MVP2.md`; requirements v2.0 (Git `HEAD`); `SYSTEM_PROMPT.md`
 - **Overall Result:** `PASS_WITH_WARNINGS`
 
@@ -82,7 +82,7 @@ User story IDs match the backlog (US-0NN = HU-NN). Team MoSCoW and SP are record
 
 | Decision | Reflected in | Result |
 |---|---|---|
-| DEC-201 Whisper | FR-018, FR-026; AC-030, AC-037 | PASS |
+| DEC-201 local `faster-whisper tiny` (CR-003) | FR-018, FR-026; AC-030, AC-037; DEC-214 notice | PASS_WITH_WARNINGS — engine/contract aligned; quality and production unverified |
 | DEC-202 ElevenLabs + edge-tts, dev default | FR-031, FR-040; NFR-006; AC-063 | PASS |
 | DEC-203 Tone.js in browser | FR-035; AC-052 | PASS |
 | DEC-204 MP3 voice only | FR-042; BR-016; AC-064; CONFLICT-205 | PASS |
@@ -131,7 +131,7 @@ User story IDs match the backlog (US-0NN = HU-NN). Team MoSCoW and SP are record
 
 ## 10. Assumptions, Open Questions and Conflicts
 
-**PASS.** Carried open: Q-009, Q-010, Q-011, Q-012, Q-020. New: Q-021-Q-025. Conflicts CONFLICT-201-205 are listed with treatment. P01 warning DISC-VAL-202 is resolved: the backlog and the decision log are inputs. DISC-VAL-203 is respected: indicators are cited as IND-2NN.
+**PASS.** Carried open: Q-009, Q-010, Q-011, Q-012, Q-020. New: Q-021-Q-028. Conflicts CONFLICT-201-205 are listed with treatment. P01 warning DISC-VAL-202 is resolved: the backlog and the decision log are inputs. DISC-VAL-203 is respected: indicators are cited as IND-2NN.
 
 ## 11. Traceability and Cross-Artifact Consistency
 
@@ -189,3 +189,23 @@ P03 can plan with:
 ## 16. Auditor Integrity Statement
 
 This report did not modify `REQUIREMENTS.md`, `product_backlog.json`, P00/P01 artifacts, the backlog input or the decision log. No requirement was added, no conflict was resolved and no planning value was assigned by the validator.
+
+## 17. CR-003 Revalidation Addendum
+
+- **Approval record:** CR-003 and the DEC-201 amendment are approved as reported by the requester; no approval date or individual approver names were supplied.
+- **Artifacts:** REQUIREMENTS v4.0 and P02 backlog v4.0; AC-030 wording and sources synchronized. US-011/US-012 keep their acceptance-criterion IDs and product scope.
+- **Privacy/dependency check:** FR-029, AC-030, NFR-004, BR-018 and DEC-214 now distinguish browser-to-Notara-backend transmission from hosting-provider processing; dictation audio/temp files are not retained, while voice-comment audio stays with its comment. DEP-008 no longer assigns an STT provider key/budget; TTS remains under Q-011.
+- **Traceability:** CR-003 added to backlog metadata and US-011/US-012 traceability; new P02 questions Q-026-Q-028 are represented in the specification and affected stories. MVP 1 IDs and publishing rules remain unchanged.
+- **Evidence limitation:** spike execution was reported on Python 3.11.9/Windows only. Music accuracy, Python 3.12 integration, concurrency, total service memory and Railway capacity remain unverified. Candidate thresholds in CR-003/P05 are not approved requirements.
+- **Current result:** `PASS_WITH_WARNINGS`. No P02 scope/contract defect found in this documentation revalidation; Q-020-Q-028 and BR-013/BR-025 remain open. No production or implementation claim is made.
+
+## 18. HU11 Authorization Revalidation Addendum
+
+- **Authorization record:** The requester confirms human approval of the HU11 conditions. No individual approver names, approval date or meeting record were supplied; none is inferred.
+- **Artifacts:** REQUIREMENTS v5.0 and P02 backlog v5.0 add FR-045, BR-029 and AC-070-076, update HU11/HU12 quota traceability, and retain all MVP 1 requirements and acceptance IDs. DEC-205, DEC-208, the recording constraints in DEC-213, DEC-215 and DEC-218 are ratified for HU11; DEC-219 records the shared daily STT quota.
+- **Decision status:** Q-021 and Q-023 are resolved for HU11 (PRE-002 satisfied); Q-027 is resolved for the shared HU11/HU12 STT quota; Q-028's corpus/quality target is approved but unmeasured. Q-012 is partially resolved: the loaded-model p95 target ≤15 s for 30 s recordings is approved, cold start is reported separately, while the 25 s completion/error ceiling and TTS targets remain open. Q-026 remains open for HU12. Q-020 remains open for other MVP 2 decisions.
+- **Quota/security requirements:** Default/configurable 30 admitted inferences per authenticated user per UTC day across HU11/HU12; counter is persistent and atomic. Invalid/authentication/CSRF failures and requests rejected before inference admission do not count; admitted attempts count on downstream failure. Typed over-limit outcome: `STT_DAILY_LIMIT_REACHED` (429). Upload validation and auth/CSRF precede inference.
+- **BR-025 clarification:** Absent headers use the existing defaults without overwriting existing header lines; the existing meter takes precedence over a conflicting dictated meter. Q-029 tracks present-but-empty/malformed headers and non-ABC content in an already populated field; clarify before coding that append path, but it does not block independent STT or empty-field dictation work.
+- **Acceptance state:** ≥100 authorized recordings / ≥5 speakers / ≥90% exact parsed ABC, p95 ≤15 s, ≤800 MiB total service memory in a 1 GiB container and one inference per process are approved targets, not results. No quality, performance, memory, concurrency, or Railway pass is claimed.
+- **Structural checks run:** P02 and P03 JSON both parse; 76 unique acceptance-criterion IDs match between P02 Markdown and JSON; P03 canonical story, AC and HU11 dependency references resolve. `git diff --check` passes.
+- **Current result:** `PASS_WITH_WARNINGS`. HU11 is ready for implementation from requirements perspective; acceptance verification remains pending. Q-020 and Q-012 residuals remain visible.

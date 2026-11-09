@@ -6,15 +6,17 @@
 |---|---|---|
 | 1.0 | MVP 1 | Screens SCR-001-SCR-009 and flows FLOW-001-FLOW-010 for HU01-HU10. Status READY; validation PASS. |
 | 2.0 | MVP 2 | Adds regions REG-001-REG-008 and dialogs SCR-010-SCR-011 to existing screens; flows FLOW-011-FLOW-019 for HU11-HU19; FLOW-010 amended for comment deletion (DEC-211); interaction states, message catalogue, accessibility rules and UX proposals. Corrects AC references of FLOW-008-FLOW-010 from version 1.0. |
+| 3.0 | MVP 2 | Applies CR-003: M-11 discloses transmission to Notara's backend and hosting-infrastructure processing; provider-name question resolved without claiming on-device processing. |
+| 4.0 | MVP 2 | Applies HU11 authorization: approved dictation vocabulary/header completion, daily STT quota message and empirical acceptance targets; no UI implementation. |
 
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 2.0
+- **Version:** 4.0
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P04 - UX/UI
 - **Status:** `READY_WITH_ASSUMPTIONS`
-- **Source Artifacts:** `REQUIREMENTS.md` v3.0 and validation; `PRIORITIZATION.md` v2.0 and validation; `PRODUCT_VISION.md` v2.2; `DECISIONS_MVP2.md`; `UX_SPEC.md` v1.0.
+- **Source Artifacts:** `REQUIREMENTS.md` v5.0 and validation; `PRIORITIZATION.md` v4.0 and validation; `PRODUCT_VISION.md` v2.2; `DECISIONS_MVP2.md` (CR-003 and HU11 authorization); `CR-003_WHISPER_TINY.md`; `UX_SPEC.md` v1.0.
 - **Upstream Validation Statuses:** P00 `PASS_WITH_WARNINGS`; P01 `PASS_WITH_WARNINGS`; P02 `PASS_WITH_WARNINGS`; P03 `PASS_WITH_WARNINGS` (P04 readiness: WITH CONSTRAINTS).
 - **Labels:** FACT / DECISION (approved source), UX-PROP (interaction detail proposed by P04, pending approval), ASSUMED.
 
@@ -81,14 +83,14 @@ HU16 (audio store) and HU17 (fallback voice) have no UI. Their only UX effect is
 | FR-040 | NON_UX (with UX constraint) | Fallback is invisible; failure of both voices shows a message. | HU17 |
 | FR-041 | NON_UX | Explicitly invisible to the user. | DEC-216 |
 | FR-042 | USER_FACING | MP3 download control. | HU18 |
-| FR-043 | UX_SUPPORTING | Audio regions require authentication. | DEC-213 |
+| FR-043, FR-045 | UX_SUPPORTING | Audio regions require authentication; STT shares the configurable per-user daily quota and presents M-17 when reached. | DEC-213, DEC-219 |
 | FR-044 | USER_FACING | Daily-limit message. | DEC-213 |
 | NFR-004 | UX_CONSTRAINT | Notice wording; no "saved recordings" UI for dictation. | DEC-214 |
 | NFR-005 | UX_CONSTRAINT | Audio failure never blocks typing, publishing or reading. | PRINCIPLE-008 |
 | NFR-006 | NON_UX | Cost control. | DEC-202 |
 | NFR-007 | UX_CONSTRAINT | All audio UI and voices in Spanish. | DEC-215 |
 | NFR-008 | UX_CONSTRAINT | Recording needs browser support and HTTPS; explain when unavailable. | P00 §7 |
-| NFR-009 | REQUIRES_DECISION | No time targets; P04 defines progress states without durations. | Q-012 |
+| NFR-009 | UX_CONSTRAINT | Approved HU11 p95 target is ≤15 s for 30 s recordings with the model loaded; cold start is reported separately. M-17 appears on quota rejection. The 25 s completion/error ceiling and TTS targets remain open. | Q-012, DEC-219 |
 | NFR-010 | NON_UX | Testability. | P00 RISK-006 |
 
 ## 5. Information Architecture
@@ -212,9 +214,10 @@ MVP 1 navigation is unchanged: `SCR-001 -> SCR-002 or SCR-003 -> SCR-004 -> SCR-
   - **Permission denied, no microphone or insecure context:** M-04; the rest of the form keeps working (AC-035).
   - **Result would exceed 1,000 characters:** M-06; content unchanged (EDGE-017).
   - **Transcription service unavailable:** M-07; the user can type instead (EDGE-018).
+  - **Daily STT quota reached:** show M-17; no inference is started (FR-045, DEC-219).
   - **Recording over 2 MB:** M-05b (AC-034).
   - **Plain-text format with content:** "Dictar" is disabled with the visible hint M-13 (UX-PROP-001).
-- **Traceability:** US-011; FR-018..FR-021, FR-025, FR-029, FR-030, FR-043; AC-030..AC-036; DEC-205, DEC-213-DEC-215, DEC-218.
+- **Traceability:** US-011; FR-018..FR-021, FR-025, FR-029, FR-030, FR-043, FR-045; AC-030..AC-036, AC-070..AC-075; DEC-205, DEC-208, DEC-213-DEC-215, DEC-218-DEC-219.
 
 #### FLOW-012 - Load a Score from an `.abc` File (HU19, P1)
 
@@ -248,7 +251,8 @@ MVP 1 navigation is unchanged: `SCR-001 -> SCR-002 or SCR-003 -> SCR-004 -> SCR-
   - **Limits:** M-05 and M-05b.
   - **Own score:** REG-005 is not shown (AC-040).
   - **Unauthenticated:** not shown (AC-041).
-- **Traceability:** US-012; FR-026..FR-030, FR-043; AC-037..AC-042; DEC-201, DEC-211, DEC-213, DEC-214.
+  - **Shared daily STT quota reached:** show M-17 and do not transcribe (AC-073, AC-076).
+- **Traceability:** US-012; FR-026..FR-030, FR-043, FR-045; AC-037..AC-042, AC-076; DEC-201, DEC-211, DEC-213, DEC-214, DEC-219; CR-003.
 
 #### FLOW-014 - Listen to the Spoken Solfege (HU13, P0)
 
@@ -392,12 +396,13 @@ Only one audio plays at a time. Starting a new playback stops the previous one (
 | M-08d | El archivo supera los 1.000 caracteres. | REG-002 | UX-PROP |
 | M-09 | No se pudo transcribir tu comentario. Puedes intentarlo de nuevo o escribirlo. | REG-005 | UX-PROP (EDGE-030) |
 | M-10 | Alcanzaste el límite diario de 20 audios nuevos. Los audios ya generados siguen disponibles. | REG-003 | UX-PROP (DEC-213) |
-| M-11 | Tu audio se enviará a un servicio externo para transcribirlo y no se guardará después de la transcripción. *(For voice comments: "Tu audio se enviará a un servicio externo para transcribirlo y se publicará junto con el texto.")* | REG-008 | UX-PROP (DEC-214); see UX-Q-002 |
+| M-11 | Dictado: "El audio se enviará a los servidores de Notara para transcribirlo. No se conservará después de la transcripción. El proveedor de alojamiento procesa esta solicitud." Voz-comentario: "El audio se enviará a los servidores de Notara para transcribirlo y se publicará junto con el texto y el audio. El proveedor de alojamiento procesa esta solicitud." | REG-008 | DECISION (DEC-214, CR-003); wording requires UX/privacy review |
 | M-12 | Dictado insertado. Revísalo antes de publicar. | REG-001 | UX-PROP |
 | M-13 | El dictado genera notación ABC. Cambia el formato a ABC o vacía el campo para dictar. | REG-001 disabled | UX-PROP-001 |
 | M-14 | Archivo cargado. Revísalo antes de publicar. | REG-002 | UX-PROP |
 | M-15 | No se pudo generar el audio. Inténtalo más tarde. | REG-003 | UX-PROP (EDGE-025) |
 | M-16 | Genera primero el solfeo para descargarlo. | REG-003 disabled | UX-PROP-007 |
+| M-17 | Alcanzaste el límite diario de {limit} transcripciones. Inténtalo de nuevo cuando se restablezca el límite. | REG-001, REG-005 | DEC-219; FR-045; shown for `STT_DAILY_LIMIT_REACHED` (429) |
 
 ## 11. MVP Exclusions and Deferred UX
 
@@ -430,9 +435,10 @@ No screens or controls for OMR, image uploads, roles, account recovery, comment 
 
 | ID | Question | Affects | Status |
 |---|---|---|---|
-| UX-Q-001 | BR-013 vocabulary and BR-025 header completion are PROPOSAL (P02 Q-021, Q-023); the vocabulary help text depends on them. | REG-008, FLOW-011 | Open (PRE-002) |
-| UX-Q-002 | Should M-11 name the provider (OpenAI) for transparency, or keep "servicio externo"? | M-11 | Open |
+| UX-Q-001 | BR-013 vocabulary and BR-025 header completion were pending P02 Q-021/Q-023. | REG-008, FLOW-011 | Resolved for HU11 by requester authorization; see UX-Q-004 / P02 Q-029 for populated-field edge behavior |
+| UX-Q-002 | Should M-11 name the provider (OpenAI) for transparency, or keep "servicio externo"? | M-11 | Resolved by CR-003: name Notara's backend, disclose hosting infrastructure generically; do not imply on-device processing or zero third parties. |
 | UX-Q-003 | Tutor content: clef, meter and difficulty only, or also key and tempo (P02 Q-025)? | FLOW-015 | Open (PRE-003) |
+| UX-Q-004 | How should dictation behave when existing content has malformed/present-empty ABC headers or is not ABC? | FLOW-011, BR-025 | Open (P02 Q-029); does not block empty-field dictation |
 
 ## 13. Requirements and MVP Coverage Matrix
 
@@ -470,6 +476,6 @@ P05 must not infer layouts from this specification.
 
 ## 15. Status and Next Actions
 
-- **Status:** `READY_WITH_ASSUMPTIONS`. Seven UX-PROP items and three open questions remain. Two of the questions depend on upstream PROPOSAL rules (PRE-002, PRE-003).
+- **Status:** `READY_WITH_ASSUMPTIONS`. Seven UX-PROP items and UX-Q-003/UX-Q-004 remain; UX-Q-001 is resolved for HU11 and UX-Q-002 by CR-003. UX-Q-004 blocks only the populated-field malformed/present-empty header path.
 - **Next stage:** P05 - Architecture.
 - **Next actions:** validate with `P04_validation.md` v2.0; take UX-PROP-001-007 and UX-Q-001-003 to the team together with PRE-001-PRE-003.

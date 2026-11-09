@@ -7,18 +7,20 @@
 | 1.0 | MVP 1 | Initial requirements (HU01-HU10). |
 | 2.0 | MVP 1 | P01 questions resolved as approved MVP decisions; status READY. |
 | 3.0 | MVP 2 | Incremental: HU11-HU19 (CR-001, CR-002) as US-011-US-019; DEC-201-DEC-218 applied; US-010 amended by DEC-211; new epics EPIC-005-EPIC-007; FR-018-FR-044, NFR-004-NFR-010, BR-013-BR-028, EDGE-014-EDGE-030, DEP-004-DEP-010, AC-029-AC-069. |
+| 4.0 | MVP 2 | Applies approved CR-003: local `faster-whisper tiny` STT; privacy notice and retention wording aligned; STT/TTS dependencies separated; open quality/performance gates recorded. No product story scope or MVP 1 behavior changed. |
+| 5.0 | MVP 2 | Records requester-reported HU11 approvals: BR-013/025, quality/performance/resource targets, daily STT quota, and security gates; adds FR-045, BR-029 and AC-070-076. Empirical acceptance remains pending; no MVP 1 behavior changed. |
 
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 3.0
+- **Version:** 5.0
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P02 - Requirements Engineering
 - **Status:** READY_WITH_ASSUMPTIONS
 - **Generated From:** `ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md` (v2.1; wording updated in v2.2)
-- **Additional Sources:** `PROJECT_CONTEXT.md` (v2.2; wording updated in v2.3), `SPRINT_2_BACKLOG_INPUT.md` (HU11-HU19), `DECISIONS_MVP2.md` (DEC-201-DEC-218), requirements v2.0 (MVP 1)
+- **Additional Sources:** `PROJECT_CONTEXT.md` (v2.2; wording updated in v2.3), `SPRINT_2_BACKLOG_INPUT.md` (HU11-HU19), `DECISIONS_MVP2.md` (DEC-201-DEC-219, CR-003 and HU11 authorization), `CR-003_WHISPER_TINY.md`, requirements v2.0 (MVP 1)
 - **P01 Validation:** PASS_WITH_WARNINGS (run 2; DISC-VAL-202 and DISC-VAL-203 carried)
-- **Change Requests:** CR-001, CR-002
+- **Change Requests:** CR-001, CR-002, CR-003 (approved per requester authorization; approver names/date not provided)
 
 > Evidence labels: FACT, DECISION (`DEC-2NN`), ASSUMPTION, PROPOSAL, UNKNOWN, CONFLICT. MVP 2 indicators are cited as `IND-2NN` (P01 CONFLICT-001 / DISC-VAL-203).
 
@@ -28,7 +30,7 @@
 
 **MVP 1 (delivered, unchanged):** Notara is a responsive web community and basic sheet-music manager. Authenticated users publish, discover, read, comment on and react to short textual scores in `.abc` or plain-text format. Content is non-empty and at most 1,000 characters; `.abc` requires basic syntax validation; plain text is free format; display preserves line breaks and identifies the format.
 
-**MVP 2 (this version):** adds dictation of scores by voice (HU11), voice comments (HU12), spoken solfege (HU13), an audio tutor (HU14), instrument playback (HU15), reuse of synthesized audio (HU16), a fallback voice (HU17), MP3 download of the solfege (HU18) and loading a score from an `.abc` file (HU19), as refined by DEC-201-DEC-218.
+**MVP 2 (this version):** adds dictation of scores by voice (HU11), voice comments (HU12), spoken solfege (HU13), an audio tutor (HU14), instrument playback (HU15), reuse of synthesized audio (HU16), a fallback voice (HU17), MP3 download of the solfege (HU18) and loading a score from an `.abc` file (HU19), as refined by DEC-201-DEC-219.
 
 ### 2.2 Scope Exclusions and Future Items
 
@@ -37,7 +39,7 @@ OMR/image recognition (MVP 3), image uploads, differentiated roles, account reco
 ### 2.3 Assumptions, Decisions and Unresolved Items
 
 - MVP 1 decisions (Q-001-Q-006) remain as recorded in version 2.0, except comment deletion, now governed by DEC-211.
-- DEC-201-DEC-218 are approved by TEAM-001 with team ratification pending (Q-020, DEP-010).
+- DEC-201 and its DEC-214 privacy-notice amendment are approved under CR-003 per requester authorization. Other MVP 2 decisions remain subject to the existing ratification question Q-020 / DEP-010; no approvers/date are inferred.
 - Two definitions delegated to P02 are written as PROPOSAL rules: the dictation vocabulary (BR-013) and the estimated-difficulty rule (BR-014). The completion of dictated ABC (BR-025) is a PROPOSAL that resolves CONFLICT-201.
 - Five conflicts were found and are listed in section 10.3.
 
@@ -85,7 +87,7 @@ OMR/image recognition (MVP 3), image uploads, differentiated roles, account reco
 | FR-026 | The platform shall allow an authenticated user viewing another user's score to record a voice note of up to 30 seconds and, after confirmation, publish it as a comment containing its transcribed text and a link to its audio. | EPIC-004 | MVP_SUPPORTING | Scope-defined | HU12; AC-012-01, AC-012-02; DEC-201 |
 | FR-027 | The platform shall allow users viewing a score detail to read the text and play the audio of its voice comments. | EPIC-004 | MVP_SUPPORTING | Scope-defined | HU12 ("se publique como texto y audio") |
 | FR-028 | The platform shall allow the author of a comment to delete it; deleting a voice comment also deletes its audio. | EPIC-004 | MVP_SUPPORTING | Scope-defined | HU10, HU12; DEC-211, DEC-214; supersedes BR-011 |
-| FR-029 | The platform shall inform the user, before recording, that the audio is sent to an external service for transcription. | EPIC-005 | MVP_CORE | Scope-defined | HU11, HU12; DEC-214 |
+| FR-029 | Before recording, the platform shall inform the user that audio is sent to Notara's backend for transcription and that hosting infrastructure may process the request; dictation audio is discarded after transcription, while voice-comment audio is retained with the comment. | EPIC-005 | MVP_CORE | Scope-defined | HU11, HU12; DEC-214, CR-003 |
 | FR-030 | The platform shall limit dictation and voice-comment recordings to 30 seconds and 2 MB. | EPIC-005 | MVP_CORE | Scope-defined | HU11, HU12; DEC-213 |
 | FR-031 | The platform shall allow a user viewing a score with valid ABC to request a spoken solfege in which a synthesized Spanish voice pronounces the note names in score order. | EPIC-006 | MVP_CORE | Scope-defined | HU13; AC-013-01; DEC-202, DEC-206; BR-026 |
 | FR-032 | The platform shall pace the spoken solfege with pauses that reflect relative note durations when the voice engine supports it, and at a constant pace otherwise. | EPIC-006 | MVP_CORE | Scope-defined | HU13 ("a tiempo"); DEC-206 |
@@ -99,8 +101,9 @@ OMR/image recognition (MVP 3), image uploads, differentiated roles, account reco
 | FR-040 | The platform shall generate the requested audio with the fallback voice when the commercial voice provider rejects the request for lack of credits or rate limiting, or is unavailable, without returning a server error to the user. | EPIC-007 | MVP_SUPPORTING | Scope-defined | HU17; AC-017-01; DEC-202, DEC-209 |
 | FR-041 | The platform shall not indicate to the user which voice produced the audio and shall record the use of the fallback voice in its logs. | EPIC-007 | MVP_SUPPORTING | Scope-defined | HU17; DEC-216; BR-023 |
 | FR-042 | The platform shall allow a user to download the spoken solfege of an `.abc` score as an MP3 file. | EPIC-006 | MVP_SUPPORTING | Scope-defined | HU18; AC-018-01 as reworded by DEC-204; BR-016 |
-| FR-043 | The platform shall require authentication for recording, transcription and voice synthesis features. | EPIC-007 | MVP_CORE | Scope-defined | DEC-213; FR-017 |
+| FR-043 | The platform shall require authentication and CSRF protection for recording, transcription and voice synthesis features. | EPIC-007 | MVP_CORE | Scope-defined | DEC-213; FR-017; ADR-003 |
 | FR-044 | The platform shall limit each user to 20 new voice syntheses per day; audio served from storage does not count; a user over the limit receives a clear message. | EPIC-007 | MVP_CORE | Scope-defined | DEC-213; BR-017 |
+| FR-045 | The platform shall allow at most the configured number of admitted STT inferences per authenticated user per UTC day (default 30) across dictation and voice-comment transcription, persist the daily counter atomically, and reject over-limit requests before inference with `STT_DAILY_LIMIT_REACHED` (429). | EPIC-007 | MVP_CORE | Scope-defined | HU11, HU12; DEC-219; BR-029; Q-027 |
 
 ## 5. Non-Functional Requirements
 
@@ -108,13 +111,13 @@ OMR/image recognition (MVP 3), image uploads, differentiated roles, account reco
 |---|---|---|---|---|---|
 | NFR-001 | Usability | The responsive web experience shall present published textual scores in a readable form while preserving line breaks and distinguishing `.abc` from plain text. | MVP_CORE | P00 textual display rule; ASM-003 | Defined |
 | NFR-002 | Responsive behavior | The main MVP flows shall be usable in current versions of Chrome, Edge, and Firefox at viewport widths of 360 px, 768 px, and 1280 px. Safari is outside the initial validation scope. | MVP_CORE | P00 platform; Q-002 | Defined |
-| NFR-003 | Security | Protected account and user-action functionality shall be available only to an authenticated user, with publication changes limited to the owner. | MVP_CORE / MVP_SUPPORTING | FR-010, FR-011, FR-017; P01 ownership principle | Defined |
-| NFR-004 | Privacy | Dictation audio shall be discarded after transcription; voice-comment audio shall be kept only while its comment exists. | MVP_CORE | DEC-214; BR-018 | Defined |
+| NFR-003 | Security | Protected account and user-action functionality shall require authentication and CSRF protection, with publication changes limited to the owner; audio uploads shall be validated server-side for size, allowed media type and file signature before inference. | MVP_CORE / MVP_SUPPORTING | FR-010, FR-011, FR-017, FR-043; DEC-219; P01 ownership principle | Defined |
+| NFR-004 | Privacy | Dictation audio and any processing temporary shall be discarded after transcription, including on failure; voice-comment audio shall be kept only while its comment exists. Audio and transcripts shall not be logged. | MVP_CORE | DEC-214; BR-018; CR-003 | Defined |
 | NFR-005 | Reliability | Failures of recording, transcription or synthesis shall not prevent the user from creating, publishing, reading or commenting on scores as text, and shall never surface as a server error. | MVP_CORE | P01 PRINCIPLE-008; AC-011-03; AC-017-01 | Defined |
 | NFR-006 | Cost control | Paid provider calls shall occur only for audio not already stored and within the per-user limit; the primary voice shall be selectable per environment, with the free fallback voice as default in development and automated testing. | MVP_SUPPORTING | DEC-202, DEC-210, DEC-213 | Defined |
 | NFR-007 | Language | Dictation, synthesized voices, tutor locutions and voice comments shall support Spanish only. | MVP_CORE | DEC-215; BR-022 | Defined |
 | NFR-008 | Platform | Recording features shall require a browser that supports audio capture in a secure (HTTPS) context, and shall be validated in the browsers and widths of NFR-002. | MVP_CORE | P00 section 7; NFR-002 | Defined |
-| NFR-009 | Performance | Maximum acceptable waiting times for transcription and synthesis. | REQUIRES_DECISION | Q-012 | REQUIRES_DECISION |
+| NFR-009 | Performance | For HU11, with the model loaded, p95 transcription time shall be ≤15 s for 30-second recordings; report cold start separately. Total service memory shall be ≤800 MiB in a 1 GiB container, with at most one simultaneous STT inference per process. Measure all targets; the proposed completion-or-typed-error-before-25-s target remains pending explicit approval. TTS latency targets remain open. | MVP_CORE | Q-012 (partially resolved), Q-028; PRE-011; CR-003; requester authorization | Approved targets; empirical verification pending |
 | NFR-010 | Testability | Automated acceptance tests shall not depend on the availability or credits of paid voice providers. | MVP_SUPPORTING | P00 RISK-006 mitigation | Defined |
 
 ## 6. User Stories
@@ -385,63 +388,71 @@ OMR/image recognition (MVP 3), image uploads, differentiated roles, account reco
 ### US-011 - Dictate a score by voice
 
 - **Epic:** EPIC-005
-- **Requirement(s):** FR-018, FR-019, FR-020, FR-021, FR-025, FR-029, FR-030, FR-043
+- **Requirement(s):** FR-018, FR-019, FR-020, FR-021, FR-025, FR-029, FR-030, FR-043, FR-045
 - **User Story:** As a music student or music teacher, I want to dictate notes and bars in Spanish through the microphone, so that they are written as ABC notation in the editor without typing them.
 - **Scope:** MVP_CORE
-- **Traceability:** HU11; NEED-007, JTBD-005, IND-201; backlog AC-011-01, AC-011-02, AC-011-03; DEC-201, DEC-205, DEC-208, DEC-213, DEC-214, DEC-215, DEC-218
+- **Traceability:** HU11; NEED-007, JTBD-005, IND-201; backlog AC-011-01, AC-011-02, AC-011-03; DEC-201, DEC-205, DEC-208, DEC-213, DEC-214, DEC-215, DEC-218, DEC-219; CR-003 and HU11 authorization record
 - **Team backlog (source data, not P02 planning):** Must / 5 SP -> Must / 8 SP (DEC-208)
 
 #### Acceptance Criteria
 
-- **AC-030:** Given an authenticated user is on the score create or edit page and has been informed that the audio is sent to an external service, when they press the microphone button and dictate "Compas cuatro cuartos, Do negra, Re corchea, Mi corchea" within 30 seconds, then the recording is transcribed. *(Source: AC-011-01; DEC-201, DEC-214, DEC-215)*
+- **AC-030:** Given an authenticated user is on the score create or edit page and has been informed that audio is sent to Notara's backend and hosting infrastructure may process the request, when they press the microphone button and dictate "Compas cuatro cuartos, Do negra, Re corchea, Mi corchea" within 30 seconds, then the recording is transcribed. *(Source: AC-011-01; DEC-201, DEC-214, DEC-215; CR-003)*
 - **AC-031:** Given the transcription uses only the supported vocabulary, when the result returns to the page, then ABC notation equivalent to `M:4/4` and `C D/2 E/2` is inserted into the content field, completed as defined by BR-025, the format is set to ABC, and nothing is published. *(Source: AC-011-02; DEC-205; BR-013, BR-025)*
 - **AC-032:** Given the recording is unintelligible or uses words outside the vocabulary, when the interpretation fails, then the message "No se pudo interpretar el dictado musical" is shown and the content field is unchanged. *(Source: AC-011-03)*
 - **AC-033:** Given a user opens the dictation option, when the option is displayed, then the supported vocabulary is visible to the user. *(Source: DEC-205)*
 - **AC-034:** Given a recording is in progress, when it reaches 30 seconds or 2 MB, then recording stops or is rejected with a clear message. *(Source: DEC-213)*
 - **AC-035:** Given microphone permission is denied or unavailable, when the user tries to dictate, then a clear message is shown and the rest of the form remains usable. *(Source: NFR-005; EDGE-014)*
 - **AC-036:** Given content produced by dictation is in the field, when the user publishes, then the MVP 1 publication rules are applied. *(Source: DEC-218; FR-025)*
+- **AC-070:** Given the authorized evaluation corpus contains at least 100 recordings from at least 5 different speakers, when all recordings are transcribed and parsed using the approved deterministic parser, then at least 90% produce the exact expected ABC. This is an acceptance target; it has not yet been measured. *(Source: Q-028; PRE-011)*
+- **AC-071:** Given the multilingual `tiny` model is loaded and the approved evaluation includes 30-second recordings, when transcription is measured, then p95 is no more than 15 seconds; cold-start time is reported separately. *(Source: Q-012; PRE-011)*
+- **AC-072:** Given the complete service runs in a 1 GiB container under the approved HU11 test profile, when model load and inference are measured, then total service memory remains at or below 800 MiB and no more than one STT inference runs simultaneously per process. *(Source: PRE-011; requester authorization)*
+- **AC-073:** Given an authenticated user has reached the configured daily STT limit, when another valid request is submitted, then the service returns `STT_DAILY_LIMIT_REACHED` (429) without starting inference. *(Source: FR-045; DEC-219)*
+- **AC-074:** Given concurrent requests approach the user's daily quota, when inference admission is attempted, then the persistent per-user/UTC-day counter is reserved atomically; invalid/authentication/CSRF failures and requests rejected before inference admission do not count, while an admitted attempt counts even if transcription or parsing fails. *(Source: FR-045; BR-029; DEC-219)*
+- **AC-075:** Given an unauthenticated request, missing/invalid CSRF token, oversized audio, or an audio file with a disallowed type or signature is submitted, when the STT endpoint validates the request, then it rejects it before inference, returns a typed error, and does not consume quota. *(Source: FR-030, FR-043, FR-045; NFR-003; DEC-219)*
 
 #### Business Rules
-- BR-013, BR-017, BR-018, BR-022, BR-024, BR-025
+- BR-013, BR-017, BR-018, BR-022, BR-024, BR-025, BR-029
 
 #### Edge Cases
-- EDGE-014, EDGE-015, EDGE-016, EDGE-017, EDGE-018
+- EDGE-014, EDGE-015, EDGE-016, EDGE-017, EDGE-018, EDGE-031
 
 #### Dependencies
 - DEP-004, DEP-008, DEP-010
 
 #### Open Questions
-- Q-021, Q-023
+- Q-012 (25-second completion/error ceiling only)
+- Q-029 (populated-field malformed/present-empty ABC completion behavior)
 
 ### US-012 - Leave a voice comment
 
 - **Epic:** EPIC-004
-- **Requirement(s):** FR-026, FR-027, FR-028, FR-029, FR-030, FR-043
+- **Requirement(s):** FR-026, FR-027, FR-028, FR-029, FR-030, FR-043, FR-045
 - **User Story:** As a member of the Notara community, I want to record spoken observations on other users' scores, so that I can leave quick feedback published as text and audio.
 - **Scope:** MVP_SUPPORTING
-- **Traceability:** HU12; NEED-008, JTBD-006, IND-202; backlog AC-012-01, AC-012-02; DEC-201, DEC-211, DEC-213, DEC-214, DEC-215
+- **Traceability:** HU12; NEED-008, JTBD-006, IND-202; backlog AC-012-01, AC-012-02; DEC-201, DEC-211, DEC-213, DEC-214, DEC-215, DEC-219; CR-003
 - **Team backlog (source data, not P02 planning):** Should / 3 SP
 
 #### Acceptance Criteria
 
-- **AC-037:** Given an authenticated user views another user's score, when they record a voice note of up to 30 seconds and confirm sending, then a comment is created with the transcribed text and a link to its recorded audio. *(Source: AC-012-01, AC-012-02; DEC-201)*
+- **AC-037:** Given an authenticated user views another user's score, when they record a voice note of up to 30 seconds and confirm sending, then a comment is created with the transcribed text and a link to its recorded audio. *(Source: AC-012-01, AC-012-02; DEC-201, DEC-214; CR-003)*
 - **AC-038:** Given a score has a voice comment, when a user opens the score detail, then they can read the comment text and play its audio. *(Source: HU12)*
 - **AC-039:** Given the transcription fails or is empty, when the user confirms sending, then no comment is created, a clear message is shown, and the user can retry or write a text comment. *(Source: NFR-005; EDGE-030)*
 - **AC-040:** Given a user views their own score, when the comment options are displayed, then the voice comment option is not available. *(Source: BR-027)*
 - **AC-041:** Given an unauthenticated user views a score, when they try to record a voice comment, then recording is not available and authentication is required. *(Source: FR-043)*
 - **AC-042:** Given the author of a voice comment deletes it, when deletion completes, then the comment and its audio are no longer available. *(Source: DEC-211, DEC-214)*
+- **AC-076:** Given the same user has made STT requests through dictation and voice-comment transcription, when daily usage is counted, then both flows share one persistent per-user/UTC-day quota and cannot each consume a separate limit. *(Source: FR-045; DEC-219)*
 
 #### Business Rules
-- BR-017, BR-018, BR-019, BR-022, BR-027
+- BR-017, BR-018, BR-019, BR-022, BR-027, BR-029
 
 #### Edge Cases
-- EDGE-014, EDGE-015, EDGE-018, EDGE-028, EDGE-029, EDGE-030
+- EDGE-014, EDGE-015, EDGE-018, EDGE-028, EDGE-029, EDGE-030, EDGE-031
 
 #### Dependencies
 - DEP-005, DEP-008, DEP-009, DEP-010
 
 #### Open Questions
-- Q-022
+- Q-022, Q-026
 
 ### US-013 - Listen to the spoken solfege
 
@@ -654,22 +665,23 @@ OMR/image recognition (MVP 3), image uploads, differentiated roles, account reco
 | BR-010 | A user can apply or remove their own like on another user's score. | FR-015; US-009 | HU09 / P01 | Defined |
 | BR-011 | Users cannot edit or delete comments in MVP 1. | FR-016; US-010 | Q-004 approved MVP decision | SUPERSEDED by BR-019 (DEC-211) |
 | BR-012 | Account recovery is excluded from MVP 1; authenticated users may change their password from their profile. | FR-002..004; US-002..003 | Q-005 approved MVP decision | Defined |
-| BR-013 | **Dictation vocabulary (PROPOSAL, DEC-205):** notes Do, Re, Mi, Fa, Sol, La, Si map to C D E F G A B in one octave starting at middle C; "sostenido" and "bemol" after a note map to sharp and flat; figures redonda, blanca, negra, corchea, semicorchea map to 4, 2, 1, 1/2 and 1/4 of the unit note (L:1/4); "silencio de <figura>" maps to a rest of that value; "compas <n> <m>" (e.g. "cuatro cuartos", "tres cuartos", "seis octavos") maps to the meter; "barra" inserts a bar line. Any other word makes the dictation uninterpretable (FR-021). | FR-019, FR-020; US-011 | DEC-205; AC-011-01 example | PROPOSAL - Q-021 |
+| BR-013 | **Approved HU11 vocabulary (DEC-205):** notes Do, Re, Mi, Fa, Sol, La, Si map to C D E F G A B in one octave starting at middle C; "sostenido" and "bemol" after a note map to sharp and flat; figures redonda, blanca, negra, corchea, semicorchea map to 4, 2, 1, 1/2 and 1/4 of the unit note (L:1/4); "silencio de <figura>" maps to a rest of that value; "compas <n> <m>" (e.g. "cuatro cuartos", "tres cuartos", "seis octavos") maps to the meter; "barra" inserts a bar line. Dotted notes are not supported; any other word makes the dictation uninterpretable (FR-021). | FR-019, FR-020; US-011 | DEC-205; Q-021 resolved by requester authorization | Approved |
 | BR-014 | **Estimated difficulty (PROPOSAL, DEC-212):** add points for shortest note value (quarter or longer 0, eighth 1, sixteenth or shorter 2), accidentals in the musical lines (none 0, 1-3 1, more than 3 2), pitch range (up to one octave 0, up to an octave and a half 1, more 2) and number of notes (up to 16 0, 17-48 1, more than 48 2). Total 0-2 = baja, 3-5 = media, 6-8 = alta. The locution says "dificultad estimada". | FR-034; US-014 | DEC-212 | PROPOSAL - Q-024 |
 | BR-015 | Listening features (solfege, tutor, instrument playback, MP3) are available only for `.abc` scores. | FR-036; US-013-US-015, US-018 | DEC-207 | Defined |
 | BR-016 | The MP3 download contains the spoken solfege voice only; mixing with the instrument is not provided. | FR-042; US-018 | DEC-204 | Defined |
 | BR-017 | Each user may request at most 20 new voice syntheses per day; stored audio does not count. Recordings are limited to 30 seconds and 2 MB. | FR-030, FR-044; US-011-US-014, US-018 | DEC-213 | Defined |
-| BR-018 | Dictation audio is not retained after transcription; voice-comment audio is retained only while its comment exists; stored synthesized audio is not personal data. | NFR-004; US-011, US-012, US-016 | DEC-214 | Defined |
+| BR-018 | Dictation audio and temporary processing files are not retained after transcription, including on failure; voice-comment audio is retained only while its comment exists; stored synthesized audio is not personal data. Audio and transcripts are not logged. | NFR-004; US-011, US-012, US-016 | DEC-214; CR-003 | Defined |
 | BR-019 | The author of a comment may delete it; deleting a voice comment deletes its audio; comments cannot be edited. | FR-028; US-010, US-012 | DEC-211 (supersedes BR-011 and P03 DEC-002) | Defined |
 | BR-020 | Only `.abc` files can be loaded; the file is read on the user's device, is not stored, and its text is subject to the 1,000-character limit. | FR-022, FR-024; US-019 | DEC-217 | Defined |
 | BR-021 | Stored synthesized audio is identified by score content, voice and language; a change in any of them requires a new synthesis. | FR-038, FR-039; US-016 | DEC-210 | Defined |
 | BR-022 | Voice features support Spanish only. | NFR-007; US-011-US-014 | DEC-215 | Defined |
 | BR-023 | The user is not told which voice produced an audio; the use of the fallback voice is logged. | FR-041; US-017 | DEC-216 | Defined |
 | BR-024 | Content produced by dictation or file loading must satisfy BR-004 and BR-005 before publication. | FR-025; US-011, US-019 | DEC-218 | Defined |
-| BR-025 | **Dictation output completion (PROPOSAL):** if the content field is empty, the dictation produces complete ABC with `X:1`, `T:` = the publication title or "Dictado", `M:` = the dictated meter or 4/4, `L:1/4`, `K:C`, followed by the dictated musical line; if the field already has content, the dictated musical line is appended at the end and the existing header lines are not changed. | FR-019; US-011 | CONFLICT-201 (AC-011-02 example lacks `X:`, `T:`, `L:`, `K:`) | PROPOSAL - Q-023 |
+| BR-025 | **Approved HU11 ABC header completion:** when the content field is empty, produce ABC with `X:1`, `T:` = publication title or "Dictado", `M:` = dictated meter or `4/4`, `L:1/4`, and `K:C`, followed by the dictated musical line. When the field contains ABC, preserve all existing content and existing required header values, add only absent required headers using those same defaults (before the music line), and append the dictated musical line. An existing `M:` takes precedence over a different meter in the new dictation; the user may review/edit before publication. Do not overwrite any existing header. Handling present-but-empty/malformed headers and non-ABC content in an already populated field requires clarification before implementing that append path. | FR-019; US-011 | DEC-205; Q-023 resolved by requester authorization; resolves CONFLICT-201 | Approved with edge-case clarification pending |
 | BR-026 | Solfege uses Spanish fixed-do names (Do, Re, Mi, Fa, Sol, La, Si). PROPOSAL: accidentals are spoken as "sostenido" or "bemol" and rests as "silencio". | FR-031; US-013 | AC-013-01 example (FACT); accidentals and rests (PROPOSAL) | Defined / PROPOSAL |
 | BR-027 | Voice comments, like text comments, can be left only on scores published by other users. | FR-026; US-012 | FR-016; backlog HU12 "partituras de otros usuarios" | Defined |
 | BR-028 | The tutor locution states the clef ("clave"), the meter and the estimated difficulty. ASSUMPTION: it also states the tempo when the ABC defines one (backlog example "ritmo moderado"). | FR-034; US-014 | Backlog HU14 and AC-014-01; CONFLICT-202 | Defined / ASSUMPTION |
+| BR-029 | **STT quota:** each authenticated user may have at most `STT_DAILY_LIMIT` admitted inference attempts per UTC day (default 30) across HU11 dictation and HU12 voice comments. Persist a unique per-user/day counter and reserve it atomically before inference; count an attempt once inference is admitted, including failures after admission. Authentication/CSRF failures, invalid uploads, and requests rejected before admission do not count. Over-limit requests return `STT_DAILY_LIMIT_REACHED` (429) without inference. This quota is separate from the 20-synthesis DEC-213 limit. | FR-045; US-011, US-012 | DEC-219; Q-027 resolved | Approved |
 
 ## 8. Edge Cases
 
@@ -692,7 +704,7 @@ OMR/image recognition (MVP 3), image uploads, differentiated roles, account reco
 | EDGE-015 | A recording reaches 30 seconds or 2 MB. | US-011, US-012 | Recording stops at the limit, or the recording is rejected with a clear message. | Defined |
 | EDGE-016 | The dictation is unintelligible or uses words outside the vocabulary. | US-011 | "No se pudo interpretar el dictado musical"; content unchanged. | Defined |
 | EDGE-017 | Inserting the dictated ABC would exceed 1,000 characters. | US-011 | The dictation is not inserted; a clear message is shown; content unchanged. | Defined |
-| EDGE-018 | The transcription service is unavailable. | US-011, US-012 | Clear message; no server error; the user can type the content or comment instead. There is no fallback for transcription in MVP 2. | Defined |
+| EDGE-018 | The local STT model is unavailable, the request times out, or inference capacity is saturated. | US-011, US-012 | Return the existing typed `STT_UNAVAILABLE` outcome; no empty success or unhandled server error; the user can type instead. There is no fallback STT in MVP 2. | Defined |
 | EDGE-019 | A selected file is not `.abc`, is empty, is unreadable or exceeds 1,000 characters. | US-019 | Rejected with a clear message; content unchanged. | Defined |
 | EDGE-020 | A file is loaded into a non-empty content field and the user cancels the confirmation. | US-019 | Existing content is kept. | Defined |
 | EDGE-021 | A user opens a plain-text score. | US-013-US-015, US-018 | Listening options disabled with "Disponible solo para partituras en ABC". | Defined |
@@ -705,6 +717,7 @@ OMR/image recognition (MVP 3), image uploads, differentiated roles, account reco
 | EDGE-028 | An author tries to leave a voice comment on their own score. | US-012 | The option is not available. | Defined |
 | EDGE-029 | The author deletes a comment that has audio. | US-010, US-012 | Comment and audio are no longer available. | Defined |
 | EDGE-030 | A voice comment's transcription fails or is empty. | US-012 | The comment is not created; clear message; the user can retry or write a text comment. | Defined |
+| EDGE-031 | An authenticated user reaches the daily STT inference limit. | US-011, US-012 | Reject before inference with `STT_DAILY_LIMIT_REACHED` (429); display the daily-limit message; do not increment the counter for the rejected request. | Defined |
 
 ## 9. Dependencies
 
@@ -717,9 +730,9 @@ OMR/image recognition (MVP 3), image uploads, differentiated roles, account reco
 | DEP-005 | Voice comments extend text comments and depend on the comment-deletion rule. | FR-026-FR-028; US-012 depends on US-010, BR-019 | Defined |
 | DEP-006 | The MP3 download requires the spoken solfege audio. | FR-042; US-018 depends on US-013 | Defined |
 | DEP-007 | Solfege and tutor rely on the audio store and the fallback voice for cost and availability. | US-013, US-014 depend on US-016, US-017 | Defined |
-| DEP-008 | Transcription and synthesis depend on provider access, keys and budget. | US-011-US-014, US-016-US-018; Q-011 | Defined |
+| DEP-008 | Local STT (US-011/US-012) depends on configured/pinned weights, sufficient CPU/memory, per-process concurrency bound and persistent per-user/day quota; paid TTS (US-013/US-014) depends on provider key/credits and Q-011. | US-011-US-014, US-016-US-018; Q-011, Q-012, Q-027; CR-003, DEC-219 | Defined; HU11 targets approved, empirical capacity pending |
 | DEP-009 | Voice comments and the audio store depend on persistent storage. | US-012, US-016; Q-009 | Defined |
-| DEP-010 | Items refined by DEC-201-DEC-218 depend on team ratification of the decisions. | US-010-US-019; Q-020 | Defined |
+| DEP-010 | Items refined by DEC-201-DEC-219 depend on team ratification of applicable decisions. HU11-specific decisions and P05 ADRs are ratified; other MVP 2 items remain subject to Q-020. | US-010-US-019; Q-020 | HU11 scope satisfied; Q-020 open overall |
 
 ## 10. Assumptions, Open Questions and Conflicts
 
@@ -732,7 +745,7 @@ OMR/image recognition (MVP 3), image uploads, differentiated roles, account reco
 | ASM-003 | Preserving line breaks is sufficient for readable textual score display. | Affects NFR-001, FR-014, FR-022. | P01 approved display rule | Resolved |
 | ASM-005 | The closed Spanish vocabulary (BR-013) is enough for useful dictation. | Affects US-011 usability. | P00/P01 ASM-005 | Open - test with real dictations |
 | ASM-011 | Loaded `.abc` files are plain UTF-8 text. | Affects US-019; unreadable files handled by EDGE-019. | P00 ASM-011 | Open |
-| ASM-012 | One octave starting at middle C is enough for dictated short exercises. | Limits US-011 output range. | BR-013 (PROPOSAL) | Open - Q-021 |
+| ASM-012 | One octave starting at middle C is enough for dictated short exercises. | Limits US-011 output range. | BR-013 / DEC-205 | Approved for HU11 |
 | ASM-013 | The tutor mentions the tempo only when the ABC defines it. | Affects US-014 locution. | Backlog example "ritmo moderado" | Open - Q-025 |
 
 ### Open Questions
@@ -747,20 +760,24 @@ OMR/image recognition (MVP 3), image uploads, differentiated roles, account reco
 | Q-006 | What measurable criteria define MVP success? | Status, P03, P10 | MVP 1 decision recorded in version 2.0; MVP 2 uses IND-201-IND-209 qualitatively. | Resolved (MVP 1); see CONFLICT-204 |
 | Q-009 | Does the Railway volume persist files across deployments? | US-012, US-016, DEP-009 | Verification. | Open |
 | Q-010 | Sprint 2 dates and story owners? | P03 | Team. | Open |
-| Q-011 | Budget, credits, keys, and global monthly cap for paid audio? | DEP-008, NFR-006 | Team. | Open |
-| Q-012 | Acceptable waiting times for transcription and synthesis? | NFR-009 | Team / P05. | Open |
-| Q-020 | Will TEAM-002-TEAM-005 ratify DEC-201-DEC-218? | DEP-010 | Team. | Open |
-| Q-021 | Approve BR-013 vocabulary, including one octave, no dotted notes, and "barra" for bar lines? | US-011, BR-013, ASM-012 | Team. | Open |
+| Q-011 | What TTS budget, credits and global monthly cap are available? | DEP-008, NFR-006 | Team; STT no longer requires a paid provider key (CR-003). | Open |
+| Q-012 | What response-time targets (including p95) are acceptable for transcription and synthesis? | NFR-009; CR-003 | HU11 loaded-model p95 ≤15 s for 30 s audio approved; report cold start separately. Synthesis targets and the proposed transcription completion-or-typed-error-before-25-s ceiling still need explicit approval. | Partially resolved |
+| Q-020 | Will TEAM-002-TEAM-005 ratify the remaining MVP 2 decisions not amended by CR-003? | DEP-010 | Team. | Open |
+| Q-021 | Approve BR-013 vocabulary, including one octave, no dotted notes, and "barra" for bar lines? | US-011, BR-013, ASM-012 | Approved by requester authorization recorded in DECISIONS_MVP2.md section 5. | Resolved |
 | Q-022 | DEC-214 deletes voice-comment audio "with the account", but Notara has no account-deletion capability. Keep the rule for administrative deletion only, or add a capability? | US-012, BR-018 | Team. | Open (CONFLICT-203) |
-| Q-023 | Approve BR-025 (completion of dictated ABC)? | US-011, BR-025 | Team. | Open (CONFLICT-201) |
+| Q-023 | Approve BR-025 (completion of dictated ABC)? | US-011, BR-025 | Approved by requester authorization recorded in DECISIONS_MVP2.md section 5; malformed/present-empty header cases remain a clarification. | Resolved (CONFLICT-201 design resolved; edge case noted) |
 | Q-024 | Approve BR-014 (estimated-difficulty rule and thresholds)? | US-014 | Team, ideally with a teacher. | Open |
 | Q-025 | The backlog says "clave" (clef). Should the tutor also state the key ("tonalidad", from `K:`) and the tempo? | US-014, BR-028 | Team. | Open (CONFLICT-202) |
+| Q-026 | What is the maximum voice-comment transcript length given the existing 500-character comment limit? | US-012, FR-026 | Team / P05. | Open |
+| Q-027 | Is a per-user STT usage limit required to control CPU abuse? | US-011, US-012; DEP-008 | Resolved by DEC-219: configurable 30 admitted inference attempts across all STT flows per user per UTC day; quota persistence and concurrency behavior must be tested. | Resolved |
+| Q-028 | What representative HU11 evaluation corpus and exact parsed-ABC quality threshold are acceptable? | US-011, NFR-009; CR-003 | Approved: ≥100 authorized recordings from ≥5 speakers; ≥90% exact expected ABC after parser. Run and report the corpus before HU11 acceptance. | Resolved (target); measurement pending |
+| Q-029 | How should dictation handle an already populated field containing present-but-empty/malformed required headers or non-ABC content while preserving existing headers? | US-011, BR-025; CONFLICT-201 | Clarify before implementing the append path; do not overwrite existing header values. | Open; does not block independent STT or empty-field dictation work |
 
 ### 10.3 Conflicts
 
 | ID | Conflict | Sources | Treatment |
 |---|---|---|---|
-| CONFLICT-201 | The AC-011-02 example output (`M:4/4`, `C D/2 E/2`) lacks the `X:`, `T:`, `L:`, `K:` fields that BR-005 requires, so it would fail publication validation. | Backlog AC-011-02; BR-005; DEC-218 | PROPOSAL BR-025 completes the headers; Q-023. |
+| CONFLICT-201 | The AC-011-02 example output (`M:4/4`, `C D/2 E/2`) lacks the `X:`, `T:`, `L:`, `K:` fields that BR-005 requires, so it would fail publication validation. | Backlog AC-011-02; BR-005; DEC-218 | Resolved for the normal dictation path by approved BR-025, which adds absent headers without overwriting existing ones; Q-029 tracks malformed/present-empty populated-field edge cases. |
 | CONFLICT-202 | P00 and P01 translate HU14 "clave" as "key", but the backlog example "clave de Sol" refers to the clef. | Backlog HU14, AC-014-01; P00 MVP-014; P01 NEED-010 | Requirements use clef (BR-028). **Corrected upstream** in P00 v2.3 and P01 v2.2. Q-025 (key and tempo) stays open. |
 | CONFLICT-203 | DEC-214 refers to account deletion, which does not exist in Notara. | DEC-214; MVP 1 scope | Q-022. |
 | CONFLICT-204 | P00 v2.2 lists Q-002 and Q-006 as open, but MVP 1 requirements v2.0 resolved them. | P00 section 11; requirements v2.0 | Keep the MVP 1 resolution here. **Synced** in P00 v2.3 and P01 v2.2. |
@@ -782,8 +799,8 @@ OMR/image recognition (MVP 3), image uploads, differentiated roles, account reco
 | HU10 / MVP-010 | EPIC-004 | FR-016 | US-010 | AC-026..028 |
 | Q-001 / ASM-002 | EPIC-002 | FR-008 | US-004..005 | AC-010, AC-013 |
 | HU10 amendment / DEC-211 | EPIC-004 | FR-028 | US-010 | AC-029 (AC-028 superseded) |
-| HU11 / MVP-011 / NEED-007 / IND-201 | EPIC-005 | FR-018-FR-021, FR-025, FR-029, FR-030, FR-043 | US-011 | AC-030-AC-036 |
-| HU12 / MVP-012 / NEED-008 / IND-202 | EPIC-004 | FR-026-FR-030, FR-043 | US-012 | AC-037-AC-042 |
+| HU11 / MVP-011 / NEED-007 / IND-201 | EPIC-005 | FR-018-FR-021, FR-025, FR-029, FR-030, FR-043, FR-045 | US-011 | AC-030-AC-036, AC-070-AC-075 |
+| HU12 / MVP-012 / NEED-008 / IND-202 | EPIC-004 | FR-026-FR-030, FR-043, FR-045 | US-012 | AC-037-AC-042, AC-076 |
 | HU13 / MVP-013 / NEED-009 / IND-203 | EPIC-006 | FR-031-FR-033, FR-036, FR-037, FR-043, FR-044 | US-013 | AC-043-AC-048 |
 | HU14 / MVP-014 / NEED-010 / IND-203 | EPIC-006 | FR-033, FR-034, FR-036, FR-037, FR-043, FR-044 | US-014 | AC-049-AC-051 |
 | HU15 / MVP-015 / NEED-011 / IND-204 | EPIC-006 | FR-035-FR-037 | US-015 | AC-052-AC-054 |
@@ -805,4 +822,4 @@ OMR/image recognition (MVP 3), image uploads, differentiated roles, account reco
 
 `READY_WITH_ASSUMPTIONS`
 
-The requirements cover HU01-HU19 with testable criteria and full traceability. They are usable for P02 validation and P03 planning. Three PROPOSAL rules (BR-013, BR-014, BR-025), the conflicts in section 10.3, team ratification (Q-020), budget (Q-011), storage (Q-009) and latency (Q-012) remain visible and do not block planning.
+The requirements cover HU01-HU19 with testable criteria and full traceability. HU11 rules and target thresholds are approved for implementation/planning; quality, latency, memory, concurrency, pinned-model and Railway evidence are not yet available. Q-020 remains open for decisions outside the approved HU11 scope; Q-012 is partially resolved (STT p95 target approved, 25-second ceiling and TTS targets open); Q-026 remains open for HU12. BR-013/BR-025 are approved, with the populated-field malformed/present-empty header edge case flagged before implementing that append path. CR-003 and the new authorization do not establish model accuracy or production readiness.

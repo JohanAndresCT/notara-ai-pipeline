@@ -4,7 +4,7 @@
 **Release:** MVP 2 — Sprint 2 (Audio, Voice and TTS/STT)
 **Date:** 2026-11-08
 **Decided by:** Johan Andrés Ceballos Tabarez (TEAM-001), who delegated the choice to the pipeline's recommendation ("respecto a decisiones toma las que consideres mejor").
-**Ratification:** Pending confirmation by the rest of the team (TEAM-002 to TEAM-005) at the next team meeting. Until then these decisions are the working baseline for P02 onward.
+**Ratification:** Pending confirmation by the rest of the team (TEAM-002 to TEAM-005) for MVP 2 decisions generally. CR-003 and the HU11-scoped decisions recorded in section 5 are approved based on the requester's authorization; this does not ratify unrelated MVP 2 decisions.
 **Type:** Team input artifact (source for P00 v2.2 and P01 v2.1)
 
 > `DEC-2NN` identifiers belong to MVP 2. They do not collide with the MVP 1 decisions `DEC-001`–`DEC-003` in `outputs/03_planning/PRIORITIZATION.md`.
@@ -13,14 +13,14 @@
 
 | ID | Replaces | Decision | Affects | Rationale |
 |---|---|---|---|---|
-| DEC-201 | PDEC-201 | Single STT provider: **Whisper (OpenAI API)** for dictation and voice comments. Deepgram is not used. | HU11, HU12 | One key, one integration, one mock; Whisper cost per minute is low. |
+| DEC-201 | PDEC-201 | **Amended by approved CR-003:** local `faster-whisper` multilingual `tiny`, CPU/`int8`, language `es`, behind `SttAdapter` for dictation and voice comments. No OpenAI/Deepgram STT API or fallback. The prior OpenAI API selection is retained here as history, not as the current STT choice. | HU11, HU12 | Removes the OpenAI STT credit dependency while preserving the adapter boundary; quality and Railway capacity remain unvalidated. |
 | DEC-202 | PDEC-202 | Commercial TTS: **ElevenLabs**. Fallback: **`edge-tts`**. Azure and Google are not used. `edge-tts` is the default voice in development and CI; ElevenLabs is enabled by configuration for demos. | HU13, HU14, HU17 | The free ElevenLabs tier is small (to verify against current pricing); keeping it for demos protects credits. |
 | DEC-203 | PDEC-203 | Instrument playback runs **in the browser with Tone.js**. No server-side FluidSynth. | HU15 | Meets "sin consumir APIs externas" without new server infrastructure. |
 | DEC-204 | PDEC-204 | The **MP3 download contains the synthesized solfège voice only**. Voice + instrument mixing is deferred (FUT-005). AC-018-01 is reworded accordingly. | HU18 | Mixing requires server-side instrument synthesis for a Could story. |
-| DEC-205 | PDEC-205 | Dictation is converted to ABC by a **deterministic parser over a closed Spanish vocabulary** (notes Do–Si, sostenido/bemol, redonda/blanca/negra/corchea/semicorchea, silencio, compás N/M). No LLM. The supported vocabulary is shown to the user. | HU11 | Predictable, testable, no extra cost. |
+| DEC-205 | PDEC-205 | **HU11-ratified:** Dictation is converted to ABC by a **deterministic parser over a closed Spanish vocabulary**: Do–Si in one octave; sostenido/bemol; redonda/blanca/negra/corchea/semicorchea; "silencio de <figura>"; compás N/M; and the command "barra". Dotted notes are not supported. No LLM. The supported vocabulary is shown to the user. | HU11 | Predictable, testable, no extra cost. |
 | DEC-206 | PDEC-206 | Solfège is **spoken, not sung**. Note names are pronounced at a steady pulse with pauses proportional to note duration when the TTS engine supports pause markup; otherwise at a constant pace. The engine capability is confirmed in P05. Sung solfège is deferred (FUT-004). | HU13 | Keeps "a tiempo" as closely as TTS allows. |
 | DEC-207 | PDEC-207 | Solfège, tutor and instrument playback are available **only for `.abc` scores**. For plain-text scores the buttons are shown disabled with "Disponible solo para partituras en ABC". If a valid ABC score contains elements the player cannot render, the user gets a clear message, never a server error. | HU13–HU15 | Resolves Q-016. |
-| DEC-208 | PDEC-208 | HU11 is **re-estimated from 5 to 8 SP** because of the parser (DEC-205). | HU11 | Honest estimate. |
+| DEC-208 | PDEC-208 | **HU11-ratified:** HU11 is estimated at **8 SP** because of the parser (DEC-205); the estimate remains provisional for sprint capacity planning. | HU11 | Honest estimate. |
 | DEC-209 | PDEC-209 | HU17 is **raised from Should to Must**. | HU17 | HU13 (Must) and the demo depend on it; `edge-tts` is also the dev default (DEC-202). |
 | DEC-210 | PDEC-210 | Cache key = hash of **content + voice + language**. | HU16 | A voice change must not return a stale file. |
 
@@ -30,18 +30,42 @@
 |---|---|---|---|
 | DEC-211 | Q-004, Q-017 | **Comment deletion by its author is ratified** as delivered in MVP 1, superseding P03 `DEC-002`. Deleting a comment also deletes its audio file. | HU10, HU12 |
 | DEC-212 | Q-018 | The tutor states an **estimated difficulty** (baja / media / alta) computed from the ABC with a simple documented rule (pitch range, accidentals, shortest note value, number of notes). The locution says "dificultad estimada". No new publication field. | HU14 |
-| DEC-213 | Q-008 | Audio features require authentication. **Limit: 20 new syntheses per user per day** (cache hits do not count). **Recordings (dictation and voice comments): max 30 s and 2 MB.** A global monthly cap is set once the budget is known (Q-011 stays open). | HU11–HU18 |
-| DEC-214 | Q-013 | **Dictation audio is discarded after transcription**; only the ABC text is kept. **Voice-comment audio lives as long as its comment** and is deleted with the comment or the account. **Cached synthesized audio is not personal data**; it is invalidated by the content hash. Before recording, the user is told that audio is sent to an external service for transcription. | HU11, HU12, HU16 |
+| DEC-213 | Q-008 | Audio features require authentication. **Limit: 20 new syntheses per user per day** (cache hits do not count). **Recordings (dictation and voice comments): max 30 s and 2 MB.** The recording limits are ratified for HU11; the separate STT quota is DEC-219. A global monthly TTS cap is set once the budget is known (Q-011 stays open). | HU11–HU18 |
+| DEC-214 | Q-013 | **Amended by approved CR-003:** dictation audio is discarded after transcription; only the resulting ABC text is kept. Voice-comment audio lives as long as its comment and is deleted with the comment; the prior account-deletion wording remains unresolved under Q-022 because Notara has no account-deletion capability. Cached synthesized audio is not personal data and is invalidated by the content hash. Before recording, the user is told audio is sent to Notara's backend for transcription; hosting infrastructure may process that request. No third-party STT API is called. | HU11, HU12, HU16 |
 | DEC-215 | Q-014 | **Spanish only** for dictation, TTS voices, tutor and voice comments in MVP 2. | HU11–HU14 |
 | DEC-216 | Q-019 | The user is **not told** which voice (commercial or fallback) answered; the backend logs it. | HU17 |
 | DEC-217 | — (new HU19) | `.abc` file loading is done **in the browser**: the file's text is read locally and placed in the content field; the file itself is not uploaded or stored. Only `.abc` files are accepted. | HU19 |
 | DEC-218 | ASM-010 | Content produced by dictation (HU11) or file loading (HU19) **must pass the existing MVP 1 content rules** (non-empty, ≤ 1,000 characters, basic ABC validation) before publication. | HU11, HU19 |
+| DEC-219 | Q-027 | Allow at most 30 admitted STT inferences per authenticated user per UTC day across dictation and voice-comment transcription; limit is configurable (`STT_DAILY_LIMIT`, default 30). Persist a per-user/day counter and reserve it atomically before inference. Invalid/authentication/CSRF failures and requests rejected before inference admission do not count; once admitted, the attempt counts even if recognition or parsing fails. Exceeding the limit returns typed `STT_DAILY_LIMIT_REACHED` (429). | HU11, HU12 |
 
 ## 3. Still open (team input required)
 
 | ID | Question | Why it stays open |
 |---|---|---|
 | Q-010 | Sprint 2 dates and story owners. | Only the team can assign. |
-| Q-011 | Budget, credits and who holds the OpenAI / ElevenLabs keys. | Needed for the global cap (DEC-213). |
-| Q-012 | Latency targets. | Technical; P05. |
+| Q-011 | TTS budget, credits and who holds the ElevenLabs key. | Needed for the global cap (DEC-213); STT no longer uses a paid API key. |
+| Q-012 | Acceptable transcription and synthesis response times, including p95 targets. | HU11 transcription p95 is approved in section 5; synthesis targets and the candidate 25 s completion/error ceiling remain open pending explicit confirmation. |
 | Q-009 | Railway volume persistence. | Must be verified, not decided. |
+| Q-020 | Ratify the remaining MVP 2 decisions not amended by CR-003, outside the explicitly approved HU11 scope. | HU11-specific decisions are recorded in section 5; other MVP 2 decisions remain pending. |
+| Q-026 | Maximum voice-comment transcript length given the existing 500-character comment limit. | P05 CONFLICT-ARCH-202; preserve existing text-comment behavior. |
+| Q-027 | Is a per-user STT usage limit required to control CPU abuse? | **Resolved for HU11 by DEC-219:** configurable 30 admitted inferences/user/UTC day; acceptance and abuse tests remain required. |
+| Q-028 | Approve the representative HU11 evaluation corpus and quality threshold for exact parsed ABC. | **Resolved:** ≥100 authorized recordings from ≥5 speakers; at least 90% exact expected ABC after parsing. Results have not yet been measured. |
+
+## 4. Approved amendment record — CR-003
+
+- **Status:** Approved, as authorized by the requester on behalf of the team.
+- **Approval date and individual approver names:** Not provided; intentionally not inferred.
+- **Scope:** DEC-201's STT engine and DEC-214's audio-processing disclosure only. Other MVP 2 decisions and their outstanding ratification status are unchanged.
+- **Evidence:** The spike measurements recorded in CR-003 are requester-reported and have not been independently reproduced.
+- **Implementation state:** Documentation updated; no Django endpoint, model, UI, Railway deployment, or production configuration is implemented or validated by this amendment.
+
+## 5. HU11 implementation authorization and decisions
+
+- **Authorization record:** The requester confirms human approval of the HU11 conditions documented in this section and the related P02–P05 updates. No individual approver names, approval date, or meeting record were supplied; none is inferred.
+- **Decision scope:** This approval ratifies DEC-205, DEC-208, the recording constraints in DEC-213, DEC-215 and DEC-218 for HU11, plus the HU11-applicable P05 implementation decisions listed in `ARCHITECTURE.md`. It does not ratify unrelated MVP 2 decisions; Q-020 therefore remains open overall.
+- **Dictation rules:** BR-013's one-octave Spanish vocabulary, no dotted notes and "barra" command are approved. BR-025 fills only absent required ABC headers, preserving existing header values and appending the parsed musical line. Defaults remain `X:1`, title or `Dictado`, dictated meter or `4/4`, `L:1/4`, and `K:C`. An existing meter takes precedence over a different meter in the new dictation; the user can review/edit before publication. P02 Q-029 tracks present-but-empty or malformed headers and non-ABC content in an already populated field; resolve it before implementing that append path.
+- **Quality and capacity targets:** Q-028 approves ≥100 authorized recordings from ≥5 speakers and ≥90% exact expected ABC after the parser. Q-012 approves loaded-model p95 ≤15 s for a 30 s recording; cold start is reported separately. Total service memory target is ≤800 MiB in a 1 GiB container; maximum one simultaneous STT inference per process. These are acceptance targets, not measured results.
+- **Unresolved timing item:** The candidate requirement to complete or return a typed error before 25 s was not separately approved. Keep it as a pending target; do not claim it as an approved SLO. Synthesis latency under Q-012 also remains open.
+- **Abuse protection:** DEC-219 resolves Q-027 with a configurable daily limit of 30 admitted STT inferences per authenticated user across HU11 and HU12, persisted per UTC day and reserved atomically before inference. Authentication/CSRF failures, invalid files, and requests rejected before inference admission do not consume quota; admitted attempts count even if inference/parsing fails. The over-limit response is `STT_DAILY_LIMIT_REACHED` (429).
+- **Security and privacy:** Require session authentication and CSRF, enforce upload size/type/signature validation before inference, retain no dictation audio or temporary files, and never log audio or transcripts. The one-inference-per-process bound and daily quota are required CPU-abuse controls.
+- **Empirical state:** Corpus results, p95, cold start, complete-service memory, concurrency, pinned-weight operation, Python 3.12 integration and Railway remain unverified. Approval authorizes implementation and planning only, not acceptance or deployment.

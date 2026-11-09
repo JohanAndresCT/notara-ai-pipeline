@@ -31,6 +31,15 @@ Se leen desde el entorno o desde un archivo `.env` en la raíz del repositorio. 
 | `MEDIA_ROOT`, `STATIC_ROOT` | Rutas de archivos | |
 | `DJANGO_FILE_STORAGE_BACKEND` | Backend de almacenamiento | |
 | `PROFILE_PHOTO_MAX_BYTES` | Tamaño máximo de foto de perfil | Por defecto 5 MiB |
+| `STT_DAILY_LIMIT` | Intentos STT admitidos por usuario y día UTC | Por defecto 30 |
+| `STT_MODEL_ID`, `STT_MODEL_SIZE` | Identidad y tamaño del modelo | Solo se acepta `Systran/faster-whisper-tiny`, `tiny` |
+| `STT_MODEL_DIR` | Directorio local con los pesos `faster-whisper` | Ruta relativa a la raíz del repositorio o absoluta; vacío desactiva STT |
+| `STT_MODEL_REVISION` | Commit completo del modelo | Fijado a `d90ca5fe260221311c53c58e660288d3deb8d356`; cualquier otra revisión falla |
+| `STT_MODEL_MANIFEST` | Manifiesto versionado `backend/voice/model_sha256.json` | Verifica inventario, tamaños y SHA-256 antes de cargar |
+| `STT_MODEL_REQUIRED` | Hace fallar el arranque si el modelo no puede cargarse/verificarse | `false` por defecto; establecer `true` en el runtime STT |
+| `STT_DEVICE`, `STT_COMPUTE_TYPE`, `STT_LANGUAGE` | Parámetros de inferencia | Solo `cpu`, `int8`, `es` |
+| `STT_CPU_THREADS`, `STT_MAX_CONCURRENT` | Hilos CPU y concurrencia por proceso | Por defecto 2 hilos y exactamente 1 inferencia |
+| `AUDIO_MAX_BYTES`, `AUDIO_MAX_SECONDS` | Límites de archivo de HU11 | Por defecto 2 MiB y 30 s |
 | `GUNICORN_WORKERS` | Workers de Gunicorn | Solo `deploy/entrypoint.sh` |
 | `PORT` | Puerto del contenedor | Lo provee Railway |
 | `VITE_API_PROXY_TARGET` | Destino del proxy `/api` de Vite | Por defecto `http://127.0.0.1:8000` |
@@ -62,6 +71,44 @@ pnpm dev
 
 El servidor de desarrollo de Vite hace proxy de `/api` hacia `http://127.0.0.1:8000`. Su puerto es `PORT` o 5173 (`vite.config.ts`).
 
+### STT local (HU11)
+
+Las dependencias de Django están en `backend\requirements.txt`; las de `experiments\whisper_tiny\requirements.txt` son solo para el spike aislado y no forman parte del backend. Los pesos nunca se descargan durante una solicitud ni se guardan en Git. `.local-models/` está excluida de Git y del contexto Docker.
+
+El contrato de integración para frontend está en [API_STT_HU11.md](./API_STT_HU11.md).
+
+El backend usa el repositorio público `Systran/faster-whisper-tiny`, fijado al commit inmutable `d90ca5fe260221311c53c58e660288d3deb8d356`. El inventario y los SHA-256 esperados están versionados en [model_sha256.json](../backend/voice/model_sha256.json). La verificación requiere exactamente `config.json`, `model.bin`, `tokenizer.json` y `vocabulary.txt`; el verificador rechaza archivos faltantes, adicionales, con tamaño distinto o con SHA-256 distinto. El manifiesto de confianza se mantiene en el repositorio, no se genera a partir de los pesos descargados.
+
+La descarga ocurre solo al ejecutar explícitamente el aprovisionador. Requiere acceso a Hugging Face; no se ejecuta en el arranque de una solicitud HTTP. Ejecuta los comandos desde la raíz del repositorio y con las dependencias de `backend\requirements.txt` instaladas.
+
+```powershell
+$env:STT_MODEL_DIR = [System.IO.Path]::GetFullPath(".local-models\whisper-tiny")
+Push-Location backend
+python -m voice.provision_model --model-dir $env:STT_MODEL_DIR
+Pop-Location
+$env:DJANGO_DB_ENGINE = "sqlite"
+python backend\manage.py migrate
+$env:STT_MODEL_REQUIRED = "true"
+python backend\manage.py runserver --noreload
+```
+
+En Linux, desde la raíz y con el entorno virtual activo:
+
+```sh
+export STT_MODEL_DIR="$PWD/.local-models/whisper-tiny"
+(
+  cd backend
+  python -m voice.provision_model --model-dir "$STT_MODEL_DIR"
+)
+DJANGO_DB_ENGINE=sqlite python backend/manage.py migrate
+export STT_MODEL_REQUIRED=true
+DJANGO_DB_ENGINE=sqlite python backend/manage.py runserver --noreload
+```
+
+El aprovisionador verifica que Hugging Face resuelva el commit solicitado al mismo hash fijado, descarga los cuatro archivos a una carpeta temporal, compara tamaños y SHA-256 con el manifiesto versionado y solo entonces instala el directorio limpio. Una instalación válida existente se verifica y reutiliza; un directorio no vacío que no coincide se rechaza para evitar reemplazar datos silenciosamente. Para desarrollo en Windows, crea primero el entorno virtual con Python 3.12 e instala `backend\requirements.txt`, como en la sección anterior.
+
+Al iniciar, el backend vuelve a calcular SHA-256 antes de cargar el modelo local en CPU/int8; si `STT_MODEL_REQUIRED=true`, cualquier ausencia o discrepancia detiene el arranque. No copies el directorio de pesos ni lo incluyas en Git: comparte únicamente código, configuración y manifiesto. En Railway aún se necesita una estrategia de almacenamiento/provisión compatible con el filesystem del contenedor, además de pruebas de memoria, latencia, calidad y concurrencia; nada de esto se ha validado en Railway.
+
 ## Opción B: Docker Compose
 
 ```powershell
@@ -74,7 +121,7 @@ Levanta `postgres:16-alpine`, el backend (`python:3.12-slim`, `runserver`) y el 
 
 | Acción | Comando | Directorio |
 |---|---|---|
-| Pruebas backend | `python backend\manage.py test accounts scores` | raíz |
+| Pruebas backend | `python backend\manage.py test accounts scores voice` | raíz |
 | Chequeo Django | `python backend\manage.py check` | raíz |
 | Migraciones pendientes | `python backend\manage.py makemigrations --check --dry-run` | raíz |
 | Tipos | `pnpm typecheck` | `frontend/` |

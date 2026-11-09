@@ -1,17 +1,18 @@
 {
   "backlog_metadata": {
     "project": "Notara",
-    "version": "2.0",
+    "version": "4.0",
     "stage": "P03",
     "release": "MVP 2 - Sprint 2",
     "status": "READY_WITH_ASSUMPTIONS",
     "purpose": "Prioritized planning index for MVP 2, with MVP 1 kept as delivered baseline.",
     "source_artifacts": [
       "ai-pipeline/outputs/03_planning/PRIORITIZATION.md",
-      "ai-pipeline/outputs/02_requirements/REQUIREMENTS.md",
+      "ai-pipeline/outputs/02_requirements/REQUIREMENTS.md (v5.0)",
       "ai-pipeline/outputs/02_requirements/product_backlog.json",
       "ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md",
-      "ai-pipeline/outputs/00_context/DECISIONS_MVP2.md"
+      "ai-pipeline/outputs/00_context/DECISIONS_MVP2.md",
+      "ai-pipeline/outputs/00_context/CR-003_WHISPER_TINY.md"
     ],
     "canonical_story_source": "ai-pipeline/outputs/02_requirements/product_backlog.json",
     "capacity": {
@@ -32,10 +33,12 @@
       "PRE-007",
       "PRE-008",
       "PRE-009",
-      "PRE-010"
+      "PRE-010",
+      "PRE-011"
     ],
     "assignment_note": "assigned_developers stays empty until the team provides owners (Q-010 / PRE-006).",
-    "previous_version": "1.0 (MVP 1; source paths updated from artifacts/ to ai-pipeline/outputs/)"
+    "previous_version": "1.0 (MVP 1; source paths updated from artifacts/ to ai-pipeline/outputs/)",
+    "notes": "CR-003 changes only the STT engine; priority, Story Points, capacity and MVP 1 baseline are unchanged. The requester has ratified HU11-specific decisions and applicable ADRs: PRE-002 is satisfied and PRE-011 is approved for planning, with empirical acceptance verification pending. PRE-001 remains open for other MVP 2 scope; HU11 no longer depends on a paid STT key."
   },
   "items": [
     {
@@ -387,8 +390,9 @@
       "depends_on": [
         "US-004",
         "US-005",
+        "PRE-007",
         "PRE-002",
-        "PRE-004"
+        "PRE-011"
       ],
       "requirement_ids": [
         "FR-018",
@@ -398,7 +402,8 @@
         "FR-025",
         "FR-029",
         "FR-030",
-        "FR-043"
+        "FR-043",
+        "FR-045"
       ],
       "acceptance_criteria_source_ids": [
         "AC-030",
@@ -407,7 +412,13 @@
         "AC-033",
         "AC-034",
         "AC-035",
-        "AC-036"
+        "AC-036",
+        "AC-070",
+        "AC-071",
+        "AC-072",
+        "AC-073",
+        "AC-074",
+        "AC-075"
       ],
       "decision_ids": [
         "DEC-201",
@@ -416,7 +427,8 @@
         "DEC-213",
         "DEC-214",
         "DEC-215",
-        "DEC-218"
+        "DEC-218",
+        "DEC-219"
       ],
       "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-011",
       "story_points": 8,
@@ -429,7 +441,10 @@
       "sprint": "Sprint 2",
       "assigned_developers": [],
       "delivery_status": "PLANNED",
-      "status": "PRIORITIZED"
+      "status": "PRIORITIZED",
+      "change_request_ids": [
+        "CR-003"
+      ]
     },
     {
       "id": "US-012",
