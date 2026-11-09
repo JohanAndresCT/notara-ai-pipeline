@@ -56,7 +56,7 @@ cleanup() {
 trap cleanup INT TERM EXIT
 
 attempt=0
-until python -c 'import os; from urllib.request import Request, urlopen; host = os.environ["DJANGO_ALLOWED_HOSTS"].split(",", 1)[0].strip(); urlopen(Request("http://127.0.0.1:8000/api/v1/health/", headers={"Host": host}), timeout=1)' >/dev/null 2>&1; do
+until python -c 'import os; from urllib.request import Request, urlopen; host = os.environ["DJANGO_ALLOWED_HOSTS"].split(",", 1)[0].strip(); urlopen(Request("http://127.0.0.1:8000/api/v1/health/", headers={"Host": host, "X-Forwarded-Proto": "https"}), timeout=1)' >/dev/null 2>&1; do
   if ! kill -0 "$gunicorn_pid" 2>/dev/null; then
     wait "$gunicorn_pid" || true
     echo "Gunicorn exited before becoming ready" >&2
