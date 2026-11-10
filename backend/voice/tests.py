@@ -46,13 +46,14 @@ class FakeSttAdapter:
         self.transcript = transcript
         self.calls = 0
 
-    def transcribe(self, audio_file):
+    def transcribe(self, audio_file, prompt=None):
         self.calls += 1
+        self.prompt = prompt
         return self.transcript
 
 
 class FailingSttAdapter:
-    def transcribe(self, audio_file):
+    def transcribe(self, audio_file, prompt=None):
         raise RuntimeError("model error")
 
 
@@ -243,6 +244,7 @@ class SttEndpointTests(TestCase):
             "X:1\nT:Tema de prueba\nM:4/4\nL:1/4\nK:C\nC D/2 E/2",
         )
         self.assertEqual(self.adapter.calls, 1)
+        self.assertIn("Do negra", self.adapter.prompt)  # vocabulary prompt for dictation
 
     def test_requires_authentication_and_does_not_infer(self):
         anonymous = Client(enforce_csrf_checks=True)

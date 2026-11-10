@@ -126,3 +126,45 @@ implementation-log evidence requirements.
   required metadata feedback.
 - JPG/PNG criteria are superseded by the text-only decision. Product Owner
   approval, PostgreSQL, and the full browser matrix remain pending.
+
+---
+
+# MVP 2 — Sprint 2 (Audio, Speech & TTS/STT)
+
+## P06 prompts v2.0
+
+- `prompts/06_implementation/P06_implementation.md` → v2.0: modos **Foundation** y **Story increment** (una ejecución por historia: prompt de historia, código, registro `US-0XX_<NAME>_IMPLEMENTATION.md`, log y validación). Rutas `outputs/`; lee las versiones vigentes de P02-P05 y `DECISIONS_MVP2.md`.
+- `prompts/06_implementation/P06_code_review.md` → v2.0: añade el modo historia con informe `US-0XX_<NAME>_VALIDATION.md`.
+- Numeración MVP 2: P06.N = número de historia (P06.11 = US-011).
+
+## P06.11 - US-011 Dictate a Score by Voice
+
+- Prompt de historia: `prompts/06_implementation/P06.11_US-011_dictate_score_by_voice.md`.
+- Backend: Alejandro Zamorano (`mvp-2`, CR-003/CR-004), integrado en `pipeline/mvp2-p00-context` (`ca9f594`).
+- Frontend: panel de dictado en "Crear partitura" (`DictationPanel.tsx`, `transcribeDictation()`).
+- Registro: `US-011_DICTATION_IMPLEMENTATION.md` — `IMPLEMENTED_WITH_GAPS`.
+- Validación: `US-011_DICTATION_VALIDATION.md` — `PASS_WITH_WARNINGS`, ejecución `PARTIAL`. Pendiente: prueba con micrófono real (IMPL-VAL-011-01) y metas de aceptación AC-070..072 (IMPL-VAL-011-02).
+- Evidencia: 113 pruebas backend (112 OK, 1 omitida), tsc y build OK, endpoint real 422/401, navegador.
+
+## P06.19 - US-019 Load a Score from an .abc File
+
+- Prompt de historia: `prompts/06_implementation/P06.19_US-019_load_abc_file.md`.
+- Frontend: `AbcFileLoader.tsx` en "Crear partitura".
+- Registro: `US-019_ABC_FILE_IMPLEMENTATION.md` — `IMPLEMENTED` (página de crear).
+- Validación: `US-019_ABC_FILE_VALIDATION.md` — `PASS_WITH_WARNINGS`, ejecución `COMPLETE`. Hallazgos LOW: página de editar sin edición de contenido; confirmación nativa.
+
+
+## P06.12-P06.18 - Voice and audio stories (HU12-HU18)
+
+- Prompts de historia: `prompts/06_implementation/P06.12_US-012_voice_comments.md` … `P06.18_US-018_mp3_download.md`.
+- Registros y validaciones: `US-012_VOICE_COMMENTS_*`, `US-013_SOLFEGE_*`, `US-014_AUDIO_TUTOR_*`, `US-015_PIANO_PLAYBACK_*`, `US-016_AUDIO_CACHE_*`, `US-017_VOICE_FALLBACK_*`, `US-018_MP3_DOWNLOAD_*`.
+- Resultado: US-016 y US-017 `PASS`; el resto `PASS_WITH_WARNINGS`. Sin hallazgos HIGH/CRITICAL.
+- Evidencia: 134 pruebas backend (133 OK, 1 omitida), tsc y build OK, navegador con Edge TTS y Whisper local.
+- Pendiente: micrófono real, ElevenLabs con clave, persistencia en Railway, piano con muestras.
+
+## P06 — cierre de pendientes HU01-HU19 (2026-11-10)
+
+- DEC-239 resuelve Q-029 (dictado sobre ABC existente) y añade dictado y carga `.abc` en la página de editar.
+- Prompt de vocabulario para Whisper en el dictado.
+- Registros retroactivos US-007 y US-008; validaciones de US-005..US-010 (`P06_code_review.md` v2.0).
+- Lista de pruebas manuales: `MVP2_MANUAL_ACCEPTANCE_CHECKLIST.md`.

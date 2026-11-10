@@ -12,6 +12,7 @@ from accounts.views import (
     register_view,
 )
 from scores.views import (
+    comment_audio_view,
     comment_create_view,
     comment_delete_view,
     score_comment_detail_view,
@@ -21,6 +22,7 @@ from scores.views import (
     score_reaction_view,
     scores_view,
 )
+from voice.speech_views import solfege_view, tutor_view
 
 
 def health_check(request):
@@ -29,6 +31,10 @@ def health_check(request):
 
 urlpatterns = [
     path("api/v1/audio/", include("voice.urls")),
+    # MVP 2 listening and voice comments (new routes only under /api/v1/, ADR-013).
+    path("api/v1/scores/<int:score_id>/audio/solfege/", solfege_view, name="score-solfege"),
+    path("api/v1/scores/<int:score_id>/audio/tutor/", tutor_view, name="score-tutor"),
+    path("api/v1/comments/<int:comment_id>/audio/", comment_audio_view, name="comment-audio"),
     path("admin/", admin.site.urls),
     path("api/health/", health_check, name="health-check"),
     path("api/csrf/", csrf_token_view, name="csrf-token"),

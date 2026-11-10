@@ -54,6 +54,10 @@ class Reaction(models.Model):
 
 
 class Comment(models.Model):
+    class Kind(models.TextChoices):
+        TEXT = "TEXT", "Text"
+        VOICE = "VOICE", "Voice"  # HU12: transcribed text plus its audio
+
     score = models.ForeignKey(
         Score,
         on_delete=models.CASCADE,
@@ -64,7 +68,12 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name="comments",
     )
-    body = models.TextField(max_length=500)
+    # 500 characters for text comments; up to 1,000 for voice transcripts (DEC-231),
+    # enforced in the views.
+    body = models.TextField(max_length=1000)
+    kind = models.CharField(max_length=5, choices=Kind.choices, default=Kind.TEXT)
+    audio = models.FileField(upload_to="voice_comments/%Y/%m/", blank=True)
+    audio_mime = models.CharField(max_length=32, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

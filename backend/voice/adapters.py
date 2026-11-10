@@ -13,7 +13,7 @@ _stt_adapter = None
 
 class SttAdapter(ABC):
     @abstractmethod
-    def transcribe(self, audio_file) -> str:
+    def transcribe(self, audio_file, prompt: str | None = None) -> str:
         raise NotImplementedError
 
 
@@ -46,13 +46,16 @@ class FasterWhisperSttAdapter(SttAdapter):
             cpu_threads=self.cpu_threads,
         )
 
-    def transcribe(self, audio_file) -> str:
+    def transcribe(self, audio_file, prompt: str | None = None) -> str:
         if self.model is None:
             raise RuntimeError("Whisper model has not been loaded.")
         audio_file.seek(0)
+        # An optional vocabulary prompt biases decoding (used by dictation only).
+        options = {"initial_prompt": prompt} if prompt else {}
         segments, _ = self.model.transcribe(
             audio_file,
             language=settings.STT_LANGUAGE,
+            **options,
         )
         transcript = " ".join(segment.text.strip() for segment in segments).strip()
         audio_file.seek(0)

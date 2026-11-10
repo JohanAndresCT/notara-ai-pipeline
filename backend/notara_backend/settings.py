@@ -147,6 +147,20 @@ if STT_MAX_CONCURRENT != 1:
     raise ValueError("HU11 supports exactly one concurrent inference per process.")
 if STT_MODEL_REQUIRED and not STT_MODEL_DIR:
     raise ValueError("STT_MODEL_DIR is required when STT_MODEL_REQUIRED is true.")
+
+# MVP 2 voice synthesis (HU13, HU14, HU16, HU17; DEC-202, DEC-213, DEC-230, DEC-232).
+VOICE_PRIMARY_ENGINE = os.getenv("VOICE_PRIMARY_ENGINE", "edge").strip().lower()
+VOICE_DAILY_LIMIT = int(os.getenv("VOICE_DAILY_LIMIT", "20"))
+TTS_TIMEOUT_SECONDS = int(os.getenv("TTS_TIMEOUT_SECONDS", "20"))
+EDGE_TTS_VOICE = os.getenv("EDGE_TTS_VOICE", "es-ES-ElviraNeural").strip()
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
+ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "").strip()
+ELEVENLABS_MODEL_ID = os.getenv("ELEVENLABS_MODEL_ID", "eleven_multilingual_v2").strip()
+if VOICE_PRIMARY_ENGINE not in {"fake", "edge", "elevenlabs"}:
+    raise ValueError("VOICE_PRIMARY_ENGINE must be fake, edge or elevenlabs.")
+if VOICE_DAILY_LIMIT < 1 or TTS_TIMEOUT_SECONDS < 1:
+    raise ValueError("VOICE_DAILY_LIMIT and TTS_TIMEOUT_SECONDS must be positive integers.")
+VOICE_COMMENT_MAX_CHARS = 1000  # DEC-231
 CSRF_FAILURE_VIEW = "voice.csrf.csrf_failure"
 STORAGES = {
     "default": {

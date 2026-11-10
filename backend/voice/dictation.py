@@ -2,6 +2,14 @@ import re
 import unicodedata
 from dataclasses import dataclass
 
+# Whisper context for HU11 dictation: lists the BR-013 vocabulary so short words such as
+# "Do negra" or "Re corchea" are not merged or misspelled ("Donegra", "recorcea").
+DICTATION_PROMPT = (
+    "Dictado musical: compás cuatro cuartos, tres cuartos, seis octavos. Do negra, "
+    "Re corchea, Mi blanca, Fa sostenido, Sol redonda, La semicorchea, Si bemol, "
+    "silencio de negra, barra."
+)
+
 
 class Uninterpretable(ValueError):
     pass

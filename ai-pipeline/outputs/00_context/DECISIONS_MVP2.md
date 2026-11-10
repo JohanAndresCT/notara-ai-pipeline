@@ -119,6 +119,7 @@
 | DEC-236 | DEC-227 | The tutor states clef, meter and estimated difficulty, plus key (`K:`) and tempo (`Q:`) when defined. Resolves Q-025. | US-014, BR-028 |
 | DEC-237 | DEC-228 | No account-deletion feature; administrative user deletion removes voice-comment audio by cascade. Resolves Q-022 / CONFLICT-203. | US-012, BR-018 |
 | DEC-238 | DEC-229 (BR-014 part) | BR-014 (estimated difficulty) approved as initial version; teacher review recommended. Resolves Q-024. BR-013 and BR-025 were already approved for HU11 in section 5. | US-014 |
+| DEC-239 | — (2026-11-10) | **Resolves Q-029.** Dictation into a populated field follows BR-025 in the browser: the existing ABC is kept, only absent required headers are added (before `K:`), an existing `M:` wins, and the dictated line is appended. When the existing `L:` is not `1/4`, dictated durations are rewritten so figures keep their value. Dictation is refused, before recording, when the field holds plain text or ABC without headers, or a required header is present but empty; an unreadable `L:` is refused after transcription. Dictation and `.abc` loading are also available on the edit page (FR-018, FR-022). Whisper receives the BR-013 vocabulary as context for dictation only. | US-011, US-019, US-005, BR-025, FR-018, FR-022 |
 
 **Not carried over (superseded by `mvp-2` decisions):**
 

@@ -10,7 +10,7 @@ from django.http.multipartparser import MultiPartParserError
 
 from .adapters import get_stt_adapter
 from .audio import AudioTooLarge, InvalidAudio, validate_audio_upload
-from .dictation import Uninterpretable, compose_document, parse
+from .dictation import DICTATION_PROMPT, Uninterpretable, compose_document, parse
 from .errors import error_response
 from .inference import inference_slot
 from .quota import reserve_daily_inference
@@ -87,7 +87,7 @@ def stt_view(request):
             )
 
         try:
-            transcript = adapter.transcribe(audio_file)
+            transcript = adapter.transcribe(audio_file, prompt=DICTATION_PROMPT)
         except (av.error.FFmpegError, OSError, RuntimeError, ValueError) as exc:
             logger.error("STT inference failed (%s).", type(exc).__name__)
             return _service_unavailable()

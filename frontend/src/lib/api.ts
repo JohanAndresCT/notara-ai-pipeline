@@ -27,11 +27,23 @@ export type PublishedScore = {
   is_liked?: boolean;
   is_owner?: boolean;
   comments?: ScoreComment[];
+  playback?: ScorePlayback;
+};
+
+// HU15 — normalized note events from the backend ABC reader (P05 ADR-010).
+export type ScorePlayback = {
+  playable: boolean;
+  reason: "NOT_ABC" | "UNSUPPORTED_ELEMENTS" | null;
+  meter?: string;
+  tempo_bpm?: number;
+  events: { midi: number | null; start: number; duration: number }[];
 };
 
 export type ScoreComment = {
   id: number;
   body: string;
+  kind?: "TEXT" | "VOICE";
+  audio_url?: string | null;
   author: string;
   author_id: number;
   created_at: string;
@@ -426,4 +438,126 @@ export async function publishScore(values: {
   }
   if (!body.score) throw new Error("La respuesta de publicación está incompleta.");
   return body.score;
+}
+
+// HU11 — dictation (POST /api/v1/audio/stt/, see docs/API_STT_HU11.md).
+export type DictationResult = {
+  transcript: string;
+  meter: string;
+  abc_line: string;
+  abc_document: string;
+};
+
+// UX_SPEC message catalogue (M-01, M-05b, M-07, M-17) mapped to the STT error codes.
+const dictationMessages: Record<string, string> = {
+  DICTATION_UNINTERPRETABLE: "No se pudo interpretar el dictado musical",
+  AUDIO_INVALID: "No se pudo interpretar el dictado musical", // M-01 (UX_SPEC)
+  AUDIO_TOO_LARGE: "La grabación es demasiado grande (máximo 2 MB).",
+  STT_UNAVAILABLE: "El servicio de transcripción no está disponible. Puedes escribir la partitura.",
+  STT_DAILY_LIMIT_REACHED:
+    "Alcanzaste el límite diario de 30 transcripciones. Inténtalo de nuevo cuando se restablezca el límite.",
+  AUTHENTICATION_REQUIRED: "Tu sesión expiró. Inicia sesión de nuevo para dictar.",
+  CSRF_FAILED: "No se pudo validar la solicitud. Recarga la página e inténtalo de nuevo.",
+};
+
+export type DictationError = Error & { code: string; status?: number };
+
+export async function transcribeDictation(audio: Blob, title: string): Promise<DictationResult> {
+  const csrfToken = await getCsrfToken();
+  const body = new FormData();
+  const extension = audio.type.includes("ogg") ? "ogg" : audio.type.includes("mp4") ? "m4a" : "webm";
+  body.append("audio", audio, `dictado.${extension}`);
+  if (title.trim()) body.append("title", title.trim());
+
+  let response: Response;
+  try {
+    response = await fetch("/api/v1/audio/stt/", {
+      method: "POST",
+      credentials: "include",
+      headers: { "X-CSRFToken": csrfToken },
+      body,
+    });
+  } catch {
+    throw Object.assign(new Error(dictationMessages.STT_UNAVAILABLE), { code: "NETWORK_ERROR" });
+  }
+  const payload = (await response.json().catch(() => ({}))) as Partial<DictationResult> & {
+    code?: string;
+  };
+  if (!response.ok) {
+    const code = payload.code ?? "";
+    throw Object.assign(new Error(dictationMessages[code] ?? dictationMessages.STT_UNAVAILABLE), {
+      code,
+      status: response.status,
+    });
+  }
+  if (!payload.abc_document) throw new Error("La respuesta del dictado está incompleta.");
+  return payload as DictationResult;
+}
+
+// HU13 / HU14 / HU18 — synthesized audio (POST returns the MP3 body).
+const synthesisMessages: Record<string, string> = {
+  NOT_ABC: "Disponible solo para partituras en ABC", // M-02
+  ABC_UNSUPPORTED: "Esta partitura contiene elementos que no se pueden reproducir.", // M-03
+  DAILY_LIMIT_REACHED:
+    "Alcanzaste el límite diario de 20 audios nuevos. Los audios ya generados siguen disponibles.", // M-10
+  AUDIO_UNAVAILABLE: "No se pudo generar el audio. Inténtalo más tarde.", // M-15
+  AUTHENTICATION_REQUIRED: "Tu sesión expiró. Inicia sesión de nuevo para escuchar.",
+};
+
+export type SynthesizedAudio = { audio: Blob; tutorText: string | null };
+
+export async function synthesizeScoreAudio(
+  scoreId: number,
+  kind: "solfege" | "tutor",
+): Promise<SynthesizedAudio> {
+  const csrfToken = await getCsrfToken();
+  let response: Response;
+  try {
+    response = await fetch(`/api/v1/scores/${scoreId}/audio/${kind}/`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "X-CSRFToken": csrfToken },
+    });
+  } catch {
+    throw new Error(synthesisMessages.AUDIO_UNAVAILABLE);
+  }
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => ({}))) as { code?: string };
+    throw new Error(synthesisMessages[payload.code ?? ""] ?? synthesisMessages.AUDIO_UNAVAILABLE);
+  }
+  const header = response.headers.get("X-Notara-Tutor-Text");
+  return { audio: await response.blob(), tutorText: header ? decodeURIComponent(header) : null };
+}
+
+// HU12 — voice comments (multipart POST on the existing comments endpoint).
+const voiceCommentMessages: Record<string, string> = {
+  AUDIO_TOO_LARGE: "La grabación es demasiado grande (máximo 2 MB).", // M-05b
+  STT_DAILY_LIMIT_REACHED:
+    "Alcanzaste el límite diario de 30 transcripciones. Inténtalo de nuevo cuando se restablezca el límite.", // M-17
+  OWN_SCORE: "No puedes comentar en tu propia partitura.",
+  TRANSCRIPTION_TOO_LONG: "La transcripción supera los 1.000 caracteres. Graba un comentario más corto.",
+  AUDIO_INVALID: "El formato, la duración o el contenido del audio no son válidos.",
+};
+const voiceCommentFallback = "No se pudo transcribir tu comentario. Puedes intentarlo de nuevo o escribirlo."; // M-09
+
+export async function createVoiceComment(scoreId: number, audio: Blob): Promise<ScoreComment> {
+  const csrfToken = await getCsrfToken();
+  const body = new FormData();
+  const extension = audio.type.includes("ogg") ? "ogg" : audio.type.includes("mp4") ? "m4a" : "webm";
+  body.append("audio", audio, `comentario.${extension}`);
+  let response: Response;
+  try {
+    response = await fetch(`/api/v1/scores/${scoreId}/comments/`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "X-CSRFToken": csrfToken },
+      body,
+    });
+  } catch {
+    throw new Error(voiceCommentFallback);
+  }
+  const payload = (await response.json().catch(() => ({}))) as { comment?: ScoreComment; code?: string };
+  if (!response.ok) throw new Error(voiceCommentMessages[payload.code ?? ""] ?? voiceCommentFallback);
+  if (!payload.comment) throw new Error("La respuesta del comentario está incompleta.");
+  return payload.comment;
 }

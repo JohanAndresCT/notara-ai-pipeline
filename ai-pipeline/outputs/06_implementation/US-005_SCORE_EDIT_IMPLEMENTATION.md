@@ -287,3 +287,13 @@ python manage.py test accounts scores -v 1
 `PENDING` — este documento es el prompt de implementación.
 La validación se registrará en `US-005_SCORE_EDIT_VALIDATION.md`
 una vez completada la implementación y verificación.
+
+
+---
+
+## Addendum 2026-11-10 — content editing (MVP 2)
+
+- `frontend/src/ScoreEditPage.tsx` now edits format and content (same 1,000-character and ABC rules as publication, enforced by the existing PATCH validation) and hosts dictation (HU11) and `.abc` loading (HU19), as FR-018/FR-022 and SCR-007 require. Instrument uses the same list as the create page.
+- Format/content are sent only when changed.
+- Validation: `US-005_SCORE_EDIT_VALIDATION.md`.
+- Implementation Status: `IMPLEMENTED`.

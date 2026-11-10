@@ -793,7 +793,7 @@ No new functional requirements or API contracts are introduced.
 | Q-026 | What is the maximum voice-comment transcript length given the existing 500-character comment limit? | US-012, FR-026 | Team / P05. | Resolved by DEC-231 (1,000 for voice comments) |
 | Q-027 | Is a per-user STT usage limit required to control CPU abuse? | US-011, US-012; DEP-008 | Resolved by DEC-219: configurable 30 admitted inference attempts across all STT flows per user per UTC day; quota persistence and concurrency behavior must be tested. | Resolved |
 | Q-028 | What representative HU11 evaluation corpus and exact parsed-ABC quality threshold are acceptable? | US-011, NFR-009; CR-003 | Approved: ≥9 authorized recordings from ≥3 speakers; ≥7 of 9 exact expected ABC after parser. Run and report the corpus before HU11 acceptance. | Resolved (target); measurement pending |
-| Q-029 | How should dictation handle an already populated field containing present-but-empty/malformed required headers or non-ABC content while preserving existing headers? | US-011, BR-025; CONFLICT-201 | Clarify before implementing the append path; do not overwrite existing header values. | Open; does not block independent STT or empty-field dictation work |
+| Q-029 | How should dictation handle an already populated field containing present-but-empty/malformed required headers or non-ABC content while preserving existing headers? | US-011, BR-025; CONFLICT-201 | Resolved by DEC-239: append in the browser per BR-025; refuse plain text, header-less ABC and present-but-empty required headers; rescale durations to the existing `L:`. | Resolved (DEC-239, 2026-11-10) |
 
 ### 10.3 Conflicts
 

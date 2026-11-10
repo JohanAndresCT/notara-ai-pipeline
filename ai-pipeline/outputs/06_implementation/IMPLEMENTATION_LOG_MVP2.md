@@ -305,3 +305,82 @@ been established. Production deployment is not authorized.
 - Separate production deployment authorization.
 
 **Status:** IMPLEMENTED LOCALLY; ACCEPTANCE PENDING.
+
+## 18. Frontend increment — HU11 dictation UI and HU19 `.abc` file loading (2026-11-09)
+
+**Branch:** `pipeline/mvp2-p00-context` (after merging `mvp-2`). **Authorization:** requested by TEAM-001 in the working session. **Status:** IMPLEMENTED LOCALLY; real-microphone acceptance pending.
+
+### Implemented
+
+| File | Change | Traceability |
+|---|---|---|
+| `frontend/src/lib/api.ts` | `transcribeDictation()` posts `audio` + `title` to `POST /api/v1/audio/stt/` with session and CSRF; maps error codes to the UX messages (M-01, M-05b, M-07, M-17; AUDIO_INVALID uses the server wording). | HU11; FR-018-FR-021, FR-043, FR-045; `docs/API_STT_HU11.md` |
+| `frontend/src/DictationPanel.tsx` | REG-001/REG-008: notice M-11, collapsible BR-013 vocabulary with example, permission and support detection (M-04, M-04b), 30 s countdown with automatic stop at 29.5 s (M-05), 2 MB check (M-05b), processing state, live region, success message M-12. | HU11; FLOW-011, FLOW-018; AC-030-AC-035, AC-070 |
+| `frontend/src/AbcFileLoader.tsx` | REG-002: `.abc` only (M-08a), empty (M-08b), UTF-8 decoding (M-08c), 1,000-character limit (M-08d), confirmation before replacing content (SCR-010, native confirm as in the existing delete flow), CRLF normalized; file never uploaded. | HU19; FLOW-012; AC-066-AC-069; DEC-217 |
+| `frontend/src/ScoreCreatePage.tsx` | Content and title become controlled; dictation and file loading insert ABC, select the ABC format and focus the field; character counter; dictation disabled while the field has content. | HU11, HU19; DEC-218 (normal publish validation) |
+| `frontend/src/index.css` | Styles for the voice panel, tools, success text, recording indicator (respects reduced motion), mobile layout, `.sr-only`. | NFR-008; P04 section 9 |
+
+### Deliberate limitations
+
+- **Dictation only into an empty field.** The endpoint returns a full new document and `docs/API_STT_HU11.md` forbids appending until P02 Q-029 is resolved; the button is disabled with an explanation when the field has content (stricter than UX-PROP-001).
+- **Edit page not changed.** `ScoreEditPage` (HU05, MVP 1) edits only title, instrument and description, so dictation and file loading — which UX_SPEC also places on SCR-007 — have no content field to fill there. Recorded as a UX/requirements gap to decide (FLOW-011/FLOW-012 vs. delivered HU05), not implemented.
+
+### Verification (local, Windows, Python 3.13 venv, Node 22)
+
+- `tsc --noEmit`: 0 errors. `vite build`: success.
+- Browser pane, authenticated local test user: create page renders the panel and the loader; `.txt` rejected with M-08a; valid `.abc` (CRLF) inserted with line breaks, ABC selected, M-14 shown, dictation disabled with its hint.
+- Real backend call with a generated 1 s WAV: `422 DICTATION_UNINTERPRETABLE` in ~1.5 s (model loaded; no server error).
+- Microphone: blocked in the browser pane, so the UI correctly showed M-04. **Recording with a real microphone was not tested**; it must be checked in Chrome/Edge/Firefox at `http://localhost:5173`.
+- Mobile width 375 px: no horizontal scroll; buttons full width.
+- Playwright E2E suite not re-run; the selectors it uses ("Tu partitura *", "Crear partitura") are unchanged.
+
+### Pending
+
+- Real-microphone test and the HU11 acceptance corpus (Q-028) with the integrated UI.
+- Decision on dictation/file loading in the edit page.
+- Remaining stories: HU12-HU18.
+
+### 18.1 Formalization under P06 v2.0 (2026-11-09)
+
+The increment above was formalized as story runs P06.11 (US-011, frontend part) and P06.19 (US-019) with story prompts, implementation records and validation reports in this folder. Backend suite re-run in a Python 3.13 virtual environment: 113 tests, 112 passed, 1 skipped. Additional browser checks for US-019: empty/whitespace, invalid UTF-8 and over-limit files rejected; replace confirmation cancel/accept; a loaded score published with format `ABC`.
+
+
+## 19. Voice and audio stories — HU12-HU18 (2026-11-09)
+
+Story runs P06.12-P06.18 under P06 v2.0, each with a story prompt, an implementation record and a validation report in this folder.
+
+| Story | Record status | Validation | Execution |
+|---|---|---|---|
+| US-012 Voice comments | `IMPLEMENTED_WITH_GAPS` | `PASS_WITH_WARNINGS` | `PARTIAL` |
+| US-013 Spoken solfege | `IMPLEMENTED_WITH_GAPS` | `PASS_WITH_WARNINGS` | `PARTIAL` |
+| US-014 Audio tutor | `IMPLEMENTED` | `PASS_WITH_WARNINGS` | `COMPLETE` |
+| US-015 Piano playback | `IMPLEMENTED_WITH_GAPS` | `PASS_WITH_WARNINGS` | `PARTIAL` |
+| US-016 Audio cache | `IMPLEMENTED` | `PASS` | `COMPLETE` |
+| US-017 Voice fallback | `IMPLEMENTED` | `PASS` | `COMPLETE` |
+| US-018 MP3 download | `IMPLEMENTED` | `PASS_WITH_WARNINGS` | `PARTIAL` |
+
+### Main changes
+
+- Backend: `scores/abc_reader.py` (ABC subset reader, playback events, solfege and tutor text, BR-014 difficulty); `voice/tts.py`, `voice/synthesis.py`, `voice/speech_views.py` (synthesis with cache, daily limit and ElevenLabs → Edge fallback); `voice/transcription.py` (shared STT path); voice comments in `scores` (model, migration, endpoints, audio cleanup signal); settings and `.env.example` voice variables; `edge-tts==7.3.1`.
+- Frontend: `ListeningPanel.tsx` (solfege, tutor, Tone.js piano, MP3 download), `VoiceCommentComposer.tsx`, `lib/useRecorder.ts` (shared with dictation, also closes IMPL-VAL-011-04), comment list with voice badge, player and delete confirmation; `tone` 15.1.22.
+
+### Verification
+
+Backend: 134 tests, 133 passed, 1 skipped (21 new). `tsc --noEmit` and `vite build` OK. Browser with real Edge voice and local Whisper: solfege, tutor, piano start/stop, download link, voice comment created from synthesized speech and deleted with its audio, plain-text score disables all listening options, 375 px layout.
+
+### Pending
+
+- Real-microphone tests (HU11, HU12) in a desktop browser.
+- ElevenLabs with a real key (PRE-004); Railway `/data` persistence for comment audio and cache (PRE-005).
+- Sampled piano (licence, ARCH-RISK-206); teacher review of BR-014 thresholds.
+- Edit-page decision for dictation and file loading; Q-029.
+
+## 20. Closing open items for HU01-HU19 (2026-11-10)
+
+- **Q-029 resolved (DEC-239):** dictation appends to existing ABC per BR-025 (`frontend/src/lib/dictationMerge.ts`), rescaling durations to the existing `L:`; plain text, header-less ABC and empty required headers are refused before recording.
+- **Edit page (HU05):** edits format and content and hosts dictation (HU11) and `.abc` loading (HU19); instrument uses the same list as the create page; format/content sent only when changed.
+- **Whisper vocabulary prompt:** dictation passes the BR-013 vocabulary as `initial_prompt` (voice comments do not). With Edge-synthesized speech, Whisper Base went from "Donegra, recorcea…" (uninterpretable) to the exact phrase; the browser check on the edit page appended `C2 D E | G4` to an `L:1/8` score.
+- **Messages:** dictation maps `AUDIO_INVALID` to M-01; M-17 states the limit of 30.
+- **Traceability:** retroactive records for US-007 and US-008; validation reports for US-005, US-006, US-007, US-008, US-009 and US-010. Every story HU01-HU19 now has an implementation record and a validation report.
+- **Verification:** 134 backend tests (133 OK, 1 skipped); `tsc` and `vite build` OK; browser at 375 px without horizontal scroll.
+- **Remaining human/infra checks:** `MVP2_MANUAL_ACCEPTANCE_CHECKLIST.md` (real microphone, listening by ear, HU11 corpus, ElevenLabs key, Railway `/data`, team ratification of DEC-230-239).

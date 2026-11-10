@@ -1,13 +1,40 @@
-import { useState, type FormEvent } from "react";
-import { instrumentOptions, publishScore, type PublishedScore } from "./lib/api";
+import { useRef, useState, type FormEvent } from "react";
+import AbcFileLoader from "./AbcFileLoader";
+import DictationPanel from "./DictationPanel";
+import { instrumentOptions, publishScore, type DictationResult, type PublishedScore } from "./lib/api";
+import { dictationBlockReason, mergeDictation } from "./lib/dictationMerge";
 
 const emptyErrors: Record<string, string[]> = {};
+const MAX_CONTENT = 1000;
 
 export default function ScoreCreatePage() {
   const [format, setFormat] = useState<PublishedScore["format"]>("TEXT");
+  const [content, setContent] = useState("");
+  const [title, setTitle] = useState("");
   const [errors, setErrors] = useState(emptyErrors);
   const [formError, setFormError] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+
+  function insertAbc(text: string) {
+    setContent(text);
+    setFormat("ABC");
+    setErrors((current) => {
+      if (!current.content) return current;
+      const next = { ...current };
+      delete next.content;
+      return next;
+    });
+    window.setTimeout(() => contentRef.current?.focus(), 0);
+  }
+
+  // BR-025 / DEC-239: empty field → full document; ABC field → append the dictated line.
+  function handleDictation(result: DictationResult) {
+    const merged = mergeDictation(content, format, result);
+    if ("error" in merged) return merged.error;
+    insertAbc(merged.content);
+    return null;
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -60,7 +87,7 @@ export default function ScoreCreatePage() {
           <h2 id="score-details-heading">Detalles de la partitura</h2>
           <p className="form-lead">Añade algunos datos para que otros músicos la encuentren.</p>
           <div className="form-row">
-            <div className={`field ${errors.title ? "has-error" : ""}`}><label htmlFor="score-title">Título <b>*</b></label><div className="input-wrap"><input id="score-title" name="title" placeholder="p. ej., Mañana en Sol" required aria-invalid={Boolean(errors.title)} /></div>{errors.title?.length ? <FieldError text={errors.title[0]} /> : null}</div>
+            <div className={`field ${errors.title ? "has-error" : ""}`}><label htmlFor="score-title">Título <b>*</b></label><div className="input-wrap"><input id="score-title" name="title" placeholder="p. ej., Mañana en Sol" required value={title} onChange={(event) => setTitle(event.target.value)} aria-invalid={Boolean(errors.title)} /></div>{errors.title?.length ? <FieldError text={errors.title[0]} /> : null}</div>
             <div className={`field ${errors.instrument ? "has-error" : ""}`}><label htmlFor="score-instrument">Instrumento <b>*</b></label><div className="input-wrap"><select id="score-instrument" name="instrument" defaultValue="" required aria-invalid={Boolean(errors.instrument)}><option value="" disabled>Selecciona un instrumento</option>{instrumentOptions.map((option) => <option key={option} value={option}>{option}</option>)}</select></div>{errors.instrument?.length ? <FieldError text={errors.instrument[0]} /> : null}</div>
           </div>
           <div className={`field ${errors.description ? "has-error" : ""}`}><label htmlFor="score-description">Descripción <b>*</b></label><div className="input-wrap"><input id="score-description" name="description" placeholder="¿Qué inspiró esta partitura?" required aria-invalid={Boolean(errors.description)} /></div>{errors.description?.length ? <FieldError text={errors.description[0]} /> : null}</div>
@@ -71,10 +98,14 @@ export default function ScoreCreatePage() {
               <button className={format === "ABC" ? "selected" : ""} type="button" onClick={() => setFormat("ABC")} aria-pressed={format === "ABC"}><strong>Notación ABC</strong><span>Notación musical en texto</span></button>
             </div>
           </div>
+          <div className="input-tools" aria-label="Otras formas de crear la partitura" role="group">
+            <DictationPanel title={title} disabledReason={dictationBlockReason(content, format)} onResult={handleDictation} />
+            <AbcFileLoader hasContent={Boolean(content.trim())} onLoad={insertAbc} />
+          </div>
           <div className={`field content-field ${errors.content ? "has-error" : ""}`}>
             <label htmlFor="score-content">Tu partitura <b>*</b></label>
-            <textarea id="score-content" name="content" maxLength={1000} required rows={8} placeholder={format === "ABC" ? "X:1\nT:Mañana en Sol\nM:4/4\nL:1/8\nK:G\nGABc d2 B2" : "Escribe aquí tu idea musical..."} aria-invalid={Boolean(errors.content)} aria-describedby={errors.content?.length ? "score-content-error" : undefined} />
-            <div className="field-help"><span>Mantenla clara y fácil de leer.</span><strong>Máximo 1.000 caracteres</strong></div>
+            <textarea ref={contentRef} id="score-content" name="content" maxLength={MAX_CONTENT} required rows={8} value={content} onChange={(event) => setContent(event.target.value)} placeholder={format === "ABC" ? "X:1\nT:Mañana en Sol\nM:4/4\nL:1/8\nK:G\nGABc d2 B2" : "Escribe aquí tu idea musical..."} aria-invalid={Boolean(errors.content)} aria-describedby={errors.content?.length ? "score-content-error" : undefined} />
+            <div className="field-help"><span>Mantenla clara y fácil de leer.</span><strong>{content.length} / 1.000 · Máximo 1.000 caracteres</strong></div>
             {errors.content?.length ? <FieldError id="score-content-error" text={errors.content[0]} /> : null}
           </div>
           {formError ? <p className="form-error" role="alert">{formError}</p> : null}

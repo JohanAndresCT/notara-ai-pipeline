@@ -2,12 +2,29 @@ import json
 import re
 from json import JSONDecodeError
 
+from django.conf import settings
+from django.core.exceptions import RequestDataTooBig
+from django.core.files.storage import default_storage
 from django.db.models import Count, Exists, IntegerField, OuterRef, Subquery
 from django.db.models.functions import Coalesce
-from django.http import HttpResponse, JsonResponse
+from django.http import FileResponse, HttpResponse, JsonResponse
+from django.http.multipartparser import MultiPartParserError
 from django.views.decorators.http import require_http_methods
 
+from voice.errors import error_response
+from voice.transcription import TranscriptionError, transcribe_upload
+
+from .abc_reader import playback_data
 from .models import Comment, Like, Reaction, Score
+
+VOICE_COMMENT_MESSAGES = {
+    "AUDIO_TOO_LARGE": "La grabación es demasiado grande (máximo 2 MB).",
+    "AUDIO_INVALID": "El formato, la duración o el contenido del audio no son válidos.",
+    "STT_UNAVAILABLE": "No se pudo transcribir tu comentario. Puedes intentarlo de nuevo o escribirlo.",
+    "STT_DAILY_LIMIT_REACHED": "Alcanzaste el límite diario de transcripciones.",
+    "TRANSCRIPTION_FAILED": "No se pudo transcribir tu comentario. Puedes intentarlo de nuevo o escribirlo.",
+    "TRANSCRIPTION_TOO_LONG": "La transcripción supera los 1.000 caracteres. Graba un comentario más corto.",
+}
 
 ABC_REQUIRED_FIELDS = ("X", "T", "M", "L", "K")
 ABC_NOTE_PATTERN = re.compile(r"(?<![A-Za-z])[A-Ga-gzZ](?:[,']*)(?:\d+|/\d+)?")
@@ -79,6 +96,8 @@ def _comment_data(comment):
     return {
         "id": comment.pk,
         "body": comment.body,
+        "kind": comment.kind,
+        "audio_url": f"/api/v1/comments/{comment.pk}/audio/" if comment.audio else None,
         "author": comment.author.name,
         "author_id": comment.author_id,
         "created_at": comment.created_at.isoformat(),
@@ -206,6 +225,7 @@ def score_detail_view(request, score_id):
             _comment_data(comment)
             for comment in score.comments.select_related("author").all()
         ]
+        data["playback"] = playback_data(score.content, score.score_format)  # HU15, ADR-010
         return JsonResponse({"score": data})
 
     if score.owner_id != request.user.pk:
@@ -281,6 +301,8 @@ def score_comments_view(request, score_id):
     if request.method == "GET":
         comments = score.comments.select_related("author").all()
         return JsonResponse({"comments": [_comment_data(comment) for comment in comments]})
+    if (request.content_type or "").startswith("multipart/form-data"):
+        return _create_voice_comment(request, score)
     payload, payload_error = _json_payload(request)
     if payload_error:
         return JsonResponse(payload_error, status=400)
@@ -294,6 +316,61 @@ def score_comments_view(request, score_id):
         )
     comment = Comment.objects.create(score=score, author=request.user, body=body.strip())
     return JsonResponse({"comment": _comment_data(comment)}, status=201)
+
+
+def _voice_comment_error(code, status):
+    return error_response(code, VOICE_COMMENT_MESSAGES.get(code, VOICE_COMMENT_MESSAGES["STT_UNAVAILABLE"]), status)
+
+
+def _create_voice_comment(request, score):
+    """HU12: transcribe a recorded note and store it with its audio as one comment."""
+    if score.owner_id == request.user.pk:
+        return error_response("OWN_SCORE", "No puedes comentar en tu propia partitura.", 403)
+    try:
+        upload = request.FILES.get("audio")
+    except (RequestDataTooBig, MultiPartParserError):
+        return _voice_comment_error("AUDIO_TOO_LARGE", 413)
+    if upload is None:
+        return _voice_comment_error("AUDIO_INVALID", 400)
+    try:
+        transcript = transcribe_upload(request.user.pk, upload)
+    except TranscriptionError as exc:
+        return _voice_comment_error(exc.code, exc.status)
+    if not transcript:
+        return _voice_comment_error("TRANSCRIPTION_FAILED", 422)
+    if len(transcript) > settings.VOICE_COMMENT_MAX_CHARS:
+        return _voice_comment_error("TRANSCRIPTION_TOO_LONG", 422)
+    upload.seek(0)
+    comment = Comment.objects.create(
+        score=score,
+        author=request.user,
+        body=transcript,
+        kind=Comment.Kind.VOICE,
+        audio=upload,
+        audio_mime=(upload.content_type or "").split(";", 1)[0].strip().lower(),
+    )
+    return JsonResponse({"comment": _comment_data(comment)}, status=201)
+
+
+@require_http_methods(["GET"])
+def comment_audio_view(request, comment_id):
+    """Serve a voice comment's audio to authenticated users only (DEC-214)."""
+    if not request.user.is_authenticated:
+        return JsonResponse({"message": "Authentication is required."}, status=401)
+    try:
+        comment = Comment.objects.get(pk=comment_id)
+    except Comment.DoesNotExist:
+        return JsonResponse({"message": "Comment not found."}, status=404)
+    if not comment.audio:
+        return JsonResponse({"message": "Comment not found."}, status=404)
+    try:
+        stored = default_storage.open(comment.audio.name, "rb")
+    except OSError:
+        return JsonResponse({"message": "Comment not found."}, status=404)
+    response = FileResponse(stored, content_type=comment.audio_mime or "application/octet-stream")
+    response["X-Content-Type-Options"] = "nosniff"
+    response["Cache-Control"] = "private, no-store"
+    return response
 
 
 @require_http_methods(["DELETE"])
