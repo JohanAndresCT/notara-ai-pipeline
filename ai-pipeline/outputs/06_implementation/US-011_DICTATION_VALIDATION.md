@@ -107,3 +107,10 @@ PASS_WITH_WARNINGS.
 ## 11. Final Decision
 
 **Overall result:** `PASS_WITH_WARNINGS` · **Execution:** `PARTIAL` · **DoD:** `PENDING_REVIEW`. US-011 may continue to P07 for release-level testing. It is not accepted until IMPL-VAL-011-01 and IMPL-VAL-011-02 are closed.
+
+
+## Addendum 2026-11-10 — assisted acceptance run
+
+Simulated-microphone run and synthetic corpus recorded in `MVP2_MANUAL_ACCEPTANCE_CHECKLIST.md` §7: create/edit dictation, 30 s auto-stop, out-of-vocabulary rejection verified through the real UI path; synthetic corpus 21/27 exact (7/9 per voice); memory peak 353 MiB working set on Windows. New findings: temperature fallback can push a 30 s dictation to 19-26 s (AC-071 risk) and an auto-stop cut mid-word loses the whole dictation. IMPL-VAL-011-01/-02 stay open until real speakers and Railway measurements exist.
+
+**DEC-240 (2026-11-10):** temperature fallback disabled for dictation; worst-case 30 s dictation 23.1 s → 5.0 s with identical transcript; synthetic corpus unchanged (21/27). Test `test_dictation_options_disable_temperature_fallback` added.

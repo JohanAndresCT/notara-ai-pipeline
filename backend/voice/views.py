@@ -87,7 +87,7 @@ def stt_view(request):
             )
 
         try:
-            transcript = adapter.transcribe(audio_file, prompt=DICTATION_PROMPT)
+            transcript = adapter.transcribe(audio_file, prompt=DICTATION_PROMPT, fallback=False)
         except (av.error.FFmpegError, OSError, RuntimeError, ValueError) as exc:
             logger.error("STT inference failed (%s).", type(exc).__name__)
             return _service_unavailable()

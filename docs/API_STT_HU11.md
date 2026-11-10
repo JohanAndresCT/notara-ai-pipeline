@@ -17,7 +17,7 @@ Use `multipart/form-data`:
 
 Limits are 2 MiB (`AUDIO_MAX_BYTES`) and 30 seconds (`AUDIO_MAX_SECONDS`). The server validates the declared media type, decoded container/signature, audio stream and duration. It does not trust a client-side file size or duration check.
 
-The endpoint returns a complete new ABC document and the bare musical line (`abc_line`, written for `L:1/4`). It does not accept the existing score content. For a populated field the frontend combines them (`frontend/src/lib/dictationMerge.ts`, DEC-239 / BR-025): it keeps the existing ABC, adds only absent required headers, keeps an existing `M:`, rescales durations to the existing `L:` and appends the line. Plain text, header-less ABC and present-but-empty required headers are refused. The model receives the BR-013 vocabulary as an initial prompt for dictation only.
+The endpoint returns a complete new ABC document and the bare musical line (`abc_line`, written for `L:1/4`). It does not accept the existing score content. For a populated field the frontend combines them (`frontend/src/lib/dictationMerge.ts`, DEC-239 / BR-025): it keeps the existing ABC, adds only absent required headers, keeps an existing `M:`, rescales durations to the existing `L:` and appends the line. Plain text, header-less ABC and present-but-empty required headers are refused. The model receives the BR-013 vocabulary as an initial prompt and decodes in a single pass at temperature 0 (no temperature fallback, DEC-240), for dictation only.
 
 ### Authentication and CSRF
 

@@ -384,3 +384,8 @@ Backend: 134 tests, 133 passed, 1 skipped (21 new). `tsc --noEmit` and `vite bui
 - **Traceability:** retroactive records for US-007 and US-008; validation reports for US-005, US-006, US-007, US-008, US-009 and US-010. Every story HU01-HU19 now has an implementation record and a validation report.
 - **Verification:** 134 backend tests (133 OK, 1 skipped); `tsc` and `vite build` OK; browser at 375 px without horizontal scroll.
 - **Remaining human/infra checks:** `MVP2_MANUAL_ACCEPTANCE_CHECKLIST.md` (real microphone, listening by ear, HU11 corpus, ElevenLabs key, Railway `/data`, team ratification of DEC-230-239).
+
+## 21. Assisted acceptance run and DEC-240 (2026-11-10)
+
+- Simulated-microphone UI run and synthetic corpus: evidence in `MVP2_MANUAL_ACCEPTANCE_CHECKLIST.md` §7.
+- DEC-240: dictation transcribes in one pass at temperature 0 (`voice/adapters.py` `fallback` flag, used by `voice/views.py`); worst-case 30 s dictation 23.1 s → 5.0 s; corpus accuracy unchanged. New unit test in `voice/tests.py`.

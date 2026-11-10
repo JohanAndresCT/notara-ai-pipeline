@@ -46,14 +46,15 @@ class FakeSttAdapter:
         self.transcript = transcript
         self.calls = 0
 
-    def transcribe(self, audio_file, prompt=None):
+    def transcribe(self, audio_file, prompt=None, fallback=True):
         self.calls += 1
         self.prompt = prompt
+        self.fallback = fallback
         return self.transcript
 
 
 class FailingSttAdapter:
-    def transcribe(self, audio_file, prompt=None):
+    def transcribe(self, audio_file, prompt=None, fallback=True):
         raise RuntimeError("model error")
 
 
@@ -61,8 +62,9 @@ class FakeWhisperModel:
     def __init__(self):
         self.language = None
 
-    def transcribe(self, audio_file, language):
+    def transcribe(self, audio_file, language, **options):
         self.language = language
+        self.options = options
         return [
             SimpleNamespace(text="Compás cuatro"),
             SimpleNamespace(text="cuartos"),
@@ -204,6 +206,16 @@ class FasterWhisperAdapterTests(TestCase):
         self.assertEqual(transcript, "Compás cuatro cuartos")
         self.assertEqual(fake_model.language, "es")
         self.assertEqual(audio_file.tell(), 0)
+        self.assertEqual(fake_model.options, {})
+
+    def test_dictation_options_disable_temperature_fallback(self):
+        adapter = FasterWhisperSttAdapter(Path("local-model"), cpu_threads=2)
+        fake_model = FakeWhisperModel()
+        adapter.model = fake_model
+
+        adapter.transcribe(io.BytesIO(b"audio"), prompt="Do negra", fallback=False)
+
+        self.assertEqual(fake_model.options, {"initial_prompt": "Do negra", "temperature": 0.0})
 
 
 class SttEndpointTests(TestCase):
@@ -245,6 +257,7 @@ class SttEndpointTests(TestCase):
         )
         self.assertEqual(self.adapter.calls, 1)
         self.assertIn("Do negra", self.adapter.prompt)  # vocabulary prompt for dictation
+        self.assertFalse(self.adapter.fallback)  # DEC-240: no temperature fallback
 
     def test_requires_authentication_and_does_not_infer(self):
         anonymous = Client(enforce_csrf_checks=True)

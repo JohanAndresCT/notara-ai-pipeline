@@ -42,3 +42,8 @@ Backend suite (SQLite, `.venv` Python 3.13): 134 tests, 133 passed, 1 skipped, 0
 ## 7. Final Decision
 
 **Overall result:** `PASS_WITH_WARNINGS` · **Execution:** `PARTIAL` · **DoD:** `PENDING_REVIEW`. May proceed to P07 for release-level testing.
+
+
+## Addendum 2026-11-10
+
+Downloaded blob verified: 112 KB, valid MPEG frame header, 18.7 s decodable, filename `estrellita-donde-estas-solfeo.mp3`.

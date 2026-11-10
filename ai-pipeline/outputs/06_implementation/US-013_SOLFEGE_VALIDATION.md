@@ -47,3 +47,8 @@ Backend suite (SQLite, `.venv` Python 3.13): 134 tests, 133 passed, 1 skipped, 0
 ## 7. Final Decision
 
 **Overall result:** `PASS_WITH_WARNINGS` · **Execution:** `PARTIAL` · **DoD:** `PENDING_REVIEW`. May proceed to P07 for release-level testing.
+
+
+## Addendum 2026-11-10
+
+Solfege MP3 transcribed back with Whisper matched the expected note order; second request served from cache in 11 ms. Edge reads quickly (9 notes in 4.2 s).
