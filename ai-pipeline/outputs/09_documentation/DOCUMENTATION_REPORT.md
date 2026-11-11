@@ -148,3 +148,25 @@ La documentación enlaza a los backlogs P02/P03, contexto y decisiones MVP2, val
 - Generación: P09 incremental, 2026-11-11
 - Validador relacionado: `ai-pipeline/prompts/09_documentation/P09_validation.md`
 - Estado de validación: ver `DOCUMENTATION_VALIDATION.md`
+
+
+---
+
+## Run 2 — MVP 2 (prompts P09 v2.0, 2026-11-11)
+
+Modo incremental: se conservan las secciones anteriores; esta corrida actualiza la evidencia y corrige afirmaciones superadas.
+
+| Archivo | Cambio |
+|---|---|
+| `README.md` | Estado US-020/US-021 (validación P06 existente), tabla de tecnologías con proveedores de IA y su propósito, resultados P07 Run 2, nota de CI con app `voice` |
+| `docs/TESTING.md` | Nueva tabla de evidencia P07 Run 2 (SQLite, PostgreSQL, tsc, build, E2E 9/9); la evidencia previa se conserva como anterior |
+| `docs/KNOWN_LIMITATIONS.md` | Cifras actualizadas; secreto versionado en `12c5e85` (rotación pendiente) |
+| `docs/REQUIREMENTS_COVERAGE.md` | Validaciones P06 de US-020/US-021; resultados vigentes |
+| `docs/USER_GUIDE.md` | Nombres de instrumentos tal como aparecen en la interfaz; filtro con 7 opciones |
+| `.env.example` (P08) | Sin valores secretos; `ELEVENLABS_VOICE_ID` vacío |
+
+Sin cambios: `API.md` (ya documenta `/api/v1/audio/stt/`, audio de solfeo/tutor, audio de comentarios y `tutor/session`/`tutor/ask`), `API_STT_HU11.md` (`ai_interpreted`), `ARCHITECTURE.md`, `DATA_MODEL.md`, `SETUP.md` (variables `VOICE_*`, `ELEVENLABS_*`, `GEMINI_*`, `TUTOR_*` ya inventariadas).
+
+Elementos eliminados (voz cantada, «Voz» como instrumento, a cappella) no aparecen como funciones entregadas. CR-005/006/007 se describen con el estado de aprobación registrado en P02 v5.6 (reportado por el responsable; acta formal pendiente).
+
+**Estado:** `PASS_WITH_WARNINGS` — documentación alineada con el código y con P07 Run 2; las limitaciones de verificación manual siguen declaradas.

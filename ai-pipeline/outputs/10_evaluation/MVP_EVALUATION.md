@@ -150,3 +150,78 @@ Recommendations are not implementation or approval decisions. No code, tests, ba
 **`NEEDS_ITERATION`**
 
 The P09 gate passed with warnings, the current backend suite passed with one PostgreSQL-only skip, and no unresolved blocker/critical defect is recorded in inspected P06/P07 evidence. However, the approved scope has expanded while US-020/US-021 and CR-006 acceptance evidence is incomplete; current frontend and PostgreSQL evidence is incomplete; key voice gates are open; P06 DoD and MVP 2 release status remain unconfirmed; and operational verification is historical and limited. These gaps justify iteration, but do not imply that missing measurements failed.
+
+
+---
+
+## Run 2 — MVP 2 evaluation (prompts P10 v2.0, 2026-11-11)
+
+Incremental: sections 1–10 above are preserved. This run supersedes the testing results of §4, EVAL-002 and the IND-204/207/210/211 rows of §7 where stated.
+
+### R2.1 Inputs
+
+P02 v5.6, P03 v4.6, P06 story records (now including `US-020_INSTRUMENTS_IMPLEMENTATION.md` / `_VALIDATION.md` and `US-021_TUTOR_CHAT_VALIDATION.md`, both `PASS_WITH_WARNINGS`), P07 Run 2, P08 Run 2, P09 Run 2, `DECISIONS_MVP2.md`, CR-005–CR-007.
+
+### R2.2 Requirements by approval status
+
+| Group | Count | Approval status | Evaluation |
+|---|---:|---|---|
+| FR-001–FR-046, NFR-001–NFR-010 | 56 | Approved | Unchanged from §3 except NFR-010 (now also verified on PostgreSQL) |
+| FR-047–FR-052 (CR-005/CR-007) and AC-078–AC-082 (CR-006) | 6 FR | Approval reported by project lead; formal record pending (Q-030) | `PARTIALLY_VERIFIED`: P06 story validation now exists (`PASS_WITH_WARNINGS`), backend mocked + UI E2E; real microphone/listening pending |
+| Proposed only | 0 | — | — |
+
+Totals stay 62: 19 `VERIFIED`, 42 `PARTIALLY_VERIFIED`, 1 `NOT_VERIFIED` (NFR-002). The new evidence narrows the gaps but does not close a full requirement's acceptance.
+
+### R2.3 Technical quality (supersedes §4 for this run)
+
+| Check | Result | Class |
+|---|---|---|
+| Backend, SQLite | 175 run, OK (2 PostgreSQL-only skipped) | AUTOMATED_EXECUTED |
+| Backend, PostgreSQL 16 | 175/175 OK, migrations included | AUTOMATED_EXECUTED |
+| Frontend `tsc` / `vite build` | PASS / PASS | AUTOMATED_EXECUTED |
+| Playwright | 9/9 (3 new MVP 2 UI tests) | AUTOMATED_EXECUTED |
+| CI workflow | Backend job now runs all apps incl. `voice` (was `accounts scores` only); remote run with the change NOT_RUN | Static |
+| Defects | No confirmed product bug in P07 Run 2 | — |
+
+### R2.4 MVP 2 indicators (changes vs. §7)
+
+| ID | §7 status | Run 2 status | Reason |
+|---|---|---|---|
+| IND-204 | `PARTIALLY_MET` | `PARTIALLY_MET` | Build and UI E2E now pass; audible playback not verified by a human |
+| IND-207 | `PARTIALLY_MET` | `PARTIALLY_MET` | Download control covered in E2E; file played outside the app NOT_RUN |
+| IND-210 | `UNMEASURED` | `PARTIALLY_MET` | P06.20 validation (simulated DDSP, fallback, MP3) + E2E picker; listening NOT_RUN |
+| IND-211 | `UNMEASURED` | `PARTIALLY_MET` | P06.21 validation (simulated Live session) + mocked backend tests; real microphone NOT_RUN |
+
+**Counts (Run 2):** 20 indicators; 7 `MET`, 11 `PARTIALLY_MET`, 0 `NOT_MET`, 2 `UNMEASURED` (SUCCESS-009, IND-208). Compared with the MVP 1 verdict, MVP 2 adds voice/AI capabilities with automated contract coverage but no human acceptance yet.
+
+### R2.5 AI components
+
+| Component | Stories | Evidence class | Measured quality | Latency | Risks |
+|---|---|---|---|---|---|
+| Whisper Base (faster-whisper, local) | US-011, US-012 | AUTOMATED_EXECUTED (fake adapter) + SIMULATED (synthetic speech) | Synthetic corpus only (21/27 before AI normalisation); human corpus AC-070 NOT_RUN | Not measured on target environment (AC-071 open) | CPU/memory in 1 GiB container (AC-072); Model provisioned at build time; pinned revision and SHA-256 manifest |
+| ElevenLabs (primary TTS) / edge-tts (fallback) | US-013, US-014, US-016, US-017, US-018 | AUTOMATED_EXECUTED (FakeTts, mocked payloads) + USER_REPORTED (real key, local) | Human listening NOT_RUN | Not measured | Free plan: premade voices only (402 for library voices); Credits/quota; Committed key in 12c5e85 must be revoked (EVAL-010) |
+| Google Gemini (generateContent) | US-011 (CR-006), US-021 typed answers | AUTOMATED_EXECUTED (mocked) + SIMULATED (real provider, local) | CR-006 local check: 7/8 transcripts as expected, no invented notes; AC-082 corpus NOT_RUN | 0.9–7.0 s per normalisation call (local, real provider) | Model retirement for new keys (2.5 → 3.5 flash-lite); 8 s timeout keeps M-01 path; LLM answers may be wrong (disclaimer M-19) |
+| Gemini Live (native audio) | US-021 | AUTOMATED_EXECUTED (token endpoint mocked) + SIMULATED (synthetic microphone) | Correct spoken answer in simulated session; real microphone NOT_RUN | Session live in 1.9 s; first audio ~4.1 s (local) | v1alpha endpoint and alias model (ARCH-RISK-212); Requires HTTPS; Free-tier limits; per-user daily quota BR-033 |
+| Magenta DDSP (TensorFlow.js) | US-020 | SIMULATED (embedded browser, WebGL) + AUTOMATED_EXECUTED (UI E2E) | Pitch check: flute 13/13, violin 11/13 (estimator octave errors); listening NOT_RUN | First use 4.4 s (model download); 1.2–1.6 s afterwards | Checkpoints hosted on Google Cloud Storage (ARCH-RISK-211); 16 kHz output; Tone.js fallback with notice M-20 |
+| Tone.js (non-AI synthesis) | US-015, US-020 | AUTOMATED_EXECUTED (build, UI E2E) + SIMULATED (MP3 render) | Valid MP3 for all instruments; listening NOT_RUN | MP3 render 4.5–10 s for 42 events | Synthesised timbres, not samples |
+
+Simulated and user-reported checks are not counted as acceptance passes.
+
+### R2.6 Decisions and change requests (evaluation input)
+
+DEC-201–DEC-244 are recorded in `DECISIONS_MVP2.md`. DEC-230–DEC-239 await full-team ratification (Q-020). CR-005/006/007 (DEC-242–DEC-244): approval reported by the project lead on 2026-11-11; formal record/date pending (Q-030). This evaluation does not change either status.
+
+### R2.7 Findings
+
+| ID | Severity | Finding | Recommendation | Source |
+|---|---|---|---|---|
+| EVAL-002 | — | **Resolved in Run 2**: typecheck, build, E2E and PostgreSQL suite now executed and passing. | — | P07 Run 2 |
+| EVAL-010 | HIGH | An ElevenLabs API key was committed in `.env.example` (commit `12c5e85`) and pushed to `origin`. Removed from the working tree in P08 Run 2; it remains in git history. | Revoke/rotate the key in ElevenLabs now; decide whether to rewrite history; keep keys only in `.env` / Railway secrets. | P08-VAL-MVP2-03 |
+| EVAL-011 | LOW | CI did not run the `voice` app tests (40 MVP 2 tests). Fixed in `ci.yml`; awaiting a remote run. | Push and confirm the backend job reports 175 tests. | P08-VAL-MVP2-01 |
+| EVAL-009 | MEDIUM | Updated: P06 validations now exist for US-020/US-021; AC-082 and real browser/microphone acceptance remain open. | Run the manual checklist and the HU11 corpus. | P06, P07 Run 2 |
+
+EVAL-001, EVAL-003–EVAL-008 remain as stated in §8.
+
+### R2.8 Verdict
+
+**`NEEDS_ITERATION`** (unchanged). Automated quality improved materially (full suite on both databases, frontend build and E2E green). The verdict is held by: the exposed provider key (EVAL-010) until it is revoked; manual acceptance of the voice/AI stories (real microphone, listening, HU11 corpus, AC-082); the formal approval record for CR-005–CR-007; and an MVP 2 release/deployment decision with operational checks (`/data`, migrations, HTTPS).

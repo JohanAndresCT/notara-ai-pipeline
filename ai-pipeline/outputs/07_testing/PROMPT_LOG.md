@@ -166,3 +166,14 @@ Sin commits, ramas, CI ni despliegue.
 - Typecheck frontend intentado desde `frontend/`; no pudo resolverse por tres paquetes declarados pero ausentes del `node_modules` local. E2E/build actuales no se ejecutaron; se preservó el `dist/` existente y se conservaron las ejecuciones históricas como evidencia histórica.
 - P07 queda `PASS_WITH_WARNINGS`, no como validación completa de release: PostgreSQL y la verificación frontend/E2E actual siguen pendientes. No hubo CI, deploy, servicios de pago, commit ni push.
 
+
+
+## Run 2 — MVP 2 (prompts P07 v2.0, 2026-11-11)
+
+| Prompt | Versión | Salida |
+|---|---|---|
+| `prompts/07_testing/P07_test_analysis.md` | 2.0 | `TEST_ANALYSIS.md` y `TEST_PLAN.md` — sección «Run 2 — MVP 2» |
+| `prompts/07_testing/P07_test_generation.md` | 2.0 | +3 pruebas backend, +3 E2E; `TEST_IMPLEMENTATION.md` y `TEST_VALIDATION.md` — Run 2 |
+| `prompts/07_testing/P07_bug_fix.md` | 2.0 | `BUG_FIX_REPORT.md` — Run 2 `NO_CONFIRMED_BUG` |
+
+Resultado de la etapa: `PASS_WITH_WARNINGS` (pendientes manuales MAN-MVP2-01..06). Ningún proveedor real invocado; ninguna clave impresa ni almacenada.

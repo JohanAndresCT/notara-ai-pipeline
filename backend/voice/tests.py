@@ -439,3 +439,42 @@ class DictationAiTests(SttEndpointTests):
         self.use_normalizer(FakeNormalizer("Do negrísima"))
         response = self.post_audio()
         self.assertEqual(response.status_code, 422)
+
+
+class GeminiNormalizerParsingTests(TestCase):
+    """P07 v2.0 gap: provider-response handling of the CR-006 normaliser (network mocked)."""
+
+    def _response(self, payload):
+        import json as _json
+        from unittest.mock import MagicMock
+        response = MagicMock()
+        response.__enter__.return_value = io.BytesIO(_json.dumps(payload).encode())
+        return response
+
+    @override_settings(GEMINI_API_KEY="test-key", GEMINI_MODEL="test-model", GEMINI_TIMEOUT_SECONDS=8)
+    def test_ok_answer_returns_text_and_sends_key_in_header(self):
+        from voice.normalizer import GeminiNormalizer
+        body = {"candidates": [{"content": {"parts": [{"text": '{"status": "ok", "text": "Do negra"}'}]}}]}
+        with patch("voice.normalizer.urllib.request.urlopen", return_value=self._response(body)) as urlopen:
+            self.assertEqual(GeminiNormalizer().normalize("Donegra"), "Do negra")
+        request = urlopen.call_args.args[0]
+        self.assertEqual(request.get_header("X-goog-api-key"), "test-key")
+        self.assertNotIn("test-key", request.full_url)
+        self.assertIn("Donegra", request.data.decode())
+
+    @override_settings(GEMINI_API_KEY="test-key")
+    def test_unintelligible_answer_returns_none(self):
+        from voice.normalizer import GeminiNormalizer
+        body = {"candidates": [{"content": {"parts": [{"text": '{"status": "unintelligible"}'}]}}]}
+        with patch("voice.normalizer.urllib.request.urlopen", return_value=self._response(body)):
+            self.assertIsNone(GeminiNormalizer().normalize("hola"))
+
+    @override_settings(GEMINI_API_KEY="test-key")
+    def test_malformed_answer_and_missing_key_raise_normalizer_error(self):
+        from voice.normalizer import GeminiNormalizer, NormalizerError
+        with patch("voice.normalizer.urllib.request.urlopen", return_value=self._response({"candidates": []})):
+            with self.assertRaises(NormalizerError):
+                GeminiNormalizer().normalize("Donegra")
+        with override_settings(GEMINI_API_KEY=""):
+            with self.assertRaises(NormalizerError):
+                GeminiNormalizer().normalize("Donegra")

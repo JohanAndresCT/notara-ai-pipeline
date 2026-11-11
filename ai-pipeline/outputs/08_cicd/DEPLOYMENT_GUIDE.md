@@ -44,3 +44,31 @@ El deploy está apagado por defecto: sin `RAILWAY_DEPLOY_ENABLED=true`, branch a
 Railway healthcheck comprueba disponibilidad durante el rollout; el workflow también solicita el endpoint de salud tras el deploy. Volúmenes montados pueden producir breve downtime en reemplazo. Rollback de código no revierte automáticamente migraciones ni datos: revisar el plan y respaldos antes de confirmar.
 
 No se incluyeron IDs, dominios internos, tokens, regiones ni tamaños inventados. Esta etapa no creó proyecto, servicio, base de datos ni volumen; el despliegue lo realizó el equipo y se contrastó con metadatos de GitHub Actions y comprobaciones públicas.
+
+
+---
+
+## Run 2 — MVP 2 (prompts P08 v2.0, 2026-11-11) — Variables y comprobaciones MVP 2
+
+Añadir en el servicio web Railway (valores nunca en el repositorio):
+
+| Variable | Valor recomendado | Nota |
+|---|---|---|
+| `MEDIA_ROOT` | `/data/media` | Audios de comentarios de voz y caché TTS (requiere volumen `/data`) |
+| `STT_DAILY_LIMIT` | `30` (o decisión aprobada) | Compartido por dictado y comentario de voz |
+| `VOICE_DAILY_LIMIT` | `20` (o decisión aprobada) | Solo audio nuevo; la caché no consume |
+| `VOICE_PRIMARY_ENGINE` | vacío (auto) o `elevenlabs` | Auto = ElevenLabs si hay clave; si no, edge-tts |
+| `ELEVENLABS_API_KEY` | secreto Railway | Usar una clave **nueva** (la publicada en `12c5e85` debe revocarse) |
+| `ELEVENLABS_VOICE_ID` / `ELEVENLABS_MODEL_ID` | vacío / `eleven_multilingual_v2` | Plan gratuito: solo voces prefabricadas |
+| `GEMINI_API_KEY` | secreto Railway | Dictado con IA y tutor; nunca llega al navegador |
+| `GEMINI_MODEL`, `TUTOR_TEXT_MODEL` | `gemini-3.5-flash-lite` | Confirmar disponibilidad para la clave de producción |
+| `TUTOR_LIVE_MODEL` | `gemini-2.5-flash-native-audio-latest` | Fijar un modelo con fecha antes de producción si existe |
+| `DICTATION_AI_ENABLED` | `true` | `false` desactiva el normalizador |
+| `TUTOR_SESSION_SECONDS`, `TUTOR_DAILY_SESSIONS`, `TUTOR_DAILY_QUESTIONS` | `120`, `5`, `20` | BR-033 |
+
+Comprobaciones tras el primer despliegue MVP 2 (requieren autorización del equipo; consumen cuota del proveedor y crean datos):
+
+1. Logs del entrypoint: `migrate` aplica `scores.0006`, `voice.0002`, `voice.0003` sin error.
+2. Crear un comentario de voz, redeplegar y comprobar que su audio sigue disponible (persistencia `/data`).
+3. Dictado y tutor desde un navegador con HTTPS (el micrófono y el WebSocket Live no funcionan en HTTP).
+4. Con una clave ElevenLabs inválida, el solfeo sigue sonando con edge-tts (AC-060).

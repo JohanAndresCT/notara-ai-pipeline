@@ -45,10 +45,11 @@ La fecha 2026-11-11 corresponde a la recepción de la confirmación, no a la fec
 
 - La observación de health check en Railway y los resultados de CI citados por P08 son históricos (2026-10-14, y metadatos de runs anteriores). No se verificaron en esta ejecución el despliegue actual, el commit servido ni su disponibilidad.
 - Persistencia de `/data`, backups, rollback, protección del environment y redirección HTTP→HTTPS no están verificados.
-- La validación backend local más reciente fue 165 tests: 164 pasaron y un test PostgreSQL-only de concurrencia se omitió. PostgreSQL local no se ejecutó.
-- El typecheck frontend actual está bloqueado por tres dependencias ausentes en el `node_modules` existente. No se instalaron paquetes; E2E y build actuales no se ejecutaron.
-- La evidencia histórica E2E P07 fue 5/5, no una reejecución actual.
-- No existe validación P06/P07 actual por criterio para US-020/US-021. La ejecución backend registrada no sustituye tests de navegador, escucha manual o micrófono real.
+- P07 Run 2 (2026-11-11): backend 175 en SQLite (2 omitidas, PostgreSQL-only) y 175/175 en PostgreSQL 16 local; Railway no reverificado.
+- Typecheck y build frontend pasan tras instalar dependencias con el lockfile (P07 Run 2).
+- E2E Playwright 9/9 en P07 Run 2; no cubre micrófono, audio audible, WebGL/DDSP ni Gemini Live.
+- US-020/US-021 tienen validación P06 por criterio (`PASS_WITH_WARNINGS`) y cobertura P07 (backend mock + E2E de interfaz); escucha humana y micrófono real siguen pendientes.
+- Una clave ElevenLabs quedó versionada en `.env.example` en el commit `12c5e85` (P08-VAL-MVP2-03); se vació en el árbol y debe revocarse en ElevenLabs.
 - La evaluación del corpus con y sin normalización Gemini (US-011 AC-082) sigue pendiente; no se repitieron llamadas a servicios de pago.
 - Precisión de dictado, corpus de aceptación, latencia p95, uso máximo de memoria, concurrencia PostgreSQL, compatibilidad de grabación por navegador y calidad auditiva requieren evidencia adicional.
 - No se afirma aceptación empírica completa de HU11–HU21, readiness de producción, disponibilidad actual ni resultados de usuarios/adopción.

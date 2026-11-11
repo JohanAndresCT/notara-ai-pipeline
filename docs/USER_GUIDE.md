@@ -17,7 +17,7 @@ Flujos disponibles según las pantallas actuales de `frontend/src`. La interfaz 
 ## 3. Inicio (`/`)
 
 - Sin sesión: página de presentación.
-- Con sesión: **Mis publicaciones recientes** y el **feed de la comunidad**, con un filtro por instrumento (6 opciones) y paginación **Anterior / Siguiente** (10 por página, más recientes primero).
+- Con sesión: **Mis publicaciones recientes** y el **feed de la comunidad**, con un filtro por instrumento (Piano, Guitarra, Violín, Flauta, Trompeta, Saxofón, Otro) y paginación **Anterior / Siguiente** (10 por página, más recientes primero).
 
 ## 4. Publicar una partitura (`/scores/new`)
 
@@ -54,7 +54,7 @@ Flujos disponibles según las pantallas actuales de `frontend/src`. La interfaz 
 - **Reproducir (HU15):** reproduce en el navegador las partituras ABC que el lector puede interpretar. Otros formatos o elementos no soportados muestran un mensaje.
 - **Descargar (HU18):** el MP3 de solfeo generado se puede descargar desde la interfaz.
 - **Cargar un archivo (HU19):** desde los formularios de creación o edición, al elegir un archivo `.abc`, el navegador lee su texto localmente y lo coloca en el editor; el archivo no se carga al servidor solo por seleccionarlo.
-- **Elegir instrumento (HU20):** en partituras ABC compatibles, selecciona Piano, Guitar, Violin, Flute, Trumpet o Saxophone. Los instrumentos IA pueden usar el fallback Tone.js con un aviso. El MP3 instrumental, cuando se ofrece, es independiente del MP3 de solfeo. El flujo está en el código, pero no cuenta con validación P06 de historia ni E2E actual.
+- **Elegir instrumento (HU20):** en partituras ABC compatibles, selecciona Piano, Guitarra, Violín, Flauta, Trompeta o Saxofón (estos cuatro últimos con insignia «IA»). Los instrumentos IA pueden usar el fallback Tone.js con un aviso. El MP3 instrumental, cuando se ofrece, es independiente del MP3 de solfeo. El flujo está en el código, pero no cuenta con validación P06 de historia ni E2E actual.
 - **Preguntar al tutor (HU21):** en el detalle, lee el aviso de privacidad y acepta antes de iniciar la conversación. La voz se transmite a Gemini durante la sesión, que termina tras 2 minutos o al pulsar "Terminar"; existe fallback de pregunta escrita. La implementación está registrada, pero falta validación P06 de historia, prueba de micrófono real y aceptación.
 
 El responsable del proyecto informó que el equipo aprobó CR-005/006/007; la fecha/acta formal de aprobación sigue pendiente de documentación. P02 incluye HU20/HU21 y la enmienda a US-011; P03 aún no asigna prioridad ni estimación a HU20/HU21. La aprobación y la presencia de código no constituyen aceptación empírica de precisión, latencia, memoria, audio ni UX.

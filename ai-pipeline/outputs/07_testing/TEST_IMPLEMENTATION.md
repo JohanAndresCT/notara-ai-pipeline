@@ -122,3 +122,32 @@ Estos archivos se usaron como referencia de ejecución y validación, sin edici�
 ## 8. Conclusión
 
 La suite Django original se conservó y, con dos regresiones nuevas, pasó 88/88 en SQLite. La suite Playwright persistente pasó 5/5 contra Django/Vite reales. La corrección de ambos DELETE ahora cumple 204 sin cuerpo y quedó verificada; PostgreSQL, CI y despliegue siguen pendientes.
+
+
+---
+
+## Run 2 — MVP 2 (prompts P07 v2.0, 2026-11-11)
+
+### R2.1 Pruebas añadidas
+
+| Archivo | Prueba | Cubre | Proveedor |
+|---|---|---|---|
+| `backend/voice/tests.py` | `GeminiNormalizerParsingTests.test_ok_answer_returns_text_and_sends_key_in_header` | AC-078, AC-081: texto normalizado; clave en `x-goog-api-key`, no en la URL | `urlopen` mockeado |
+| `backend/voice/tests.py` | `GeminiNormalizerParsingTests.test_unintelligible_answer_returns_none` | AC-079 | mock |
+| `backend/voice/tests.py` | `GeminiNormalizerParsingTests.test_malformed_answer_and_missing_key_raise_normalizer_error` | AC-080 | mock |
+| `frontend/e2e/notara-e2e.spec.ts` | «panel de escucha, instrumentos con IA y tutor en una partitura ABC» | AC-090–AC-092, AC-094 (insignias), AC-095 (descarga de solfeo deshabilitada antes de sintetizar), M-16, M-18 | Ninguno (no pulsa reproducción) |
+| `frontend/e2e/notara-e2e.spec.ts` | «partitura de texto: escucha desactivada y dictado bloqueado al editar» | AC-093 / M-02, bloqueo de dictado en texto plano, «Cargar archivo .abc» | Ninguno |
+| `frontend/e2e/notara-e2e.spec.ts` | «el comentario de voz solo aparece en partituras de otros usuarios» | AC-037 (precondición de autoría) | Ninguno |
+
+Helpers añadidos al spec: `publishAbcScore`, `openScore`. Datos únicos por ejecución (sufijo aleatorio), limpieza a cargo de la base de pruebas.
+
+### R2.2 Archivos modificados
+
+- `backend/voice/tests.py` (+3 pruebas)
+- `frontend/e2e/notara-e2e.spec.ts` (+3 pruebas, selector `getByRole("button", { name: "Cargar archivo .abc" })`)
+
+Sin cambios de código de producto en esta corrida.
+
+### R2.3 No automatizado (por diseño)
+
+Micrófono, WebGL/DDSP, AudioWorklet y WebSocket de Gemini Live dependen del navegador y de proveedores; quedan como SIMULATED (P06) o NOT_RUN (manual).

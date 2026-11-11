@@ -79,3 +79,25 @@ reconciliación documental.
 
 La prioridad, el Story Point, el orden y el esfuerzo de US-020/US-021 siguen
 sin asignación en P03. Estos casos no cambian el total de pruebas históricas.
+
+
+---
+
+## Run 2 — MVP 2 (prompts P07 v2.0, 2026-11-11)
+
+Complementa §7 (casos de P02 v5.6); no reemplaza el plan MVP 1.
+
+| Test ID | Fuente | Capa | Ejecución | Estado en Run 2 |
+|---|---|---|---|---|
+| TP-MVP2-01 | Regresión backend completa | Django tests, SQLite | `python manage.py test` | Ejecutado |
+| TP-MVP2-02 | Regresión backend + migraciones | Django tests, PostgreSQL 16 | `DJANGO_DB_ENGINE=postgresql … manage.py test --noinput` | Ejecutado |
+| TP-MVP2-03 | Tipos y build frontend | `tsc --noEmit`, `vite build` | `frontend/` | Ejecutado |
+| TP-MVP2-04 | E2E MVP 1 + MVP 2 | Playwright (Chromium) | `pnpm exec playwright test` | Ejecutado |
+| TEST-HU11-AI-01 | AC-078–AC-081, BR-032 | Backend mock | `DictationAiTests`, `GeminiNormalizerParsingTests` | Ejecutado |
+| TEST-HU11-AI-02 | AC-082 | Corpus | Manual | NOT_RUN |
+| TEST-HU20-01 | AC-090–AC-094 | E2E (UI) + navegador | E2E MVP 2 test 1; DDSP en P06.20 | UI ejecutado; DDSP SIMULATED (P06) |
+| TEST-HU20-02 | AC-095–AC-096 | Navegador | P06.20 | MP3 SIMULATED (P06); reduced motion NOT_RUN |
+| TEST-HU21-01 | AC-083–AC-089 | Backend mock + E2E (aviso) | `tests_tutor.py`, E2E MVP 2 test 1 | Ejecutado (mock); Live SIMULATED (P06.21) |
+| MAN-MVP2-01..06 | Checklist manual | Manual | Ver TEST_ANALYSIS R2.5 | NOT_RUN |
+
+Orden: TP-MVP2-03 → TP-MVP2-01 → TP-MVP2-02 → TP-MVP2-04. Ninguna prueba consume créditos de ElevenLabs/Gemini.

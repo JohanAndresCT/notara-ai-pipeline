@@ -86,3 +86,10 @@ La validación P06 conservada afirma que backend/PostgreSQL no existen, en contr
 - Se incorporó el resultado de la revalidación P07 actual: 165 backend tests en SQLite, un skip PostgreSQL-only y typecheck frontend no reproducible por dependencias locales ausentes.
 - Se preservan los runs remotos y verificaciones HTTP del 2026-10-14 como evidencia histórica, sin afirmar disponibilidad actual.
 - No se consultaron servicios externos ni se cambiaron workflows, configuración, código o documentación de despliegue. No hubo deploy, pago, commit ni push.
+
+
+## Run 2 — MVP 2 (prompts P08 v2.0, 2026-11-11)
+
+- `prompts/08_cicd/P08_cicd.md` v2.0 → `CICD_IMPLEMENTATION.md` y `DEPLOYMENT_GUIDE.md` (Run 2); cambios en `.github/workflows/ci.yml` y `.env.example`.
+- `prompts/08_cicd/P08_validation.md` v2.0 → `CICD_VALIDATION.md` (Run 2): `READY_WITH_WARNINGS`; hallazgo crítico de secreto versionado, mitigado en el árbol, rotación pendiente.
+- Sin despliegue, sin recursos facturables, sin llamadas a proveedores.

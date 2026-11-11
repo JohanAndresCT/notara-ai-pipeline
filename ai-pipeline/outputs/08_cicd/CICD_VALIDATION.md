@@ -190,3 +190,22 @@ Revisar los logs del run #15 para explicar el E2E intermitente; configurar y ver
 - El typecheck frontend actual no pudo reproducirse porque faltan tres dependencias en el `node_modules` local. El manifiesto y lockfile las declaran; no se instalaron paquetes ni se modificó el lockfile.
 - Última evidencia remota documentada: runs `38481851856` y `38610251114`, con despliegue y verificaciones limitadas observadas el 2026-10-14. No se comprobó su disponibilidad actual ni se inspeccionaron los logs, Environment protection, volumen, backup o rollback en esta ejecución.
 - Estado de configuración CI: `READY_WITH_WARNINGS` según la revisión estática previa. Ejecución actual local: `PASS_WITH_WARNINGS`; PostgreSQL/CI remotos no reejecutados. Último estado de runtime registrado: `DEPLOYED_AND_VERIFIED` al 2026-10-14, alcance limitado; estado operativo actual `NOT_RECHECKED`.
+
+
+---
+
+## Run 2 — MVP 2 (prompts P08 v2.0, 2026-11-11)
+
+| ID | Verificación | Evidencia | Clase | Resultado |
+|---|---|---|---|---|
+| P08-VAL-MVP2-01 | CI ejecuta las pruebas MVP 2 | Antes: job `backend` solo `accounts scores` (omitía `voice`). Corregido en `ci.yml`; equivalente local: 175 pruebas OK en PostgreSQL 16 (P07 Run 2) | AUTOMATED_EXECUTED (local) | PASS tras corrección; run remoto con el cambio NOT_RUN (sin push) |
+| P08-VAL-MVP2-02 | CI sin claves de proveedor | Revisión de `ci.yml`; suite con fakes | MANUAL_EXECUTED (estático) | PASS |
+| P08-VAL-MVP2-03 | Ningún secreto en el repositorio | `git grep` de patrones de clave: **1 hallazgo** (`.env.example`, clave ElevenLabs, commit `12c5e85`, publicado en `origin`) → vaciado en el árbol; re-escaneo 0 hallazgos | MANUAL_EXECUTED | **FAIL → mitigado parcialmente**; requiere revocar la clave (acción del equipo) y decidir si reescribir historial |
+| P08-VAL-MVP2-04 | Variables MVP 2 documentadas | `.env.example`, `DEPLOYMENT_GUIDE.md` Run 2 | MANUAL_EXECUTED | PASS |
+| P08-VAL-MVP2-05 | Modelo Whisper disponible | `Dockerfile` provisiona y verifica hashes; build de imagen no ejecutado en esta corrida | MANUAL_EXECUTED (estático) | PASS_WITH_WARNINGS |
+| P08-VAL-MVP2-06 | Persistencia `/data` | Configuración presente; montaje real en Railway no comprobado | NOT_RUN | PENDING (PRE-005) |
+| P08-VAL-MVP2-07 | Migraciones en despliegue | `entrypoint.sh` + drift check en CI + migraciones probadas en PostgreSQL local | AUTOMATED_EXECUTED (local) | PASS |
+| P08-VAL-MVP2-08 | HTTPS | Settings con `DEBUG=False` y validación `https://` en el job deploy | MANUAL_EXECUTED (estático) | PASS |
+| P08-VAL-MVP2-09 | Runs CI con código MVP 2 | `gh` no disponible en este entorno; no se consultaron Actions | NOT_RUN | — |
+
+**Estado de la etapa:** `READY_WITH_WARNINGS` para CI; despliegue MVP 2 `NOT_DEPLOYED` en esta corrida (sin autorización). Bloqueante para producción: revocar la clave ElevenLabs expuesta (P08-VAL-MVP2-03).

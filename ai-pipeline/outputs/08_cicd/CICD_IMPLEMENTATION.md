@@ -53,3 +53,37 @@ Evidencia ejecutada: `pnpm install --frozen-lockfile` PASS; YAML workflow parsea
 Pendiente: GitHub Actions real con PostgreSQL 16, Docker build/runtime, ejecución E2E PostgreSQL, configurar environment/secrets/vars y servicios/volumen Railway, validar HSTS conforme al dominio elegido y primer deployment/healthcheck. Docker no está instalado localmente y no se creó ni modificó ningún recurso remoto.
 
 Estado actual (revalidado 2026-10-14): configuración CI `READY_WITH_WARNINGS`; ejecución remota `PASS` (run `38481851856`, SHA `430dfad`, y run `38610251114`, SHA `3ce012f`, rama `pruebas-despliegue`, con E2E intermitente en el run `38606194394`); producción `READY_WITH_WARNINGS`; runtime `DEPLOYED_AND_VERIFIED` (alcance limitado: health, SPA, 401 de API y CSRF verificados; persistencia de medios, backups y rollback pendientes). URL: https://notara-production.up.railway.app. Detalle y límites en `CICD_VALIDATION.md` sección 14. Esta revalidación no cambió código, tests, workflow ni configuración.
+
+
+---
+
+## Run 2 — MVP 2 (prompts P08 v2.0, 2026-11-11)
+
+Modo incremental (P08_cicd v2.0 §0). Se conserva todo lo anterior.
+
+### R2.1 Cambios aplicados
+
+| Archivo | Cambio | Motivo |
+|---|---|---|
+| `.github/workflows/ci.yml` (job `backend`) | `manage.py test accounts scores` → `manage.py test` (todas las apps) con `STT_MODEL_REQUIRED=false` | **P08-MVP2-01**: CI omitía la app `voice` (40 pruebas MVP 2: STT, normalizador Gemini, tutor). Los proveedores se sustituyen por fakes, así que no se necesitan claves. |
+| `.env.example` | `ELEVENLABS_API_KEY` y `ELEVENLABS_VOICE_ID` vaciados | **P08-MVP2-02 (CRITICAL)**: el commit `12c5e85` versionó una clave ElevenLabs con formato real en `.env.example` y está publicado en `origin`. Se elimina del árbol; **la clave debe revocarse/rotarse en ElevenLabs** (el historial de git la conserva). La voz de biblioteca devolvía 402 en plan gratuito; vacío = voz prefabricada por defecto. |
+
+No se cambió el job de despliegue ni se activó ningún despliegue.
+
+### R2.2 Configuración MVP 2 verificada (estática)
+
+| Requisito P08 v2.0 | Evidencia | Estado |
+|---|---|---|
+| CI sin claves de proveedor | Ningún job define `ELEVENLABS_*`/`GEMINI_*`; pruebas con fakes/mocks (P07 Run 2) | OK |
+| Variables MVP 2 documentadas sin valores | `.env.example`: `STT_*`, `AUDIO_*`, `VOICE_*`, `TTS_TIMEOUT_SECONDS`, `EDGE_TTS_VOICE`, `ELEVENLABS_*`, `GEMINI_*`, `DICTATION_AI_ENABLED`, `TUTOR_*` | OK (tras P08-MVP2-02) |
+| Modelo Whisper en la imagen | `Dockerfile`: `voice.provision_model` descarga revisión fijada `ebe41f70…` y verifica `model_sha256.json`; `STT_MODEL_REQUIRED=true` | OK (estático) |
+| `MEDIA_ROOT` en volumen persistente | `Dockerfile` `MEDIA_ROOT=/data/media`; volumen `/data` en Railway (PRE-005) | Configurado; montaje real NOT_RUN |
+| Migraciones en despliegue | `deploy/entrypoint.sh` ejecuta `migrate --noinput` antes de Gunicorn; incluye `scores.0006`, `voice.0002`, `voice.0003`; CI comprueba drift (`makemigrations --check`) | OK |
+| HTTPS (micrófono y WebSocket Gemini Live) | `SECURE_SSL_REDIRECT`/`SESSION_COOKIE_SECURE` con `DEBUG=False`; el job deploy exige `RAILWAY_PUBLIC_URL` `https://` | OK (estático) |
+| Límites diarios | Defaults: STT 30, voz 20, tutor 5 sesiones / 20 preguntas. Valores locales distintos (p. ej. 50) solo en `.env` del desarrollador; en producción se fijan como variables Railway | Documentado |
+
+### R2.3 Pendientes
+
+- P08-MVP2-03: el job `backend` usa Python 3.12 y la ejecución local 3.13; la imagen también 3.12 (coherente con CI).
+- P08-MVP2-04: modelos DDSP se cargan desde `storage.googleapis.com` (ARCH-RISK-211); sin CSP que lo restrinja. Auto-hospedar si el equipo lo exige.
+- P08-MVP2-05: los defaults de modelos Gemini (`gemini-3.5-flash-lite`, `gemini-2.5-flash-native-audio-latest`) son alias que pueden cambiar (ARCH-RISK-212).

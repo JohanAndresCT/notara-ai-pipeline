@@ -56,3 +56,9 @@
 - Se registró que `mkdocs.yml`, `requirements-docs.txt` y `.github/workflows/docs.yml` son preexistentes y no se modificaron; sus destinos de navegación existen. No se ejecutó el workflow ni se instaló MkDocs.
 - Se actualizó el inventario y el registro de verificaciones de `DOCUMENTATION_REPORT.md`.
 - No se modificaron código, pruebas, requisitos, backlog, CI/CD o infraestructura; no se instalaron dependencias ni se realizaron llamadas externas.
+
+
+## Run 2 — MVP 2 (prompts P09 v2.0, 2026-11-11)
+
+- `prompts/09_documentation/P09_documentation.md` v2.0 → README y `docs/` actualizados; `DOCUMENTATION_REPORT.md` Run 2.
+- `prompts/09_documentation/P09_validation.md` v2.0 → `DOCUMENTATION_VALIDATION.md` Run 2.

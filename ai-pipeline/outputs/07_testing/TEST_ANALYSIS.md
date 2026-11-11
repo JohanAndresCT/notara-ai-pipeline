@@ -147,3 +147,83 @@ Siguiente acción recomendada: generar la suite de pruebas o ampliaciones de pru
 4. Reacciones y comentarios.
 5. Seguridad y CSRF.
 
+
+
+---
+
+## Run 2 — MVP 2 (prompts P07 v2.0, 2026-11-11)
+
+Modo incremental (P07_test_analysis v2.0 §0). Las secciones anteriores se conservan; esta corrida añade la matriz MVP 2 y sustituye, para MVP 2, la indicación previa de que US-020/US-021 no tenían registro P06/P07 (ahora existen `US-020_INSTRUMENTS_*` y `US-021_TUTOR_CHAT_VALIDATION.md`).
+
+### R2.1 Alcance y estado de aprobación (según P02 v5.6 / P03 v4.6)
+
+- MVP 1 (US-001–US-010): línea base `v1.0.0`; regresión automatizada.
+- MVP 2: US-011–US-019 y, como **alcance aprobado reportado por el líder del proyecto** con registro formal pendiente (Q-030), CR-005 (US-020), CR-006 (enmienda US-011) y CR-007 (US-021). Este análisis no modifica la aprobación.
+- Excluidos y no probados como entregados: voz cantada, «Voz» como instrumento, a cappella sintético, OMR, MP3 mixto voz+instrumento (DEC-204).
+
+### R2.2 Entorno
+
+| Elemento | Valor |
+|---|---|
+| Rama / base | `pipeline/mvp2-p00-context`, HEAD `658f2e8` + cambios de prueba sin commit (`backend/voice/tests.py`, `frontend/e2e/notara-e2e.spec.ts`) |
+| Python | 3.13.14 (venv `.venv`), Django 5.2 |
+| Node / gestor | Node 22.19.0, pnpm 12.11.2 (`frontend/`, `pnpm install --frozen-lockfile`, dependencias instaladas) |
+| Bases de datos | SQLite (temporal) y PostgreSQL 16 en contenedor local `notara-p07-pg` (puerto 55432) |
+| Modelo Whisper | No requerido (`STT_MODEL_REQUIRED=false`); STT/TTS/Gemini sustituidos por fakes/mocks |
+| Proveedores reales | No invocados por la suite automatizada (DEC-230, NFR-010) |
+| Diferencias | CI usa PostgreSQL de servicio y fakes; Railway (volumen `/data`, HTTPS, claves) no ejecutado en esta corrida |
+
+### R2.3 Matriz de cobertura AC-029–AC-096
+
+| AC | Historia | Pruebas existentes | Clase de evidencia | Brecha |
+|---|---|---|---|---|
+| AC-029 | US-010 enmienda: borrar comentario propio | `scores/tests.py::ScoreCommentTests` (204, CSRF, no autor), `ScoreCommunityApiTests.test_visitor_can_comment_and_delete_own_comment_but_not_owner_comment` | AUTOMATED_EXECUTED | — |
+| AC-030–AC-036 | US-011 dictado | `DictationParserTests`, `SttEndpointTests` (contrato, auth, CSRF, 2 MB, MIME/firma, 30 s, modelo no configurado), `FasterWhisperAdapterTests`; E2E bloqueo en texto plano; navegador con voz sintética (P06) | AUTOMATED_EXECUTED; navegador SIMULATED | Micrófono real, corte a 30 s y permiso denegado NOT_RUN (checklist #1–#5) |
+| AC-037–AC-042 | US-012 comentario de voz | `scores/tests_mvp2.py::VoiceCommentTests` (creación, rechazos, audio con auth, borrado y cascada); E2E propio/ajeno | AUTOMATED_EXECUTED | Grabar/escuchar/borrar con micrófono real NOT_RUN (#6, #7) |
+| AC-043–AC-048 | US-013 solfeo | `AbcReaderTests.test_solfege_text_names_and_pauses`, `SynthesisEndpointTests` (MP3, caché, límite diario) | AUTOMATED_EXECUTED (FakeTts) | Escucha humana NOT_RUN (#8) |
+| AC-049–AC-051 | US-014 tutor auditivo | `test_difficulty_and_tutor_text`, `test_tutor_returns_text_header`, `test_text_unsupported_and_auth_errors` | AUTOMATED_EXECUTED | Escucha NOT_RUN (#9) |
+| AC-052–AC-054 | US-015 piano | `DetailPlaybackTests`, `AbcReaderTests` (eventos, alteraciones, silencios); E2E panel y texto plano (M-02) | AUTOMATED_EXECUTED | Ritmo por oído NOT_RUN (#10) |
+| AC-055–AC-058 | US-016 caché de audio | `test_solfege_returns_mp3_and_is_cached`, `test_edited_content_generates_new_audio`, `test_storage_failure_still_returns_audio` | AUTOMATED_EXECUTED | Latencia de caché percibida NOT_RUN (#12) |
+| AC-059–AC-063 | US-017 voz de respaldo | `test_fallback_voice_when_primary_fails`, `test_both_voices_fail_returns_503_and_releases_quota`, `test_elevenlabs_primary_serves_audio_without_fallback`, `test_primary_voice_is_not_hidden_by_fallback_cache`, `test_fallback_cache_used_when_primary_fails_without_spending_quota` | AUTOMATED_EXECUTED (mock) | ElevenLabs real con clave inválida NOT_RUN (#13) |
+| AC-064–AC-065 | US-018 MP3 | Endpoint MP3 en `SynthesisEndpointTests`; E2E descarga deshabilitada antes de sintetizar | AUTOMATED_EXECUTED | Descarga y reproducción fuera de la app NOT_RUN (#11) |
+| AC-066–AC-069 | US-019 carga `.abc` | E2E: botón «Cargar archivo .abc» visible en edición; validaciones de publicación MVP 1 | AUTOMATED_EXECUTED (parcial) | Selección real de archivo, confirmación de reemplazo y rechazos (AC-067/068) sin E2E — brecha menor |
+| AC-070–AC-072 | US-011 metas de corpus | — | NOT_RUN | Corpus humano ≥ 9 grabaciones / 3 personas (Q-028, PRE-011) |
+| AC-073–AC-075 | US-011 cuota y admisión | `SttEndpointTests` (cuota, saturación, rechazos), `QuotaConcurrencyTests` | AUTOMATED_EXECUTED | — |
+| AC-076–AC-077 | US-012 cuota compartida y 1.000 caracteres | `test_long_transcript_is_kept_up_to_1000`, `test_text_comments_keep_500_limit`; cuota compartida vía `SttEndpointTests` | AUTOMATED_EXECUTED | — |
+| AC-078–AC-082 | US-011 enmienda CR-006 | `DictationAiTests` (6) + `GeminiNormalizerParsingTests` (3, **nuevas**) | AUTOMATED_EXECUTED (mock); Gemini real SIMULATED (CR-006 §8) | AC-082 NOT_RUN (depende del corpus) |
+| AC-083–AC-089 | US-021 tutor | `voice/tests_tutor.py` (8); E2E aviso M-18 y botones | AUTOMATED_EXECUTED (mock); Live SIMULATED | Conversación con micrófono real NOT_RUN |
+| AC-090–AC-096 | US-020 instrumentos | E2E: 6 instrumentos, 4 insignias IA, selección inicial, solfeo separado | AUTOMATED_EXECUTED (UI); DDSP/MP3 SIMULATED (P06.20) | Escucha humana NOT_RUN; reduced motion sin alternar |
+
+### R2.4 Riesgos altos MVP 2 y cobertura
+
+| Riesgo | Cobertura en esta corrida |
+|---|---|
+| Cuota STT y slot de inferencia | `QuotaConcurrencyTests`, `test_saturated_process_returns_unavailable_without_quota_charge` — PASS |
+| Normalizador IA (BR-032: solo texto, sin notas añadidas, 8 s, M-01) | `DictationAiTests.test_ai_cannot_add_notes`, `test_provider_failure_keeps_m01_without_server_error`; clave en cabecera, nunca en URL (`GeminiNormalizerParsingTests`) — PASS |
+| Cadena TTS (ElevenLabs primario, Edge respaldo, caché prioriza primario) | `SynthesisEndpointTests` con FakeTts, incl. `language_code` por modelo — PASS |
+| Almacenamiento y borrado de comentarios de voz | `VoiceCommentTests` — PASS |
+| Token efímero del tutor (un uso, setup bloqueado, sin clave) y cuotas BR-033 | `tests_tutor.py` — PASS |
+| Fallback DDSP y MP3 | Solo navegador; registrado como SIMULATED en P06.20 |
+| Migraciones en PostgreSQL | `scores/tests_migrations.py` (7) en PostgreSQL 16 — PASS |
+
+### R2.5 Casos manuales importados (`MVP2_MANUAL_ACCEPTANCE_CHECKLIST.md`)
+
+| Caso | Contenido | Estado |
+|---|---|---|
+| MAN-MVP2-01 | Micrófono real HU11/HU12 (checklist #1–#7) | NOT_RUN |
+| MAN-MVP2-02 | Escucha humana HU13/14/15/16/18 (#8–#12) | NOT_RUN |
+| MAN-MVP2-03 | Corpus HU11 AC-070–AC-072 y AC-082 | NOT_RUN |
+| MAN-MVP2-04 | ElevenLabs con clave real y clave inválida (#13) | USER_REPORTED parcial (CR-005); fallback con clave inválida NOT_RUN |
+| MAN-MVP2-05 | Railway `/data` y migraciones (#14, #15) | NOT_RUN (sin despliegue autorizado) |
+| MAN-MVP2-06 | Escucha de instrumentos IA y conversación del tutor con micrófono real | NOT_RUN |
+
+### R2.6 Brechas seleccionadas para generación
+
+1. Analizador de respuesta Gemini del normalizador (JSON válido, «unintelligible», respuesta malformada, clave ausente, clave en cabecera) → añadido.
+2. E2E MVP 2 de interfaz sin proveedores (panel de escucha, partitura de texto, comentario de voz propio/ajeno) → añadido.
+3. Brecha menor sin cubrir: carga real de archivo `.abc` (AC-067/068) en E2E — se deja para una próxima corrida.
+4. Pendientes no automatizables en CI: micrófono, WebGL/DDSP, AudioWorklet y WebSocket Live → manuales.
+
+### R2.7 Estado
+
+`PASS_WITH_WARNINGS` — cobertura automatizada completa del contrato backend y de la UI sin proveedores; aceptación con micrófono real, escucha humana, corpus y Railway pendiente.

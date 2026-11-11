@@ -95,3 +95,7 @@ execution remains `PARTIAL`.
 The project lead's confirmation was received 2026-11-11; formal team approval
 record/date remains pending documentation (Q-030). No paid provider calls,
 code modifications, or deployment were made for this reconciliation.
+
+## Update P06-REV-004 (2026-11-11, P07–P10 Run 2)
+
+The missing P06 story records noted in P06-REV-004 now exist: `US-020_INSTRUMENTS_IMPLEMENTATION.md`, `US-020_INSTRUMENTS_VALIDATION.md` and `US-021_TUTOR_CHAT_VALIDATION.md` (both `PASS_WITH_WARNINGS`; DoD pending manual acceptance and the formal approval record, Q-030).

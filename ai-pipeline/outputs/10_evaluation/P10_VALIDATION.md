@@ -115,3 +115,21 @@ Retain the open P06/P07 acceptance and environment gates, P03 plan/unplanned dis
 This addendum supersedes the earlier candidate-scope classification without
 claiming acceptance or a release. No external service, test suite, CI workflow,
 or deployment was invoked for this documentary reconciliation.
+
+
+---
+
+## Run 2 — MVP 2 validation (prompts P10 v2.0, 2026-11-11)
+
+| ID | Check | Result |
+|---|---|---|
+| P10-VAL-MVP2-01 | Recomputed from P02 v5.6: FR 52, NFR 10 (62), US 21, AC 96 — matches `MVP_EVALUATION.md` R2.2 and `eval_metrics.json` `mvp2.approved_requirements` | PASS |
+| P10-VAL-MVP2-02 | Indicator totals 20 = 7 + 11 + 0 + 2 in R2.4 and `success_criteria` | PASS |
+| P10-VAL-MVP2-03 | Simulated / user-reported / not-run checks not counted as passes (IND-210/211 moved only to `PARTIALLY_MET`; manual items listed in `manual_acceptance_pending`) | PASS |
+| P10-VAL-MVP2-04 | CR items kept separate from approved baseline (R2.2; `proposed_requirements.total = 0` with Q-030 note) | PASS |
+| P10-VAL-MVP2-05 | AI components table checked against code (`voice/adapters.py`, `voice/tts.py`, `voice/normalizer.py`, `voice/tutor.py`, `frontend/src/lib/ddsp.ts`, `lib/instruments.ts`) and P06/P07 evidence | PASS |
+| P10-VAL-MVP2-06 | Test numbers equal P07 Run 2 `TEST_VALIDATION.md` (175 / 175 / 9) | PASS |
+| P10-VAL-MVP2-07 | `eval_metrics.json` keeps the previous schema, adds `mvp2`, `history`, `evaluation_version` 2.0; valid JSON | PASS |
+| P10-VAL-MVP2-08 | Removed features (sung voice, "Voz" instrument) absent from the evaluation | PASS |
+
+**Decision:** evaluation valid; verdict `NEEDS_ITERATION` justified by EVAL-010 and pending manual acceptance.

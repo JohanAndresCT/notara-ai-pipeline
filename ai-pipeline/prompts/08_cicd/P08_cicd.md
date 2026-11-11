@@ -1,15 +1,51 @@
 # P08 - Continuous Integration and Deployment Preparation
 
-**Version:** 1.0  
+**Version:** 2.0  
 **Stage:** P08 - CI/CD  
 **Type:** Generation Prompt  
 **Project:** Notara  
+**Release covered:** MVP 2 — Sprint 2 (incremental over MVP 1)  
 **Input Artifacts:** Actual code/manifests/settings; P07 test evidence; approved architecture; Railway destination decision; system prompt  
-**Output Artifacts:** CI and scoped production/deploy configuration; `ai-pipeline/artifacts/08_cicd/CICD_IMPLEMENTATION.md`, `DEPLOYMENT_GUIDE.md`, `PROMPT_LOG.md`  
+**Output Artifacts:** CI and scoped production/deploy configuration; `ai-pipeline/outputs/08_cicd/CICD_IMPLEMENTATION.md`, `DEPLOYMENT_GUIDE.md`, `PROMPT_LOG.md`  
 **Validator / Related Prompt:** `P08_validation.md`  
 **Previous Stage:** P07 - Testing  
 **Next Stage:** P08 - Validation / P09 - Documentation  
 **Advance Condition:** CI evidence is valid and production/deployment readiness is separately established.
+
+---
+
+## Change Log
+
+| Version | Change |
+|---|---|
+| 1.0 | MVP 1 prompt (October 2026). |
+| 2.0 | 2026-11-11: incremental mode for MVP 2 (section 0); output paths moved to `ai-pipeline/outputs/`; MVP 2 scope, change requests CR-005-CR-007, AI/voice providers, evidence classes and append-only runs. |
+
+---
+
+## 0. Incremental Mode (MVP 2)
+
+Apply this section on top of the rest of the prompt. Where it conflicts with an MVP 1 instruction below, this section prevails.
+
+### 0.1 Common rules (all P07-P10 prompts)
+
+1. **Scope baseline.** MVP 1 (US-001-US-010) is the delivered baseline (tag `v1.0.0`). MVP 2 covers US-011-US-019 and, **only with the approval status recorded in the latest P02/P03 outputs**, the change requests CR-005 (US-020, other and AI instruments), CR-006 (US-011 amendment, AI interpretation of dictation) and CR-007 (US-021, conversational tutor). Never decide or change an approval; report the status the artifacts record (approved, proposed, rejected).
+2. **Latest inputs.** Read the latest versions under `ai-pipeline/outputs/` (P00 `PROJECT_CONTEXT.md`, P02 `REQUIREMENTS.md` and `product_backlog.json`, P03 `PRIORITIZATION.md`, P04 `UX_SPEC.md`, P05 `ARCHITECTURE.md`, P06 story records `US-0XX_*_IMPLEMENTATION.md` / `_VALIDATION.md`, `IMPLEMENTATION_LOG_MVP2.md`, `IMPLEMENTATION_VALIDATION_MVP2.md`, `MVP2_MANUAL_ACCEPTANCE_CHECKLIST.md`) and `00_context/DECISIONS_MVP2.md` plus `CR-00X_*.md`. If two versions conflict, report the conflict and its impact; do not pick one silently.
+3. **Incremental, append-only.** Keep every earlier run and result. Add a new dated run section (`Run N — MVP 2, <date>`) and, where the output has a change log, a new version row. Mark statements that a new run supersedes; never delete or rewrite earlier evidence. Preserve all existing identifiers (`AC-*`, `FR-*`, `TC-*`, `EVAL-*`, `P08-VAL-*`, …) and continue numbering for new ones.
+4. **Evidence classes.** Label every check: `AUTOMATED_EXECUTED`, `MANUAL_EXECUTED`, `SIMULATED` (for example synthetic speech injected as a microphone stream, or a mocked provider), `USER_REPORTED`, `NOT_RUN` or `BLOCKED`. A simulated check is never reported as real-device or real-user evidence; a blocked environment is never reported as a pass.
+5. **AI and voice providers.** Notara MVP 2 uses: Whisper Base locally via `faster-whisper` (STT), ElevenLabs (primary TTS) with `edge-tts` fallback, Google Gemini (dictation interpretation and typed tutor answers), Gemini Live (spoken tutor, single-use ephemeral tokens), Magenta DDSP models with TensorFlow.js (AI instruments) and Tone.js (browser synthesis). Automated tests and CI must use fakes/mocks (DEC-230, NFR-010). Real-provider checks are optional, must be labelled, must not consume paid credits without the team's authorization, and must never print, store or commit keys, tokens or provider responses containing personal data.
+6. **Environment disclosure.** State Python and Node versions, package manager (pnpm, from `frontend/`), database (SQLite or PostgreSQL), whether frontend dependencies were installed and whether the Whisper model was available. Differences between local, CI and Railway must be stated, not assumed away.
+7. **Removed or excluded items** (sung voice, "Voz" as an instrument, synthetic a cappella; OMR; mixed voice+instrument MP3 per DEC-204) must not be tested, documented or evaluated as delivered features.
+8. **Language.** Reports may be written in Spanish or English, consistently within a document; final responses to the team are in Spanish.
+
+### 0.2 Stage-specific rules (P08 CI/CD, MVP 2)
+
+- CI must keep running MVP 1 and MVP 2 tests with fake providers and must not need provider keys.
+- Production configuration must cover the MVP 2 variables without committing values: `STT_*` (model directory, revision/manifest, limits), `VOICE_*` / `TTS_*`, `ELEVENLABS_API_KEY` / `ELEVENLABS_VOICE_ID` / `ELEVENLABS_MODEL_ID`, `GEMINI_API_KEY` / `GEMINI_MODEL` / `DICTATION_AI_ENABLED`, `TUTOR_*`. Keys go to Railway variables or CI secrets only.
+- Check that the Whisper model is available in the image or volume, that `MEDIA_ROOT` points to the persistent volume (`/data`, PRE-005) and that migrations `scores.0006`, `voice.0002`, `voice.0003` run on deploy.
+- HTTPS is required in production for microphone capture and the Gemini Live WebSocket.
+- Do not trigger a deployment, create billable resources or change provider plans without explicit authorization.
+- Output: append an MVP 2 section to `CICD_IMPLEMENTATION.md` and `DEPLOYMENT_GUIDE.md`.
 
 ---
 
@@ -30,7 +66,7 @@ Inspect the current repository, not a previously generated implementation.
 
 Resolve upstream requirements, backlog/sprint, UX, architecture and implementation
 records from their actual locations. This project has historically used both
-`ai-pipeline/artifacts/` and `ai-pipeline/outputs/`; locate the real files, report
+`ai-pipeline/artifacts/` (MVP 1) and `ai-pipeline/outputs/` (current); locate the real files, report
 which ones were used, and do not duplicate or fabricate missing artifacts.
 If several versions conflict, identify the conflict and its impact.
 

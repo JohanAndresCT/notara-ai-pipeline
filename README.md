@@ -30,8 +30,8 @@ Notara ofrece un espacio sencillo para crear, publicar, encontrar y comentar par
 | US-016–US-017 / HU16–HU17 | Implementadas; operación del proveedor no revalidada | Caché y voz de respaldo |
 | US-018 / HU18 | Implementada; flujo de navegador no reejecutado | Descarga MP3 de solfeo |
 | US-019 / HU19 | Implementada; E2E/typecheck actuales incompletos | Carga local de archivo `.abc` |
-| US-020 / HU20 | Aprobada para alcance; sin prioridad/estimación P03 ni validación P06 | Selección de instrumentos, DDSP/fallback y descarga de audio instrumental |
-| US-021 / HU21 | Aprobada para alcance; sin prioridad/estimación P03 ni validación P06 | Tutor conversacional por voz/texto |
+| US-020 / HU20 | Implementada; validación P06 `PASS_WITH_WARNINGS`; escucha humana pendiente; sin prioridad/estimación P03 | Piano y guitarra (Tone.js); violín, flauta, trompeta y saxofón con IA (Magenta DDSP) y respaldo Tone.js; MP3 por instrumento |
+| US-021 / HU21 | Implementada; validación P06 `PASS_WITH_WARNINGS`; micrófono real pendiente; sin prioridad/estimación P03 | Tutor conversacional por voz (Gemini Live) y texto (Gemini) |
 
 CR-006 añade AC-078–AC-082 a US-011; no reemplaza los criterios anteriores.
 
@@ -44,7 +44,7 @@ El responsable del proyecto informó que el equipo aprobó CR-005/006/007; esa c
 | Backend | Django 5.2.18, Django REST Framework 3.15.2; Python 3.11.9 probado localmente |
 | Frontend | React 19, TypeScript, Vite 8, Tailwind CSS 4 |
 | Base de datos | PostgreSQL 16 en configuración de Compose/CI; SQLite en la ejecución local de pruebas actual |
-| Audio | faster-whisper local para STT, proveedores TTS configurables, reproducción web con Tone.js |
+| Audio e IA | Whisper Base local (faster-whisper) para STT; ElevenLabs (principal) y edge-tts (respaldo) para TTS; Google Gemini (interpretación de dictado y respuestas escritas del tutor); Gemini Live (tutor por voz, tokens efímeros de un uso); Magenta DDSP con TensorFlow.js (instrumentos IA); Tone.js (síntesis en navegador) |
 | Pruebas | Django test runner y Playwright |
 | Empaquetado/despliegue | Docker, Nginx, Gunicorn, configuración Railway y GitHub Actions |
 
@@ -53,7 +53,7 @@ Usa las versiones indicadas en los manifiestos y la configuración de CI/Docker;
 
 ## 5. Prerrequisitos
 
-- Python 3.11.9 para la configuración local validada; la imagen Docker y CI usan Python 3.12.
+- Python 3.11.9 o 3.13.14 para la configuración local validada; la imagen Docker y CI usan Python 3.12.
 - Node.js 24 y Corepack con pnpm 12.11.2 para el frontend.
 - PostgreSQL 16 solo si se usa PostgreSQL o Docker Compose.
 - Para activar dictado y comentarios de voz: un modelo STT local verificado. Su aprovisionamiento es opcional, explícito y requiere acceso a Hugging Face; no se descarga al recibir una petición HTTP.
@@ -110,9 +110,7 @@ ai-pipeline/   Prompts y registros del pipeline
 
 ## 10. Pruebas
 
-La última ejecución local del backend ejecutó 165 pruebas: 164 pasaron y una prueba de concurrencia exclusiva de PostgreSQL se omitió. Usó Python 3.11.9, Django 5.2.18 y SQLite de pruebas aislado. `check` de Django y la comprobación de migraciones también pasaron.
-
-El typecheck del frontend está bloqueado por tres paquetes ausentes en el `node_modules` local existente; no se instalaron dependencias. E2E 5/5 es evidencia histórica de P07, no una reejecución en esta validación. No se volvió a verificar el E2E, el build actual, PostgreSQL ni el comportamiento de producción. Véase [TESTING.md](./docs/TESTING.md).
+Backend: 175 pruebas en SQLite (173 pasaron, 2 omitidas por ser exclusivas de PostgreSQL) y 175/175 en PostgreSQL 16, Python 3.13.14; `tsc` y `vite build` pasan; Playwright 9/9 (6 MVP 1 + 3 MVP 2). Ejecución P07 Run 2 del 2026-11-11. Las pruebas automatizadas sustituyen ElevenLabs, Gemini y Whisper por fakes; no necesitan claves. Micrófono real, escucha humana, corpus HU11 y producción siguen sin verificar. Véase [TESTING.md](./docs/TESTING.md).
 
 ## 11. Índice de documentación
 
@@ -140,9 +138,9 @@ El typecheck del frontend está bloqueado por tres paquetes ausentes en el `node
 
 | Dimensión | Estado y evidencia |
 |---|---|
-| Implementación | MVP 1 es la línea base entregada. P06 informa implementación para US-001–US-019 y código para CR-005/006/007; esto no equivale a aceptación. Faltan validaciones de historia US-020/US-021 y medición AC-082. |
-| Pruebas | Backend: 164 pasaron y 1 PostgreSQL-only se omitió. Typecheck bloqueado por dependencias locales ausentes; E2E y build actuales no reejecutados. |
-| CI | El workflow está en `.github/`; sus resultados documentados son históricos y no fueron consultados en esta ejecución. |
+| Implementación | MVP 1 es la línea base entregada. P06 informa implementación para US-001–US-019 y código para CR-005/006/007; esto no equivale a aceptación. US-020/US-021 tienen validación P06 (`PASS_WITH_WARNINGS`); falta la medición AC-082 y la aceptación manual. |
+| Pruebas | Backend: 175 pruebas en SQLite (173 pasaron, 2 omitidas por ser exclusivas de PostgreSQL) y 175/175 en PostgreSQL 16, Python 3.13.14; `tsc` y `vite build` pasan; Playwright 9/9 (6 MVP 1 + 3 MVP 2). Ejecución P07 Run 2 del 2026-11-11. |
+| CI | El workflow está en `.github/`; desde P08 Run 2 el job backend ejecuta todas las apps (incluida `voice`). Resultados remotos no consultados en esta ejecución. |
 | Despliegue | Health check público observado el 2026-10-14; disponibilidad y commit actualmente desplegado no verificados. No se realizó despliegue. |
 
 La evidencia formal de aprobación de CR-005/006/007 (fecha/acta) sigue pendiente de documentación; la confirmación de alcance ya fue reportada por el responsable. US-020/US-021 no tienen prioridad ni estimación asignadas.

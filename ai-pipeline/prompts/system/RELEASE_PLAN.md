@@ -379,3 +379,92 @@
 2. **COMMUNITY — HU07 (Dashboard):** En un próximo incremento se podría agregar ordenamiento del feed por popularidad (reacciones), además del orden actual por fecha.
 3. **ACCESS — HU01:** Considerar añadir verificación de correo electrónico en el MVP 2 para fortalecer la confianza de la comunidad.
 4. **General — Equipo:** Alejandro Zamorano (Tester / Despliegue) tiene una carga baja en asignaciones de historias; se sugiere que lidere las pruebas de aceptación end-to-end y el proceso de despliegue del MVP sin que esto se refleje en el release plan como una historia formal.
+
+---
+
+# Release Plan — MVP 2 (Audio, voz e IA)
+
+**MVP 2 · Sprint 2 · 2 semanas**  
+**Fecha de inicio:** 28 de octubre de 2026 | **Fecha de entrega:** 11 de noviembre de 2026  
+**Fuentes:** P02 v5.6 (US-011–US-021, EPIC-005–EPIC-007), P03 v4.6 (prioridades y 31 SP de US-011–US-019), CR-005/006/007, `DECISIONS_MVP2.md`.
+
+> **Estado de este plan:** las fechas las confirmó el responsable del proyecto el 2026-11-11 (cierra PRE-006 en lo que respecta a fechas). La **asignación de responsables** y los **SP/prioridad de HU20 y HU21** son una **PROPUESTA** pendiente de confirmación del equipo; P03 no los asigna.
+
+## 9. Resumen general del release MVP 2
+
+| Release | Duración | Sprints | Objetivo funcional |
+|---|---|---:|---|
+| MVP 2 — Notara | 2 semanas (28 de octubre–11 de noviembre de 2026) | 1 sprint | Que un usuario pueda dictar una partitura, publicarla y escucharla (solfeo, tutor, instrumentos), con comentarios de voz, caché/respaldo de voz, descarga MP3, carga de `.abc` y un tutor conversacional con IA. |
+
+## 10. Épicas MVP 2
+
+| Épica | Nombre | Historias |
+|---|---|---|
+| EPIC-005 | Entrada de partituras por voz y archivo | HU11, HU19 |
+| EPIC-006 | Escucha y aprendizaje con audio | HU13, HU14, HU15, HU18, HU20, HU21 |
+| EPIC-007 | Fiabilidad y control de costo del audio | HU16, HU17 |
+| EPIC-004 (MVP 1, ampliada) | Comunidad | HU12 |
+
+## 11. Plan del Sprint 2
+
+| Sprint | Historias incluidas | Story Points | Objetivo del sprint |
+|---|---|---:|---|
+| Sprint 2 — 28 de octubre al 11 de noviembre de 2026 | HU11–HU19 (P03) + HU20, HU21 (CR-005, CR-007) | 31 (P03) + 13 (propuesta) = **44** | Entregar el alcance MVP 2 aprobado. Orden P03: 1a HU15, 1b HU19, 2a HU17, 2b HU16, 2c HU13, 3 HU11, 4a HU14, 4b HU12, 5 HU18; después HU20 y HU21. |
+
+## 12. Historias del Sprint 2
+
+| HU | Historia | SP | MoSCoW / P03 | Clasificación IA | Dev. principal (propuesta) | Dev. apoyo (propuesta) | Estado al 11-nov |
+|---|---|---:|---|---|---|---|---|
+| HU11 | Dictar una partitura por voz (+ CR-006 Gemini) | 8 (provisional) | Must / P0 | 4/5 — IA | Emanuel Rivas | Johan Andrés Ceballos | Implementada; aceptación con micrófono real y corpus pendiente |
+| HU12 | Comentarios de voz | 3 | Should / P1 | 4/5 — IA | David Urrego | Alejandro Rodríguez | Implementada; micrófono real pendiente |
+| HU13 | Solfeo hablado | 5 | Must / P0 | 2/5 — Asistida por IA | David Urrego | Emanuel Rivas | Implementada; escucha humana pendiente |
+| HU14 | Tutor auditivo | 3 | Should / P1 | 2/5 — Asistida por IA | David Urrego | Johan Andrés Ceballos | Implementada; escucha humana pendiente |
+| HU15 | Reproducción con instrumento | 3 | Must / P0 | 0/5 — Tradicional | Johan Andrés Ceballos | Alejandro Zamorano | Implementada |
+| HU16 | Almacén (caché) de audio | 3 | Must / P0 | 0/5 — Tradicional | Alejandro Rodríguez | David Urrego | Implementada |
+| HU17 | Voz de respaldo | 2 | Must / P0 | 2/5 — Asistida por IA | Emanuel Rivas | Alejandro Rodríguez | Implementada |
+| HU18 | Descarga MP3 | 2 | Could / P2 | 0/5 — Tradicional | Johan Andrés Ceballos | Alejandro Rodríguez | Implementada |
+| HU19 | Cargar archivo `.abc` | 2 | Should / P1 | 0/5 — Tradicional | Johan Andrés Ceballos | Alejandro Zamorano | Implementada |
+| HU20 | Tocar con otros instrumentos (DDSP) | 5 (propuesta CR-005) | Could / P2 (propuesta) | 3/5 — IA | Johan Andrés Ceballos | Emanuel Rivas | Implementada; escucha humana pendiente |
+| HU21 | Tutor conversacional (Gemini Live) | 8 (propuesta CR-007) | Could / P2 (propuesta) | 5/5 — IA | Emanuel Rivas | Johan Andrés Ceballos | Implementada; micrófono real pendiente |
+
+Alejandro Zamorano (Tester / Despliegue) lidera además la aceptación manual (`MVP2_MANUAL_ACCEPTANCE_CHECKLIST.md`) y el despliegue en Railway (P07/P08), como sugería la sección 8 del MVP 1.
+
+## 13. Evaluación de IA por historia (MVP 2)
+
+Criterios iguales a la sección 5. Clasificación: 0 = Tradicional; 1–2 = Asistida por IA; 3–5 = IA.
+
+| HU | Datos no estructurados | Patrones / predicción | Lenguaje natural | Personalización | Probabilístico | Puntaje | Tecnología |
+|---|---|---|---|---|---|---:|---|
+| HU11 | Sí (audio) | Sí | Sí | No | Sí | 4 | Whisper Base local + Gemini (interpretación) |
+| HU12 | Sí (audio) | Sí | Sí | No | Sí | 4 | Whisper Base local |
+| HU13 | No | No | Sí (voz sintética) | No | Sí | 2 | ElevenLabs / edge-tts |
+| HU14 | No | No | Sí | No | Sí | 2 | ElevenLabs / edge-tts |
+| HU15 | No | No | No | No | No | 0 | Tone.js |
+| HU16 | No | No | No | No | No | 0 | Caché en servidor |
+| HU17 | No | No | Sí | No | Sí | 2 | edge-tts |
+| HU18 | No | No | No | No | No | 0 | Codificación MP3 |
+| HU19 | No | No | No | No | No | 0 | Lectura de archivo en navegador |
+| HU20 | Sí (audio generado) | Sí | No | No | Sí | 3 | Magenta DDSP + TensorFlow.js (respaldo Tone.js) |
+| HU21 | Sí (voz) | Sí | Sí | Sí (contexto de la partitura) | Sí | 5 | Gemini Live + Gemini |
+
+## 14. Distribución de carga del equipo (propuesta)
+
+| Desarrollador | Rol | Principal | Apoyo | Total | % de carga |
+|---|---|---:|---:|---:|---:|
+| Johan Andrés Ceballos | Frontend | 4 | 3 | 7 | 32% |
+| Emanuel Rivas | Backend / Arquitecto | 3 | 2 | 5 | 23% |
+| David Urrego | Backend | 3 | 1 | 4 | 18% |
+| Alejandro Rodríguez | Base de datos | 1 | 3 | 4 | 18% |
+| Alejandro Zamorano | Tester / Despliegue | 0 | 2 | 2 | 9% (+ aceptación y despliegue) |
+
+## 15. Validación de control MVP 2
+
+- [x] Todas las historias pertenecen a una épica (EPIC-004–EPIC-007).
+- [x] IDs únicos HU11–HU21 / US-011–US-021, trazables a P02 v5.6.
+- [x] Todas las historias asignadas al Sprint 2 del MVP 2.
+- [x] SP en escala Fibonacci; los de HU20/HU21 marcados como propuesta.
+- [x] Puntaje de IA por historia, no por épica.
+- [x] Funciones eliminadas (voz cantada, «Voz» como instrumento) fuera del plan.
+- [ ] Asignación de responsables confirmada por el equipo (pendiente).
+- [ ] Prioridad y SP de HU20/HU21 confirmados en P03 (pendiente).
+- [ ] Demostración del MVP 2 al cierre del sprint registrada (IND-208; pendiente de evidencia).

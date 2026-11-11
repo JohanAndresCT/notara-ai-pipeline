@@ -393,3 +393,23 @@ The previous Run 22 status is historical and superseded on the approval
 classification. P09 documentation now aligns with P02/P03 v5.6/4.6. `PASS_WITH_WARNINGS`
 is limited to this documentation reconciliation; missing formal approval
 documentation and unrun MkDocs build remain explicit warnings.
+
+
+---
+
+## Run 2 — MVP 2 (prompts P09 v2.0, 2026-11-11)
+
+| ID | Verificación | Evidencia | Clase | Resultado |
+|---|---|---|---|---|
+| P09-VAL-MVP2-01 | Capacidades MVP 2 documentadas con su estado de aprobación | README §3 (US-011–US-021, CR-005/006/007 con acta pendiente) | MANUAL_EXECUTED | PASS |
+| P09-VAL-MVP2-02 | Proveedores de IA y propósito | README §4; `ARCHITECTURE.md`; `USER_GUIDE.md` (avisos M-11, M-18) | MANUAL_EXECUTED | PASS |
+| P09-VAL-MVP2-03 | Endpoints MVP 2 y códigos de error | `API.md`, `API_STT_HU11.md` contrastados con `voice/urls`, `tutor_views.py` | MANUAL_EXECUTED | PASS |
+| P09-VAL-MVP2-04 | Variables y límites sin valores secretos | `SETUP.md`, `.env.example` (vaciado en P08), `git grep` de patrones de clave en README/docs: 0 | AUTOMATED_EXECUTED | PASS |
+| P09-VAL-MVP2-05 | Cifras de prueba coinciden con P07 Run 2 | README §10/§13, `TESTING.md`, `KNOWN_LIMITATIONS.md`, `REQUIREMENTS_COVERAGE.md` = 175 / 175 / 9 | MANUAL_EXECUTED | PASS |
+| P09-VAL-MVP2-06 | Sin funciones eliminadas presentadas como entregadas | Búsqueda de «cantada», «a cappella», «Voz» como instrumento: sin menciones como función | AUTOMATED_EXECUTED | PASS |
+| P09-VAL-MVP2-07 | Enlaces relativos de README y `docs/` | Script de verificación: 0 enlaces rotos | AUTOMATED_EXECUTED | PASS |
+| P09-VAL-MVP2-08 | Evidencia manual no presentada como automatizada | Micrófono real, escucha, corpus y Railway marcados como pendientes | MANUAL_EXECUTED | PASS |
+
+Observación: `REQUIREMENTS_COVERAGE.md` conserva la cifra 165/164 dentro de la descripción histórica de P06 (correcta como registro de esa etapa).
+
+**Resultado:** `PASS_WITH_WARNINGS` (limitaciones de verificación manual y rotación de clave pendientes).

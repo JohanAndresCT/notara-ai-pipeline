@@ -64,3 +64,48 @@ el estado registrado arriba permanece `PARTIAL`.
 El proyecto lead confirmó el alcance; la fecha/acta formal de aprobación está
 pendiente de documentación (Q-030), no es una condición para el registro de
 las pruebas. No se modificaron pruebas ni código en esta reconciliación.
+
+
+---
+
+## Run 2 — MVP 2 (prompts P07 v2.0, 2026-11-11)
+
+### Entorno
+
+| Elemento | Valor |
+|---|---|
+| Rama / base | `pipeline/mvp2-p00-context`, HEAD `658f2e8` + cambios de prueba sin commit (`backend/voice/tests.py`, `frontend/e2e/notara-e2e.spec.ts`) |
+| Python | 3.13.14 (venv `.venv`), Django 5.2 |
+| Node / gestor | Node 22.19.0, pnpm 12.11.2 (`frontend/`, `pnpm install --frozen-lockfile`, dependencias instaladas) |
+| Bases de datos | SQLite (temporal) y PostgreSQL 16 en contenedor local `notara-p07-pg` (puerto 55432) |
+| Modelo Whisper | No requerido (`STT_MODEL_REQUIRED=false`); STT/TTS/Gemini sustituidos por fakes/mocks |
+| Proveedores reales | No invocados por la suite automatizada (DEC-230, NFR-010) |
+| Diferencias | CI usa PostgreSQL de servicio y fakes; Railway (volumen `/data`, HTTPS, claves) no ejecutado en esta corrida |
+
+### Comandos y resultados
+
+| # | Comando (desde) | Exit | Resultado | Clase |
+|---|---|---|---|---|
+| 1 | `pnpm exec tsc --noEmit` (`frontend/`) | 0 | 0 errores | AUTOMATED_EXECUTED |
+| 2 | `pnpm exec vite build` (`frontend/`) | 0 | Build OK; TensorFlow.js en chunk diferido | AUTOMATED_EXECUTED |
+| 3 | `DJANGO_DB_ENGINE=sqlite STT_MODEL_REQUIRED=false python manage.py test` (`backend/`) | 0 | **Ran 175, OK (skipped=2)** — las 2 omitidas son pruebas solo-PostgreSQL de `tests_migrations` | AUTOMATED_EXECUTED |
+| 4 | `DJANGO_DB_ENGINE=postgresql POSTGRES_HOST=127.0.0.1 POSTGRES_PORT=55432 STT_MODEL_REQUIRED=false python manage.py test --noinput` | 0 | **Ran 175, OK** — incluye migraciones `scores.0006`, `voice.0002`, `voice.0003` | AUTOMATED_EXECUTED |
+| 5 | `pnpm exec playwright test` (`frontend/`, backend y Vite locales) | 0 | **9 passed** (6 MVP 1 + 3 MVP 2) | AUTOMATED_EXECUTED |
+
+Desglose backend por módulo: `voice/tests.py` 32, `voice/tests_tutor.py` 8, `scores/tests.py` 66, `scores/tests_mvp2.py` 26, `scores/tests_migrations.py` 7, `accounts/tests.py` 25, resto 11.
+
+### Evidencia no automatizada
+
+| Elemento | Clase |
+|---|---|
+| Dictado y tutor Live con voz sintetizada inyectada como micrófono (P06, CR-006/CR-007) | SIMULATED |
+| Gemini/ElevenLabs reales en desarrollo local (CR-005..007) | USER_REPORTED / SIMULATED; no repetido |
+| Micrófono real, escucha humana, corpus AC-070–AC-072/AC-082, Railway `/data` | NOT_RUN |
+
+### Defectos
+
+Ninguno confirmado en esta corrida (ver `BUG_FIX_REPORT.md`, Run 2).
+
+### Estado
+
+`PASS_WITH_WARNINGS` — todas las suites automatizadas pasan en SQLite y PostgreSQL; la aceptación manual MVP 2 (MAN-MVP2-01..06) sigue pendiente y bloquea declarar las HU como aceptadas por usuario.

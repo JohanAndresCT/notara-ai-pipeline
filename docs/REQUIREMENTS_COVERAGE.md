@@ -29,11 +29,11 @@ Estados: `IMPLEMENTED`, `PARTIAL` (implementado con diferencias que requieren de
 
 ## Trazabilidad con pruebas
 
-La evidencia histórica P09 de MVP 1 registraba 88 pruebas backend; la revalidación más reciente para el código actual ejecutó 165 pruebas backend y voice (164 pasaron, una PostgreSQL-only omitida). E2E histórico: 5 escenarios, no reejecutados en la validación actual. Ver [TESTING.md](./TESTING.md).
+La evidencia histórica P09 de MVP 1 registraba 88 pruebas backend; P07 Run 2 (2026-11-11) ejecutó 175 pruebas backend en SQLite (2 PostgreSQL-only omitidas) y 175/175 en PostgreSQL; E2E 9/9. Ver [TESTING.md](./TESTING.md).
 
 ## Validación de historias de P06
 
-Los registros actuales contienen implementación y validación individual para `US-001`–`US-019`. CR-005 y CR-007 tienen código/registro de implementación, pero no existe validación P06 dedicada para US-020/US-021; AC-082 de CR-006 sigue pendiente de medir. La existencia de informes no significa aceptación manual, de rendimiento o de despliegue. P06 clasifica la ejecución global como `PASS_WITH_WARNINGS` / `PARTIAL`: 165 pruebas backend (164 pasaron y una prueba de concurrencia PostgreSQL fue omitida), Django `check` y migraciones pasaron; el typecheck frontend quedó bloqueado y el build actual no se reejecutó. Véanse `ai-pipeline/outputs/06_implementation/IMPLEMENTATION_VALIDATION_MVP2.md` y `ai-pipeline/outputs/07_testing/TEST_VALIDATION.md`.
+Los registros actuales contienen implementación y validación individual para `US-001`–`US-019`. US-020 y US-021 tienen ahora registro y validación P06 (`US-020_INSTRUMENTS_VALIDATION.md`, `US-021_TUTOR_CHAT_VALIDATION.md`, `PASS_WITH_WARNINGS`); AC-082 de CR-006 sigue pendiente de medir. La existencia de informes no significa aceptación manual, de rendimiento o de despliegue. P06 clasifica la ejecución global como `PASS_WITH_WARNINGS` / `PARTIAL`: 165 pruebas backend (164 pasaron y una prueba de concurrencia PostgreSQL fue omitida), Django `check` y migraciones pasaron; el typecheck frontend quedó bloqueado y el build actual no se reejecutó. Véanse `ai-pipeline/outputs/06_implementation/IMPLEMENTATION_VALIDATION_MVP2.md` y `ai-pipeline/outputs/07_testing/TEST_VALIDATION.md`.
 
 ## Historias canónicas de MVP 2 (US-011–US-021)
 
@@ -63,4 +63,4 @@ La fecha indicada para la recepción de la confirmación (2026-11-11) no se pres
 
 ## Resultados de prueba vigentes
 
-Backend: 165 ejecutadas en SQLite aislado con Python 3.11.9 / Django 5.2.18: 164 pasaron y una prueba específica de concurrencia PostgreSQL se omitió. `manage.py check` y `makemigrations --check --dry-run` pasaron. Typecheck frontend bloqueado por dependencias locales ausentes; build y E2E actuales no ejecutados. La evidencia histórica E2E P07 es 5/5, no una reejecución actual. Más detalle en [TESTING.md](./TESTING.md).
+Backend: 175 pruebas en SQLite (173 pasaron, 2 omitidas por ser exclusivas de PostgreSQL) y 175/175 en PostgreSQL 16, Python 3.13.14; `tsc` y `vite build` pasan; Playwright 9/9 (6 MVP 1 + 3 MVP 2). Ejecución P07 Run 2 del 2026-11-11. Más detalle en [TESTING.md](./TESTING.md).

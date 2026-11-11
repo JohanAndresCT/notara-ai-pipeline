@@ -1,6 +1,17 @@
 # Pruebas
 
-## Evidencia local más reciente
+## Evidencia local más reciente (P07 Run 2, 2026-11-11)
+
+| Capa | Comando | Entorno | Resultado |
+|---|---|---|---|
+| Backend SQLite | `DJANGO_DB_ENGINE=sqlite STT_MODEL_REQUIRED=false python manage.py test` (desde `backend/`) | Python 3.13.14, Django 5.2 | 175 ejecutadas, OK (2 omitidas: exclusivas de PostgreSQL) |
+| Backend PostgreSQL | `DJANGO_DB_ENGINE=postgresql POSTGRES_HOST=… POSTGRES_PORT=… python manage.py test --noinput` | PostgreSQL 16 (contenedor local) | 175/175 OK, incluidas migraciones `scores.0006`, `voice.0002`, `voice.0003` |
+| Frontend | `pnpm exec tsc --noEmit`; `pnpm exec vite build` (desde `frontend/`) | Node 22.19.0, pnpm 12.11.2, lockfile | 0 errores; build OK |
+| Playwright E2E | `pnpm exec playwright test` | Chromium, backend y Vite locales | 9/9 (6 MVP 1 + 3 MVP 2) |
+
+Proveedores sustituidos por fakes/mocks (FakeTts, FakeSttAdapter, normalizador falso, `urlopen` mockeado para Gemini); no se usan claves. Las pruebas E2E MVP 2 no reproducen audio ni usan micrófono.
+
+## Evidencia anterior (revalidación previa)
 
 | Capa | Comando / evidencia | Entorno | Resultado |
 |---|---|---|---|
@@ -8,7 +19,7 @@
 | Chequeo Django | `.\.venv\Scripts\python.exe backend\manage.py check` | Mismo entorno | Sin incidencias |
 | Migraciones | `.\.venv\Scripts\python.exe backend\manage.py makemigrations --check --dry-run` | Mismo entorno | No se detectaron cambios |
 | Frontend | `npm.cmd run typecheck` desde `frontend/` | Node 24.21.0; instalación local incompleta | Bloqueado: no resuelve `@tensorflow/tfjs`, `tone` y `@breezystack/lamejs`, aunque están declarados en los manifiestos |
-| Playwright E2E | No ejecutado en esta revalidación | Requiere dependencias frontend | `NOT_RUN`; se conserva evidencia histórica P07 de 5/5 |
+| Playwright E2E | No ejecutado en esa revalidación | Requiere dependencias frontend | `NOT_RUN` entonces; superado por P07 Run 2 (9/9) |
 | Build frontend | No ejecutado en esta revalidación | `frontend/dist/` preexistente | `NOT_RUN`; se preservó el artefacto existente |
 | PostgreSQL local | No ejecutado | PostgreSQL no disponible en esta ejecución | `NOT_RUN`; no se infiere equivalencia con SQLite |
 

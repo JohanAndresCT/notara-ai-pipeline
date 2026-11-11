@@ -58,3 +58,14 @@ Después:
 ## 8. Estado y siguiente acción
 
 `FIXED_AND_VERIFIED` para el defecto HTTP 204. No crear rama ni commit. Mantener P07 como verificado localmente con SQLite y dejar PostgreSQL como validación pendiente; no avanzar a CI/despliegue por esta solicitud.
+
+
+---
+
+## Run 2 — MVP 2 (prompts P07 v2.0, 2026-11-11)
+
+- Estado: `NO_CONFIRMED_BUG`.
+- Suites ejecutadas: backend 175 (SQLite y PostgreSQL), `tsc`, `vite build`, Playwright 9/9 — sin fallos.
+- Incidencias de entorno observadas (no defectos de producto): el `.env` local apunta a PostgreSQL en el puerto 5433 (no levantado); se resolvió por variables de entorno de la corrida (`DJANGO_DB_ENGINE`), clasificación `ENVIRONMENT`, sin cambios de código.
+- Defectos previos (`BUG-P07-204-01`) se mantienen `FIXED_AND_VERIFIED`; la regresión MVP 1 sigue pasando.
+- Riesgos de proveedor ya mitigados en P06 (modelo Gemini 2.5 retirado para claves nuevas → `gemini-3.5-flash-lite`; voz de biblioteca ElevenLabs 402 → voz prefabricada) se registran como `PROVIDER` resueltos por configuración, sin debilitar fallbacks, cuotas, autenticación ni CSRF.
