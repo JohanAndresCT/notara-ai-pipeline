@@ -3,15 +3,25 @@
 import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
+from django.db.migrations.state import ModelState
 
 
 def create_comment_table_if_missing(apps, schema_editor):
-    try:
-        comment_model = apps.get_model("scores", "Comment")
-    except LookupError:
-        from scores.models import Comment
-
-        comment_model = Comment
+    comment_model = ModelState(
+        app_label="scores",
+        name="Comment",
+        fields=[
+            ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+            ("body", models.TextField(max_length=500)),
+            ("created_at", models.DateTimeField(auto_now_add=True)),
+            ("author", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="comments", to=settings.AUTH_USER_MODEL)),
+            ("score", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="comments", to="scores.score")),
+        ],
+        options={
+            "ordering": ("created_at", "id"),
+            "indexes": [models.Index(fields=["score", "created_at", "id"], name="comment_score_recent_idx")],
+        },
+    ).render(apps)
     if comment_model._meta.db_table not in schema_editor.connection.introspection.table_names():
         schema_editor.create_model(comment_model)
 
