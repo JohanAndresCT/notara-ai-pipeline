@@ -84,7 +84,7 @@ Las dependencias de Django están en `backend\requirements.txt`; las de `experim
 
 El contrato de integración para frontend está en [API_STT_HU11.md](./API_STT_HU11.md).
 
-El backend usa el repositorio público `Systran/faster-whisper-base`, fijado al commit inmutable `ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66`. El inventario y los SHA-256 esperados están versionados en [model_sha256.json](../backend/voice/model_sha256.json). La verificación requiere exactamente `config.json`, `model.bin`, `tokenizer.json` y `vocabulary.txt`; el verificador rechaza archivos faltantes, adicionales, con tamaño distinto o con SHA-256 distinto. El manifiesto de confianza se mantiene en el repositorio, no se genera a partir de los pesos descargados.
+El backend usa el repositorio público `Systran/faster-whisper-base`, fijado al commit inmutable `ebe41f70d5b6dfa9166e2c581c45c9c0cfc57b66`. El inventario y los SHA-256 esperados están versionados en [model_sha256.json](https://github.com/JohanAndresCT/notara-ai-pipeline/blob/main/backend/voice/model_sha256.json). La verificación requiere exactamente `config.json`, `model.bin`, `tokenizer.json` y `vocabulary.txt`; el verificador rechaza archivos faltantes, adicionales, con tamaño distinto o con SHA-256 distinto. El manifiesto de confianza se mantiene en el repositorio, no se genera a partir de los pesos descargados.
 
 La descarga ocurre solo al ejecutar explícitamente el aprovisionador. Requiere acceso a Hugging Face; no se ejecuta en el arranque de una solicitud HTTP. Ejecuta los comandos desde la raíz del repositorio y con las dependencias de `backend\requirements.txt` instaladas.
 
