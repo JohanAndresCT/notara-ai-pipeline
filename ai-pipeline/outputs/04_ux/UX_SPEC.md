@@ -12,15 +12,16 @@
 | 4.2 | MVP 2 | Records requester-approved CR-004 implementation of Whisper Base for HU11/HU12. Existing UX flows, messages, accessibility rules and MVP 1 remain unchanged. Empirical acceptance and production authorization remain pending. |
 | 4.3 | MVP 2 | Merge reconciliation: UX-PROP-001-007 approved (DEC-235); UX-Q-003 resolved (tutor adds key and tempo, DEC-236); voice-comment transcript shown in full up to 1,000 characters (FR-046, AC-077, DEC-231). M-11 (Notara servers, CR-003) unchanged. |
 | 4.4 | MVP 2 | Reconciles P00–P03 source versions and records CR-005/006/007 as pending changes outside active UX flows. |
+| 4.5 | MVP 2 | Reconciles reported approval of CR-005/006/007 and P02 v5.6; specifies the instrument playback/download and tutor behaviors from their criteria, and the Gemini dictation notice. Formal approval record/date and UX acceptance remain pending documentation. |
 
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 4.4
+- **Version:** 4.5
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P04 - UX/UI
 - **Status:** `READY_WITH_ASSUMPTIONS`
-- **Source Artifacts:** `REQUIREMENTS.md` v5.5 and validation; `PRIORITIZATION.md` v4.4 and validation; `PRODUCT_VISION.md` v2.3; `DECISIONS_MVP2.md` (DEC-201–DEC-244 with approval states retained); `CR-003_WHISPER_TINY.md`; `CR-005_INSTRUMENTS.md`; `CR-006_GEMINI_DICTATION.md`; `CR-007_GEMINI_LIVE_TUTOR.md`; `UX_SPEC.md` v1.0.
+- **Source Artifacts:** `REQUIREMENTS.md` v5.6 and validation; `PRIORITIZATION.md` v4.6 and validation; `PRODUCT_VISION.md` v2.4; `DECISIONS_MVP2.md` (DEC-201–DEC-244 with approval states retained); `CR-003_WHISPER_TINY.md`; `CR-005_INSTRUMENTS.md`; `CR-006_GEMINI_DICTATION.md`; `CR-007_GEMINI_LIVE_TUTOR.md`; `UX_SPEC.md` v1.0.
 - **Upstream Validation Statuses:** P00 `PASS_WITH_WARNINGS`; P01 `PASS_WITH_WARNINGS`; P02 `PASS_WITH_WARNINGS`; P03 `PASS_WITH_WARNINGS` (P04 readiness: WITH CONSTRAINTS).
 - **Labels:** FACT / DECISION (approved source), UX-PROP (interaction detail proposed by P04, pending approval), ASSUMED.
 
@@ -37,6 +38,8 @@
 - **load** an `.abc` file into the editor (HU19);
 - **listen** to an ABC score: spoken solfege, audio tutor and piano (HU13-HU15);
 - **download** the solfege as MP3 (HU18);
+- choose from the approved instruments and download an instrument rendering (HU20);
+- ask the conversational tutor about the score (HU21);
 - **comment by voice** (HU12) and delete their own comments (DEC-211).
 
 HU16 (audio store) and HU17 (fallback voice) have no UI. Their only UX effect is that audio arrives or a clear message is shown, never a server error.
@@ -122,12 +125,13 @@ HU16 (audio store) and HU17 (fallback voice) have no UI. Their only UX effect is
 |---|---|---|---|---|
 | REG-001 Dictation panel | SCR-006, SCR-007 | Record a dictation, see vocabulary and notice, get ABC inserted. | FR-018..FR-021, FR-029, FR-030 | P0 |
 | REG-002 File loading control | SCR-006, SCR-007 | Select an `.abc` file. | FR-022..FR-024 | P1 |
-| REG-003 Listening panel | SCR-005 | "Escuchar Solfeo", "Tutor Auditivo", "Reproducir Piano", "Descargar MP3". | FR-031..FR-037, FR-042, FR-044 | P0 (solfege, piano), P1 (tutor), P2 (MP3) |
-| REG-004 Audio player | SCR-005 (REG-003, REG-006) | Play/pause/stop synthesized audio and voice comments. | FR-027, FR-033 | P0 |
+| REG-003 Listening panel | SCR-005 | "Escuchar Solfeo", "Tutor Auditivo", instrument playback, and solfege/instrument MP3 downloads. | FR-031..FR-037, FR-042, FR-044, FR-051, FR-052 | Existing P03 priorities; CR-005 unplanned |
+| REG-004 Audio player | SCR-005 (REG-003, REG-006) | Play/pause/stop synthesized audio and voice comments; select an instrument, show DDSP/fallback state, and download instrument MP3. | FR-027, FR-033, FR-051, FR-052 | Existing P03 priorities; CR-005 unplanned |
 | REG-005 Voice comment composer | SCR-005 (comment area) | Record up to 30 s, review, send or discard. | FR-026, FR-029, FR-030 | P1 |
 | REG-006 Voice comment item | SCR-005 (comment list) | Show transcribed text with a play control. | FR-027 | P1 |
 | REG-007 Comment delete action | SCR-005 (own comments) | Delete own comment (text or voice). | FR-028 | delivered (MVP 1 code), amended |
 | REG-008 Notice and vocabulary help | REG-001, REG-005 | Privacy notice; supported vocabulary with example. | FR-020, FR-029 | P0 |
+| REG-009 Conversational tutor | SCR-005 | Accept M-18, conduct a Spanish live voice conversation with score context, text answers, a 2-minute limit, stop control, and typed fallback. | FR-047..FR-050 | Not assigned (P03) |
 
 ### 5.3 Navigation Model
 
@@ -216,6 +220,8 @@ MVP 1 navigation is unchanged: `SCR-001 -> SCR-002 or SCR-003 -> SCR-004 -> SCR-
   6. The user reviews or edits, then publishes with the normal validation (FLOW-004).
 - **Alternatives/errors:**
   - **Uninterpretable dictation:** M-01 "No se pudo interpretar el dictado musical"; content unchanged (AC-032).
+  - **Gemini normalization after deterministic parse failure:** the transcript text only may be normalized; if it parses, insert the result and label it "Interpretado con IA". Audio is never sent to Gemini (CR-006 AC-078/AC-081).
+  - **Non-musical text or Gemini failure/timeout:** show M-01 and leave content unchanged; no server error reaches the user (AC-079/AC-080).
   - **Permission denied, no microphone or insecure context:** M-04; the rest of the form keeps working (AC-035).
   - **Result would exceed 1,000 characters:** M-06; content unchanged (EDGE-017).
   - **Transcription service unavailable:** M-07; the user can type instead (EDGE-018).
@@ -401,13 +407,33 @@ Only one audio plays at a time. Starting a new playback stops the previous one (
 | M-08d | El archivo supera los 1.000 caracteres. | REG-002 | UX-PROP |
 | M-09 | No se pudo transcribir tu comentario. Puedes intentarlo de nuevo o escribirlo. | REG-005 | UX-PROP (EDGE-030) |
 | M-10 | Alcanzaste el límite diario de 20 audios nuevos. Los audios ya generados siguen disponibles. | REG-003 | UX-PROP (DEC-213) |
-| M-11 | Dictado: "El audio se enviará a los servidores de Notara para transcribirlo. No se conservará después de la transcripción. El proveedor de alojamiento procesa esta solicitud." Voz-comentario: "El audio se enviará a los servidores de Notara para transcribirlo y se publicará junto con el texto y el audio. El proveedor de alojamiento procesa esta solicitud." | REG-008 | DECISION (DEC-214, CR-003); wording requires UX/privacy review |
+| M-11 | Dictado: "El audio se enviará a los servidores de Notara para transcribirlo. No se conservará después de la transcripción. El proveedor de alojamiento procesa esta solicitud. Si el parser no puede interpretarlo, el texto transcrito podría enviarse a Google Gemini para normalizarlo; nunca se envía el audio a Gemini." Voz-comentario: "El audio se enviará a los servidores de Notara para transcribirlo y se publicará junto con el texto y el audio. El proveedor de alojamiento procesa esta solicitud." | REG-008 | DECISION (DEC-214, CR-003, CR-006); wording requires UX/privacy review |
 | M-12 | Dictado insertado. Revísalo antes de publicar. | REG-001 | UX-PROP |
 | M-13 | El dictado genera notación ABC. Cambia el formato a ABC o vacía el campo para dictar. | REG-001 disabled | UX-PROP-001 |
 | M-14 | Archivo cargado. Revísalo antes de publicar. | REG-002 | UX-PROP |
 | M-15 | No se pudo generar el audio. Inténtalo más tarde. | REG-003 | UX-PROP (EDGE-025) |
 | M-16 | Genera primero el solfeo para descargarlo. | REG-003 disabled | UX-PROP-007 |
 | M-17 | Alcanzaste el límite diario de {limit} transcripciones. Inténtalo de nuevo cuando se restablezca el límite. | REG-001, REG-005 | DEC-219; FR-045; shown for `STT_DAILY_LIMIT_REACHED` (429) |
+| M-18 | Tu voz se envía a Google Gemini durante la conversación para generar las respuestas; Notara no guarda el audio. | REG-009, before session | CR-007 AC-083, AC-088 |
+
+## 10.1 Approved-scope flows (CR-005/006/007)
+
+### FLOW-020 — Play the score with other instruments (HU20)
+
+- **Entry:** a user opens an ABC score in SCR-005 and uses REG-004.
+- **Main path:** choose Piano, Guitar, Violin, Flute, Trumpet or Saxophone; play the score with a stop control; highlight the score's matching instrument. DDSP instruments are marked "IA"; if their model cannot load or run, use Tone.js and show the documented fallback notice. The user may download the selected instrument MP3; the spoken-solfege download from HU18 remains separate.
+- **Constraints:** only one audio plays at a time; unsupported/plain-text scores are disabled as for HU15; playback does not upload score/audio to an audio service or use voice-synthesis quota. Required DDSP model assets may load from their documented host. Respect reduced-motion preference for rising icon/note animation.
+- **Traceability:** US-020; FR-051–FR-052; AC-090–AC-096; CR-005 / DEC-242.
+- **Priority:** not assigned in P03.
+
+### FLOW-021 — Talk to the music tutor about a score (HU21)
+
+- **Entry:** an authenticated user opens SCR-005 and REG-009.
+- **Main path:** read and accept M-18, start a live voice conversation, receive Spanish spoken answers with answer text, and end with "Terminar". End the session automatically after 2 minutes and release the microphone.
+- **Context and alternatives:** the tutor receives the current score context and politely declines unrelated topics; plain-text score content is supported, with notice that playback needs ABC. If microphone access or the provider is unavailable, show a clear message and retain typed-question fallback (or HU14 audio tutor).
+- **Limit:** after 5 tutor uses in a day, show the daily-limit message.
+- **Traceability:** US-021; FR-047–FR-050; AC-083–AC-089; CR-007 / DEC-244.
+- **Priority:** not assigned in P03.
 
 ## 11. MVP Exclusions and Deferred UX
 
@@ -451,7 +477,7 @@ No screens or controls for OMR, image uploads, roles, account recovery, comment 
 |---|---|---|---|---|
 | HU01-HU09 / FR-001..FR-015 | FLOW-001..FLOW-009 | SCR-001..SCR-009 | Delivered | COVERED (v1.0) |
 | HU10 / FR-016, FR-028 | FLOW-010 | SCR-005, REG-007, SCR-011 | Delivered + amended | COVERED |
-| HU11 / FR-018..FR-021, FR-025, FR-029, FR-030 | FLOW-011, FLOW-018 | SCR-006/007, REG-001, REG-008 | P0 | COVERED |
+| HU11 / FR-018..FR-021, FR-025, FR-029, FR-030 | FLOW-011, FLOW-018 | SCR-006/007, REG-001, REG-008 | P0 | COVERED; CR-006 AC-078–AC-082 mapped |
 | HU12 / FR-026..FR-030, FR-046 | FLOW-013, FLOW-018 | SCR-005, REG-005, REG-006, REG-007 | P1 | COVERED |
 | HU13 / FR-031..FR-033, FR-036, FR-037, FR-044 | FLOW-014 | SCR-005, REG-003, REG-004 | P0 | COVERED |
 | HU14 / FR-033, FR-034 | FLOW-015 | SCR-005, REG-003, REG-004 | P1 | COVERED |
@@ -460,12 +486,14 @@ No screens or controls for OMR, image uploads, roles, account recovery, comment 
 | HU17 / FR-040, FR-041 | FLOW-019 | REG-003 (M-15 only) | P0 | NON_UX, behavior covered |
 | HU18 / FR-042 | FLOW-017 | SCR-005, REG-003 | P2 | COVERED |
 | HU19 / FR-022..FR-024 | FLOW-012 | SCR-006/007, REG-002, SCR-010 | P1 | COVERED |
+| HU20 / FR-051..FR-052 | FLOW-020 | SCR-005, REG-003/004 | Not assigned | SPECIFIED; UX acceptance pending |
+| HU21 / FR-047..FR-050 | FLOW-021 | SCR-005, REG-009 | Not assigned | SPECIFIED; UX acceptance pending |
 | FR-043 | All audio flows | REG-001, REG-003, REG-005 | P0 | COVERED |
 | NFR-001..NFR-003 | All | All | — | COVERED (v1.0) |
 | NFR-004, NFR-005, NFR-007, NFR-008 | FLOW-011..FLOW-019 | Audio regions | P0 | COVERED |
 | NFR-009 | Processing states | REG-001, REG-003, REG-005 | — | REQUIRES_DECISION (no durations) |
 
-AC coverage: AC-029-AC-069 are reachable in FLOW-010-FLOW-019. AC-055-AC-063 (store and fallback) are observable only as "audio arrives / M-15".
+AC coverage: AC-029-AC-096 are mapped to FLOW-010-FLOW-021. AC-055-AC-063 (store and fallback) are observable only as "audio arrives / M-15". The addition maps approved criteria; it does not claim user testing or browser/accessibility acceptance.
 
 ## 14. P05 Handoff Notes
 
@@ -510,18 +538,18 @@ Production deployment is not authorized.
 - **Next stage:** P05 - Architecture.
 - **Next actions:** validate with `P04_validation.md` v2.0; take UX-PROP-001-007 and UX-Q-001-003 to the team together with PRE-001-PRE-003.
 
-## Addendum — Pending changes (2026-11-11)
+## Addendum — Scope approval reconciliation (2026-11-11)
 
-The approved UX scope remains HU01–HU19. The following code/product changes
-remain outside the approved interaction specification until their recorded
-approval gates close:
+Version 4.4's pending-change status is superseded by this specification and
+the project-lead confirmation received 2026-11-11. The source change requests
+define the product behaviors mapped in FLOW-020/021 above:
 
 | Change | UX treatment |
 |---|---|
-| CR-005 / HU20 | The instrument picker and related playback/MP3 behavior are proposed; no approved REG/FLOW or acceptance mapping is added. |
-| CR-006 / US-011 | The Gemini label and revised M-11 notice are implemented per the requester-approved change, but remain unratified by the team; the approved baseline messages are unchanged. |
-| CR-007 / HU21 | The conversational tutor panel, live stream, and typed fallback are candidate UI behavior; REG-009 and AC-083–089 are not active UX requirements. |
+| CR-005 / HU20 | Approved scope as reported by the project lead; REG-003/004 and FLOW-020 map AC-090–AC-096. Priority remains unassigned. |
+| CR-006 / US-011 | Approved scope as reported by the project lead; REG-001's M-11 notice discloses transcript-only Gemini normalization after deterministic parse failure; AC-078–AC-082 apply. |
+| CR-007 / HU21 | Approved scope as reported by the project lead; REG-009 and FLOW-021 map AC-083–AC-089. Priority remains unassigned. |
 
-The source CR records and DEC-242–DEC-244 remain the authoritative approval
-state. The existence of UI code is not an approval or accessibility/browser
-acceptance result.
+The formal team approval record/date remains pending documentation (Q-030);
+the request receipt date is not presented as the approval date. The mapping
+does not constitute usability, accessibility, browser, or story acceptance.

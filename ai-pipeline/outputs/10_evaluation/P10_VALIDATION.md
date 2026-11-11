@@ -7,11 +7,11 @@
 
 ## 1. Validation Summary
 
-The evaluation is usable and its `NEEDS_ITERATION` verdict is supported by the available evidence. It uses the current approved P02/P03 baseline, distinguishes implementation from acceptance and release, preserves pending CR states, and corrects stale conclusions from the older MVP 1 evaluation.
+The evaluation is usable and its `NEEDS_ITERATION` verdict is supported by the available evidence. It uses the current approved P02/P03 baseline, distinguishes implementation from acceptance and release, records the formal approval-documentation gap, and corrects stale conclusions from the older MVP 1 evaluation.
 
 The JSON parses, its required fields and allowed statuses are present, counts are internally consistent, and the report agrees with the metrics. The evaluation accurately discloses missing current frontend/PostgreSQL/operations evidence, historical deployment provenance, and unavailable user/business outcomes.
 
-Warnings: the report aggregates the 77 acceptance-criteria entries through story-level P06 evidence rather than independently rerunning each criterion; this is explicitly disclosed. The P09 validation was produced in the same working session as P09 generation, so it is not a fully independent audit. This does not invalidate the P09 recorded result but limits its independence.
+Warnings: the report aggregates the 96 acceptance-criteria records through story-level P06 evidence rather than independently rerunning each criterion; this is explicitly disclosed. The P09 validation was produced in the same working session as P09 generation, so it is not a fully independent audit. This does not invalidate the P09 recorded result but limits its independence.
 
 ## 2. Artifact Integrity
 
@@ -20,33 +20,33 @@ Warnings: the report aggregates the 77 acceptance-criteria entries through story
 | `MVP_EVALUATION.md` | Exists, readable Markdown, includes the 10 required evaluation sections. | PASS |
 | `eval_metrics.json` | Exists, valid JSON, required top-level fields and expected nested structures present. | PASS |
 | JSON status and count checks | Statuses conform to the P10 prompt; known counts sum to their totals; unknown coverage is `null`. | PASS |
-| Evidence paths | All 17 paths listed in `evidence_sources` exist in the repository. | PASS |
+| Evidence paths | All paths listed in `evidence_sources` exist in the repository. | PASS |
 | Formatting/scope | `git diff --check` passes; this P10 run changed only its evaluation outputs. | PASS |
 
 ## 3. Evidence and Traceability Audit
 
 | Claim | Status | Evidence and assessment |
 |---|---|---|
-| Current approved scope is US-001–US-019, FR-001–FR-046 and NFR-001–NFR-010; candidate CR additions are excluded. | `VERIFIED` | P02 v5.5, backlog JSON, and P02 reconciliation addendum. |
-| There are 77 P02 acceptance-criteria entries; AC-028 is superseded by AC-029. | `VERIFIED` | `REQUIREMENTS_VALIDATION.md`, including the v5.3 merge reconciliation and v5.5 addendum. |
+| Current approved scope is US-001–US-021, FR-001–FR-052 and NFR-001–NFR-010. | `VERIFIED` | P02 v5.6 and its Run 6 scope reconciliation. |
+| P02 has 96 acceptance-criteria records; AC-028 is superseded by AC-029. | `VERIFIED` | P02 v5.6 Markdown/JSON and Run 6 validation. |
 | P09 is complete with `PASS_WITH_WARNINGS`. | `VERIFIED` | Current `DOCUMENTATION_VALIDATION.md`, section 20, and P09 report. The evaluation correctly states MkDocs was not built. |
 | Current backend execution is 165 discovered, 164 passed, 1 skipped, 0 failed. | `VERIFIED` | Current P06/P07 validation: local SQLite run; the skipped concurrency test requires PostgreSQL. |
 | Frontend typecheck is blocked by unresolved local dependencies; current build/E2E were not run. | `VERIFIED` | Current P06/P07 validation records and package manifest/lockfile status. |
 | Current deployment/availability is not established by historical P08 evidence. | `VERIFIED` | P08 records limited 2026-10-14 checks and explicitly says current operation was not rechecked. |
 | Historical E2E CI run #15 failed with unknown cause while run #14 passed on the same SHA. | `VERIFIED` | P08 validation, `P08-VAL-005`; logs were not audited, as disclosed by P10. |
 | The former CSRF finding and content-edit finding are not repeated as current defects. | `VERIFIED` | Current P09 records `P09-DISC-007` as resolved and `P09-DISC-004` as resolved; current requirement coverage says edit content/format is available. |
-| P10 does not treat CR-005/006/007 as approved canonical scope. | `VERIFIED` | P02/P03 current approval register and P10 scope language. |
+| P10 treats CR-005/006/007 as approved scope per project-lead confirmation while separating formal approval documentation and story acceptance. | `VERIFIED` | P00/P01/P02 current addenda, Q-030 and P06/P07 validation. |
 | Cache and fallback indicators are met using local tests/simulated provider failures. | `PARTIALLY_VERIFIED` | P06 US-016/US-017 report passing tests; external-provider behavior was not called or independently verified in P10, which the report states. |
 | User/business outcomes are unavailable. | `VERIFIED` | No usage or impact dataset or approved numeric targets were identified; P10 does not invent values. |
 
 ## 4. Requirements and Success Criteria Audit
 
-- Baseline verified: 46 approved FRs plus 10 approved NFRs = 56 requirement items. P10 explains that 19 stories are the traceability layer rather than additional items.
+- Baseline verified: 52 approved FRs plus 10 approved NFRs = 62 requirement items. P10 explains that 21 stories are the traceability layer rather than additional items.
 - Requirement totals: 19 `VERIFIED` + 36 `PARTIALLY_VERIFIED` + 1 `NOT_VERIFIED` = 56; no unsupported `NOT_IMPLEMENTED` or unknown-zero counts are used.
-- Success-indicator baseline: P01 `SUCCESS-001`–`SUCCESS-009` and `IND-201`–`IND-209` = 18. The P10 report has 18 rows, preserves the identifiers and qualitative targets, and totals 7 met, 9 partially met, 0 not met, and 2 unmeasured.
+- Success-indicator baseline: P01 `SUCCESS-001`–`SUCCESS-009` and `IND-201`–`IND-211` = 20. The P10 report has 20 rows, preserves the identifiers and qualitative targets, and totals 7 met, 9 partially met, 0 not met, and 4 unmeasured.
 - The P00/P01 `SUCCESS-*` collision is handled by citing MVP 2 indicators as `IND-*`.
-- P02 reports 77 acceptance-criteria entries, with AC-028 superseded. P10 uses existing story-level validation and discloses that it did not rerun every criterion. It does not claim individual P10 verification of all ACs.
-- Pending CRs, requester approval, team ratification, acceptance, and release are kept distinct.
+- P02 reports 96 acceptance-criteria records (95 active), with AC-028 superseded. P10 uses existing story-level validation and discloses that it did not rerun every criterion. It does not claim individual P10 verification of all ACs.
+- Reported scope approval, missing formal approval documentation, story acceptance, and release are kept distinct.
 
 Result: PASS_WITH_WARNINGS. No unsupported requirements or changed success targets were identified.
 
@@ -65,7 +65,7 @@ P10 accurately states that the MkDocs build was not run and does not claim curre
 - `coverage_percent`: `null`, appropriately indicating no measured coverage result.
 - Deployment status: `DEPLOYED_VERIFIED` is explicitly historical; operational verification is `PARTIALLY_VERIFIED`, with current status not rechecked.
 - Documentation `major_gaps`: 0 is consistent with the P09 validation's finding that no further documentation corrections are required; the unrun MkDocs build is separately disclosed.
-- Finding totals: 0 blocker, 0 high, 6 medium, 2 low, 0 info; these match the eight EVAL rows.
+- Finding totals: 0 blocker, 0 high, 7 medium, 2 low, 0 info; these match the nine EVAL rows.
 - `evidence_sources`: 17 entries; all paths exist.
 
 No malformed values or cross-file count inconsistencies were found.
@@ -94,6 +94,24 @@ No material unsupported conclusion or metrics error requires P10 correction.
 
 The evaluation is acceptable for handoff within its stated scope. It accurately represents the current repository evidence and limitations. The warnings above do not materially undermine the verdict or counts.
 
-## 10. Handoff
+## 10. Historical Handoff
 
-Retain the open P06/P07 acceptance and environment gates, P03 `PLANNED` delivery status, pending CR ratification, and P08 operational limitations. Reevaluate after authorized new test, product acceptance, release, or operations evidence becomes available. No code, tests, backlog, infrastructure, deployment, or external service was changed or invoked during P10.
+Retain the open P06/P07 acceptance and environment gates, P03 plan/unplanned distinctions, Q-030 formal approval documentation, and P08 operational limitations. Reevaluate after authorized test, product acceptance, release, or operations evidence becomes available. No code, tests, backlog, infrastructure, deployment, or external service was changed or invoked during the original P10 run.
+
+## 11. Scope approval reconciliation validation (P02 v5.6, 2026-11-11)
+
+**Decision:** `PASS_WITH_WARNINGS` · **Current P10 verdict:** `NEEDS_ITERATION`
+
+| Check | Result |
+|---|---|
+| Current scope and denominators | 21 canonical stories; 52 FR + 10 NFR = 62 requirements; 96 AC records (95 active, AC-028 superseded); 20 qualitative indicators. |
+| Requirement status totals | 19 verified + 42 partially verified + 1 not verified = 62. The six new FRs are only partially verified because code is present but story acceptance is not. |
+| Success-indicator totals | 7 met + 9 partially met + 4 unmeasured = 20. IND-210/211 are unmeasured, not reported as failed. |
+| Planning | P03's known 31-SP plan applies to US-001–US-019. US-020/US-021 are approved scope but unplanned, with no assigned priority or estimate. |
+| Approval provenance | Project lead confirmation received 2026-11-11; formal team approval record/date remains pending documentation (Q-030). |
+| Acceptance/evaluation | P06 lacks story validation for US-020/US-021; AC-082 measurement and real-microphone/browser evidence remain pending. The NEEDS_ITERATION verdict is supported. |
+| JSON integrity | The metrics arithmetic is consistent; evidence sources include the current P02–P09 scope artifacts. Deployment and test evidence remain historical/current as marked in the report. |
+
+This addendum supersedes the earlier candidate-scope classification without
+claiming acceptance or a release. No external service, test suite, CI workflow,
+or deployment was invoked for this documentary reconciliation.

@@ -13,18 +13,19 @@
 | 5.3 | MVP 2 | Merge reconciliation with `pipeline/mvp2-p00-context`: applies DEC-230-DEC-238. BR-014 approved as initial version; Q-022, Q-024, Q-025, Q-026 resolved; tutor adds key and tempo; FR-046, BR-030, BR-031, AC-077 added for voice-comment transcripts and storage; AC-029 adds confirmation; AC-063 and NFR-006/NFR-010 use fake engines in CI; NFR-009 records the approved 25 s ceiling. |
 | 5.4 | MVP 2 | Records **proposed** changes pending team approval in section 6.3: CR-005 (US-020 instruments, AI instruments DEC-242), CR-006 (US-011 amendment: Gemini interpretation of dictation), CR-007 (US-021 conversational tutor with Gemini Live). No approved story changes. |
 | 5.5 | MVP 2 | Reconciles source metadata and pending-change tracking with P00/P01 v2.4/2.3. Canonical requirements remain US-001–US-019; CR-005/006/007 remain separate proposals pending the documented approvals. |
+| 5.6 | MVP 2 | Reconciles the project-lead-reported team approval of CR-005/006/007: canonical US-020 and US-021, the CR-006 amendment to US-011, FR-047-FR-052 and BR-032/033. Formal approval record/date remains pending documentation; no unprovided priority or estimate is assigned. |
 
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 5.5
+- **Version:** 5.6
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P02 - Requirements Engineering
 - **Status:** READY_WITH_ASSUMPTIONS
-- **Generated From:** `ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md` (v2.3)
-- **Additional Sources:** `PROJECT_CONTEXT.md` (v2.4), `SPRINT_2_BACKLOG_INPUT.md` (HU11-HU19), `DECISIONS_MVP2.md` (DEC-201-DEC-244; approval states retained), `CR-003_WHISPER_TINY.md`, `CR-004_WHISPER_BASE.md`, `CR-005_INSTRUMENTS.md`, `CR-006_GEMINI_DICTATION.md`, `CR-007_GEMINI_LIVE_TUTOR.md`, requirements v2.0 (MVP 1)
+- **Generated From:** `ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md` (v2.4)
+- **Additional Sources:** `PROJECT_CONTEXT.md` (v2.5), `SPRINT_2_BACKLOG_INPUT.md` (HU11-HU19), `DECISIONS_MVP2.md` (DEC-201-DEC-244; approval states retained), `CR-003_WHISPER_TINY.md`, `CR-004_WHISPER_BASE.md`, `CR-005_INSTRUMENTS.md`, `CR-006_GEMINI_DICTATION.md`, `CR-007_GEMINI_LIVE_TUTOR.md`, requirements v2.0 (MVP 1)
 - **P01 Validation:** PASS_WITH_WARNINGS (run 2; DISC-VAL-202 and DISC-VAL-203 carried)
-- **Change Requests:** CR-001–CR-003 (as recorded in prior versions); CR-004 (requester-approved for implementation; acceptance pending); CR-005 (proposed); CR-006/CR-007 (requester-approved implementations; team ratification pending).
+- **Change Requests:** CR-001–CR-004 as recorded in prior versions; CR-005/006/007 scope approval reported by the project lead in the request received 2026-11-11. The underlying team approval record/date is pending documentation; this does not establish story acceptance or release approval.
 
 > Evidence labels: FACT, DECISION (`DEC-2NN`), ASSUMPTION, PROPOSAL, UNKNOWN, CONFLICT. MVP 2 indicators are cited as `IND-2NN` (P01 CONFLICT-001 / DISC-VAL-203).
 
@@ -34,7 +35,7 @@
 
 **MVP 1 (delivered, unchanged):** Notara is a responsive web community and basic sheet-music manager. Authenticated users publish, discover, read, comment on and react to short textual scores in `.abc` or plain-text format. Content is non-empty and at most 1,000 characters; `.abc` requires basic syntax validation; plain text is free format; display preserves line breaks and identifies the format.
 
-**MVP 2 (this version):** adds dictation of scores by voice (HU11), voice comments (HU12), spoken solfege (HU13), an audio tutor (HU14), instrument playback (HU15), reuse of synthesized audio (HU16), a fallback voice (HU17), MP3 download of the solfege (HU18) and loading a score from an `.abc` file (HU19), as refined by DEC-201-DEC-219.
+**MVP 2 (this version):** adds dictation of scores by voice (HU11), voice comments (HU12), spoken solfege (HU13), an audio tutor (HU14), instrument playback (HU15), reuse of synthesized audio (HU16), a fallback voice (HU17), MP3 download of the solfege (HU18), loading a score from an `.abc` file (HU19), instrument selection and DDSP playback (HU20), and the conversational score tutor (HU21). CR-006 amends HU11 without changing its prior criteria.
 
 ### 2.2 Scope Exclusions and Future Items
 
@@ -125,6 +126,12 @@ No new functional requirements or API contracts are introduced.
 | FR-044 | The platform shall limit each user to 20 new voice syntheses per day; audio served from storage does not count; a user over the limit receives a clear message. | EPIC-007 | MVP_CORE | Scope-defined | DEC-213; BR-017 |
 | FR-045 | The platform shall allow at most the configured number of admitted STT inferences per authenticated user per UTC day (default 30) across dictation and voice-comment transcription, persist the daily counter atomically, and reject over-limit requests before inference with `STT_DAILY_LIMIT_REACHED` (429). | EPIC-007 | MVP_CORE | Scope-defined | HU11, HU12; DEC-219; BR-029; Q-027 |
 | FR-046 | The platform shall store the full transcribed text of a voice comment up to 1,000 characters without truncating it; text comments keep the 500-character limit. | EPIC-004 | MVP_SUPPORTING | Scope-defined | DEC-231; BR-030 |
+| FR-047 | The platform shall allow an authenticated user to start a Gemini Live tutor session for a score using a short-lived token issued by the backend; the provider API key shall not be exposed to the browser. | EPIC-006 | MVP_SUPPORTING | Scope-defined | HU21; CR-007; AC-083, AC-088 |
+| FR-048 | During an active tutor session, the platform shall stream microphone audio to Google Gemini for live Spanish spoken responses and display the text of each response; Notara shall not store the session audio. | EPIC-006 | MVP_SUPPORTING | Scope-defined | HU21; CR-007; AC-083, AC-088 |
+| FR-049 | The platform shall enforce the approved tutor limit of 5 live sessions per authenticated user per day and show a clear limit response. | EPIC-006 | MVP_SUPPORTING | Scope-defined | HU21; CR-007; AC-086; BR-033 |
+| FR-050 | If microphone access or the live provider is unavailable, the platform shall show a clear message and retain typed-question fallback; a plain-text score remains eligible for tutor answers. | EPIC-006 | MVP_SUPPORTING | Scope-defined | HU21; CR-007; AC-087, AC-089 |
+| FR-051 | The platform shall let a user play a valid ABC score using Piano, Guitar, Violin, Flute, Trumpet or Saxophone; Violin, Flute, Trumpet and Saxophone use the documented Magenta DDSP path with a Tone.js fallback notice, and instrument playback is generated in the browser without counting against voice-synthesis quotas. | EPIC-006 | MVP_SUPPORTING | Scope-defined | HU20; CR-005; DEC-242; AC-090, AC-094 |
+| FR-052 | The platform shall allow a user to download an MP3 of the ABC score played with the selected instrument, while retaining HU18's separate spoken-solfege MP3. | EPIC-006 | MVP_SUPPORTING | Scope-defined | HU20; CR-005; AC-095 |
 
 ## 5. Non-Functional Requirements
 
@@ -671,37 +678,67 @@ No new functional requirements or API contracts are introduced.
 #### Open Questions
 - None
 
-### 6.3 Proposed MVP 2 changes (pending team approval)
+### 6.3 Approved MVP 2 changes (CR-005/006/007)
 
-These items are **PROPOSED**. They do not change the approved stories above until the team approves the change requests and P02 is re-run for them. IDs are reserved so that later stages can trace them.
+The project lead reported in the request received 2026-11-11 that the team
+approved CR-005, CR-006 and CR-007. The formal team approval record/date
+remains pending documentation. The criteria below retain the source change
+request content and its documented updates; approval is not implementation
+acceptance or release authorization.
 
-#### US-011 amendment — AI interpretation of dictation (CR-006)
+#### US-011 amendment — AI interpretation of dictation (CR-006, DEC-243)
 
-- **Status:** IMPLEMENTED 2026-11-10 (approved by the requester; team ratification pending, DEC-243).
-
-- **Change:** when the deterministic parser cannot interpret the Whisper transcript, the backend asks Google Gemini to rewrite the transcript text using only the BR-013 vocabulary and parses it again with the same parser. Audio is never sent to Gemini; the parser remains the only source of ABC.
-- **Proposed rule:** BR-032 (normalisation limits: fix spelling/word splits only, never add, remove or reorder notes; token-count safety check; 8 s timeout; fallback to M-01).
-- **Proposed criteria:** AC-078 (misspelled dictation interpreted and labelled "Interpretado con IA"), AC-079 (non-musical text still gives M-01), AC-080 (provider failure gives M-01, no server error), AC-081 (text only; updated M-11 notice), AC-082 (corpus reported with and without AI).
-- **Source:** `00_context/CR-006_GEMINI_DICTATION.md`.
+- **Change:** only after deterministic parsing fails, Google Gemini may normalize transcript text using BR-013; the same deterministic parser remains the only source of ABC. Audio is never sent to Gemini.
+- **Status:** Approved scope; implemented 2026-11-10. Formal team approval record/date pending documentation.
+- **Business rule:** BR-032.
 
 #### US-020 - Play the score with other instruments (CR-005, DEC-242)
 
 - **Epic:** EPIC-006
+- **Requirement(s):** FR-051, FR-052
 - **User Story:** As a user viewing an ABC score, I want to choose the instrument that plays it, so that I can hear how the melody sounds on my own instrument.
-- **Scope:** MVP_SUPPORTING (proposed)
-- **Status:** PROPOSED — prototype implemented in the working branch.
-- **Proposed criteria:** AC-090 (piano, guitar, violin, flute, trumpet and saxophone play the score; button shows "Detener"; voice options removed 2026-11-10), AC-091 (one audio at a time), AC-092 (score's instrument highlighted), AC-093 (plain-text/unsupported scores disabled with M-02/M-03), AC-094 (violin, flute, trumpet and saxophone played by the Magenta DDSP neural model and marked "IA", Tone.js fallback with notice), AC-095 (MP3 of the selected instrument downloadable; spoken-solfege MP3 of HU18 kept), AC-096 (no rising-icon animation with reduced motion).
-- **Source:** `00_context/CR-005_INSTRUMENTS.md` (local IDs AC-020-01..07 map to AC-090..096).
+- **Scope:** MVP_SUPPORTING
+- **Traceability:** HU20; NEED-014; JTBD-012; IND-210; CR-005; DEC-242
+- **Status:** Approved scope; implementation is recorded in CR-005. Formal team approval record/date pending documentation.
 
-#### US-021 - Talk to the music tutor about a score (CR-007)
+#### Acceptance Criteria
+
+- **AC-090:** Given a score with valid ABC, when I choose Piano, Guitar, Violin, Flute, Trumpet or Saxophone, then the melody plays in the browser and the button shows "Detener"; playback sends no score/audio to an audio service and does not use the voice-synthesis daily limit. Required DDSP model assets may be fetched from their documented host. *(Source: CR-005 AC-020-01 and AC-020-05; 2026-11-10 instrument update)*
+- **AC-091:** Given an instrument is playing, when I choose another instrument, solfege or tutor, then the previous playback stops so only one audio plays at a time. *(Source: CR-005 AC-020-02)*
+- **AC-092:** Given the score's instrument matches an available option, when the panel loads, then that option is highlighted. *(Source: CR-005 AC-020-03)*
+- **AC-093:** Given a plain-text or unsupported score, then instrument playback is disabled with M-02/M-03, as for HU15. *(Source: CR-005 AC-020-04)*
+- **AC-094:** Given Violin, Flute, Trumpet or Saxophone is selected, then playback uses the Magenta DDSP model and is marked "IA"; if the model cannot load or run, Tone.js plays instead and a fallback notice is shown. Piano and Guitar use Tone.js. *(Source: CR-005 DEC-242 and documented implementation update)*
+- **AC-095:** Given an instrument is selected, when I press "Descargar <instrumento> (MP3)", then an MP3 of the whole score played with that instrument is downloaded as `<titulo>-<instrumento>.mp3`; "Descargar solfeo (MP3)" for HU18 remains available. *(Source: CR-005 AC-020-07)*
+- **AC-096:** Given "reduce motion" is enabled, then no rising icons, notes or related animation are shown. *(Source: CR-005 AC-020-06)*
+
+#### US-021 - Talk to the music tutor about a score (CR-007, DEC-244)
 
 - **Epic:** EPIC-006
+- **Requirement(s):** FR-047, FR-048, FR-049, FR-050
 - **User Story:** As a music student, I want to ask the tutor questions by voice about the score I am viewing, so that I can understand it and learn how to play it without leaving the page.
-- **Scope:** MVP_SUPPORTING (proposed)
-- **Status:** IMPLEMENTED 2026-11-10 (requester approval; team ratification pending, DEC-244).
-- **Proposed criteria:** AC-083 (live voice conversation in Spanish with text of each answer), AC-084 (score context and scope limits), AC-085 (2-minute limit, "Terminar", "Reiniciar conversación", microphone released), AC-086 (daily limit), AC-087 (microphone/provider failure with typed-question fallback), AC-088 (API key never in the browser; ephemeral token; audio not stored by Notara), AC-089 (plain-text scores supported).
-- **Proposed requirements:** FR-047..FR-050, BR-033, message M-18 (privacy notice).
-- **Source:** `00_context/CR-007_GEMINI_LIVE_TUTOR.md`.
+- **Scope:** MVP_SUPPORTING
+- **Traceability:** HU21; NEED-015; JTBD-013; IND-211; CR-007; DEC-244
+- **Status:** Approved scope; implemented 2026-11-10. Formal team approval record/date pending documentation.
+
+#### Acceptance Criteria
+
+- **AC-083:** Given an authenticated user on a score detail page, when they press "Preguntar al tutor" and accept the notice, then a live voice conversation starts and the tutor answers in Spanish with voice, also showing the text of each answer. *(Source: CR-007 AC-083)*
+- **AC-084:** Given the conversation is active, then the tutor knows the score's title, instrument, format and content (ABC or text), answers about that score and general music theory, and politely declines unrelated topics. *(Source: CR-007 AC-084)*
+- **AC-085:** Given a conversation, then it ends automatically after 2 minutes or when the user presses "Terminar"; the microphone is released when it ends. *(Source: CR-007 AC-085)*
+- **AC-086:** Given the user has used the tutor 5 times today, when they try again, then a clear daily-limit message is shown. *(Source: CR-007 AC-086; the criterion's limit is retained as stated.)*
+- **AC-087:** Given microphone access is denied or the AI service is unavailable, then a clear message is shown and the user can still type a question and receive a text answer (or use the existing audio tutor, HU14). *(Source: CR-007 AC-087)*
+- **AC-088:** The Gemini API key never reaches the browser; the backend issues a short-lived token for each session; audio is streamed to the provider only during the session and is not stored by Notara. *(Source: CR-007 AC-088)*
+- **AC-089:** Given a plain-text score, then the tutor still answers using the text content and states that playback features need ABC. *(Source: CR-007 AC-089)*
+
+#### US-011 added Acceptance Criteria (CR-006)
+
+- **AC-078:** Given the transcript contains recognisable dictation words written incorrectly (e.g. "Donegra, recorcea"), when the parser fails, then AI normalisation is applied and the expected ABC (e.g. `C D/2`) is inserted for review, labelled "Interpretado con IA". *(Source: CR-006 AC-078)*
+- **AC-079:** Given the transcript is unrelated to music (e.g. "hola qué tal"), when AI normalisation runs, then no ABC is produced and M-01 is shown. *(Source: CR-006 AC-079)*
+- **AC-080:** Given the AI service is unavailable, misconfigured or exceeds 8 seconds, when the parser fails, then M-01 is shown and no server error reaches the user. *(Source: CR-006 AC-080)*
+- **AC-081:** Given AI normalisation is used, then only transcript text is sent to the provider (never audio) and M-11 states that the text may be processed by an AI provider. *(Source: CR-006 AC-081)*
+- **AC-082:** Given the evaluation corpus (AC-070), when measured with AI normalisation enabled, then exact results are reported both with and without it. *(Source: CR-006 AC-082)*
+
+**Message M-18:** "Tu voz se envía a Google Gemini durante la conversación para generar las respuestas; Notara no guarda el audio." The notice is presented before starting the tutor session. **Sources:** `00_context/CR-005_INSTRUMENTS.md`, `CR-006_GEMINI_DICTATION.md`, and `CR-007_GEMINI_LIVE_TUTOR.md`. FR-047–FR-050 and BR-033 apply to US-021; FR-051–FR-052 and DEC-242 apply to US-020.
 
 ## 7. Business Rules
 
@@ -738,6 +775,8 @@ These items are **PROPOSED**. They do not change the approved stories above unti
 | BR-029 | **STT quota:** each authenticated user may have at most `STT_DAILY_LIMIT` admitted inference attempts per UTC day (default 30) across HU11 dictation and HU12 voice comments. Persist a unique per-user/day counter and reserve it atomically before inference; count an attempt once inference is admitted, including failures after admission. Authentication/CSRF failures, invalid uploads, and requests rejected before admission do not count. Over-limit requests return `STT_DAILY_LIMIT_REACHED` (429) without inference. This quota is separate from the 20-synthesis DEC-213 limit. | FR-045; US-011, US-012 | DEC-219; Q-027 resolved | Approved |
 | BR-030 | A voice comment's transcribed text may have up to 1,000 characters and is never truncated; text comments keep the 500-character limit. | FR-026, FR-046; US-012 | DEC-231 | Defined |
 | BR-031 | Voice-comment recordings are kept in the container produced by the browser (`webm`, `ogg`; `wav` and `mp4` also accepted); no conversion is made. | FR-026; US-012 | DEC-233 | Defined |
+| BR-032 | When deterministic parsing of the STT transcript fails, Gemini may normalize transcript text using the BR-013 vocabulary; it may correct spelling, spacing, word splits and close synonyms but must not add, remove or reorder musical content. Only transcript text, never audio, is sent. The result must pass the same deterministic parser and the note/rest count safety check; at most one call is made per STT request with an 8-second timeout. If unavailable, misconfigured, timed out or still uninterpretable, preserve existing behavior and return M-01. | FR-019, FR-021; US-011; AC-078-AC-082 | CR-006; DEC-243 | Defined; evaluation pending |
+| BR-033 | The conversational tutor is limited to 5 live sessions per authenticated user per day; a live session ends after 2 minutes or when the user ends it. A backend-issued short-lived token protects the provider key; session audio is streamed to Gemini and is not stored by Notara. | FR-047-FR-049; US-021 | CR-007; DEC-244 | Defined |
 
 ## 8. Edge Cases
 
@@ -774,6 +813,11 @@ These items are **PROPOSED**. They do not change the approved stories above unti
 | EDGE-029 | The author deletes a comment that has audio. | US-010, US-012 | Comment and audio are no longer available. | Defined |
 | EDGE-030 | A voice comment's transcription fails or is empty. | US-012 | The comment is not created; clear message; the user can retry or write a text comment. | Defined |
 | EDGE-031 | An authenticated user reaches the daily STT inference limit. | US-011, US-012 | Reject before inference with `STT_DAILY_LIMIT_REACHED` (429); display the daily-limit message; do not increment the counter for the rejected request. | Defined |
+| EDGE-032 | Gemini normalization is unavailable, times out, returns unrelated text, or the normalized text fails deterministic parsing or the safety check. | US-011 | Return M-01; do not produce ABC from Gemini output; do not surface a server error. | Defined |
+| EDGE-033 | A DDSP model cannot load or run. | US-020 | Play with the documented Tone.js fallback and show its notice. | Defined |
+| EDGE-034 | A plain-text score is open in the conversational tutor. | US-021 | Answer using the text content and state that playback features require ABC. | Defined |
+| EDGE-035 | The tutor microphone is denied or the live provider is unavailable. | US-021 | Show a clear message; typed-question fallback or the existing HU14 tutor remains available. | Defined |
+| EDGE-036 | A user reaches the 5-session daily tutor limit or a session reaches 2 minutes. | US-021 | Reject further sessions with a clear message, or end the active session and release the microphone, respectively. | Defined |
 
 ## 9. Dependencies
 
@@ -788,7 +832,7 @@ These items are **PROPOSED**. They do not change the approved stories above unti
 | DEP-007 | Solfege and tutor rely on the audio store and the fallback voice for cost and availability. | US-013, US-014 depend on US-016, US-017 | Defined |
 | DEP-008 | Local STT (US-011/US-012) depends on configured/pinned weights, sufficient CPU/memory, per-process concurrency bound and persistent per-user/day quota; paid TTS (US-013/US-014) depends on provider key/credits and Q-011. | US-011-US-014, US-016-US-018; Q-011, Q-012, Q-027; CR-003, DEC-219 | Defined; HU11 targets approved, empirical capacity pending |
 | DEP-009 | Voice comments and the audio store depend on persistent storage. | US-012, US-016; Q-009 | Defined |
-| DEP-010 | Items refined by DEC-201-DEC-219 depend on team ratification of applicable decisions. HU11-specific decisions and P05 ADRs are ratified; other MVP 2 items remain subject to Q-020. | US-010-US-019; Q-020 | HU11 scope satisfied; Q-020 open overall |
+| DEP-010 | Items refined by DEC-201-DEC-219 depend on ratification of applicable decisions. HU11-specific decisions and P05 ADRs, and CR-005/006/007 scope, are reported approved; CR-005/006/007 formal approval record/date remains pending documentation and is not a planning or acceptance decision. Other MVP 2 decisions remain subject to Q-020. | US-010-US-021; Q-020 | Scope approved as reported; formal approval record pending; Q-020 open overall |
 
 ## 10. Assumptions, Open Questions and Conflicts
 
@@ -828,6 +872,7 @@ These items are **PROPOSED**. They do not change the approved stories above unti
 | Q-027 | Is a per-user STT usage limit required to control CPU abuse? | US-011, US-012; DEP-008 | Resolved by DEC-219: configurable 30 admitted inference attempts across all STT flows per user per UTC day; quota persistence and concurrency behavior must be tested. | Resolved |
 | Q-028 | What representative HU11 evaluation corpus and exact parsed-ABC quality threshold are acceptable? | US-011, NFR-009; CR-003 | Approved: ≥9 authorized recordings from ≥3 speakers; ≥7 of 9 exact expected ABC after parser. Run and report the corpus before HU11 acceptance. | Resolved (target); measurement pending |
 | Q-029 | How should dictation handle an already populated field containing present-but-empty/malformed required headers or non-ABC content while preserving existing headers? | US-011, BR-025; CONFLICT-201 | Resolved by DEC-239: append in the browser per BR-025; refuse plain text, header-less ABC and present-but-empty required headers; rescale durations to the existing `L:`. | Resolved (DEC-239, 2026-11-10) |
+| Q-030 | Where is the formal team approval record and approval date for CR-005, CR-006 and CR-007? | US-011, US-020, US-021; P00, P01, P02 | Record the meeting/minutes or other approval evidence when supplied; do not infer a date from the request receipt. | Pending documentation; scope approval reported by project lead |
 
 ### 10.3 Conflicts
 
@@ -855,7 +900,7 @@ These items are **PROPOSED**. They do not change the approved stories above unti
 | HU10 / MVP-010 | EPIC-004 | FR-016 | US-010 | AC-026..028 |
 | Q-001 / ASM-002 | EPIC-002 | FR-008 | US-004..005 | AC-010, AC-013 |
 | HU10 amendment / DEC-211 | EPIC-004 | FR-028 | US-010 | AC-029 (AC-028 superseded) |
-| HU11 / MVP-011 / NEED-007 / IND-201 | EPIC-005 | FR-018-FR-021, FR-025, FR-029, FR-030, FR-043, FR-045 | US-011 | AC-030-AC-036, AC-070-AC-075 |
+| HU11 / MVP-011 / NEED-007 / IND-201 | EPIC-005 | FR-018-FR-021, FR-025, FR-029, FR-030, FR-043, FR-045 | US-011 | AC-030-AC-036, AC-070-AC-075, AC-078-AC-082 |
 | HU12 / MVP-012 / NEED-008 / IND-202 | EPIC-004 | FR-026-FR-030, FR-043, FR-045, FR-046 | US-012 | AC-037-AC-042, AC-076, AC-077 |
 | HU13 / MVP-013 / NEED-009 / IND-203 | EPIC-006 | FR-031-FR-033, FR-036, FR-037, FR-043, FR-044 | US-013 | AC-043-AC-048 |
 | HU14 / MVP-014 / NEED-010 / IND-203 | EPIC-006 | FR-033, FR-034, FR-036, FR-037, FR-043, FR-044 | US-014 | AC-049-AC-051 |
@@ -864,6 +909,9 @@ These items are **PROPOSED**. They do not change the approved stories above unti
 | HU17 / MVP-017 / OPS-001 / IND-206 | EPIC-007 | FR-040, FR-041 | US-017 | AC-059-AC-063 |
 | HU18 / MVP-018 / NEED-012 / IND-207 | EPIC-006 | FR-036, FR-042, FR-044 | US-018 | AC-064-AC-065 |
 | HU19 / MVP-019 / NEED-013 / IND-209 | EPIC-005 | FR-022-FR-025 | US-019 | AC-066-AC-069 |
+| HU20 / NEED-014 / IND-210 | EPIC-006 | FR-051-FR-052 | US-020 | AC-090-AC-096 |
+| HU21 / NEED-015 / IND-211 | EPIC-006 | FR-047-FR-050 | US-021 | AC-083-AC-089 |
+| CR-006 amendment / DEC-243 | EPIC-005 | FR-019, FR-021 | US-011 | AC-078-AC-082; BR-032 |
 
 ### Superseded items
 
@@ -878,21 +926,21 @@ These items are **PROPOSED**. They do not change the approved stories above unti
 
 `READY_WITH_ASSUMPTIONS`
 
-The requirements cover HU01-HU19 with testable criteria and full traceability. HU11 rules and target thresholds are approved for implementation/planning; quality, latency, memory, concurrency, pinned-model and Railway evidence are not yet available. Q-020 remains open for decisions outside the approved HU11 scope; Q-012 is partially resolved (STT p95 target and initial 25-second ceiling approved; TTS targets open); Q-026 is resolved for HU12 by DEC-231. BR-013/BR-025 are approved, with the populated-field malformed/present-empty header edge case flagged before implementing that append path. CR-003 and the new authorization do not establish model accuracy or production readiness.
+The requirements cover HU01-HU21 (with CR-006 amending US-011) and retain US-001–US-019 unchanged except the approved amendment. HU11 rules and target thresholds are approved for implementation/planning; quality, latency, memory, concurrency, pinned-model and Railway evidence are not yet available. Scope approval for CR-005/006/007 is reported by the project lead; formal team approval record/date is pending documentation (Q-030). No priority or estimate is assigned to US-020 or US-021. Q-020 remains open for other decisions outside the confirmed scope; Q-012 is partially resolved (STT p95 target and initial 25-second ceiling approved; TTS targets open); Q-026 is resolved for HU12 by DEC-231. BR-013/BR-025 are approved, with the populated-field malformed/present-empty header edge case flagged before implementing that append path. Scope approval does not establish model accuracy, story acceptance or production readiness.
 
-### P02 addendum — pending-change reconciliation (2026-11-11)
+### P02 addendum — scope approval reconciliation (2026-11-11)
 
-The canonical requirements and backlog remain US-001–US-019 / HU01–HU19.
-Section 6.3 is a non-normative candidate register:
+The canonical requirements and backlog now contain US-001–US-021 / HU01–HU21.
+The project lead's confirmation in the request received 2026-11-11 is the
+source for the reported team approval. It does not provide the underlying
+approval date, minutes or participant list; Q-030 tracks that documentation.
 
 | Change | Status retained | Canonical backlog effect |
 |---|---|---|
-| CR-005 / US-020 / HU20 | Proposed; code present; team approval pending. | No active story, estimate, or priority. |
-| CR-006 / US-011 amendment | Requester-approved implementation; team ratification pending. | AC-078–AC-082 and BR-032 remain proposed, not additions to US-011. |
-| CR-007 / US-021 / HU21 | Requester-approved implementation; team ratification pending. | AC-083–AC-089, FR-047–FR-050, BR-033, and M-18 remain proposed, not active requirements. |
+| CR-005 / US-020 / HU20 | Team approval reported; formal record/date pending documentation. | Canonical story, FR-051–FR-052 and AC-090–AC-096; priority and estimate unassigned. |
+| CR-006 / US-011 amendment | Team approval reported; formal record/date pending documentation. | AC-078–AC-082 and BR-032 added without replacing prior US-011 criteria. |
+| CR-007 / US-021 / HU21 | Team approval reported; formal record/date pending documentation. | Canonical story, AC-083–AC-089, FR-047–FR-050, BR-033 and M-18; priority and estimate unassigned. |
 
-This distinction follows Q-020 and the recorded P02 gate. Existing 19 story
-records, MVP 1 requirements, and approved HU11–HU19 acceptance criteria are
-preserved. The pending candidates are also recorded in the P02 backlog
-metadata, separate from `items`; no approval, team ratification, estimate,
-priority, or acceptance is inferred.
+US-001–US-019 and their existing criteria are preserved; the only amendment
+to an existing story is the approved CR-006 addition to US-011. Code presence
+and historical test evidence remain distinct from story acceptance and release.

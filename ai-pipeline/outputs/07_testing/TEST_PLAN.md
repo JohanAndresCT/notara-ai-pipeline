@@ -61,3 +61,21 @@
 - La suite existente es sólida para backend y seguridad.
 - La principal brecha del plan es la ausencia de pruebas de interfaz real y ausencia de trazabilidad formal a requisitos con IDs globales.
 
+## 7. Casos añadidos para el alcance aprobado (P02 v5.6)
+
+Los siguientes casos son requisitos de prueba; no son resultados ejecutados.
+Las pruebas automatizadas deben usar proveedores falsos/mocks y no consumir
+servicios de pago. La prueba de aceptación que exige proveedor real o
+micrófono físico se mantiene como pendiente y no se ejecuta en esta
+reconciliación documental.
+
+| Test ID | Source requirement | Scenario / expected result | Layer | Estado en esta actualización |
+|---|---|---|---|---|
+| TEST-HU11-AI-01 | US-011 AC-078–AC-081; BR-032 | Parse-first; texto normalizado solo tras fallo; mismo parser genera ABC; falla/no musical/provider timeout conserva M-01; no audio enviado; etiqueta/notificación visibles. | Backend mocked + UI | No se re-ejecutó; evidencia histórica no equivale a aprobación de AC |
+| TEST-HU11-AI-02 | US-011 AC-082 | Reportar exactamente resultados del corpus aprobado con y sin normalización Gemini. | Métrica de corpus | Pendiente; no invocar Gemini real |
+| TEST-HU20-01 | US-020 AC-090–AC-094 | Instrumentos soportados, un audio a la vez, instrumento inicial resaltado, estado disabled, DDSP y fallback/aviso. | Frontend/unit + browser | Sin reporte P06/P07 específico; no validado en esta actualización |
+| TEST-HU20-02 | US-020 AC-095–AC-096 | Descargar MP3 del instrumento seleccionado conservando el download de solfeo; respetar reduced motion. | Frontend/browser | Sin reporte P06/P07 específico; no validado en esta actualización |
+| TEST-HU21-01 | US-021 AC-083–AC-089 | Token breve sin clave en browser; texto/voz y contexto, 2 minutos, límite de cinco usos, release del micrófono, errores/fallback y texto plano. | Backend mocked + browser | No se re-ejecutó; el reporte de implementación no es aceptación |
+
+La prioridad, el Story Point, el orden y el esfuerzo de US-020/US-021 siguen
+sin asignación en P03. Estos casos no cambian el total de pruebas históricas.

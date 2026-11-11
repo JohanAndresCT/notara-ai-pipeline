@@ -8,11 +8,11 @@
 
 ## 1. Executive Summary
 
-**Verdict: `NEEDS_ITERATION`.** The current repository contains implementation evidence for all 19 canonical stories and a current SQLite backend run with 164 passing tests. That evidence is not equivalent to Product Owner acceptance, team ratification, a release of the current tree, or complete verification of the voice, browser, frontend, and operational gates.
+**Verdict: `NEEDS_ITERATION`.** The current repository contains implementation records for US-001–US-019 and code/evidence related to the approved-scope additions US-020/US-021 and the CR-006 amendment. The current SQLite backend run had 164 passing tests. This is not equivalent to Product Owner story acceptance, release of the current tree, or complete verification of voice, browser, frontend, and operational gates.
 
-The approved baseline contains 46 functional requirements and 10 non-functional requirements. Of these 56 requirements, 19 are verified, 36 partially verified, and 1 is not verified. The 18 approved qualitative success indicators comprise 7 met, 9 partially met, and 2 unmeasured. No user adoption, engagement, or business-impact data are available.
+P02 v5.6 contains 52 functional requirements and 10 non-functional requirements. Of these 62 requirements, 19 are verified, 42 partially verified, and 1 is not verified. The 20 approved qualitative success indicators comprise 7 met, 9 partially met, and 4 unmeasured. No user adoption, engagement, or business-impact data are available.
 
-MVP 1 remains the delivered `v1.0.0` baseline. MVP 2 work is present, but P03 still marks US-011–US-019 `PLANNED`; P06 records open acceptance and execution gates. CR-005 remains proposed. CR-006 and CR-007 have requester-approved implementations but team ratification remains pending; neither is added to the canonical baseline.
+MVP 1 remains the delivered `v1.0.0` baseline. P02 includes US-001–US-021; P03 retains the known 31-SP plan for US-001–US-019 and marks US-020/US-021 unplanned because no priority or estimate was supplied. The project lead reported team approval of CR-005/006/007; the formal approval record/date remains pending documentation. P06/P07 story acceptance gates remain open.
 
 This verdict does not mean the product is unusable, and it does not establish production readiness or business viability. It means the evidence supports continuing evaluation and closing the identified acceptance and verification gaps before claiming MVP 2 delivery.
 
@@ -20,10 +20,9 @@ This verdict does not mean the product is unusable, and it does not establish pr
 
 ### Baseline and counting method
 
-- P02 v5.5 defines canonical stories US-001–US-019, FR-001–FR-046, NFR-001–NFR-010, and 77 acceptance-criteria entries. AC-028 is explicitly superseded by AC-029. Requirement metrics count each approved FR and NFR once (56 total); stories are the traceability layer and are not double-counted.
-- P01 preserves MVP 1 `SUCCESS-001`–`SUCCESS-009` and defines MVP 2 `IND-201`–`IND-209`. The P00/P01 `SUCCESS-*` collision is kept explicit; this report uses `IND-*` for MVP 2.
-- CR-001/002 scope is reflected in the approved MVP 2 baseline. CR-003/004 are recorded in the upstream decisions; CR-004 implementation acceptance remains open. CR-005/006/007 candidate additions are excluded from the approved counts. HU19 is in US-019; HU21 is not in the canonical backlog.
-- P03 v4.5 retains the 31-SP plan (P0 21, P1 8, P2 2), with no confirmed release of the inspected tree. No approval or acceptance is inferred from code presence.
+- P02 v5.6 defines canonical stories US-001–US-021, FR-001–FR-052, NFR-001–NFR-010, and 96 acceptance-criteria records (AC-028 is superseded by AC-029). Requirement metrics count each FR and NFR once (62 total); stories are the traceability layer.
+- P01 preserves MVP 1 `SUCCESS-001`–`SUCCESS-009` and defines MVP 2 `IND-201`–`IND-211`. The P00/P01 `SUCCESS-*` collision is kept explicit; this report uses `IND-*` for MVP 2.
+- CR-005/006/007 scope is included as reported by the project lead; the formal approval record/date is tracked as pending documentation (Q-030). P03 v4.6 keeps the known 31-SP plan for US-001–US-019; US-020/US-021 are approved but unplanned. No priority/estimate or acceptance is inferred.
 
 ### P09 gate
 
@@ -44,8 +43,8 @@ Status counts are derived from the approved requirement IDs and their linked US-
 | Status | Requirement IDs | Count | Evidence and limitations |
 |---|---|---:|---|
 | `VERIFIED` | FR-001, FR-002, FR-004–FR-014, FR-017, FR-038–FR-041 | 18 | P06 validations and current backend tests support the MVP 1 account, publication, edit/delete, feed, detail, cache, and fallback behaviors. FR-010 content/format editing is now present and P06 reports a browser check; its content-edit E2E remains absent. US-016 and US-017 validations report cache/fallback tests, including no-provider cache hits and simulated provider failures. |
-| `PARTIALLY_VERIFIED` | FR-003, FR-015–FR-016, FR-018–FR-037, FR-042–FR-046 | 28 | Code and story-level evidence exist, but voice/manual acceptance, frontend revalidation, edge cases, or behavior alignment remain incomplete. Notable gaps include self-reaction/self-comment behavior, profile-photo scope mismatch, HU11 corpus/resource acceptance, and the lack of current frontend/E2E execution. |
-| `NOT_VERIFIED` / `NOT_IMPLEMENTED` | None | 0 | All canonical stories have implementation records and current code review; this is not proof of acceptance or release. |
+| `PARTIALLY_VERIFIED` | FR-003, FR-015–FR-016, FR-018–FR-037, FR-042–FR-052 | 34 | Code and story-level evidence exist, but voice/manual acceptance, frontend revalidation, edge cases, or behavior alignment remain incomplete. FR-047–FR-052 are in scope but lack current story-level validation. |
+| `NOT_VERIFIED` / `NOT_IMPLEMENTED` | None | 0 | Implementation records/code are not proof of acceptance or release. |
 
 ### Non-functional requirements
 
@@ -62,7 +61,7 @@ Status counts are derived from the approved requirement IDs and their linked US-
 | NFR-009 | `PARTIALLY_VERIFIED` | Synthetic corpus and local memory/timing observations exist, but the approved human corpus, p95/target-environment measurements, TTS targets, and Railway capacity gates are not closed. |
 | NFR-010 | `VERIFIED` | The current automated suite uses fake/provider-independent engines; the local backend suite passed apart from the PostgreSQL-only skip. |
 
-The canonical P02 backlog is not amended by this evaluation. The 77 acceptance-criteria entries are assessed through their story-level validations and test evidence, not by a new P10 execution of every criterion. No claim is made that every criterion has been independently re-run.
+The canonical P02 backlog is not amended by this evaluation. The 96 acceptance-criteria records (95 active; AC-028 superseded by AC-029) are assessed through story-level validation and test evidence, not by a new P10 execution of every criterion. No claim is made that every criterion has been independently re-run.
 
 ## 4. Functional and Technical Quality
 
@@ -115,8 +114,10 @@ The targets below retain P01 identifiers and qualitative wording. `MET` reflects
 | IND-207 | A user can download the synthesized solfège as an MP3 file. | Implementation/story evidence exists; current frontend validation and E2E were not run. | `PARTIALLY_MET` |
 | IND-208 | The team can demonstrate MVP 2 within the Sprint 2 timeline. | Sprint dates and a release of the current tree were not established. | `UNMEASURED` |
 | IND-209 | A user can load an `.abc` file and see its text, with line breaks, in the editor before publishing; invalid files are rejected with a clear message. | P06 browser checks cover the create flow; edit-flow and release-level E2E verification remain incomplete. | `PARTIALLY_MET` |
+| IND-210 | A user can choose a supported instrument and hear an ABC score played with it, with a fallback notice when an AI timbre is unavailable. | Implementation evidence exists; no P06 story validation or current browser run. | `UNMEASURED` |
+| IND-211 | A user can ask the tutor questions by voice about the current score and receive Spanish spoken answers with text. | Implementation record and historical provider evidence exist; no current P06 story validation or real-microphone acceptance. | `UNMEASURED` |
 
-**Counts:** 18 indicators; 7 `MET`, 9 `PARTIALLY_MET`, 0 `NOT_MET`, 2 `UNMEASURED`, 0 `NOT_APPLICABLE`.
+**Counts:** 20 indicators; 7 `MET`, 9 `PARTIALLY_MET`, 0 `NOT_MET`, 4 `UNMEASURED`, 0 `NOT_APPLICABLE`.
 
 **Outcomes:** technical outcomes are partially demonstrated by current backend tests and P06 review. Historical deployment evidence is limited and not a current operational check. User adoption, engagement, learning outcomes, and business impact are `DATA_UNAVAILABLE`; no approved numeric targets or usage dataset exist.
 
@@ -128,16 +129,17 @@ Recommendations are not implementation or approval decisions. No code, tests, ba
 |---|---|---|---|---|
 | EVAL-001 | MEDIUM | HU11 quality and resource acceptance is incomplete: human corpus, target-environment latency/memory, and real-device gates remain open in P02/P06. | Collect the already approved acceptance evidence before claiming HU11 acceptance; keep synthetic results distinct. | US-011; NFR-009; PRE-011; DEC-240 |
 | EVAL-002 | MEDIUM | Current frontend verification is incomplete and one PostgreSQL-only test was skipped; current E2E/build were not run. | Restore the existing declared dependencies when authorized, then run typecheck/build/E2E and the PostgreSQL-specific test in an approved environment. | P06-REV-001/002; P07 |
-| EVAL-003 | MEDIUM | P06 DoD/Product Owner review and MVP 2 release status remain open; P03 keeps US-011–US-019 `PLANNED`. | Obtain the documented product/team acceptance and release decision without treating implementation presence as approval. | US-011–US-019; P03 v4.5 |
+| EVAL-003 | MEDIUM | P06 DoD/Product Owner review and MVP 2 release status remain open; P03 keeps US-011–US-019 `PLANNED` and US-020/US-021 unplanned. | Obtain the documented product/team acceptance and release decision without treating implementation presence as acceptance. | US-011–US-021; P03 v4.6 |
 | EVAL-004 | MEDIUM | NFR-002 browser/viewport coverage and broader usability/accessibility evidence are incomplete. | Validate the approved browsers and widths and record relevant usability/accessibility evidence without adding unapproved thresholds. | NFR-001/002/008 |
 | EVAL-005 | MEDIUM | P08 operational evidence is historical and limited; persistence, backup, rollback, environment protection, and current availability are unchecked. | Verify these operational items only through an authorized operational review; do not infer them from CI configuration. | P08; Q-009 |
 | EVAL-006 | MEDIUM | Some current behavior differs from the approved baseline: users can react to/comment on their own scores, `Reaction` and `Like` coexist, and the profile-photo API conflicts with OOS-003. | Record the product/team disposition before claiming full scope conformance; this report does not select or implement a resolution. | FR-003, FR-015/016; OOS-003; P09-DISC-002/003/006 |
 | EVAL-007 | LOW | The documentation-site build was not executed because MkDocs is unavailable locally. | Run the documented build when the tool is available and authorized; P09 content validation remains `PASS_WITH_WARNINGS`. | P09 |
 | EVAL-008 | LOW | P08 historically observed that `/admin/login/` is publicly reachable; this observation alone is not a finding of unauthorized access. | Decide whether an additional access policy is required for the deployment. | P08-VAL-006 |
+| EVAL-009 | MEDIUM | The newly approved-scope US-020/US-021 and CR-006 amendment have incomplete story-level acceptance evidence; AC-082 and current browser/microphone validation remain open. | Validate the criteria with provider mocks and approved manual evidence; do not make real paid-provider calls for routine tests. | US-011 AC-078–AC-082; US-020; US-021; P06/P07 |
 
 ## 9. Next Evaluation Steps
 
-1. Close the applicable P06 human acceptance, P07 test, and product-review gates; retain the current approval state of CR-005/006/007.
+1. Close the applicable P06/P07 story acceptance gates for US-020/US-021 and CR-006; obtain the formal approval record/date for Q-030 when available.
 2. Obtain authorized frontend/PostgreSQL evidence without installing packages or contacting external services as part of this evaluation.
 3. If MVP 2 release or deployment is later approved, evaluate that specific release and current operational evidence separately.
 4. Reassess NFR-002 and the approved NFR-009 targets using their stated scope and targets; do not add thresholds.
@@ -147,4 +149,4 @@ Recommendations are not implementation or approval decisions. No code, tests, ba
 
 **`NEEDS_ITERATION`**
 
-The P09 gate passed with warnings, the current backend suite passed with one PostgreSQL-only skip, and no unresolved blocker/critical defect is recorded in the inspected P06/P07 evidence. However, a substantial portion of the approved requirements is only partially verified; current frontend and PostgreSQL evidence is incomplete; key voice acceptance gates are open; P06 DoD and MVP 2 release status remain unconfirmed; and operational verification is historical and limited. These gaps justify iteration, but do not prevent a meaningful evaluation and do not imply that missing measurements failed.
+The P09 gate passed with warnings, the current backend suite passed with one PostgreSQL-only skip, and no unresolved blocker/critical defect is recorded in inspected P06/P07 evidence. However, the approved scope has expanded while US-020/US-021 and CR-006 acceptance evidence is incomplete; current frontend and PostgreSQL evidence is incomplete; key voice gates are open; P06 DoD and MVP 2 release status remain unconfirmed; and operational verification is historical and limited. These gaps justify iteration, but do not imply that missing measurements failed.

@@ -6,9 +6,10 @@
 - **Validator:** P02 - Requirements Validation Prompt v2.0 (Senior Requirements Validation Auditor)
 - **Stage:** P02 - Requirements Engineering
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
-- **Validation Date:** 2026-11-08
-- **Requirements Version:** 5.0 (HU11 authorization revalidation addendum below; earlier runs preserved)
-- **Backlog Version:** 5.0
+- **Validation Date:** 2026-11-11
+- **Historical Run:** requirements v5.0 (prior assessment preserved below)
+- **Current Requirements Version:** 5.6 (Run 6 below)
+- **Current Backlog Version:** 5.6
 - **Inputs:** `PRODUCT_VISION.md` v2.1 and its validation (PASS_WITH_WARNINGS); `PROJECT_CONTEXT.md` v2.2; `SPRINT_2_BACKLOG_INPUT.md`; `DECISIONS_MVP2.md`; requirements v2.0 (Git `HEAD`); `SYSTEM_PROMPT.md`
 - **Overall Result:** `PASS_WITH_WARNINGS`
 
@@ -288,3 +289,21 @@ Remaining findings: REQ-VAL-205 and REQ-VAL-206 (LOW), plus the empirical HU11 a
 Q-020 remains open. This addendum does not ratify the changes or assert
 acceptance of their implementations. Existing findings REQ-VAL-205/206 and
 empirical HU11 acceptance gates remain visible.
+
+## Run 6 — Scope approval reconciliation (requirements v5.6, 2026-11-11)
+
+**Result:** `PASS_WITH_WARNINGS` · **P03 readiness:** `READY_WITH_ASSUMPTIONS`
+
+| Check | Result |
+|---|---|
+| Source approval | Project lead confirms team approval for CR-005/006/007 in the request received 2026-11-11. The underlying team approval record/date remains pending documentation (Q-030); the request date is not treated as the approval date. |
+| Story inventory | 21 canonical stories: US-001–US-019 preserved, US-020/HU20 and US-021/HU21 added once; CR-006 adds AC-078–AC-082 to US-011. |
+| Acceptance criteria | 96 criterion records in Markdown and JSON (95 active; AC-028 remains superseded by AC-029). CR source criteria AC-078–AC-082 and AC-083–AC-089 are retained; HU20 criteria AC-090–AC-096 are traced to CR-005 and its documented updates. |
+| Requirements coverage | 52 FRs (FR-001–FR-052), 10 NFRs, 33 business-rule IDs (BR-011 superseded), and 36 edge cases (EDGE-001–EDGE-036). New requirements trace to the approved scope sources. |
+| Planning boundary | All 21 P02 planning fields remain null and all developer assignments empty. Existing team backlog values are preserved; no MoSCoW or estimate is assigned to US-020/US-021. |
+| Preservation | MVP 1 US-001–US-010 and US-011–US-019 remain present with prior criteria intact. New stories do not duplicate or renumber existing records. |
+| Acceptance boundary | Implementation records and historic provider evidence are not treated as acceptance or current validation. AC-082 measurement and US-020/US-021 story-level validation evidence remain open downstream. |
+
+Q-030 is a documentation warning, not a reinstated scope-approval gate. The
+P02 artifacts pass structural and traceability review with the disclosed
+approval-record limitation.

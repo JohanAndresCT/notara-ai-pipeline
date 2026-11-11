@@ -2,14 +2,16 @@
 
 **Project:** Notara
 **Release:** MVP 2 — Sprint 2 (Audio, Voice and TTS/STT)
-**Input Artifact:** `ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md` (version 2.1)
-**P00 Context:** `ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md` (version 2.2)
-**P00 Validation:** `ai-pipeline/outputs/00_context/CONTEXT_VALIDATION.md` (run 3, `PASS_WITH_WARNINGS`)
+**Historical Input Artifact:** `ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md` (version 2.1)
+**Historical P00 Context:** `ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md` (version 2.2)
+**Historical P00 Validation:** `ai-pipeline/outputs/00_context/CONTEXT_VALIDATION.md` (run 3, `PASS_WITH_WARNINGS`)
 **Backlog / Decisions:** `SPRINT_2_BACKLOG_INPUT.md` (with HU19 addendum), `DECISIONS_MVP2.md`
 **Baseline:** `PRODUCT_VISION.md` version 1.0 (Git `fe459d5`) and version 2.0
 **Validator Role:** Senior Product Discovery Auditor and Software Product Process Validator
 **Validation Prompt:** `ai-pipeline/prompts/01_discovery/P01_validation.md` v2.0
 **Run:** 2 for MVP 2
+
+> Sections 1–17 record the historical Run 2. The current scope validation is Run 5 below, against P00 context v2.5 / validation Run 6.
 
 ## 1. Overall Result
 
@@ -185,5 +187,19 @@ None blocking. Recommended: DISC-VAL-202 when adapting P02; ratify the decisions
 | CR-007 / HU21 | Kept as a requester-approved implementation with team ratification pending; not added to active vision scope. |
 | Change-source accuracy | The CR and decision records are cited; code presence is not treated as approval or user acceptance. |
 
-No new user need or success target is added. Re-run P01 for these changes only
-after the recorded team-ratification gate is resolved.
+No new scope was approved in Run 4. Its pending status is superseded by Run 5.
+
+## Addendum — Run 5 (vision version 2.4, 2026-11-11)
+
+**Result:** `PASS_WITH_WARNINGS` · **P02 readiness:** `READY_WITH_ASSUMPTIONS`
+
+| Check | Result |
+|---|---|
+| Approval source | Project lead confirmation in a request received 2026-11-11 says the team approved CR-005/006/007. No underlying approval date, minutes, or ratifier list was supplied. |
+| Canonical scope | HU20/US-020, the CR-006 amendment to US-011, and HU21/US-021 are included; HU01–HU19 and all prior IDs are preserved. |
+| Source content | HU20/21 story statements and criteria are traced to the CR sources; new needs/JTBD/indicators derive from those approved stories and do not change their acceptance criteria. |
+| Planning | No priority or estimate is assigned to HU20/HU21. Source suggestions remain suggestions pending P03 planning input. |
+| Acceptance and delivery | Code presence and scope approval are not treated as P06/P07 acceptance or an MVP release. |
+
+The formal approval record/date remains pending documentation. No new numeric
+outcome targets were added. Run 4's pending-scope decision is superseded.

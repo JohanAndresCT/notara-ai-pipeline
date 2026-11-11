@@ -48,14 +48,16 @@ Flujos disponibles según las pantallas actuales de `frontend/src`. La interfaz 
 
 ## 8. Funciones de voz y audio (MVP 2)
 
-- **Dictar una partitura (HU11):** desde los formularios de creación o edición, permite grabar audio en español y devuelve una propuesta ABC que el usuario puede revisar antes de guardar. Se necesita permiso de micrófono, navegador compatible y contexto seguro. Audio máximo: 30 segundos y 2 MiB.
+- **Dictar una partitura (HU11):** desde los formularios de creación o edición, permite grabar audio en español y devuelve una propuesta ABC que el usuario puede revisar antes de guardar. Si el parser determinista no interpreta el texto transcrito, puede usarse Gemini para normalizar solo ese texto; el audio no se envía a Gemini. Se necesita permiso de micrófono, navegador compatible y contexto seguro. Audio máximo: 30 segundos y 2 MiB.
 - **Comentar con voz (HU12):** en partituras de otra persona, graba un comentario, permite previsualizarlo y lo envía para transcripción. Se publica el texto junto con el audio; el límite del texto transcrito es 1.000 caracteres.
 - **Escuchar (HU13–HU14):** en partituras ABC compatibles se puede generar solfeo hablado o un resumen hablado; el audio se devuelve como MP3.
 - **Reproducir (HU15):** reproduce en el navegador las partituras ABC que el lector puede interpretar. Otros formatos o elementos no soportados muestran un mensaje.
 - **Descargar (HU18):** el MP3 de solfeo generado se puede descargar desde la interfaz.
 - **Cargar un archivo (HU19):** desde los formularios de creación o edición, al elegir un archivo `.abc`, el navegador lee su texto localmente y lo coloca en el editor; el archivo no se carga al servidor solo por seleccionarlo.
+- **Elegir instrumento (HU20):** en partituras ABC compatibles, selecciona Piano, Guitar, Violin, Flute, Trumpet o Saxophone. Los instrumentos IA pueden usar el fallback Tone.js con un aviso. El MP3 instrumental, cuando se ofrece, es independiente del MP3 de solfeo. El flujo está en el código, pero no cuenta con validación P06 de historia ni E2E actual.
+- **Preguntar al tutor (HU21):** en el detalle, lee el aviso de privacidad y acepta antes de iniciar la conversación. La voz se transmite a Gemini durante la sesión, que termina tras 2 minutos o al pulsar "Terminar"; existe fallback de pregunta escrita. La implementación está registrada, pero falta validación P06 de historia, prueba de micrófono real y aceptación.
 
-El código también contiene Gemini para normalizar dictados no interpretables (CR-006) y un tutor conversacional de voz/texto (CR-007). Ambos cambios están implementados con aprobación del solicitante, pero pendientes de ratificación del equipo y no son historias canónicas añadidas. Las opciones de instrumentos adicionales asociadas a CR-005 siguen propuestas; su presencia en el código no significa aprobación. No se afirma aceptación empírica de precisión, latencia, memoria o calidad de audio.
+El responsable del proyecto informó que el equipo aprobó CR-005/006/007; la fecha/acta formal de aprobación sigue pendiente de documentación. P02 incluye HU20/HU21 y la enmienda a US-011; P03 aún no asigna prioridad ni estimación a HU20/HU21. La aprobación y la presencia de código no constituyen aceptación empírica de precisión, latencia, memoria, audio ni UX.
 
 ## 9. Límites de esta versión
 

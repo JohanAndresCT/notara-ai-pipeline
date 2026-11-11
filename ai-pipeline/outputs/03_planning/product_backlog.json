@@ -1,14 +1,14 @@
 {
   "backlog_metadata": {
     "project": "Notara",
-    "version": "4.5",
+    "version": "4.6",
     "stage": "P03",
     "release": "MVP 2 - Sprint 2",
     "status": "READY_WITH_ASSUMPTIONS",
     "purpose": "Prioritized planning index for MVP 2, with MVP 1 kept as delivered baseline.",
     "source_artifacts": [
       "ai-pipeline/outputs/03_planning/PRIORITIZATION.md",
-      "ai-pipeline/outputs/02_requirements/REQUIREMENTS.md (v5.5)",
+      "ai-pipeline/outputs/02_requirements/REQUIREMENTS.md (v5.6)",
       "ai-pipeline/outputs/02_requirements/product_backlog.json",
       "ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md",
       "ai-pipeline/outputs/00_context/DECISIONS_MVP2.md",
@@ -25,7 +25,8 @@
       "target_p1": 8,
       "stretch_p2": 2,
       "provisional_story_points": 8,
-      "reference_mvp1_story_points": 31
+      "reference_mvp1_story_points": 31,
+      "approved_unplanned_items": 2
     },
     "preconditions": [
       "PRE-001",
@@ -42,27 +43,28 @@
     ],
     "assignment_note": "assigned_developers stays empty until the team provides owners (Q-010 / PRE-006).",
     "previous_version": "1.0 (MVP 1; source paths updated from artifacts/ to ai-pipeline/outputs/)",
-    "pending_change_requests": [
+    "approval_documentation_pending": [
       {
         "change_request": "CR-005",
-        "candidate_story": "US-020 / HU20",
-        "status": "PROPOSED_PENDING_TEAM_APPROVAL",
+        "canonical_story": "US-020 / HU20",
+        "status": "TEAM_APPROVAL_REPORTED_BY_PROJECT_LEAD; FORMAL_RECORD_AND_DATE_PENDING",
         "planned": false
       },
       {
         "change_request": "CR-006",
-        "candidate_story": "US-011 amendment",
-        "status": "IMPLEMENTED_REQUESTER_APPROVED_TEAM_RATIFICATION_PENDING",
+        "canonical_story": "US-011 amendment",
+        "status": "TEAM_APPROVAL_REPORTED_BY_PROJECT_LEAD; FORMAL_RECORD_AND_DATE_PENDING",
         "planned": false
       },
       {
         "change_request": "CR-007",
-        "candidate_story": "US-021 / HU21",
-        "status": "IMPLEMENTED_REQUESTER_APPROVED_TEAM_RATIFICATION_PENDING",
+        "canonical_story": "US-021 / HU21",
+        "status": "TEAM_APPROVAL_REPORTED_BY_PROJECT_LEAD; FORMAL_RECORD_AND_DATE_PENDING",
         "planned": false
       }
     ],
-    "notes": "Canonical planned items remain US-001-US-019. CR-003 changes only the STT engine; priority, Story Points, capacity and MVP 1 baseline are unchanged. HU11-specific decisions and applicable ADRs are ratified for planning; PRE-002 is satisfied and PRE-011 is approved for planning, with empirical acceptance verification pending. PRE-001 remains open for other MVP 2 scope; HU11 no longer depends on a paid STT key. CR-004 approves Whisper Base for HU11/HU12 implementation per requester authorization on 2026-11-09; other team approvals are not established. CR-005 remains proposed; CR-006/007 are requester-approved implementations pending team ratification and are not planned. Empirical acceptance and Railway validation remain pending. As-built note (2026-11-11): P06 current validation reports implementation records for US-001-US-019; current implementation and test evidence is tracked in P06/P07 and docs/REQUIREMENTS_COVERAGE.md. This does not imply acceptance, team ratification, or MVP 2 release. No current-tree MVP 2 release was confirmed; US-011-US-019 delivery_status remains PLANNED. Priorities, estimates, assignments, dependencies, and change-request states are unchanged."
+    "notes": "The approved scope contains US-001-US-021, with US-020 and US-021 canonical but unplanned. The explicit priority/capacity plan remains for US-001-US-019 only (31 SP: P0 21, P1 8, P2 2); the two added stories have no supplied priority, Story Points, delivery order, release, sprint, or assignment, and are not included in the 31-SP total. CR-003 changes only the STT engine; HU11-specific decisions and applicable ADRs are ratified for planning; PRE-002 is satisfied and PRE-011 is approved for planning, with empirical acceptance verification pending. PRE-001 remains open for other MVP 2 decisions; HU11 no longer depends on a paid STT key. CR-004 approves Whisper Base for HU11/HU12 implementation per requester authorization on 2026-11-09. Project lead reported team approval of CR-005/006/007 in the request received 2026-11-11; formal approval record/date remains pending documentation. P06/P07 implementation and test evidence does not imply acceptance or release. No current-tree MVP 2 release was confirmed; US-011-US-019 delivery_status remains PLANNED; US-020/US-021 remain UNPLANNED_APPROVED_SCOPE.",
+    "merge_note": "v4.6 reconciles the reported scope approvals with P02 v5.6; existing 31-SP plan and all assigned values remain unchanged."
   },
   "items": [
     {
@@ -842,6 +844,90 @@
       "assigned_developers": [],
       "delivery_status": "PLANNED",
       "status": "PRIORITIZED"
+    },
+    {
+      "id": "US-020",
+      "title": "Play the score with other instruments",
+      "hu_ids": [
+        "HU20"
+      ],
+      "mvp_ids": [
+        "MVP-020"
+      ],
+      "priority": null,
+      "scope": "MVP_SUPPORTING",
+      "delivery_group_order": null,
+      "depends_on": [],
+      "requirement_ids": [
+        "FR-051",
+        "FR-052"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-090",
+        "AC-091",
+        "AC-092",
+        "AC-093",
+        "AC-094",
+        "AC-095",
+        "AC-096"
+      ],
+      "decision_ids": [
+        "DEC-242"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-020",
+      "story_points": null,
+      "estimate_status": "UNASSIGNED",
+      "moscow": null,
+      "capacity_band": null,
+      "drop_order": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "delivery_status": "UNPLANNED_APPROVED_SCOPE",
+      "status": "UNPLANNED"
+    },
+    {
+      "id": "US-021",
+      "title": "Talk to the music tutor about a score",
+      "hu_ids": [
+        "HU21"
+      ],
+      "mvp_ids": [
+        "MVP-021"
+      ],
+      "priority": null,
+      "scope": "MVP_SUPPORTING",
+      "delivery_group_order": null,
+      "depends_on": [],
+      "requirement_ids": [
+        "FR-047",
+        "FR-048",
+        "FR-049",
+        "FR-050"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-083",
+        "AC-084",
+        "AC-085",
+        "AC-086",
+        "AC-087",
+        "AC-088",
+        "AC-089"
+      ],
+      "decision_ids": [
+        "DEC-244"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-021",
+      "story_points": null,
+      "estimate_status": "UNASSIGNED",
+      "moscow": null,
+      "capacity_band": null,
+      "drop_order": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "delivery_status": "UNPLANNED_APPROVED_SCOPE",
+      "status": "UNPLANNED"
     }
   ]
 }

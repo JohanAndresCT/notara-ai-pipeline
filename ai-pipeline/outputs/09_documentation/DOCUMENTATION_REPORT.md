@@ -12,7 +12,7 @@
 
 ## 2. Resumen de documentación (Documentation Summary)
 
-Se actualizaron los documentos para cubrir la línea base MVP 1 y las historias canónicas MVP 2 US-011–US-019, reflejando el código actual y las limitaciones de verificación. CR-005/HU20 se mantiene como propuesta pendiente de aprobación; CR-006/enmienda US-011 y CR-007/HU21 siguen implementados con aprobación del solicitante, pero pendientes de ratificación del equipo. No se promovieron a historias canónicas ni se infirió aceptación.
+La documentación ahora refleja MVP 1 y el backlog canónico P02 v5.6 de US-001–US-021. CR-005/HU20 y CR-007/HU21 son historias aprobadas para alcance según la confirmación del responsable; CR-006 añade AC-078–AC-082 a US-011. P03 v4.6 deja US-020/US-021 sin prioridad ni estimación; P06/P07 aún no acreditan su aceptación. La fecha/acta formal de aprobación queda pendiente de documentación.
 
 La documentación distingue la evidencia local actual de pruebas y los datos históricos de CI/despliegue. En la revisión de consistencia P09 se precisaron en `docs/API.md` los campos de los comentarios y la variación de idioma/formato de errores de voz. La configuración MkDocs (`mkdocs.yml`, `requirements-docs.txt` y `.github/workflows/docs.yml`) ya existía por una solicitud anterior; se inventarió y preservó sin cambios. No se hicieron llamadas a Railway, GitHub, Hugging Face, proveedores de audio ni servicios de pago. No se instalaron dependencias ni se hicieron commits, push o despliegues.
 
@@ -28,8 +28,8 @@ La documentación distingue la evidencia local actual de pruebas y los datos his
 | `docs/ARCHITECTURE.md` | Arquitectura backend, frontend y voz | Actualizado; inventario P00–P10 y errores por endpoint |
 | `docs/DATA_MODEL.md` | Modelos de cuentas, partituras, voz y migraciones | Actualizado |
 | `docs/TESTING.md` | Resultado actual, comandos y límites | Reescrito con datos de la revalidación |
-| `docs/REQUIREMENTS_COVERAGE.md` | Trazabilidad MVP 1/MVP 2 y cambios separados | Actualizado para US-001–US-019 |
-| `docs/KNOWN_LIMITATIONS.md` | Alcance excluido, cambios pendientes y brechas | Actualizado |
+| `docs/REQUIREMENTS_COVERAGE.md` | Trazabilidad MVP 1/MVP 2, CR-005/006/007 y límites de validación | Actualizado para P02 v5.6 / US-001–US-021 |
+| `docs/KNOWN_LIMITATIONS.md` | Alcance excluido, aprobación formal pendiente y brechas de aceptación | Actualizado |
 | `docs/index.md` | Índice de documentación | Actualizado |
 | `mkdocs.yml` | Navegación del sitio documental | Preexistente; preservado sin cambios |
 | `requirements-docs.txt` | Dependencia MkDocs Material | Preexistente; preservado sin cambios |
@@ -51,6 +51,8 @@ Se contrastaron rutas y vistas de Django, modelos y migraciones `accounts`, `sco
 | US-016–US-017 / HU16–HU17 | Caché y fallback TTS | Implementados; disponibilidad y persistencia de producción no verificadas |
 | US-018 / HU18 | Descarga MP3 de solfeo | Implementada en cliente; no revalidada en navegador |
 | US-019 / HU19 | Lectura local de archivo `.abc` | Implementada; E2E/typecheck actuales incompletos |
+| US-020 / HU20 | Selección de instrumentos, DDSP/fallback y descarga instrumental | Código presente; aprobación de alcance reportada; sin plan/validación P06 individual |
+| US-021 / HU21 | Tutor conversacional de voz/texto | Código y registro de implementación presentes; aprobación de alcance reportada; sin validación P06 individual |
 
 Los detalles de trazabilidad y los estados de verificación se encuentran en `docs/REQUIREMENTS_COVERAGE.md`.
 

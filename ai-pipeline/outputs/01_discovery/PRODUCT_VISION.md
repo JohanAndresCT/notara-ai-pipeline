@@ -2,11 +2,11 @@
 
 **Project:** Notara
 **Stage:** P01 — Product Discovery
-**Version:** 2.3
+**Version:** 2.4
 **Release:** MVP 2 — Sprint 2 (Audio, Voice and TTS/STT)
 **Supersedes:** Version 2.2 (HU14 wording), version 2.1, version 2.0 (MVP 2, decisions pending) and version 1.0 (MVP 1, tag `v1.0.0`)
 **Mode:** Incremental. MVP 1 content is preserved; MVP 2 content is added and marked.
-**Change Requests:** CR-001 — voice and audio (Annex A); CR-002 — `.abc` file loading (Annex B); CR-005–CR-007 — pending-scope changes recorded in the addendum below
+**Change Requests:** CR-001 — voice and audio (Annex A); CR-002 — `.abc` file loading (Annex B); CR-005–CR-007 — approved for product scope per project-lead confirmation received 2026-11-11; formal approval details pending documentation.
 **Status:** READY_WITH_ASSUMPTIONS
 
 > Labels: **FACT** (P00 or an approved source), **DECISION** (approved `DEC-2NN` in `DECISIONS_MVP2.md`), **ASSUMPTION**, **PROPOSAL** (needs approval), **UNKNOWN**, **CONFLICT**.
@@ -21,11 +21,12 @@
 | 2.0 | MVP 2 | Voice and audio layer (HU11–HU18) through CR-001. Conflicts and CR-001 annex. Validation `PASS_WITH_WARNINGS` (4 LOW). |
 | 2.1 | MVP 2 | Applies DEC-201–DEC-218 (decisions replace proposals and resolve questions). Adds HU19 (`.abc` file loading) through CR-002 with NEED-013, JTBD-011, IND-209 and Annex B. Fixes DISC-VAL-201 and DISC-VAL-204. Load 31 SP. |
 | 2.2 | MVP 2 | HU14 "clave" is the clef, not the key (P02 REQ-VAL-202 / CONFLICT-202): USER-002, NEED-010, JTBD-008. Q-002 and Q-006 shown as resolved in MVP 1 requirements (REQ-VAL-203). No scope change. |
-| 2.3 | MVP 2 | Reconciles CR-005/006/007 and HU20/HU21 as pending changes; approved scope and all existing MVP 1 / MVP 2 identifiers remain unchanged. |
+| 2.3 | MVP 2 | Records CR-005/006/007 and HU20/HU21 as pending changes. |
+| 2.4 | MVP 2 | Incorporates HU20, the CR-006 US-011 amendment, and HU21 into approved product scope per project-lead confirmation received 2026-11-11; preserves existing acceptance criteria and records missing formal approval details. |
 
 ## 1. Discovery Status
 
-**FACT:** P00 context version 2.4 is the input (including the pending-change reconciliation). Its validation result is recorded in `CONTEXT_VALIDATION.md` (runs 3–5).
+**FACT:** P00 context version 2.5 is the input (including the reported scope approvals and documentation caveat). Its validation result is recorded in `CONTEXT_VALIDATION.md` (run 6).
 
 **FACT — P00 warnings carried into discovery:**
 
@@ -91,7 +92,7 @@
 
 **Main goal:** Access and share short musical material that supports teaching.
 
-**Relevant needs:** A simple collection of exercises; (MVP 2) dictate exercises quickly (HU11) and load exercises already written as `.abc` files (HU19).
+**Relevant needs:** A simple collection of exercises; (MVP 2) dictate exercises quickly (HU11), load `.abc` files (HU19), choose a sound for instrument playback (HU20), and ask questions about a score through a conversational tutor (HU21).
 
 **FACT:** There is no differentiated role management. HU16 ("administrador del sistema") and HU17 ("desarrollador del proyecto") are technical enabler stories and do not create a product role (P00 ASM-009).
 
@@ -119,6 +120,8 @@
 | NEED-011 | Hear how the melody sounds on an instrument. | FACT | MVP-015 / HU15 |
 | NEED-012 | Keep synthesized audio to practice without an internet connection. | FACT; content set by DEC-204 (solfège voice) | MVP-018 / HU18 |
 | NEED-013 | Bring an existing `.abc` file into Notara without copying and pasting its text. | FACT | MVP-019 / HU19 |
+| NEED-014 | Hear an ABC score with a selected supported instrument, including the approved AI timbres and fallback behavior. | FACT | HU20 / US-020 / CR-005 |
+| NEED-015 | Ask questions by voice about the score being viewed and receive spoken and textual tutor answers. | FACT | HU21 / US-021 / CR-007 |
 
 ### Operational needs protected by enabler stories
 
@@ -149,12 +152,15 @@
 | JTBD-009 | When I read a score, I want to hear it played on an instrument, so I know exactly how the melody should sound. | FACT | HU15 |
 | JTBD-010 | When I will practice away from a connection, I want to download the audio of a score, so I can listen to it offline. | FACT | HU18 |
 | JTBD-011 | When I already have a score written in an `.abc` file, I want to load it into the editor, so I can publish it without copying and pasting. | FACT | HU19 |
+| JTBD-012 | As a user viewing an ABC score, I want to choose the instrument that plays it, so that I can hear how the melody sounds on my own instrument. | FACT | HU20 / CR-005 |
+| JTBD-013 | As a music student, I want to ask the tutor questions by voice about the score I am viewing, so that I can understand it and learn how to play it without leaving the page. | FACT | HU21 / CR-007 |
 
 ## 7. Value Proposition
 
 **FACT (MVP 1):** Notara provides a text-first community workflow for publishing, viewing, discovering, commenting on and reacting to short musical scores in `.abc` or plain text.
 
 **FACT (MVP 2):** Notara adds a voice, file and listening layer: users can dictate a score or load it from an `.abc` file, hear it (spoken note names, a spoken summary, an instrument), comment by voice and download the solfège.
+**Approved scope extension (CR-005/006/007):** users can choose among the approved instrument options, dictation may use Gemini text normalization after deterministic parsing fails, and users can have a conversational voice tutor about the score. The source change requests contain the full acceptance criteria; this vision does not redefine them.
 
 **ASSUMPTION:** Dictation and file loading lower the effort of entering a score, and listening helps students connect written notation with sound.
 
@@ -168,6 +174,12 @@
 | Listening on plain-text scores | Requires valid ABC (HU13, HU15) | DEC-207 | Only `.abc`; plain text shows a disabled option with a message. |
 | Tutor difficulty | "dificultad" (HU14) | DEC-212 | "Dificultad estimada" from a simple rule. |
 | `.abc` file | HU19 | DEC-217 | The file's text appears in the editor; the file is not stored. |
+| Instrument choice and AI timbres | HU20 | CR-005 / DEC-242 | Supported instrument options play the score; DDSP AI instruments use the documented Tone.js fallback. |
+| Dictation normalization | HU11 amendment | CR-006 / DEC-243 | Gemini may normalize transcript text only after parser failure; the same deterministic parser remains the ABC source. |
+| Conversational tutor | HU21 | CR-007 / DEC-244 | A user may ask about the score by voice and receive Spanish audio and text; privacy, quota, and fallback remain as specified by CR-007. |
+| Instrument choice and AI timbres | HU20 | CR-005 / DEC-242 | Supported instrument options play the score; DDSP AI instruments use the documented Tone.js fallback. |
+| Dictation normalization | HU11 amendment | CR-006 / DEC-243 | Gemini may normalize transcript text only after parser failure; the same deterministic parser remains the ABC source. |
+| Conversational tutor | HU21 | CR-007 / DEC-244 | A user may ask about the score by voice and receive Spanish audio and text; privacy, quota, and fallback remain as specified by CR-007. |
 
 **UNKNOWN:** No validated adoption, learning, performance or community target.
 
@@ -252,8 +264,10 @@ Screens, API calls, storage and providers belong to later stages.
 | Audio tutor | HU14 / MVP-014 | Should / 3 | FACT scope |
 | Load score from `.abc` file | HU19 / MVP-019 | Should / 2 | FACT scope (CR-002) |
 | MP3 download | HU18 / MVP-018 | Could / 2 | FACT scope |
+| Other instrument choices and DDSP instruments | HU20 / US-020 | Not provided | FACT scope (CR-005); planning undecided |
+| Conversational score tutor | HU21 / US-021 | Not provided | FACT scope (CR-007); planning undecided |
 
-**FACT:** Total MVP 2 load is 31 SP. Must stories: 21 SP. HU18 (Could) is the first candidate to drop under schedule pressure.
+**FACT (existing HU11–HU19 planning source):** load is 31 SP. Must stories: 21 SP. HU18 (Could) is the first candidate to drop under schedule pressure. HU20 and HU21 are approved scope additions but have no team-confirmed priority or estimate; P03 must leave them unplanned until supplied.
 
 ### Future
 
@@ -337,6 +351,9 @@ Qualitative indicators, not acceptance criteria.
 | IND-207 | A user can download the synthesized solfège as an MP3 file. | HU18 / P00 SUCCESS-014 |
 | IND-208 | The team can demonstrate MVP 2 within the Sprint 2 timeline. | P00 SUCCESS-015 |
 | IND-209 | A user can load an `.abc` file and see its text, with line breaks, in the editor before publishing; invalid files are rejected with a clear message. | HU19 / P00 SUCCESS-016 |
+| IND-210 | A user can select a supported instrument and hear an ABC score played with it, with a fallback notice when an AI timbre is unavailable. | HU20 / CR-005 AC-090–AC-096 |
+| IND-211 | A user can ask the tutor questions by voice about the current score and receive Spanish spoken answers with text. | HU21 / CR-007 AC-083–AC-089 |
+| IND-211 | A user can ask the tutor questions by voice about the current score and receive Spanish spoken answers with text. | HU21 / CR-007 AC-083–AC-089 |
 
 **UNKNOWN:** No numeric target for adoption, latency, transcription accuracy, learning or community activity.
 
@@ -514,18 +531,21 @@ Approval:
   team ratification pending (Q-020).
 ```
 
-## Addendum — Pending changes (2026-11-11)
+## Addendum — Scope approval reconciliation (2026-11-11)
 
-The product vision's active MVP 2 scope remains HU11–HU19. The following
-documented requests are retained without assigning new NEED, JTBD, indicator,
-priority, or acceptance identifiers to the approved scope:
+Version 2.3 recorded the following requests as pending. That classification is
+superseded by version 2.4 and the project-lead confirmation received
+2026-11-11:
 
 | Change | Source-record status | Product-vision treatment |
 |---|---|---|
-| CR-005 / HU20 / US-020 / DEC-242 | Proposed; prototype code exists; team approval pending. | Candidate instrument extension only; not an approved MVP 2 promise. |
-| CR-006 / US-011 amendment / DEC-243 | Implemented and approved by the requester; team ratification pending. | Candidate amendment; the approved US-011 baseline is unchanged until ratification and P02 revalidation. |
-| CR-007 / HU21 / US-021 / DEC-244 | Implemented and approved by the requester; team ratification pending. | Candidate conversational tutor; not an approved MVP 2 promise. |
+| CR-005 / HU20 / US-020 / DEC-242 | Team approval reported by project lead in request received 2026-11-11; formal approval record/date pending documentation. | Approved MVP 2 scope. Original ACs and documented updates are preserved; P03 priority/estimate remain undecided. |
+| CR-006 / US-011 amendment / DEC-243 | Team approval reported by project lead in request received 2026-11-11; formal approval record/date pending documentation. | Approved amendment. AC-078–AC-082 supplement, and do not replace, prior US-011 criteria. |
+| CR-007 / HU21 / US-021 / DEC-244 | Team approval reported by project lead in request received 2026-11-11; formal approval record/date pending documentation. | Approved MVP 2 scope. AC-083–AC-089 remain as recorded; P03 priority/estimate remain undecided. |
 
-The current implementation is not evidence of product approval or acceptance.
-The source-of-truth status is in `DECISIONS_MVP2.md` and the three CR records.
-Q-020 remains open, and no team ratification is inferred.
+The scope update relies on the project lead's confirmation in the request
+received 2026-11-11. The underlying team approval date, meeting minutes, and
+participant list were not supplied and remain pending documentation. This
+scope approval is not implementation acceptance, test evidence, a sprint
+commitment, or deployment authorization. Q-020 remains open for other MVP 2
+decisions not covered by this confirmation.

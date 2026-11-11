@@ -168,8 +168,8 @@ None blocking. Recommended: VAL-212 when adapting P02/P03; VAL-213 before P03.
 | Check | Result |
 |---|---|
 | MVP 1 and approved MVP 2 baseline | Preserved; canonical scope remains HU01–HU19. No identifiers, estimates, or acceptance criteria were changed. |
-| Change-request status | CR-005 remains proposed. CR-006 and CR-007 are recorded as requester-approved implementations with team ratification pending (DEC-243/244). No approval is inferred. |
-| Candidate scope | HU20 and HU21, and the CR-006 amendment to US-011, are explicitly non-active until the recorded approval gate closes. |
+| Change-request status | At Run 5, CR-005 remained proposed and CR-006/007 had requester approval only. This historical status is superseded by Run 6 and the project-lead confirmation received 2026-11-11. |
+| Candidate scope | At Run 5, HU20/HU21 and the CR-006 amendment were non-active. Run 6 now authorizes their inclusion in P01/P02; formal approval record/date remain to be documented. |
 | Current-source correction | DEFECT-001 is fixed in `ScoreCreatePage.tsx` (`&#10;` absent; newline placeholder present). Static inspection only; P06 must validate behavior. |
 | Traceability | Source records are `CR-005_INSTRUMENTS.md`, `CR-006_GEMINI_DICTATION.md`, `CR-007_GEMINI_LIVE_TUTOR.md`, and `DECISIONS_MVP2.md` (DEC-242–DEC-244). |
 | Prompt coverage | P00/P01 prompt versions predate these requests; their active-scope rules are preserved and the scope limitation is disclosed. |
@@ -181,3 +181,18 @@ separate from the canonical backlog and do not claim team acceptance.
 **Context status:** `READY_WITH_ASSUMPTIONS` for the established HU01–HU19
 baseline. CR-005/006/007 remain pending scope changes; P06 review must assess
 their implementation only as current code, not as approved acceptance.
+
+## Addendum — Run 6: project-lead scope confirmation (2026-11-11)
+
+**Result:** `PASS_WITH_WARNINGS`
+
+| Check | Result |
+|---|---|
+| Approval source | The project lead stated in a request received 2026-11-11 that the team approved CR-005/006/007. No approval date, minutes, or ratifier list was supplied. |
+| Scope disposition | HU20, the CR-006 amendment to US-011, and HU21 may proceed as approved product scope for P01/P02. This supersedes Run 5's pending-scope classification. |
+| Source criteria | Retained from the CR records; P02 maps them without duplicating US-001–US-019 or altering the source acceptance text. |
+| Planning and acceptance | No priority, estimate, assignment, implementation acceptance, test result, release, or deployment is inferred from scope approval. |
+| Remaining documentation | Formal approval date/minutes and participants remain pending; Q-020 remains open for other MVP 2 decisions. |
+
+No product or technical criterion was invented. The current context is ready
+for P01/P02 with this documented approval-provenance warning.

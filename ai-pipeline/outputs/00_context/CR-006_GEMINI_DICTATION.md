@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **IMPLEMENTED** (2026-11-10) — approved by the requester (Johan); team ratification pending (DEC-243) |
+| Status | **IMPLEMENTED** (2026-11-10); team approval reported by project lead in request received 2026-11-11; formal team approval record/date pending documentation (DEC-243) |
 | Requested by | TEAM-001 (Johan), 2026-11-10 |
 | Affects | HU11 / US-011 (dictation), FR-019, FR-021, BR-013, BR-025, M-01, M-11, AC-070 |
 | Course AI tool | **Google Gemini API** (course list item 8, Gemini family) |

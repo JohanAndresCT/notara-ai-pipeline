@@ -264,7 +264,7 @@ acceptance, Railway readiness or production deployment.
 
 Remaining: ADR approvals outside HU11, Railway storage verification (ARCH-VAL-202), and the empirical HU11 gates (corpus, p95, memory, Railway).
 
-## P05 reconciliation addendum — architecture v4.5
+## P05 historical reconciliation addendum — architecture v4.5
 
 **Date:** 2026-11-11 · **Result:** `PASS_WITH_WARNINGS` for the approved
 US-001–US-019 baseline · **P06 readiness:** `YES_WITH_REVIEW_GATES` for that
@@ -277,6 +277,22 @@ baseline only.
 | CR-005/006/007 | Implementation code is noted as pending-scope source evidence. P05 does not claim that its architecture design or validation covers these changes. |
 | Runtime/deployment | No production deployment, paid-provider call, or deployment authorization is claimed. Existing Railway and acceptance gates remain open. |
 
-**Gate:** P06 may review existing code for the approved baseline and report
-pending-scope deviations. Any source-code correction or implementation of a
-pending feature requires a separate plan and confirmation.
+**Gate:** the status above is historical. See the approval reconciliation
+below for the current P06 review scope.
+
+## P05 scope approval reconciliation — architecture v4.6 (2026-11-11)
+
+**Result:** `PASS_WITH_WARNINGS` for scope/source reconciliation · **P06 readiness:** `YES_WITH_REVIEW_GATES`
+
+| Check | Result |
+|---|---|
+| Current upstream | P00 v2.5, P01 v2.4, P02 v5.6, P03 v4.6 and P04 v4.5 identify the approved scope; the project lead reports approval of CR-005/006/007. |
+| CR-005 / US-020 | Existing browser DDSP/Tone.js instrument playback and client-side MP3 path are inventoried. Architecture approval, acceptance evidence and full component-level review remain pending. |
+| CR-006 / US-011 | Existing Gemini text-normalization adapter is inventoried; audio remains on the local STT path and the deterministic parser remains the ABC source. AC-082 corpus measurement remains pending. |
+| CR-007 / US-021 | Existing backend ephemeral-token/session routes and live browser client are inventoried. Token-flow security review and story acceptance remain pending. |
+| ADR scope | No new ADR, design constraint, or provider call is inferred from implementation presence; the underlying approval record/date remains pending documentation (Q-030). |
+| Operational boundary | No provider call, deployment, or release was made or authorized. P06/P07 must not treat this documentation update as acceptance. |
+
+This validates document traceability only; it does not certify new architecture
+or security controls. Existing P05 findings and Railway/HU11 validation gates
+remain open.

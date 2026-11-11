@@ -19,7 +19,7 @@ Notara ofrece un espacio sencillo para crear, publicar, encontrar y comentar par
 - Las capacidades incluyen registro, autenticación, perfil y contraseña; creación/edición/eliminación de partituras; validación ABC básica y límite de 1.000 caracteres; feed, detalle, reacciones y comentarios.
 - El contenido se muestra como texto; Notara no renderiza notación musical.
 
-### Historias canónicas MVP 2 (US-011–US-019 / HU11–HU19)
+### Historias canónicas MVP 2 (US-011–US-021 / HU11–HU21)
 
 | Historia | Estado en el código | Capacidad |
 |---|---|---|
@@ -30,10 +30,12 @@ Notara ofrece un espacio sencillo para crear, publicar, encontrar y comentar par
 | US-016–US-017 / HU16–HU17 | Implementadas; operación del proveedor no revalidada | Caché y voz de respaldo |
 | US-018 / HU18 | Implementada; flujo de navegador no reejecutado | Descarga MP3 de solfeo |
 | US-019 / HU19 | Implementada; E2E/typecheck actuales incompletos | Carga local de archivo `.abc` |
+| US-020 / HU20 | Aprobada para alcance; sin prioridad/estimación P03 ni validación P06 | Selección de instrumentos, DDSP/fallback y descarga de audio instrumental |
+| US-021 / HU21 | Aprobada para alcance; sin prioridad/estimación P03 ni validación P06 | Tutor conversacional por voz/texto |
 
-### Cambios implementados fuera del backlog canónico
+CR-006 añade AC-078–AC-082 a US-011; no reemplaza los criterios anteriores.
 
-No se promueven a historias aprobadas: CR-005 / propuesta HU20 sigue pendiente de aprobación del equipo; CR-006 / enmienda HU11 y CR-007 / propuesta HU21 están implementados con aprobación del solicitante, pero pendientes de ratificación del equipo. El código incluye normalización Gemini opcional para dictados y un tutor conversacional Gemini. Véase [DECISIONS_MVP2.md](./ai-pipeline/outputs/00_context/DECISIONS_MVP2.md) y [KNOWN_LIMITATIONS.md](./docs/KNOWN_LIMITATIONS.md). La existencia de código no constituye ratificación ni aceptación.
+El responsable del proyecto informó que el equipo aprobó CR-005/006/007; esa confirmación se recibió el 2026-11-11. La fecha y acta formal de aprobación quedan pendientes de documentación. La aprobación de alcance no constituye aceptación de historias ni de pruebas. Véase [DECISIONS_MVP2.md](./ai-pipeline/outputs/00_context/DECISIONS_MVP2.md) y [KNOWN_LIMITATIONS.md](./docs/KNOWN_LIMITATIONS.md).
 
 ## 4. Tecnologías
 
@@ -90,7 +92,7 @@ Copia `.env.example` a `.env` solo cuando lo necesites y completa los valores lo
 1. Regístrate e inicia sesión.
 2. Publica una partitura ABC o de texto, o carga un archivo `.abc` local en el editor.
 3. Explora el feed, filtra por instrumento y abre una partitura para reaccionar o comentar.
-4. En partituras ABC compatibles, usa dictado, comentarios de voz, solfeo hablado, reproducción en navegador y descarga MP3. El código también incluye el tutor conversacional CR-007, aprobado por el solicitante y pendiente de ratificación del equipo.
+4. En partituras ABC compatibles, usa dictado, comentarios de voz, solfeo hablado, reproducción en navegador y descarga MP3. El alcance aprobado también incluye selección de instrumentos (HU20) y el tutor conversacional (HU21); su aceptación sigue pendiente.
 
 Las funciones de grabación requieren soporte del navegador, permiso de micrófono y un contexto seguro. La partitura debe estar dentro del subconjunto ABC admitido para reproducir audio. Consulta [USER_GUIDE.md](./docs/USER_GUIDE.md).
 
@@ -131,23 +133,23 @@ El typecheck del frontend está bloqueado por tres paquetes ausentes en el `node
 
 - MVP 2 no incluye OMR, reconocimiento de partituras desde imágenes, recuperación de cuenta ni gestión diferenciada de roles.
 - La calidad del dictado, la aceptación de micrófono/navegador, la concurrencia PostgreSQL y los objetivos de memoria/latencia de producción no están todos medidos.
-- El código contiene cambios CR-005/006/007 que siguen fuera del backlog canónico ratificado. Sus estados se detallan por separado; la presencia de código no equivale a aprobación ni ratificación.
+- CR-005/006/007 están incorporados al alcance canónico P02; la aprobación fue reportada por el responsable. La fecha/acta formal sigue pendiente de documentación y el código no equivale a aceptación de historias.
 - Algunas conductas del backend y frontend difieren de requisitos anteriores; ver [REQUIREMENTS_COVERAGE.md](./docs/REQUIREMENTS_COVERAGE.md).
 
 ## 13. Estado del proyecto
 
 | Dimensión | Estado y evidencia |
 |---|---|
-| Implementación | MVP 1 es la línea base entregada. El repositorio contiene implementación de las historias canónicas MVP 2 US-011–US-019, pero esto no equivale a aceptación; quedan gates manuales y de rendimiento. |
+| Implementación | MVP 1 es la línea base entregada. P06 informa implementación para US-001–US-019 y código para CR-005/006/007; esto no equivale a aceptación. Faltan validaciones de historia US-020/US-021 y medición AC-082. |
 | Pruebas | Backend: 164 pasaron y 1 PostgreSQL-only se omitió. Typecheck bloqueado por dependencias locales ausentes; E2E y build actuales no reejecutados. |
 | CI | El workflow está en `.github/`; sus resultados documentados son históricos y no fueron consultados en esta ejecución. |
 | Despliegue | Health check público observado el 2026-10-14; disponibilidad y commit actualmente desplegado no verificados. No se realizó despliegue. |
 
-La ratificación del equipo para CR-006/007 sigue pendiente. CR-005/HU20 continúa propuesta.
+La evidencia formal de aprobación de CR-005/006/007 (fecha/acta) sigue pendiente de documentación; la confirmación de alcance ya fue reportada por el responsable. US-020/US-021 no tienen prioridad ni estimación asignadas.
 
 ## 14. Trazabilidad del pipeline
 
-Los registros actuales del pipeline están en `ai-pipeline/outputs/` (no en `ai-pipeline/artifacts/`). Los prompts P00–P10 están en `ai-pipeline/prompts/`. El backlog canónico P02/P03 conserva US-001–US-019; CR-005/006/007 están separados como cambios pendientes. Véanse el [reporte P09](./ai-pipeline/outputs/09_documentation/DOCUMENTATION_REPORT.md) y la [evaluación P10](./ai-pipeline/outputs/10_evaluation/MVP_EVALUATION.md).
+Los registros actuales del pipeline están en `ai-pipeline/outputs/` (no en `ai-pipeline/artifacts/`). Los prompts P00–P10 están en `ai-pipeline/prompts/`. P02 incluye US-001–US-021; P03 mantiene el plan de 31 SP para US-001–US-019 y deja US-020/US-021 sin planificar. Véanse el [reporte P09](./ai-pipeline/outputs/09_documentation/DOCUMENTATION_REPORT.md) y la [evaluación P10](./ai-pipeline/outputs/10_evaluation/MVP_EVALUATION.md).
 
 ## 15. Equipo
 

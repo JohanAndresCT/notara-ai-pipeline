@@ -13,33 +13,34 @@
 | 4.3 | MVP 2 | Merge reconciliation: PRE-003 (DEC-236, DEC-238) and PRE-008 (DEC-237) resolved; PRE-009 records the approved 25 s STT ceiling (DEC-232); US-014 estimate is a team estimate (its rule is approved). US-011 stays provisional per DEC-208. |
 | 4.4 | MVP 2 | Reconciles source versions and records CR-005/006/007 as pending changes; no new story is prioritized and the 31-SP HU11–HU19 plan is unchanged. |
 | 4.5 | MVP 2 | Adds an as-built implementation evidence note from P06 without changing planned scope, priority, estimates, capacity, assignments, release status, or CR approval states. |
+| 4.6 | MVP 2 | Reconciles project-lead-reported team approval of CR-005/006/007 and P02 v5.6. Adds US-020/US-021 to the approved scope register without assigning priority, estimates, delivery order, or capacity. The known HU11–HU19 plan remains 31 SP. |
 
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 4.5
+- **Version:** 4.6
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P03 - Planning
 - **Status:** `READY_WITH_ASSUMPTIONS`
 - **Source Artifacts:**
-  - `ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md` (v2.4), `CONTEXT_VALIDATION.md`
+  - `ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md` (v2.5), `CONTEXT_VALIDATION.md`
   - `ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md` (HU11-HU19, SP, MoSCoW)
   - `ai-pipeline/outputs/00_context/DECISIONS_MVP2.md` (DEC-201-DEC-244; approval states retained)
-  - `ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md` (v2.3), `PRODUCT_VISION_VALIDATION.md`
-  - `ai-pipeline/outputs/02_requirements/REQUIREMENTS.md` (v5.5), `product_backlog.json` (v5.5), `REQUIREMENTS_VALIDATION.md`
+  - `ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md` (v2.4), `PRODUCT_VISION_VALIDATION.md`
+  - `ai-pipeline/outputs/02_requirements/REQUIREMENTS.md` (v5.6), `product_backlog.json` (v5.6), `REQUIREMENTS_VALIDATION.md`
   - `ai-pipeline/outputs/00_context/CR-003_WHISPER_TINY.md` (approved per requester authorization)
   - `ai-pipeline/outputs/00_context/CR-004_WHISPER_BASE.md` (approved by requester for implementation; acceptance pending)
   - `ai-pipeline/outputs/03_planning/PRIORITIZATION.md` and `product_backlog.json` v1.0 (MVP 1)
   - `ai-pipeline/prompts/system/RELEASE_PLAN.md` (MVP 1 load reference), `SYSTEM_PROMPT.md`
   - `ai-pipeline/outputs/06_implementation/IMPLEMENTATION_VALIDATION_MVP2.md` (as-built status note only; not a planning or acceptance input)
 - **Validation Statuses:**
-  - P00: `PASS_WITH_WARNINGS` (run 5; VAL-212–VAL-214)
-  - P01: `PASS_WITH_WARNINGS` (run 4; DISC-VAL-202, DISC-VAL-203 carried)
-  - P02: `PASS_WITH_WARNINGS` (requirements v5.5; REQ-VAL-205/206 and empirical HU11 gates remain)
+  - P00: `PASS_WITH_WARNINGS` (run 6; formal CR-005/006/007 approval record pending documentation)
+  - P01: `PASS_WITH_WARNINGS` (run 5; formal CR-005/006/007 approval record pending documentation)
+  - P02: `PASS_WITH_WARNINGS` (requirements v5.6; Q-030 and empirical HU11 gates remain)
 
 ## 0.1 As-built implementation status note (2026-11-11)
 
-P06's current validation reports implementation records for all canonical stories US-001–US-019 and reviews the current source tree. Implementation and verification states are tracked in P06/P07 and `docs/REQUIREMENTS_COVERAGE.md`; their presence does not establish acceptance, team ratification, or release delivery. No MVP 2 release tag or deployment of the inspected current tree was confirmed, so the existing P03 `delivery_status: PLANNED` values for US-011–US-019 remain unchanged. The 31-SP prioritization, sequence, cut line, estimates, assignments, and pending CR-005/006/007 states are unchanged.
+P06's current validation reports implementation records for US-001–US-019 and code for CR-005/006/007. US-020 and US-021 are now approved-scope backlog items but are not incorporated into the 31-SP HU11–HU19 plan because no team priority or estimate was supplied. Implementation and verification states are tracked in P06/P07 and `docs/REQUIREMENTS_COVERAGE.md`; their presence does not establish acceptance or release delivery. No MVP 2 release tag or deployment of the inspected current tree was confirmed, so US-011–US-019 delivery statuses remain `PLANNED`; US-020/US-021 are explicitly unplanned.
 
 ## 2. Executive Summary
 
@@ -73,6 +74,8 @@ For these reasons the plan **commits only the P0 slice**, targets P1, treats P2 
 | P1 | Voice comments | Extends community feedback to voice. | US-012; FR-026-FR-030 | MVP Supporting |
 | P1 | Audio tutor | Helps users understand a score before practicing. | US-014; FR-034 | MVP Supporting |
 | P2 | MP3 download | Convenience for offline practice. | US-018; FR-042 | MVP Supporting (stretch) |
+| — | Other-instrument playback / DDSP and instrument MP3 | Approved CR-005 scope; priority and estimate are not supplied, so not part of this committed or target plan. | US-020; FR-051-FR-052 | Approved scope; unplanned |
+| — | Conversational score tutor | Approved CR-007 scope; priority and estimate are not supplied, so not part of this committed or target plan. | US-021; FR-047-FR-050 | Approved scope; unplanned |
 | P3 | OMR, sung solfege, mixed MP3, other languages | Excluded or future. | P00 FUT-002, FUT-004, FUT-005; OOS-* | Future / Out of Scope |
 
 ## 4. MVP Focus
@@ -301,19 +304,22 @@ CR-003 remains preserved as the historical STT decision.
   3. Take PRE-001-PRE-011 to the team; update this plan with dates and owners when PRE-006 closes.
 - **Human decisions required:** PRE-001-PRE-011 as applicable by story. HU11 is authorized to begin implementation: PRE-002 is satisfied and PRE-011 is approved for planning. PRE-001 remains open overall but its HU11-specific subset is ratified; empirical acceptance gates are still outstanding.
 
-## Addendum — Pending-change reconciliation (2026-11-11)
+## Addendum — Approved-scope planning reconciliation (2026-11-11)
 
-The canonical plan and planned backlog remain the 19 approved stories
-US-001–US-019. Total load remains 31 SP (P0 21, P1 8, P2 2), with no
-developer assignments. The separate P02 `pending_change_requests` register is
-informational only:
+The approved scope contains US-001–US-021. The detailed, prioritized plan
+below still covers US-001–US-019 only: 31 SP (P0 21, P1 8, P2 2), with no
+developer assignments. US-020 and US-021 remain canonical but unplanned
+because the project lead supplied no priority, estimate, sequencing or
+capacity decision. They are not assigned a release or sprint.
 
 | Change | Planning treatment |
 |---|---|
-| CR-005 / HU20 | Proposed; excluded from capacity, priority, sequence, and cut line pending team approval. |
-| CR-006 / US-011 amendment | Requester-approved implementation, team ratification pending; not used to change US-011's canonical criteria or estimate. |
-| CR-007 / HU21 | Requester-approved implementation, team ratification pending; not planned or assigned. |
+| CR-005 / HU20 | Approved scope as reported by the project lead; canonical US-020, not prioritized or estimated. |
+| CR-006 / US-011 amendment | Approved scope as reported by the project lead; AC-078–AC-082 apply to US-011. Existing estimate and priority are unchanged. |
+| CR-007 / HU21 | Approved scope as reported by the project lead; canonical US-021, not prioritized or estimated. |
 
-No estimates or priorities are invented. The plan is not a sprint commitment;
-PRE-001 and existing dates, owners, budget, storage and acceptance preconditions
-remain open as recorded.
+The underlying team approval record/date remains pending documentation (Q-030);
+the request receipt date is not represented as the approval date. The 31-SP
+known plan is unchanged and is not a plan for all approved scope. No estimates
+or priorities are invented. This is not a sprint commitment; dates, owners,
+budget, storage and acceptance preconditions remain open as recorded.

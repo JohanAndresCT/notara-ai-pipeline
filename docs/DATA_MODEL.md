@@ -51,7 +51,7 @@ Ambos relacionan `Score` con `User` y tienen una restricción de unicidad por pa
 | `STTInferenceQuota` | Usuario, día UTC, inferencias admitidas | Cuota compartida de dictado y comentarios de voz |
 | `VoiceSynthesisQuota` | Usuario, día UTC, síntesis nuevas | Limita síntesis TTS; caché servida no consume una síntesis nueva |
 | `SynthesizedAudio` | Clave de caché, tipo, motor, voz, idioma, archivo y tamaño | Guarda audio sintetizado, no audio personal |
-| `TutorUsageQuota` | Usuario, día UTC, sesiones y preguntas | Usado por el tutor conversacional CR-007, pendiente de ratificación |
+| `TutorUsageQuota` | Usuario, día UTC, sesiones y preguntas | Usado por el tutor conversacional CR-007, aprobado para alcance según el responsable; aceptación P06 pendiente |
 
 Los archivos de comentarios de voz se guardan bajo `MEDIA_ROOT`; la caché TTS usa el almacenamiento Django configurado. La persistencia de dichos archivos en producción no se ha verificado.
 

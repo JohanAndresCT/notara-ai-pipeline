@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **PROPOSED** — implemented in the working branch; pending team approval. AI instruments: DEC-242 |
+| Status | **TEAM APPROVAL REPORTED** by project lead in request received 2026-11-11; formal team approval record/date pending documentation. Implemented in working tree. AI instruments: DEC-242 |
 | Requested by | TEAM-001 (Johan), 2026-11-10 |
 | Affects | HU15 / US-015 (instrument playback), UX REG-004, ADR-010 |
 | Branch | `pipeline/mvp2-p00-context` (uncommitted at the time of writing) |

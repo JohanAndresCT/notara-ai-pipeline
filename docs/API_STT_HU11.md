@@ -63,7 +63,7 @@ HTTP `200`, JSON con los campos:
 
 Para un campo vacío, el documento usa los valores predeterminados BR-025: `X:1`, `T:` del campo `title` o `Dictado`, el compás dictado o `4/4`, `L:1/4` y `K:C`. Este endpoint no publica ni persiste `abc_line` ni `abc_document`. Ante cualquier respuesta no-2xx, el frontend conserva el campo existente; el usuario puede revisar el resultado antes de publicarlo.
 
-`ai_interpreted` indica si se utilizó el normalizador Gemini de CR-006. Esa enmienda está implementada con aprobación del solicitante, pero pendiente de ratificación del equipo; no se integra al contrato canónico US-011 mientras no se ratifique.
+`ai_interpreted` indica si se utilizó el normalizador Gemini de CR-006. La enmienda forma parte del alcance de US-011 según la aprobación reportada por el responsable; la fecha/acta formal de aprobación sigue pendiente de documentación. Gemini recibe solo el texto transcrito después de un fallo del parser determinista; el audio nunca se envía a Gemini. La medición AC-082 y la aceptación de la enmienda siguen pendientes.
 
 ### Errores
 

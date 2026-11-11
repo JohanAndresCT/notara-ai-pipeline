@@ -193,7 +193,7 @@ Revalidar solo si se corrige el README (VAL-001) o se modifica de forma material
 
 No se reescribió documentación; no se modificó código fuente ni artefactos previos; no se tomaron decisiones de producto o técnicas; no se corrigió ningún defecto de implementación. Los hallazgos se basan en evidencia y las limitaciones del entorno de validación se describen en la sección 3. La ejecución creó una base SQLite temporal que se eliminó.
 
-## 22. Current Incremental Validation — 2026-11-11
+## 22. Historical Incremental Validation — 2026-11-11
 
 ### 1. Validation Metadata
 
@@ -288,13 +288,13 @@ Structural checks were exhaustive for README section order, Markdown H1 count, r
 | MVP-001–MVP-010 | P02/P03 and code | Implemented/partial/unknown as listed | Matches implementation and documented deviations | Coverage table, views, frontend, P06/P07 records | STATUS_CORRECT | OK |
 | US-011 / HU11 | Canonical backlog | Implemented; human/performance acceptance pending | Code present; measured acceptance incomplete | `voice` code and P06 validation | STATUS_CORRECT | OK |
 | US-012–US-019 / HU12–HU19 | Canonical backlog | Implemented with story-specific limits | Matches code and stated verification gaps | Voice/frontend code and P06/P07 reports | STATUS_CORRECT | OK |
-| CR-005 / HU20 | Pending change register | Proposed; approval pending | Not canonical/approved | P02/P03 `pending_change_requests` | STATUS_CORRECT | OK |
-| CR-006 / US-011 amendment | Pending change register | Requester-approved; team ratification pending | Code present, not silently accepted as canonical | Decisions and P06 report | STATUS_CORRECT | OK |
-| CR-007 / HU21 | Pending change register | Requester-approved; team ratification pending | Code present, no canonical story acceptance inferred | Decisions and P06 report | STATUS_CORRECT | OK |
+| CR-005 / HU20 | Historical pending change register | Proposed at the time of this validation | Status superseded by later project-lead confirmation | P02/P03 then-current registers | Historical | Superseded |
+| CR-006 / US-011 amendment | Historical pending change register | Requester-approved; team ratification then pending | Status superseded by later project-lead confirmation | Decisions and P06 report at the time | Historical | Superseded |
+| CR-007 / HU21 | Historical pending change register | Requester-approved; team ratification then pending | Status superseded by later project-lead confirmation | Decisions and P06 report at the time | Historical | Superseded |
 
 ### 9. Scope Fidelity Audit
 
-MVP 1 is retained; the approved MVP 2 baseline remains US-011–US-019. OMR, image recognition, differentiated roles, and account recovery are not presented as implemented. The documentation distinguishes implementation from acceptance and does not promote CR-005/006/007 to approved stories. No new requirements or technical decisions were introduced.
+MVP 1 is retained; at the time of this historical validation the approved MVP 2 baseline was US-011–US-019. The current scope is reconciled in Run 23 below.
 
 ### 10. Discrepancy Audit
 
@@ -373,3 +373,23 @@ Revalidate if API behavior, feature status, scope approval, configuration, or do
 ### 21. Validator Integrity Statement
 
 During this final validation phase, no documentation was rewritten and no source code, tests, prior-stage artifacts, dependencies, configuration, or infrastructure were modified. The preceding P09 generation iteration corrected the documented API/architecture inaccuracies and recorded existing MkDocs files. No product or technical decision was made, and no implementation defect was fixed. Findings and limitations are based on inspected code, configuration, pipeline records, and reproducible local checks.
+[Addendum content retained above is the historical 2026-11-11 validation and must be read with Run 23.]
+
+## 23. Current Scope Reconciliation Validation — P02 v5.6 (2026-11-11)
+
+**Result:** `PASS_WITH_WARNINGS` · **Execution:** documentation-only; no MkDocs
+build, tests, provider calls, remote CI, or deployment were performed.
+
+| Check | Result |
+|---|---|
+| Current scope | README, user guide, coverage, architecture, API, setup, data-model and known-limitations docs now reference canonical US-001–US-021 and CR-006's US-011 amendment. |
+| Planning distinction | US-020/US-021 are approved scope but unplanned; no priority or estimate was added. Existing 31-SP plan is for US-001–US-019 only. |
+| Approval source | Project lead confirmation received 2026-11-11. Formal approval record/date remains pending documentation (Q-030); the request date is not called the approval date. |
+| Acceptance boundary | Documentation distinguishes implementation evidence from P06/P07 story acceptance. US-020/US-021 lack dedicated P06 validation; AC-082 measurement remains pending. |
+| Technical/operational claims | Gemini and instrument behaviors are traced to the CR sources; no actual paid service call, test run, CI run or deployment is claimed. |
+| Structural checks | File/path references in changed documents are retained; MkDocs remains unavailable/not run, and no dependency was installed. |
+
+The previous Run 22 status is historical and superseded on the approval
+classification. P09 documentation now aligns with P02/P03 v5.6/4.6. `PASS_WITH_WARNINGS`
+is limited to this documentation reconciliation; missing formal approval
+documentation and unrun MkDocs build remain explicit warnings.

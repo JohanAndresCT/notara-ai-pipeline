@@ -44,9 +44,9 @@ Se leen desde el entorno o desde un archivo `.env` en la raíz del repositorio. 
 | `VOICE_PRIMARY_ENGINE`, `VOICE_DAILY_LIMIT`, `TTS_TIMEOUT_SECONDS` | Motor TTS principal, cuota diaria y timeout de síntesis | Opcionales; settings define defaults. Cuota por usuario; caché disponible no consume una síntesis nueva |
 | `EDGE_TTS_VOICE` | Voz de `edge-tts` | Opcional; voz de fallback/desarrollo según configuración |
 | `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MODEL_ID` | Configuración opcional de ElevenLabs | El valor del API key es secreto; no lo copies a documentación ni al repositorio |
-| `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_TIMEOUT_SECONDS` | Configuración Gemini para normalización opcional de dictado y tutor conversacional | Opcionales; API key requerida para habilitar las llamadas Gemini. CR-006 y CR-007 están pendientes de ratificación; el key es secreto |
+| `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_TIMEOUT_SECONDS` | Configuración Gemini para normalización opcional de dictado y tutor conversacional | Opcionales; API key requerida para habilitar las llamadas Gemini. CR-006/007 están aprobadas para alcance según el responsable; la key es secreta y la aceptación permanece pendiente |
 | `DICTATION_AI_ENABLED` | Habilita la normalización Gemini del dictado | Desactivada salvo configuración explícita |
-| `TUTOR_LIVE_MODEL`, `TUTOR_TEXT_MODEL`, `TUTOR_SESSION_SECONDS`, `TUTOR_DAILY_SESSIONS`, `TUTOR_DAILY_QUESTIONS` | Modelos y límites del tutor conversacional | El tutor Gemini es CR-007, pendiente de ratificación del equipo |
+| `TUTOR_LIVE_MODEL`, `TUTOR_TEXT_MODEL`, `TUTOR_SESSION_SECONDS`, `TUTOR_DAILY_SESSIONS`, `TUTOR_DAILY_QUESTIONS` | Modelos y límites del tutor conversacional | Funcionalidad CR-007 aprobada para alcance según responsable; configuración y límites no constituyen aprobación de despliegue |
 | `PORT` | Puerto del contenedor | Requerido por el entrypoint; lo provee Railway |
 | `VITE_API_PROXY_TARGET` | Destino del proxy `/api` de Vite | Opcional; por defecto `http://127.0.0.1:8000` |
 | `VITE_API_BASE_URL` | Aparece en `.env.example` | No se encontró uso en `frontend/src` ni `vite.config.ts` |

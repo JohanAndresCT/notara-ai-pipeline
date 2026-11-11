@@ -47,3 +47,20 @@ Esta ejecución revalida el código actual sin añadir ni modificar pruebas.
 Resultado de la revalidación: `PASS_WITH_WARNINGS` para las pruebas backend y
 checks de Django ejecutados; la validación frontend/E2E actual queda parcial
 por dependencias locales ausentes. PostgreSQL continúa `NOT_RUN`.
+
+## Reconciliación de alcance aprobado P02 v5.6 (2026-11-11)
+
+**Resultado documental:** `PASS_WITH_WARNINGS` · **Resultado de ejecución:**
+el estado registrado arriba permanece `PARTIAL`.
+
+| Alcance | Evidencia actual | Estado de validación |
+|---|---|---|
+| CR-006 / US-011 AC-078–AC-081 | La revalidación backend existente ejecutó 165 tests; los tests del normalizador usan proveedor falso, según P06/CR-006. | Evidencia automatizada histórica/reproducida en P06, no aceptación de AC por Product Owner. |
+| CR-006 / AC-082 | El corpus con y sin normalización requiere medición y reporte exacto. | `NOT_RUN`; no se hizo llamada real a Gemini. |
+| CR-005 / US-020 AC-090–AC-096 | CR-005 contiene verificaciones locales históricas del MP3/DDSP, pero P07 no tiene reporte de validación de historia US-020. | `NOT_VALIDATED`; no se ha repetido browser/manual testing ni se ha afirmado aceptación. |
+| CR-007 / US-021 AC-083–AC-089 | La suite backend registrada incluye tests de tutor con proveedor mock, y CR-007 conserva pruebas locales históricas de proveedor. | Parcial; falta reporte P06/P07 de aceptación por criterio y la verificación con micrófono real sigue pendiente. No se repitieron llamadas a Gemini. |
+| Frontend y PostgreSQL | Typecheck actual bloqueado por dependencias; build/E2E actual y PostgreSQL no ejecutados, según P06. | `BLOCKED` / `NOT_RUN`, respectivamente. |
+
+El proyecto lead confirmó el alcance; la fecha/acta formal de aprobación está
+pendiente de documentación (Q-030), no es una condición para el registro de
+las pruebas. No se modificaron pruebas ni código en esta reconciliación.

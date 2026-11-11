@@ -41,6 +41,23 @@ El deploy ejecuta checkout explícito con `ref: ${{ github.sha }}` y `persist-cr
 | Docker image/runtime | Dockerfile + smoke | Working tree; SHA UNKNOWN | Docker | NOT_RUN | STATIC_REVIEW; NOT_RUN ejecución | Docker CLI no está instalado; no hay prueba Nginx/volumen/UID. |
 | Railway deploy/health | Job `deploy-railway` | `github.sha` estático; SHA efectivo UNKNOWN | Railway | NOT_RUN / NOT_DEPLOYED (auditoría 2026-10-13; superado por la sección 14) | STATIC_REVIEW; NOT_RUN ejecución | Sin proyecto, token, IDs, domain, volumen ni logs reales. |
 
+## 14. Reconciliación de alcance P02 v5.6 (2026-11-11)
+
+**Resultado documental:** `PASS_WITH_WARNINGS`. Este addendum no cambia ni
+afirma un resultado remoto de GitHub Actions.
+
+| Cambio | Tratamiento P08 |
+|---|---|
+| CR-006 / US-011 | Los tests unitarios del normalizador deben usar el fake provider; la ejecución backend local registrada en P06/P07 no equivale a aceptación del corpus AC-082. |
+| CR-005 / US-020 | No existe en esta validación un resultado CI/E2E específico por AC-090–AC-096; el frontend typecheck actual está bloqueado por dependencias y el build/E2E actual no se ejecutó. |
+| CR-007 / US-021 | Tests del tutor con provider mock aparecen en la evidencia backend registrada; no hay una validación de aceptación browser/micrófono ni un run remoto atribuible a todos los AC-083–AC-089. |
+| Approval provenance | El proyecto lead reportó la aprobación de alcance en la solicitud recibida 2026-11-11; la fecha/acta formal sigue pendiente de documentación (Q-030). |
+| Remote/deployment boundary | No se dispararon workflows, llamadas a proveedores, ni despliegues. SHA, CI remoto y estado Railway actual permanecen sin verificar. |
+
+El workflow existente no se modificó por este ajuste documental. Los gates de
+PostgreSQL, typecheck/build/E2E del tree actual y la prueba de aceptación
+individual de US-020/US-021 siguen abiertos o `NOT_RUN`, según P06/P07.
+
 ## 5. Revisión de producción
 
 STATIC_REVIEW: imagen multistage Node 24 + Python 3.12; Nginx sirve SPA con fallback, proxya `/api/` a Gunicorn y `/static/` de Django; no sirve `/media/`. El entrypoint exige `PORT`, secret y DB, exige `DJANGO_DEBUG=false`, ejecuta `check --deploy` y migraciones antes de arrancar. Django configura cookies Secure, CSRF origins, SSL redirect y proxy header. `MEDIA_ROOT=/data/media` requiere volumen manual `/data`.

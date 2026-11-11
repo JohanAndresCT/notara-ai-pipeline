@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | **IMPLEMENTED** (2026-11-10) — requested and approved by the requester (Johan); team ratification pending (DEC-244) |
+| Status | **IMPLEMENTED** (2026-11-10); team approval reported by project lead in request received 2026-11-11; formal team approval record/date pending documentation (DEC-244) |
 | Requested by | TEAM-001 (Johan), 2026-11-10 |
 | Affects | New story HU21 / US-021; EPIC-006 (Listening and Audio Learning); score detail page (REG-003/REG-004) |
 | Course AI tool | **Google Gemini Live API** (course list item 8) |

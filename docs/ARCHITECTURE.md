@@ -46,8 +46,9 @@ En desarrollo, Vite sirve la SPA y hace proxy de `/api` al servidor de Django.
 - Las rutas protegidas muestran el login a usuarios anónimos.
 - `src/lib/api.ts` centraliza las llamadas a la API y usa mayormente `/api/v1/*`.
 - Configuración de Vite con plugins de Figma Make (`vite.config.ts`) además de React y Tailwind.
-- HU11/HU12 envían grabaciones al backend; STT usa un modelo faster-whisper local previamente provisionado. CR-006 añade una normalización Gemini opcional del texto, pendiente de ratificación.
-- HU13/HU14 generan audio mediante la cadena TTS configurada, con caché/cuota. CR-007 añade tutor conversacional Gemini con credenciales temporales de servidor, pendiente de ratificación.
+- HU11/HU12 envían grabaciones al backend; STT usa un modelo faster-whisper local previamente provisionado. El alcance aprobado CR-006 permite normalización Gemini opcional del texto transcrito tras un fallo del parser determinista; el audio no se envía a Gemini.
+- HU13/HU14 generan audio mediante la cadena TTS configurada, con caché/cuota. HU21/CR-007 usa Gemini Live con credenciales temporales emitidas por el servidor; aceptación de seguridad y de historia sigue pendiente.
+- HU20/CR-005 genera reproducción instrumental/MP3 en el navegador; los instrumentos DDSP obtienen sus modelos del host documentado y cuentan con fallback Tone.js.
 - La reproducción instrumental, el uso del modelo de instrumento, la composición de solfeo MP3 y la lectura del archivo `.abc` ocurren en el navegador.
 
 ## Decisiones visibles en el código

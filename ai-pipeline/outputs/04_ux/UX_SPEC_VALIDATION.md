@@ -221,7 +221,7 @@ empirical model acceptance or production readiness.
 
 UX-VAL-203 (LOW, no "Cancelar" during processing) remains.
 
-## P04 reconciliation addendum — UX v4.4
+## P04 historical reconciliation addendum — UX v4.4
 
 **Date:** 2026-11-11 · **Result:** `PASS_WITH_WARNINGS` for the approved HU01–HU19 scope · **P05 readiness:** `YES_WITH_REVIEW_GATES`.
 
@@ -233,5 +233,23 @@ UX-VAL-203 (LOW, no "Cancelar" during processing) remains.
 | CR-007 | HU21's live tutor panel and typed fallback remain a candidate, not an accepted REG-009. |
 | Coverage limits | The existing UX validation does not certify the new UI against accessibility, responsive, or real-microphone acceptance criteria. |
 
-Existing finding UX-VAL-203 remains open. Re-run P04 against CR-005–CR-007
-only after their recorded approval gate closes.
+Existing finding UX-VAL-203 remains open. The approval status in this
+historical addendum is superseded by Run 6 below.
+
+## P04 scope approval reconciliation — UX v4.5 (2026-11-11)
+
+**Result:** `PASS_WITH_WARNINGS` for documented scope mapping · **P05 readiness:** `YES_WITH_REVIEW_GATES`
+
+| Check | Result |
+|---|---|
+| Approved source scope | P02 v5.6 includes US-020/HU20, US-021/HU21 and the CR-006 amendment to US-011; P03 v4.6 leaves the two new stories unplanned. |
+| HU20 mapping | REG-003/004 and FLOW-020 map instrument choice, DDSP/fallback, single-audio behavior, reduced motion and instrument MP3 to AC-090–AC-096; no P03 priority is assigned. |
+| HU21 mapping | REG-009, FLOW-021 and M-18 map live voice, Spanish/text responses, score context, two-minute end, five-session limit, typed fallback and plain-text support to AC-083–AC-089; no P03 priority is assigned. |
+| CR-006 mapping | M-11 discloses transcript-only Gemini normalization after deterministic parsing fails; AC-078–AC-082 remain traced to US-011. |
+| Preservation | Existing MVP 1 and US-001–US-019 flows and assignments are retained; only the approved US-011 amendment is added. |
+| Validation limit | This is specification/traceability validation only. No user test, real microphone, cross-browser, accessibility, live provider, or story acceptance test was run. |
+
+The project lead's confirmation was received 2026-11-11; the underlying
+approval record/date remains pending documentation (Q-030). Run 6 supersedes
+the prior pending-approval classification without treating approval as UX
+acceptance. `UX-VAL-203` remains open.

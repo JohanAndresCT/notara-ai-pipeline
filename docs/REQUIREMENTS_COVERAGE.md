@@ -1,6 +1,6 @@
 # Cobertura de requisitos
 
-Estado de los requisitos según el código actual y la evidencia disponible. MVP 1 se conserva como baseline; el backlog canónico vigente de MVP 2 tiene 19 historias (`US-001`–`US-019`). Las fuentes actuales viven en `ai-pipeline/outputs/`, no en `ai-pipeline/artifacts/`.
+Estado de los requisitos según el código actual y la evidencia disponible. MVP 1 se conserva como baseline; el backlog canónico vigente contiene 21 historias (`US-001`–`US-021`), con US-020/US-021 aprobadas para alcance pero todavía sin plan P03. Las fuentes actuales viven en `ai-pipeline/outputs/`, no en `ai-pipeline/artifacts/`.
 
 Estados: `IMPLEMENTED`, `PARTIAL` (implementado con diferencias que requieren decisión), `NOT_IMPLEMENTED`, `UNKNOWN`.
 
@@ -33,13 +33,13 @@ La evidencia histórica P09 de MVP 1 registraba 88 pruebas backend; la revalidac
 
 ## Validación de historias de P06
 
-Los registros actuales contienen implementación y validación individual para `US-001`–`US-019`. La existencia de esos informes no significa que se hayan ejecutado todos los criterios de aceptación ni que haya aceptación manual, de rendimiento o de despliegue. P06 clasifica la ejecución global como `PASS_WITH_WARNINGS` / `PARTIAL`: 165 pruebas backend (164 pasaron y una prueba de concurrencia PostgreSQL fue omitida), Django `check` y migraciones pasaron; el typecheck frontend quedó bloqueado y el build actual no se reejecutó. Véanse `ai-pipeline/outputs/06_implementation/IMPLEMENTATION_VALIDATION_MVP2.md` y `ai-pipeline/outputs/07_testing/TEST_VALIDATION.md`.
+Los registros actuales contienen implementación y validación individual para `US-001`–`US-019`. CR-005 y CR-007 tienen código/registro de implementación, pero no existe validación P06 dedicada para US-020/US-021; AC-082 de CR-006 sigue pendiente de medir. La existencia de informes no significa aceptación manual, de rendimiento o de despliegue. P06 clasifica la ejecución global como `PASS_WITH_WARNINGS` / `PARTIAL`: 165 pruebas backend (164 pasaron y una prueba de concurrencia PostgreSQL fue omitida), Django `check` y migraciones pasaron; el typecheck frontend quedó bloqueado y el build actual no se reejecutó. Véanse `ai-pipeline/outputs/06_implementation/IMPLEMENTATION_VALIDATION_MVP2.md` y `ai-pipeline/outputs/07_testing/TEST_VALIDATION.md`.
 
-## Historias canónicas de MVP 2 (US-011–US-019)
+## Historias canónicas de MVP 2 (US-011–US-021)
 
 | ID / HU | Capacidad | Estado en el código | Evidencia actual | Límite de verificación |
 |---|---|---|---|---|
-| US-011 / HU11 | Dictado de voz a ABC | Implementado con STT local y parser determinista | `backend/voice/views.py`, `dictation.py`, `frontend/src/lib/api.ts`; validación US-011 | Calidad/corpus, micrófono real, p95 y memoria pendientes; CR-006 es enmienda separada |
+| US-011 / HU11 | Dictado de voz a ABC, con Gemini opcional tras fallo del parser | Implementado con STT local, normalizador opcional y parser determinista | `backend/voice/views.py`, `dictation.py`, `normalizer.py`, `frontend/src/lib/api.ts`; validación US-011 | Calidad/corpus, AC-082, micrófono real, p95 y memoria pendientes |
 | US-012 / HU12 | Comentario de voz transcrito con audio | Implementado | `scores` comment endpoint, `backend/voice/transcription.py`, `VoiceCommentComposer.tsx` | Verificación de micrófono y aceptación humana no completa |
 | US-013 / HU13 | Solfeo hablado | Implementado para ABC compatible | `backend/voice/speech_views.py`, síntesis TTS, `ListeningPanel.tsx` | Calidad/latencia de proveedor no medidas en esta revalidación |
 | US-014 / HU14 | Resumen hablado de la partitura | Implementado para ABC compatible | `speech_views.py`, lector ABC y TTS | Calidad/latencia no medidas |
@@ -48,16 +48,18 @@ Los registros actuales contienen implementación y validación individual para `
 | US-017 / HU17 | Voz de fallback | Implementado mediante cadena TTS configurada | `backend/voice/tts.py`, `synthesis.py` | Fallo/disponibilidad del proveedor externo no se probó en esta revalidación |
 | US-018 / HU18 | Descarga MP3 de solfeo | Implementado en el cliente | `frontend/src/ListeningPanel.tsx`, `frontend/src/lib/renderInstrument.ts` | No se reejecutó el flujo de navegador |
 | US-019 / HU19 | Cargar archivo `.abc` | Implementado en el editor, lectura local | `frontend/src/ScoreCreatePage.tsx` y validación US-019 | El typecheck y E2E actual no se pudieron completar |
+| US-020 / HU20 | Elegir instrumento y reproducir/descargar audio instrumental | Código presente; aprobación de alcance reportada | `frontend/src/lib/instruments.ts`, `ddsp.ts`, `ListeningPanel.tsx`, `renderInstrument.ts` | Sin prioridad ni SP P03; falta validación P06 de AC-090–AC-096 y E2E actual |
+| US-021 / HU21 | Tutor conversacional de voz/texto | Código y registro de implementación presentes; aprobación de alcance reportada | `backend/voice/tutor.py`, `tutor_views.py`, `frontend/src/lib/liveTutor.ts`, `TutorChat.tsx` | Sin prioridad ni SP P03; sin validación P06 por criterio; micrófono real pendiente |
 
-### Cambios fuera del backlog canónico
+### Estado de aprobación y planificación
 
 | Cambio | Estado del alcance | Evidencia |
 |---|---|---|
-| CR-005 / HU20 propuesta | Pendiente de aprobación del equipo; no es una historia aprobada | `DECISIONS_MVP2.md`, `CR-005_INSTRUMENTS.md`; existen opciones de instrumento en el cliente |
-| CR-006 / enmienda US-011 | Implementada y aprobada por el solicitante; ratificación del equipo pendiente | Normalizador Gemini opcional en `backend/voice/normalizer.py`; activación por configuración |
-| CR-007 / HU21 propuesta | Implementada y aprobada por el solicitante; ratificación del equipo pendiente | Endpoints y servicio tutor en `backend/voice/tutor.py`, `tutor_views.py`; no se agrega a US-001–US-019 |
+| CR-005 / HU20 / US-020 | Equipo aprobó según confirmación del responsable; fecha/acta formal pendiente de documentación; no planificada | `DECISIONS_MVP2.md`, `CR-005_INSTRUMENTS.md`; código en frontend |
+| CR-006 / enmienda US-011 | Equipo aprobó según confirmación del responsable; fecha/acta formal pendiente de documentación | Normalizador Gemini procesa texto transcrito, no audio; AC-078–AC-082 canónicas |
+| CR-007 / HU21 / US-021 | Equipo aprobó según confirmación del responsable; fecha/acta formal pendiente de documentación; no planificada | Endpoints y servicio tutor; aceptación sigue separada de implementación |
 
-No se infiere aprobación ni aceptación de las capacidades CR-005/006/007 por su presencia en el código. Los backlogs P02 v5.5 y P03 v4.4 conservan 19 historias canónicas y el registro de cambios pendientes separado.
+La fecha indicada para la recepción de la confirmación (2026-11-11) no se presenta como fecha de aprobación. P02 v5.6 contiene 21 historias. P03 v4.6 mantiene la carga conocida de 31 SP para US-001–US-019; no asigna prioridad ni estimación a US-020/US-021. La aprobación de alcance y el código no equivalen a aceptación.
 
 ## Resultados de prueba vigentes
 

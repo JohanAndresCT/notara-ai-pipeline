@@ -5,7 +5,8 @@
 - **Validator:** P03 Prioritization Validator (prompt v2.0)
 - **Project:** Notara
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
-- **Planning Version:** `PRIORITIZATION.md` 4.0; `product_backlog.json` 4.0 (HU11 authorization addendum below; earlier validations preserved)
+- **Historical Planning Version:** `PRIORITIZATION.md` 4.0; `product_backlog.json` 4.0
+- **Current Planning Version:** 4.6 (scope-approval reconciliation below)
 - **Validation Date:** 2026-11-08
 - **Upstream Artifact Statuses:** P00 `PASS_WITH_WARNINGS` (run 4); P01 `PASS_WITH_WARNINGS` (run 3); P02 `PASS_WITH_WARNINGS` (requirements v5.0)
 - **Overall Result:** `PASS_WITH_WARNINGS`
@@ -253,3 +254,19 @@ design requirements.
 This focused check does not replace the earlier full P03 validation. It confirms
 the 4.5 delta only; `READY_WITH_ASSUMPTIONS` and existing planning preconditions
 remain unchanged.
+
+## P03 scope approval reconciliation — planning v4.6 / backlog v4.6
+
+**Date:** 2026-11-11 · **Result:** `PASS_WITH_WARNINGS` · **P04 readiness:** `WITH CONSTRAINTS`
+
+| Check | Result |
+|---|---|
+| Approved scope | P02 v5.6 contains US-001–US-021; P03 includes US-020 and US-021 as canonical, unplanned scope entries. |
+| Existing plan | US-001–US-019 retain their existing priority, estimates, dependencies, sequence, delivery status and assignment. Known capacity remains 31 SP (P0/P1/P2 = 21/8/2). |
+| Added planning fields | US-020 and US-021 have null priority, estimate, release, sprint, delivery order and capacity band; both have empty assignments. No source suggestion was promoted to a team plan. |
+| Approval source | Team approval is reported by the project lead in the request received 2026-11-11. The underlying team approval record/date remains pending documentation (Q-030); this is not represented as a pending scope gate. |
+| Readiness | P04 can reconcile the approved scope and source behaviors. P03 cannot claim a prioritized schedule, capacity fit or sprint commitment for US-020/US-021 without team planning input. |
+
+`PASS_WITH_WARNINGS`: the delta is structurally traceable and does not change
+the known 31-SP plan. The newly approved stories remain outside that capacity
+calculation until the team supplies planning values.

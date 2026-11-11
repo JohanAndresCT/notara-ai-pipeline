@@ -12,17 +12,17 @@ Este documento separa el alcance MVP 2 canónico, funcionalidades implementadas 
 | Edición de comentarios | No implementada; la eliminación por el autor se conserva según DEC-211 |
 | Renderizado gráfico de la notación | No implementado; el contenido de partitura sigue mostrándose como texto |
 
-El inventario P00/P03 de MVP 1 marcaba voz y audio como futuro/no incluido. CR-001 incorporó las historias aprobadas HU11–HU18 a MVP 2, CR-002 incorporó HU19, y los artefactos P02/P03 vigentes mantienen las historias canónicas US-001–US-019.
+El inventario P00/P03 de MVP 1 marcaba voz y audio como futuro/no incluido. CR-001 incorporó HU11–HU18, CR-002 incorporó HU19, y la confirmación del responsable del proyecto incorpora al alcance HU20/HU21 y la enmienda CR-006 a US-011. P02 v5.6 contiene US-001–US-021; P03 v4.6 deja US-020/US-021 sin prioridad/estimación y fuera de la capacidad conocida de 31 SP.
 
-## Cambios implementados pendientes de ratificación del equipo
+## Estado de aprobación, planificación y validación de CR-005/006/007
 
 | Cambio | Estado documentado | Tratamiento |
 |---|---|---|
-| CR-005 / propuesta HU20 (instrumentos adicionales) | `PROPOSED_PENDING_TEAM_APPROVAL` | No es una historia canónica aprobada; no inferir aprobación por presencia de controles o código |
-| CR-006 / enmienda a US-011 | Implementada y aprobada por el solicitante; ratificación del equipo pendiente | El normalizador Gemini opcional procesa texto transcrito, no audio. Mantener fuera del backlog canónico mientras no se ratifique |
-| CR-007 / propuesta HU21 (tutor conversacional) | Implementada y aprobada por el solicitante; ratificación del equipo pendiente | Endpoints y configuración Gemini presentes; no es una historia canónica aprobada |
+| CR-005 / US-020 / HU20 | Aprobación del equipo reportada por el responsable; fecha/acta formal pendiente de documentación; sin plan P03 | Historia canónica; código presente; faltan validación P06 individual y verificación browser actual |
+| CR-006 / enmienda a US-011 | Aprobación del equipo reportada por el responsable; fecha/acta formal pendiente de documentación | AC-078–AC-082 canónicas; Gemini procesa texto transcrito, nunca audio; AC-082 requiere medición |
+| CR-007 / US-021 / HU21 | Aprobación del equipo reportada por el responsable; fecha/acta formal pendiente de documentación; sin plan P03 | Historia canónica; implementación registrada; falta validación P06 individual y aceptación por criterio |
 
-Ver [DECISIONS_MVP2.md](../ai-pipeline/outputs/00_context/DECISIONS_MVP2.md) y el registro `pending_change_requests` de los backlogs P02/P03. Esta documentación no crea aprobaciones ni añade historias.
+La fecha 2026-11-11 corresponde a la recepción de la confirmación, no a la fecha de aprobación. La aprobación de alcance no equivale a aceptación de implementación, pruebas ni lanzamiento. Ver [DECISIONS_MVP2.md](../ai-pipeline/outputs/00_context/DECISIONS_MVP2.md) y Q-030 en P02.
 
 ## Discrepancias de implementación y requisitos
 
@@ -38,7 +38,7 @@ Ver [DECISIONS_MVP2.md](../ai-pipeline/outputs/00_context/DECISIONS_MVP2.md) y e
 | `P09-DISC-008` | El reporte P08 previo decía `NOT_DEPLOYED` pese a evidencia de despliegue histórica | Reconciliado en P08; la evidencia sigue siendo histórica y no acredita disponibilidad actual |
 | `P09-DISC-009` | Los documentos históricos citaban `ai-pipeline/artifacts/`; el pipeline actual está en `ai-pipeline/outputs/` | Reconciliado en esta actualización; no se crearon copias |
 | `P09-DISC-010` | Registro histórico sobre borrado de comentarios frente a AC-028 | Resuelto por DEC-211, que ratificó el borrado del autor y supersedió AC-028 |
-| `P09-DISC-011` | Registros antiguos afirmaban que faltaban validaciones individuales | Los registros actuales US-001–US-019 existen; ello no equivale a aceptación manual de cada criterio |
+| `P09-DISC-011` | Registros antiguos afirmaban que faltaban validaciones individuales | Los registros individuales US-001–US-019 existen; US-020 carece de validación P06 y US-021 tiene implementación, pero no validación P06. Ningún registro equivale a aceptación manual de cada criterio |
 | `P09-DISC-012` | `VITE_API_BASE_URL` figura en `.env.example` sin uso observado en el frontend | Permanece sin uso conocido |
 
 ## Evidencia operativa y pruebas pendientes
@@ -48,8 +48,10 @@ Ver [DECISIONS_MVP2.md](../ai-pipeline/outputs/00_context/DECISIONS_MVP2.md) y e
 - La validación backend local más reciente fue 165 tests: 164 pasaron y un test PostgreSQL-only de concurrencia se omitió. PostgreSQL local no se ejecutó.
 - El typecheck frontend actual está bloqueado por tres dependencias ausentes en el `node_modules` existente. No se instalaron paquetes; E2E y build actuales no se ejecutaron.
 - La evidencia histórica E2E P07 fue 5/5, no una reejecución actual.
+- No existe validación P06/P07 actual por criterio para US-020/US-021. La ejecución backend registrada no sustituye tests de navegador, escucha manual o micrófono real.
+- La evaluación del corpus con y sin normalización Gemini (US-011 AC-082) sigue pendiente; no se repitieron llamadas a servicios de pago.
 - Precisión de dictado, corpus de aceptación, latencia p95, uso máximo de memoria, concurrencia PostgreSQL, compatibilidad de grabación por navegador y calidad auditiva requieren evidencia adicional.
-- No se afirma aceptación empírica completa de HU11–HU19, readiness de producción, disponibilidad actual ni resultados de usuarios/adopción.
+- No se afirma aceptación empírica completa de HU11–HU21, readiness de producción, disponibilidad actual ni resultados de usuarios/adopción.
 
 ## Referencias de origen
 

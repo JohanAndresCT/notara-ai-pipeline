@@ -5,9 +5,9 @@
   "mvp_maturity": "PARTIALLY_VERIFIED",
   "p09_status": "PASS_WITH_WARNINGS",
   "requirements": {
-    "total": 56,
+    "total": 62,
     "verified": 19,
-    "partially_verified": 36,
+    "partially_verified": 42,
     "not_verified": 1,
     "not_implemented": 0,
     "data_unavailable": 0,
@@ -30,11 +30,11 @@
     "major_gaps": 0
   },
   "success_criteria": {
-    "total": 18,
+    "total": 20,
     "met": 7,
     "partially_met": 9,
     "not_met": 0,
-    "unmeasured": 2,
+    "unmeasured": 4,
     "not_applicable": 0
   },
   "user_and_business_outcomes": {
@@ -47,20 +47,21 @@
   "findings": {
     "blocker": 0,
     "high": 0,
-    "medium": 6,
+    "medium": 7,
     "low": 2,
     "info": 0
   },
   "limitations": [
-    "Requirement metrics count 46 approved functional requirements and 10 approved non-functional requirements; 19 canonical stories are the traceability layer, not additional requirements.",
-    "P02 defines 77 acceptance-criteria entries; AC-028 is superseded by AC-029. P10 assessed them through story-level evidence and did not rerun every criterion.",
+    "Requirement metrics count 52 approved functional requirements and 10 approved non-functional requirements; 21 canonical stories are the traceability layer, not additional requirements.",
+    "P02 defines 96 acceptance-criteria records (95 active; AC-028 is superseded by AC-029). P10 assessed them through story-level evidence and did not rerun every criterion.",
     "The current SQLite suite discovered 165 tests: 164 passed, one PostgreSQL-only concurrency test was skipped, and none failed.",
     "Current frontend typecheck is blocked by locally unresolved manifest-declared packages; current frontend build and E2E were not run.",
     "Historical P07 E2E evidence is 5/5 in Chromium and is not a current execution.",
     "P08 records an E2E CI failure in run #15 with unknown cause and a passing run #14 on the same SHA; logs were not audited.",
     "Deployment/runtime evidence is historical and limited to 2026-10-14; current availability and operations were not checked.",
     "Human voice acceptance, approved corpus/target-environment measurements, cross-browser testing, accessibility, performance/load, and code coverage remain incomplete or unmeasured.",
-    "MVP 2 stories remain PLANNED in P03; P06 DoD/product review and CR-005/006/007 approval states are not inferred from code."
+    "P03 keeps the known 31-SP plan for US-001-US-019; approved-scope US-020/US-021 are unplanned and have incomplete story-level acceptance evidence.",
+    "The project lead reported team approval of CR-005/006/007 in the request received 2026-11-11; formal approval record/date remains pending documentation."
   ],
   "evidence_sources": [
     "ai-pipeline/outputs/00_context/DECISIONS_MVP2.md",
@@ -69,11 +70,15 @@
     "ai-pipeline/outputs/02_requirements/REQUIREMENTS_VALIDATION.md",
     "ai-pipeline/outputs/02_requirements/product_backlog.json",
     "ai-pipeline/outputs/03_planning/PRIORITIZATION.md",
+    "ai-pipeline/outputs/03_planning/PRIORITIZATION_VALIDATION.md",
     "ai-pipeline/outputs/03_planning/product_backlog.json",
+    "ai-pipeline/outputs/04_ux/UX_SPEC.md",
+    "ai-pipeline/outputs/05_architecture/ARCHITECTURE.md",
     "ai-pipeline/outputs/06_implementation/IMPLEMENTATION_VALIDATION_MVP2.md",
     "ai-pipeline/outputs/06_implementation/US-016_AUDIO_CACHE_VALIDATION.md",
     "ai-pipeline/outputs/06_implementation/US-017_VOICE_FALLBACK_VALIDATION.md",
     "ai-pipeline/outputs/07_testing/TEST_VALIDATION.md",
+    "ai-pipeline/outputs/07_testing/TEST_PLAN.md",
     "ai-pipeline/outputs/08_cicd/CICD_VALIDATION.md",
     "ai-pipeline/outputs/09_documentation/DOCUMENTATION_REPORT.md",
     "ai-pipeline/outputs/09_documentation/DOCUMENTATION_VALIDATION.md",

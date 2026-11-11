@@ -1,11 +1,11 @@
 # Project Context
 
-**Version:** 2.4
+**Version:** 2.5
 **Release:** MVP 2 — Sprint 2 (Audio, Voice and TTS/STT)
 **Supersedes:** Version 2.3 (HU14 wording and MVP 1 question status), version 2.2, version 2.1 (MVP 2, proposals pending) and version 1.0 (MVP 1, repository tag `v1.0.0`)
 **last edited by:** Johan Andrés Ceballos
 **Mode:** Incremental update. All MVP 1 content is preserved; MVP 2 content is added and marked.
-**Change Requests:** CR-001 — Voice and audio capabilities enter MVP 2. CR-002 — Loading a score from an `.abc` file enters MVP 2 (HU19). CR-003/CR-004 — requester-authorized STT amendments as recorded in their source documents. CR-005 — proposed instrument changes. CR-006/CR-007 — requester-approved implementations pending team ratification.
+**Change Requests:** CR-001 — Voice and audio capabilities enter MVP 2. CR-002 — Loading a score from an `.abc` file enters MVP 2 (HU19). CR-003/CR-004 — STT amendments as recorded in their source documents. CR-005/CR-006/CR-007 — approved for MVP2 scope per project-lead confirmation received 2026-11-11; formal team approval record and approval date remain to be documented.
 
 > Classification legend:
 > **FACT** — stated by the team in an input artifact or verifiable in the repository.
@@ -23,7 +23,8 @@
 | 2.1 | MVP 2 | Corrections VAL-201–VAL-210; proposals PDEC-201–PDEC-210 tabled. |
 | 2.2 | MVP 2 | Proposals resolved by DEC-201–DEC-210; open questions resolved by DEC-211–DEC-218 (`DECISIONS_MVP2.md`). HU19 / MVP-019 added through CR-002. Load becomes 31 SP. Defect DEFECT-001 (ABC placeholder) recorded. |
 | 2.3 | MVP 2 | Corrections from P02 validation: HU14 "clave" is the clef, not the key (REQ-VAL-202 / CONFLICT-202), in §3 and MVP-014; Q-002 and Q-006 synced with their MVP 1 resolution in requirements v2.0 (REQ-VAL-203 / CONFLICT-204). No scope change. |
-| 2.4 | MVP 2 | Records the 2026-11-10 CR-005/006/007 implementation and approval states without promoting pending proposals to approved scope; marks DEFECT-001 as fixed in the current source. |
+| 2.4 | MVP 2 | Records the 2026-11-10 CR-005/006/007 implementation states; marks DEFECT-001 as fixed in the current source. |
+| 2.5 | MVP 2 | Updates scope for CR-005/006/007 and HU20/HU21 based on project-lead confirmation received 2026-11-11; formal approval date/minutes still need to be recorded. |
 
 Identifiers are stable. Items that changed status keep their ID and are marked as superseded or resolved; they are not renumbered.
 
@@ -465,16 +466,18 @@ scope or presented as team-ratified decisions:
 
 | Change | Current recorded state | Scope treatment |
 |---|---|---|
-| CR-005 / proposed HU20 / DEC-242 | Proposed; code is present in the working tree; team approval is pending. | Not an approved backlog story or planned item. |
-| CR-006 / US-011 amendment / DEC-243 | Implemented and approved by the requester; team ratification is pending. | The approved US-011 baseline remains unchanged until P02 is re-run after ratification. |
-| CR-007 / proposed HU21 / US-021 / DEC-244 | Implemented and approved by the requester; team ratification is pending. | Not an approved backlog story or planned item. |
+| CR-005 / HU20 / DEC-242 | Team approval reported by project lead in request received 2026-11-11; formal team approval record/date pending documentation. | Approved for scope; include HU20 in P01/P02. Priority and estimate remain unconfirmed. |
+| CR-006 / US-011 amendment / DEC-243 | Team approval reported by project lead in request received 2026-11-11; formal team approval record/date pending documentation. | Approved amendment to US-011; incorporate its existing criteria in P02 without replacing prior criteria. |
+| CR-007 / HU21 / US-021 / DEC-244 | Implemented; team approval reported by project lead in the 2026-11-11 request. | Approved for P01/P02 scope. Formal approval date/minutes remain undocumented; story-level P06/P07 validation remains separate. |
 
-These are facts about the source records and the existence of implementation
-files, not acceptance evidence. The details remain in `CR-005_INSTRUMENTS.md`,
-`CR-006_GEMINI_DICTATION.md`, `CR-007_GEMINI_LIVE_TUTOR.md`, and
-`DECISIONS_MVP2.md`. Q-020 remains open; no additional approver or ratification
-date is inferred. P02–P05 must not treat the proposals as approved requirements
-or expand the canonical Product Backlog while this gate remains open.
+The project lead's confirmation in the request received 2026-11-11 authorizes
+P00/P01/P02 to treat these changes as approved product scope. It does not supply
+an approval meeting record, team-member list, or the date on which the team
+approved them; those details remain pending documentation and are not inferred.
+The CR documents remain the source of the unchanged story text and acceptance
+criteria. Approval is not implementation acceptance, test evidence, a sprint
+commitment, or deployment authorization. Q-020 remains open for other MVP 2
+decisions not covered by this confirmation.
 
 **Repository correction:** DEFECT-001 is no longer open in the current source.
 `frontend/src/ScoreCreatePage.tsx` now contains actual newline characters in the
@@ -482,5 +485,5 @@ ABC placeholder; the obsolete literal `&#10;` is absent. This is a static
 source check, not a browser acceptance result.
 
 **Prompt limitation:** the current P00/P01 prompts predate HU19 and CR-005–CR-007.
-This addendum preserves their historical instructions while keeping HU20/HU21
-and CR-006's amendment outside approved scope.
+This addendum preserves their historical instructions and supersedes the
+previous pending-scope classification based on the project-lead confirmation.

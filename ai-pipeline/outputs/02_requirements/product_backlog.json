@@ -1,16 +1,16 @@
 {
   "backlog_metadata": {
     "project": "Notara",
-    "version": "5.5",
+    "version": "5.6",
     "stage": "P02",
     "status": "READY_WITH_ASSUMPTIONS",
-    "source": "ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md (v2.3)",
+    "source": "ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md (v2.4)",
     "validation_source": "ai-pipeline/outputs/01_discovery/PRODUCT_VISION_VALIDATION.md",
     "release": "MVP 2 - Sprint 2",
     "additional_sources": [
       "ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md",
       "ai-pipeline/outputs/00_context/DECISIONS_MVP2.md",
-      "ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md (v2.4)",
+      "ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md (v2.5)",
       "ai-pipeline/outputs/00_context/CR-003_WHISPER_TINY.md",
       "ai-pipeline/outputs/00_context/CR-004_WHISPER_BASE.md",
       "ai-pipeline/outputs/00_context/CR-005_INSTRUMENTS.md",
@@ -26,31 +26,28 @@
       "CR-006",
       "CR-007"
     ],
-    "pending_change_requests": [
+    "approval_documentation_pending": [
       {
         "change_request": "CR-005",
-        "candidate_story": "US-020 / HU20",
+        "canonical_story": "US-020 / HU20",
         "decision": "DEC-242",
-        "status": "PROPOSED_PENDING_TEAM_APPROVAL",
-        "canonical_backlog_item": false
+        "status": "TEAM_APPROVAL_REPORTED_BY_PROJECT_LEAD; FORMAL_RECORD_AND_DATE_PENDING"
       },
       {
         "change_request": "CR-006",
-        "candidate_story": "US-011 amendment",
+        "canonical_story": "US-011 amendment",
         "decision": "DEC-243",
-        "status": "IMPLEMENTED_REQUESTER_APPROVED_TEAM_RATIFICATION_PENDING",
-        "canonical_backlog_item": false
+        "status": "TEAM_APPROVAL_REPORTED_BY_PROJECT_LEAD; FORMAL_RECORD_AND_DATE_PENDING"
       },
       {
         "change_request": "CR-007",
-        "candidate_story": "US-021 / HU21",
+        "canonical_story": "US-021 / HU21",
         "decision": "DEC-244",
-        "status": "IMPLEMENTED_REQUESTER_APPROVED_TEAM_RATIFICATION_PENDING",
-        "canonical_backlog_item": false
+        "status": "TEAM_APPROVAL_REPORTED_BY_PROJECT_LEAD; FORMAL_RECORD_AND_DATE_PENDING"
       }
     ],
-    "notes": "Canonical active items remain US-001-US-019; the pending_change_requests register is separate from items and does not add approved stories or acceptance criteria. MVP 1 items US-001-US-010 are preserved; US-010 is amended by DEC-211 (AC-028 superseded by AC-029). CR-003 amends DEC-201/DEC-214 for local STT and updated notice. HU11 authorization resolves BR-013/025 and approves quality/performance/resource targets and a configurable 30/day STT quota (DEC-219); empirical acceptance and Railway evidence remain pending. Planning fields stay null; team MoSCoW and Story Points remain source data. CR-004 supersedes the CR-003 Tiny model selection with Systran/faster-whisper-base for HU11/HU12. Requester approval for CR-004 implementation does not establish approval by other team members. CR-005 remains proposed; CR-006/007 are implemented with requester approval and team ratification pending. No approval, estimate, priority, or acceptance is inferred.",
-    "merge_note": "v5.3: merge reconciliation with pipeline/mvp2-p00-context; DEC-230-DEC-238 applied (AC-029, AC-049, AC-063 reworded; AC-077, FR-046, BR-030, BR-031 added). v5.5 reconciles P00/P01 metadata and records pending CR-005/006/007 separately."
+    "notes": "Canonical active items are US-001-US-021; US-001-US-019 and their existing criteria are preserved, with CR-006 adding AC-078-AC-082 to US-011. MVP 1 items US-001-US-010 are preserved; US-010 is amended by DEC-211 (AC-028 superseded by AC-029). CR-003 amends DEC-201/DEC-214 for local STT and updated notice. HU11 authorization resolves BR-013/025 and approves quality/performance/resource targets and a configurable 30/day STT quota (DEC-219); empirical acceptance and Railway evidence remain pending. Planning fields stay null; team MoSCoW and Story Points remain source data. CR-004 supersedes the CR-003 Tiny model selection with Systran/faster-whisper-base for HU11/HU12. Project lead reported team approval of CR-005/006/007 in the request received 2026-11-11; formal approval record/date remains pending documentation and is tracked above. No priority, estimate, acceptance, or release approval is inferred.",
+    "merge_note": "v5.3: merge reconciliation with pipeline/mvp2-p00-context; DEC-230-DEC-238 applied (AC-029, AC-049, AC-063 reworded; AC-077, FR-046, BR-030, BR-031 added). v5.5 reconciled P00/P01 metadata and recorded CR-005/006/007 separately. v5.6 incorporates the reported scope approvals and adds canonical stories/criteria while keeping planning fields unassigned."
   },
   "epics": [
     {
@@ -872,6 +869,41 @@
           "when": "the STT endpoint validates the request",
           "then": "it rejects it before inference, returns a typed error, and does not consume quota",
           "source": "FR-030, FR-043, FR-045; NFR-003; DEC-219"
+        },
+        {
+          "id": "AC-078",
+          "given": "the transcript contains recognisable dictation words written incorrectly (e.g. \"Donegra, recorcea\")",
+          "when": "the parser fails",
+          "then": "AI normalisation is applied and the expected ABC (e.g. `C D/2`) is inserted for review, labelled \"Interpretado con IA\"",
+          "source": "CR-006 AC-078"
+        },
+        {
+          "id": "AC-079",
+          "given": "the transcript is unrelated to music (e.g. \"hola qué tal\")",
+          "when": "AI normalisation runs",
+          "then": "no ABC is produced and M-01 is shown",
+          "source": "CR-006 AC-079"
+        },
+        {
+          "id": "AC-080",
+          "given": "the AI service is unavailable, misconfigured or exceeds 8 seconds",
+          "when": "the parser fails",
+          "then": "M-01 is shown and no server error reaches the user",
+          "source": "CR-006 AC-080"
+        },
+        {
+          "id": "AC-081",
+          "given": "AI normalisation is used",
+          "when": "the transcript is sent for processing",
+          "then": "only transcript text is sent to the provider (never audio) and M-11 states that the text may be processed by an AI provider",
+          "source": "CR-006 AC-081"
+        },
+        {
+          "id": "AC-082",
+          "given": "the evaluation corpus (AC-070) is available",
+          "when": "it is measured with AI normalisation enabled",
+          "then": "exact results are reported both with and without AI normalisation",
+          "source": "CR-006 AC-082"
         }
       ],
       "business_rule_ids": [
@@ -881,7 +913,8 @@
         "BR-022",
         "BR-024",
         "BR-025",
-        "BR-029"
+        "BR-029",
+        "BR-032"
       ],
       "edge_case_ids": [
         "EDGE-014",
@@ -889,7 +922,8 @@
         "EDGE-016",
         "EDGE-017",
         "EDGE-018",
-        "EDGE-031"
+        "EDGE-031",
+        "EDGE-032"
       ],
       "dependency_ids": [
         "DEP-004",
@@ -928,7 +962,8 @@
           "DEC-214",
           "DEC-215",
           "DEC-218",
-          "DEC-219"
+          "DEC-219",
+          "DEC-243"
         ],
         "team_backlog": {
           "moscow": "Must",
@@ -1719,6 +1754,219 @@
           "moscow": "Should",
           "story_points": 2
         }
+      }
+    },
+    {
+      "id": "US-020",
+      "title": "Play the score with other instruments",
+      "epic_id": "EPIC-006",
+      "requirement_ids": [
+        "FR-051",
+        "FR-052"
+      ],
+      "user_story": {
+        "as_a": "user viewing an ABC score",
+        "i_want": "to choose the instrument that plays it",
+        "so_that": "I can hear how the melody sounds on my own instrument"
+      },
+      "scope": "MVP_SUPPORTING",
+      "acceptance_criteria": [
+        {
+          "id": "AC-090",
+          "given": "a score with valid ABC",
+          "when": "I choose Piano, Guitar, Violin, Flute, Trumpet or Saxophone",
+          "then": "the melody plays in the browser and the button shows \"Detener\"; playback sends no score/audio to an audio service and does not use the voice-synthesis daily limit; required DDSP model assets may be fetched from their documented host",
+          "source": "CR-005 AC-020-01, AC-020-05; 2026-11-10 instrument update"
+        },
+        {
+          "id": "AC-091",
+          "given": "an instrument is playing",
+          "when": "I choose another instrument, solfege or tutor",
+          "then": "the previous playback stops so only one audio plays at a time",
+          "source": "CR-005 AC-020-02"
+        },
+        {
+          "id": "AC-092",
+          "given": "the score's instrument matches an available option",
+          "when": "the panel loads",
+          "then": "that option is highlighted",
+          "source": "CR-005 AC-020-03"
+        },
+        {
+          "id": "AC-093",
+          "given": "a plain-text or unsupported score is open",
+          "when": "instrument playback is presented",
+          "then": "it is disabled with M-02/M-03, as for HU15",
+          "source": "CR-005 AC-020-04"
+        },
+        {
+          "id": "AC-094",
+          "given": "Violin, Flute, Trumpet or Saxophone is selected",
+          "when": "the score is played",
+          "then": "playback uses the Magenta DDSP model and is marked \"IA\"; if the model cannot load or run, Tone.js plays instead and a fallback notice is shown; Piano and Guitar use Tone.js",
+          "source": "CR-005 DEC-242 and documented implementation update"
+        },
+        {
+          "id": "AC-095",
+          "given": "an instrument is selected",
+          "when": "I press \"Descargar <instrumento> (MP3)\"",
+          "then": "an MP3 of the whole score played with that instrument is downloaded as `<titulo>-<instrumento>.mp3`; \"Descargar solfeo (MP3)\" for HU18 remains available",
+          "source": "CR-005 AC-020-07"
+        },
+        {
+          "id": "AC-096",
+          "given": "\"reduce motion\" is enabled",
+          "when": "instrument playback is displayed",
+          "then": "no rising icons, notes or related animation are shown",
+          "source": "CR-005 AC-020-06"
+        }
+      ],
+      "business_rule_ids": [
+        "BR-015"
+      ],
+      "edge_case_ids": [
+        "EDGE-021",
+        "EDGE-022",
+        "EDGE-033"
+      ],
+      "dependency_ids": [
+        "DEP-003",
+        "DEP-010"
+      ],
+      "open_question_ids": [
+        "Q-030"
+      ],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {
+        "p01_elements": [
+          "NEED-014",
+          "JTBD-012",
+          "IND-210"
+        ],
+        "hu_ids": [
+          "HU20"
+        ],
+        "backlog_ac_ids": [],
+        "decision_ids": [
+          "DEC-242"
+        ],
+        "team_backlog": {},
+        "change_request_ids": [
+          "CR-005"
+        ]
+      }
+    },
+    {
+      "id": "US-021",
+      "title": "Talk to the music tutor about a score",
+      "epic_id": "EPIC-006",
+      "requirement_ids": [
+        "FR-047",
+        "FR-048",
+        "FR-049",
+        "FR-050"
+      ],
+      "user_story": {
+        "as_a": "music student",
+        "i_want": "to ask the tutor questions by voice about the score I am viewing",
+        "so_that": "I can understand it and learn how to play it without leaving the page"
+      },
+      "scope": "MVP_SUPPORTING",
+      "acceptance_criteria": [
+        {
+          "id": "AC-083",
+          "given": "an authenticated user is on a score detail page",
+          "when": "they press \"Preguntar al tutor\" and accept the notice",
+          "then": "a live voice conversation starts and the tutor answers in Spanish with voice, also showing the text of each answer",
+          "source": "CR-007 AC-083"
+        },
+        {
+          "id": "AC-084",
+          "given": "the conversation is active",
+          "when": "the user asks a question",
+          "then": "the tutor knows the score's title, instrument, format and content (ABC or text), answers about that score and general music theory, and politely declines unrelated topics",
+          "source": "CR-007 AC-084"
+        },
+        {
+          "id": "AC-085",
+          "given": "a conversation is active",
+          "when": "2 minutes elapse or the user presses \"Terminar\"",
+          "then": "the conversation ends and the microphone is released",
+          "source": "CR-007 AC-085"
+        },
+        {
+          "id": "AC-086",
+          "given": "the user has used the tutor 5 times today",
+          "when": "they try again",
+          "then": "a clear daily-limit message is shown",
+          "source": "CR-007 AC-086"
+        },
+        {
+          "id": "AC-087",
+          "given": "microphone access is denied or the AI service is unavailable",
+          "when": "the user attempts to use the tutor",
+          "then": "a clear message is shown and the user can still type a question and receive a text answer (or use the existing audio tutor, HU14)",
+          "source": "CR-007 AC-087"
+        },
+        {
+          "id": "AC-088",
+          "given": "a live tutor session starts",
+          "when": "the client connects to the provider",
+          "then": "the Gemini API key never reaches the browser; the backend issues a short-lived token for each session; audio is streamed to the provider only during the session and is not stored by Notara",
+          "source": "CR-007 AC-088"
+        },
+        {
+          "id": "AC-089",
+          "given": "a plain-text score is open",
+          "when": "the tutor answers a question",
+          "then": "it uses the text content and states that playback features need ABC",
+          "source": "CR-007 AC-089"
+        }
+      ],
+      "business_rule_ids": [
+        "BR-033"
+      ],
+      "edge_case_ids": [
+        "EDGE-034",
+        "EDGE-035",
+        "EDGE-036"
+      ],
+      "dependency_ids": [
+        "DEP-001",
+        "DEP-003",
+        "DEP-010"
+      ],
+      "open_question_ids": [
+        "Q-030"
+      ],
+      "priority": null,
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "DEFINED",
+      "traceability": {
+        "p01_elements": [
+          "NEED-015",
+          "JTBD-013",
+          "IND-211"
+        ],
+        "hu_ids": [
+          "HU21"
+        ],
+        "backlog_ac_ids": [],
+        "decision_ids": [
+          "DEC-244"
+        ],
+        "team_backlog": {},
+        "change_request_ids": [
+          "CR-007"
+        ]
       }
     }
   ]

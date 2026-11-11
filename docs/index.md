@@ -1,6 +1,6 @@
 # Notara
 
-Aplicación web responsive de comunidad y gestor básico de partituras en texto para estudiantes de música y músicos aficionados. MVP 1 se conserva como baseline; el backlog canónico de MVP 2 abarca US-011–US-019.
+Aplicación web responsive de comunidad y gestor básico de partituras en texto para estudiantes de música y músicos aficionados. MVP 1 se conserva como baseline; el backlog canónico de MVP 2 abarca US-011–US-021. US-020/US-021 están aprobadas para alcance pero no planificadas ni aceptadas.
 
 - Evidencia histórica de despliegue: <https://notara-production.up.railway.app> (health check observado el 2026-10-14; no revalidado actualmente).
 - Repositorio: <https://github.com/JohanAndresCT/notara-ai-pipeline>

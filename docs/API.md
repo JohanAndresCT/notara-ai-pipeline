@@ -65,10 +65,10 @@ Las rutas nuevas usan `/api/v1/`; requieren sesión y CSRF válido para POST, sa
 | GET | `/api/v1/comments/<comment_id>/audio/` | Devuelve el audio del comentario de voz si el usuario tiene acceso. |
 | POST | `/api/v1/scores/<id>/audio/solfege/` | Devuelve audio MPEG del solfeo (HU13); requiere partitura ABC compatible. |
 | POST | `/api/v1/scores/<id>/audio/tutor/` | Devuelve audio MPEG del resumen hablado (HU14); el texto también se incluye en `X-Notara-Tutor-Text`. |
-| POST | `/api/v1/scores/<id>/tutor/session/` | Devuelve credenciales de sesión temporales de Gemini Live (CR-007, pendiente de ratificación). |
-| POST | `/api/v1/scores/<id>/tutor/ask/` | Recibe JSON `question` (1–500 caracteres) y devuelve `answer` (CR-007, pendiente de ratificación). |
+| POST | `/api/v1/scores/<id>/tutor/session/` | Devuelve credenciales de sesión temporales de Gemini Live (US-021/CR-007, aprobada para alcance; aceptación pendiente). |
+| POST | `/api/v1/scores/<id>/tutor/ask/` | Recibe JSON `question` (1–500 caracteres) y devuelve `answer` (US-021/CR-007, aprobada para alcance; aceptación pendiente). |
 
-El cliente genera la reproducción instrumental y el MP3 descargable en el navegador; no se exponen como endpoints de síntesis de servidor. Los endpoints del tutor conversacional son funcionalidades presentes en el código, pero no forman parte del backlog canónico ratificado.
+El cliente genera la reproducción instrumental y el MP3 descargable en el navegador; no se exponen como endpoints de síntesis de servidor. Los endpoints del tutor conversacional son funcionalidades presentes en el código y están mapeados a US-021; su presencia no equivale a aceptación ni autorización de despliegue.
 
 ## Rutas heredadas `/api/...`
 
