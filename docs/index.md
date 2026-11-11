@@ -1,6 +1,6 @@
 # Notara
 
-Comunidad web responsiva y gestor básico de partituras para estudiantes de música y músicos aficionados. Permite crear, publicar, explorar, comentar y reaccionar a partituras breves en notación ABC o texto libre.
+Comunidad web responsive y gestor básico de partituras para estudiantes de música y músicos aficionados. Permite crear, publicar, explorar, comentar y reaccionar a partituras breves en notación ABC o texto libre.
 
 ## Versiones
 
