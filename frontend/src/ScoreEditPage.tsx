@@ -3,6 +3,7 @@ import AbcFileLoader from "./AbcFileLoader";
 import DictationPanel from "./DictationPanel";
 import { getScore, instrumentOptions, updateScore, type DictationResult, type PublishedScore } from "./lib/api";
 import { dictationBlockReason, mergeDictation } from "./lib/dictationMerge";
+import Icon from "./Icon";
 
 // HU05 edit page; also hosts HU11 dictation and HU19 file loading (FR-018, FR-022, SCR-007).
 const MAX_CONTENT = 1000;
@@ -89,7 +90,7 @@ export default function ScoreEditPage({ scoreId }: { scoreId: number }) {
   if (!score && error) return <div className="empty-state"><span aria-hidden="true">!</span><h2>No se pudo cargar la partitura</h2><p className="form-error" role="alert">{error}</p><a className="button secondary" href="/">Volver al inicio</a></div>;
   return (
     <>
-      <a className="back" href={`/scores/${scoreId}`}>← Volver a la partitura</a>
+      <a className="back" href={`/scores/${scoreId}`}><Icon name="arrowLeft" size={16} /> Volver a la partitura</a>
       <header className="page-heading">
         <div><p className="eyebrow"><span className="dot" /> TU PARTITURA</p><h1>Editar publicación</h1><p>Modifica los datos y el contenido de tu partitura.</p></div>
         <span className="step">EDITAR PARTITURA</span>
@@ -121,11 +122,11 @@ export default function ScoreEditPage({ scoreId }: { scoreId: number }) {
             {errors.content?.length ? <span className="field-error" id="edit-content-error">{errors.content[0]}</span> : null}
           </div>
           {error ? <p className="form-error" role="alert">{error}</p> : null}
-          <div className="form-actions"><a className="button secondary" href={`/scores/${scoreId}`}>Cancelar</a><button className="button primary" type="submit" disabled={saving}>{saving ? "Guardando..." : "Guardar cambios →"}</button></div>
+          <div className="form-actions"><a className="button secondary" href={`/scores/${scoreId}`}>Cancelar</a><button className="button primary" type="submit" disabled={saving}>{saving ? "Guardando..." : <>Guardar cambios <Icon name="arrowRight" size={16} /></>}</button></div>
         </section>
         <aside className="editor-aside">
-          <section className="tip-card"><span aria-hidden="true">♫</span><div><strong>Tu partitura, mejorada.</strong><p>Actualiza los datos para que otros músicos la encuentren y entiendan tu idea.</p></div></section>
-          <section className="rules"><h3>Antes de guardar</h3><ul><li>✓ Las mismas reglas que al publicar.</li><li>✓ No superes los 1.000 caracteres.</li><li>✓ En ABC, el dictado se añade al final y respeta tus cabeceras.</li></ul></section>
+          <section className="tip-card"><span aria-hidden="true"><Icon name="sparkles" size={20} /></span><div><strong>Tu partitura, mejorada.</strong><p>Actualiza los datos para que otros músicos la encuentren y entiendan tu idea.</p></div></section>
+          <section className="rules"><h3>Antes de guardar</h3><ul><li><Icon name="check" size={14} /> Las mismas reglas que al publicar.</li><li><Icon name="check" size={14} /> No superes los 1.000 caracteres.</li><li><Icon name="check" size={14} /> En ABC, el dictado se añade al final y respeta tus cabeceras.</li></ul></section>
         </aside>
       </form>
     </>

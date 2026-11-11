@@ -5,6 +5,7 @@ download without a second synthesis (HU18, DEC-204)."""
 
 from urllib.parse import quote
 
+from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 
@@ -41,7 +42,7 @@ def _audio_response(kind, texts, request, score_id):
     except SynthesisLimitReached:
         return None, error_response(
             "DAILY_LIMIT_REACHED",
-            "Alcanzaste el límite diario de 20 audios nuevos. Los audios ya generados siguen disponibles.",
+            f"Alcanzaste el límite diario de {settings.VOICE_DAILY_LIMIT} audios nuevos. Los audios ya generados siguen disponibles.",
             429,
         )
     except SynthesisUnavailable:
@@ -73,3 +74,4 @@ def tutor_view(request, score_id):
         return error
     response["X-Notara-Tutor-Text"] = quote(text)  # DEC-234; shown as text (UX-PROP-005)
     return response
+

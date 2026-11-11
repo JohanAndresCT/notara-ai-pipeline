@@ -275,7 +275,7 @@ export type ScoreFeed = {
   has_previous: boolean;
 };
 
-export const instrumentOptions = ["Piano", "Guitarra", "Violín", "Flauta", "Voz", "Otro"];
+export const instrumentOptions = ["Piano", "Guitarra", "Violín", "Flauta", "Trompeta", "Saxofón", "Otro"];
 
 export function getInitials(name: string) {
   return name
@@ -446,6 +446,8 @@ export type DictationResult = {
   meter: string;
   abc_line: string;
   abc_document: string;
+  /** CR-006: true when Gemini rewrote the transcript before parsing. */
+  ai_interpreted?: boolean;
 };
 
 // UX_SPEC message catalogue (M-01, M-05b, M-07, M-17) mapped to the STT error codes.
@@ -455,7 +457,7 @@ const dictationMessages: Record<string, string> = {
   AUDIO_TOO_LARGE: "La grabación es demasiado grande (máximo 2 MB).",
   STT_UNAVAILABLE: "El servicio de transcripción no está disponible. Puedes escribir la partitura.",
   STT_DAILY_LIMIT_REACHED:
-    "Alcanzaste el límite diario de 30 transcripciones. Inténtalo de nuevo cuando se restablezca el límite.",
+    "Alcanzaste el límite diario de transcripciones. Inténtalo de nuevo cuando se restablezca el límite.",
   AUTHENTICATION_REQUIRED: "Tu sesión expiró. Inicia sesión de nuevo para dictar.",
   CSRF_FAILED: "No se pudo validar la solicitud. Recarga la página e inténtalo de nuevo.",
 };
@@ -499,7 +501,7 @@ const synthesisMessages: Record<string, string> = {
   NOT_ABC: "Disponible solo para partituras en ABC", // M-02
   ABC_UNSUPPORTED: "Esta partitura contiene elementos que no se pueden reproducir.", // M-03
   DAILY_LIMIT_REACHED:
-    "Alcanzaste el límite diario de 20 audios nuevos. Los audios ya generados siguen disponibles.", // M-10
+    "Alcanzaste el límite diario de audios nuevos. Los audios ya generados siguen disponibles.", // M-10
   AUDIO_UNAVAILABLE: "No se pudo generar el audio. Inténtalo más tarde.", // M-15
   AUTHENTICATION_REQUIRED: "Tu sesión expiró. Inicia sesión de nuevo para escuchar.",
 };
@@ -533,7 +535,7 @@ export async function synthesizeScoreAudio(
 const voiceCommentMessages: Record<string, string> = {
   AUDIO_TOO_LARGE: "La grabación es demasiado grande (máximo 2 MB).", // M-05b
   STT_DAILY_LIMIT_REACHED:
-    "Alcanzaste el límite diario de 30 transcripciones. Inténtalo de nuevo cuando se restablezca el límite.", // M-17
+    "Alcanzaste el límite diario de transcripciones. Inténtalo de nuevo cuando se restablezca el límite.", // M-17
   OWN_SCORE: "No puedes comentar en tu propia partitura.",
   TRANSCRIPTION_TOO_LONG: "La transcripción supera los 1.000 caracteres. Graba un comentario más corto.",
   AUDIO_INVALID: "El formato, la duración o el contenido del audio no son válidos.",
@@ -560,4 +562,46 @@ export async function createVoiceComment(scoreId: number, audio: Blob): Promise<
   if (!response.ok) throw new Error(voiceCommentMessages[payload.code ?? ""] ?? voiceCommentFallback);
   if (!payload.comment) throw new Error("La respuesta del comentario está incompleta.");
   return payload.comment;
+}
+
+// HU21 / CR-007 — conversational tutor (Gemini). The API key stays on the server.
+const tutorMessages: Record<string, string> = {
+  TUTOR_DAILY_LIMIT_REACHED: "Alcanzaste el límite diario de conversaciones con el tutor.",
+  TUTOR_UNAVAILABLE: "El tutor no está disponible en este momento. Inténtalo más tarde.",
+  QUESTION_INVALID: "Escribe una pregunta de 1 a 500 caracteres.",
+  AUTHENTICATION_REQUIRED: "Tu sesión expiró. Inicia sesión de nuevo.",
+  SCORE_NOT_FOUND: "No se encontró la partitura.",
+};
+
+async function tutorRequest<T>(path: string, body: unknown): Promise<T> {
+  const csrfToken = await getCsrfToken();
+  let response: Response;
+  try {
+    response = await fetch(path, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json", "X-CSRFToken": csrfToken },
+      body: JSON.stringify(body ?? {}),
+    });
+  } catch {
+    throw new Error(tutorMessages.TUTOR_UNAVAILABLE);
+  }
+  const payload = (await response.json().catch(() => ({}))) as T & { code?: string; message?: string };
+  if (!response.ok) {
+    const code = payload.code ?? "";
+    throw Object.assign(new Error(tutorMessages[code] ?? payload.message ?? tutorMessages.TUTOR_UNAVAILABLE), { code });
+  }
+  return payload;
+}
+
+export function createTutorSession(scoreId: number) {
+  return tutorRequest<{ token: string; ws_url: string; model: string; max_seconds: number }>(
+    `/api/v1/scores/${scoreId}/tutor/session/`,
+    {},
+  );
+}
+
+export async function askTutor(scoreId: number, question: string) {
+  const result = await tutorRequest<{ answer: string }>(`/api/v1/scores/${scoreId}/tutor/ask/`, { question });
+  return result.answer;
 }

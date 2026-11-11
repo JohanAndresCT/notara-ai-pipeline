@@ -149,18 +149,36 @@ if STT_MODEL_REQUIRED and not STT_MODEL_DIR:
     raise ValueError("STT_MODEL_DIR is required when STT_MODEL_REQUIRED is true.")
 
 # MVP 2 voice synthesis (HU13, HU14, HU16, HU17; DEC-202, DEC-213, DEC-230, DEC-232).
-VOICE_PRIMARY_ENGINE = os.getenv("VOICE_PRIMARY_ENGINE", "edge").strip().lower()
+# DEC-241: ElevenLabs (AI voice) is the primary engine whenever an API key is configured;
+# edge-tts stays as the automatic fallback (HU17). Without a key the default is edge.
 VOICE_DAILY_LIMIT = int(os.getenv("VOICE_DAILY_LIMIT", "20"))
 TTS_TIMEOUT_SECONDS = int(os.getenv("TTS_TIMEOUT_SECONDS", "20"))
 EDGE_TTS_VOICE = os.getenv("EDGE_TTS_VOICE", "es-ES-ElviraNeural").strip()
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "").strip()
-ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "").strip()
+# Default: a premade ElevenLabs voice used in the official SDK examples; override per demo.
+ELEVENLABS_VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID", "").strip() or "JBFqnCBsd6RMkjVDRZzb"
+VOICE_PRIMARY_ENGINE = (
+    os.getenv("VOICE_PRIMARY_ENGINE", "").strip().lower()
+    or ("elevenlabs" if ELEVENLABS_API_KEY else "edge")
+)
 ELEVENLABS_MODEL_ID = os.getenv("ELEVENLABS_MODEL_ID", "eleven_multilingual_v2").strip()
 if VOICE_PRIMARY_ENGINE not in {"fake", "edge", "elevenlabs"}:
     raise ValueError("VOICE_PRIMARY_ENGINE must be fake, edge or elevenlabs.")
 if VOICE_DAILY_LIMIT < 1 or TTS_TIMEOUT_SECONDS < 1:
     raise ValueError("VOICE_DAILY_LIMIT and TTS_TIMEOUT_SECONDS must be positive integers.")
 VOICE_COMMENT_MAX_CHARS = 1000  # DEC-231
+
+# CR-006 / BR-032: Gemini rewrites uninterpretable dictation transcripts (text only).
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
+GEMINI_TIMEOUT_SECONDS = int(os.getenv("GEMINI_TIMEOUT_SECONDS", "8"))
+# HU21 / CR-007: conversational tutor with Gemini Live (ephemeral tokens; key stays on the server).
+TUTOR_LIVE_MODEL = os.getenv("TUTOR_LIVE_MODEL", "gemini-2.5-flash-native-audio-latest").strip()
+TUTOR_TEXT_MODEL = os.getenv("TUTOR_TEXT_MODEL", "gemini-3.5-flash-lite").strip()
+TUTOR_SESSION_SECONDS = int(os.getenv("TUTOR_SESSION_SECONDS", "120"))
+TUTOR_DAILY_SESSIONS = int(os.getenv("TUTOR_DAILY_SESSIONS", "5"))
+TUTOR_DAILY_QUESTIONS = int(os.getenv("TUTOR_DAILY_QUESTIONS", "20"))
+DICTATION_AI_ENABLED = os.getenv("DICTATION_AI_ENABLED", "true").strip().lower() in {"1", "true", "yes"} and bool(GEMINI_API_KEY)
 CSRF_FAILURE_VIEW = "voice.csrf.csrf_failure"
 STORAGES = {
     "default": {

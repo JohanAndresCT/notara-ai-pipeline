@@ -1,10 +1,14 @@
 import { useState, type FormEvent } from "react";
 import { loginAccount } from "./lib/api";
 import PublicHeader from "./PublicHeader";
+import Icon from "./Icon";
+import CommunityChat from "./CommunityChat";
+import StreamerBackground from "./StreamerBackground";
 
 export default function LoginPage({ onAuthenticated }: { onAuthenticated: () => void }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -28,19 +32,13 @@ export default function LoginPage({ onAuthenticated }: { onAuthenticated: () => 
       <PublicHeader current="login" />
       <main className="auth-main">
         <section className="auth-intro" aria-labelledby="login-intro-heading">
-          <div className="auth-circles" aria-hidden="true">
-            <span /><span /><span /><span /><span />
-          </div>
-          <p className="eyebrow"><span className="dot" /> COMPARTE TU MÚSICA. DESCUBRE LA DE OTROS.</p>
-          <h1 id="login-intro-heading">Qué bueno verte.<br /><em>Tu música te espera.</em></h1>
-          <p>Retoma donde te quedaste y sigue compartiendo la música que te inspira.</p>
-          <div className="staff-lines" aria-hidden="true">
-            <i /><i /><i /><i /><i /><span>♫</span>
-          </div>
+          <StreamerBackground variant="auth" />
+          <CommunityChat headingId="login-intro-heading" title="Qué bueno verte." highlight="Tu música te espera." lead="Retoma donde te quedaste y sigue compartiendo la música que te inspira." />
         </section>
         <section className="auth-card" aria-labelledby="login-heading">
+          <div className="auth-card-wave" aria-hidden="true" />
           <div className="auth-heading">
-            <span className="mini-icon" aria-hidden="true">♫</span>
+            <span className="mini-icon" aria-hidden="true"><Icon name="music" size={22} /></span>
             <div>
               <h2 id="login-heading">Inicia sesión</h2>
               <p>Entra para continuar en tu espacio musical.</p>
@@ -49,7 +47,8 @@ export default function LoginPage({ onAuthenticated }: { onAuthenticated: () => 
           <form className="auth-form" onSubmit={handleSubmit}>
             <div className="field">
               <label htmlFor="login-email">Correo electrónico <b>*</b></label>
-              <div className="input-wrap">
+              <div className="input-wrap with-icon">
+                <Icon name="mail" size={18} />
                 <input
                   id="login-email"
                   name="email"
@@ -64,16 +63,20 @@ export default function LoginPage({ onAuthenticated }: { onAuthenticated: () => 
             </div>
             <div className="field">
               <label htmlFor="login-password">Contraseña <b>*</b></label>
-              <div className="input-wrap">
+              <div className="input-wrap with-icon">
+                <Icon name="lock" size={18} />
                 <input
                   id="login-password"
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   required
                 />
+                <button type="button" className="password-toggle" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"} aria-pressed={showPassword}>
+                  <Icon name={showPassword ? "eyeOff" : "eye"} size={18} />
+                </button>
               </div>
             </div>
             {error ? <p className="form-error" role="alert">{error}</p> : null}

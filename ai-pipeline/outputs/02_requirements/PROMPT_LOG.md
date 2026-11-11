@@ -223,3 +223,7 @@ Prompts P02 v2.1: sin estado fijo de una ejecución (rangos DEC, versiones). Val
 ## Merge `mvp-2` → `pipeline/mvp2-p00-context` (2026-11-09)
 
 Se tomó como base la versión de `mvp-2` (CR-003, CR-004, implementación de HU11) y se reaplicó el segundo lote de decisiones renumerado como DEC-230..DEC-238. Retiradas: antigua DEC-222 (20/día; gana DEC-219 con 30/día) y antigua DEC-226 (aviso con OpenAI; obsoleto tras CR-003). Validaciones re-ejecutadas: PASS_WITH_WARNINGS.
+
+## MVP 2 — Proposed changes recorded (2026-11-10)
+
+- REQUIREMENTS.md v5.4: section 6.3 lists **proposed** CR-005 (US-020 instruments; DEC-242 AI instruments), CR-006 (US-011 amendment, Gemini interpretation of dictation) and CR-007 (US-021 conversational tutor, Gemini Live). Reserved IDs: AC-078..AC-096, BR-032, BR-033, FR-047..FR-050, M-18. Pending team approval before re-running P02-P05 for them.

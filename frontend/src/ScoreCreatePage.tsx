@@ -3,6 +3,7 @@ import AbcFileLoader from "./AbcFileLoader";
 import DictationPanel from "./DictationPanel";
 import { instrumentOptions, publishScore, type DictationResult, type PublishedScore } from "./lib/api";
 import { dictationBlockReason, mergeDictation } from "./lib/dictationMerge";
+import Icon from "./Icon";
 
 const emptyErrors: Record<string, string[]> = {};
 const MAX_CONTENT = 1000;
@@ -77,7 +78,7 @@ export default function ScoreCreatePage() {
 
   return (
     <>
-      <a className="back" href="/">← Volver al inicio</a>
+      <a className="back" href="/"><Icon name="arrowLeft" size={16} /> Volver al inicio</a>
       <header className="page-heading">
         <div><p className="eyebrow"><span className="dot" /> COMPARTE CON TU COMUNIDAD</p><h1 id="score-heading">Crear partitura</h1><p>Convierte una idea musical en algo que otros puedan descubrir.</p></div>
         <span className="step">NUEVA PARTITURA</span>
@@ -109,11 +110,11 @@ export default function ScoreCreatePage() {
             {errors.content?.length ? <FieldError id="score-content-error" text={errors.content[0]} /> : null}
           </div>
           {formError ? <p className="form-error" role="alert">{formError}</p> : null}
-          <div className="form-actions"><a className="button secondary" href="/">Cancelar</a><button className="button primary" type="submit" disabled={isPublishing}>{isPublishing ? "Publicando..." : "Crear partitura →"}</button></div>
+          <div className="form-actions"><a className="button secondary" href="/">Cancelar</a><button className="button primary" type="submit" disabled={isPublishing}>{isPublishing ? "Publicando..." : <>Crear partitura <Icon name="arrowRight" size={16} /></>}</button></div>
         </section>
         <aside className="editor-aside">
-          <section className="tip-card"><span aria-hidden="true">♫</span><div><strong>Una pequeña idea puede llegar lejos.</strong><p>Comparte una melodía, un ejercicio o un boceto. Tu partitura puede inspirar a alguien.</p></div></section>
-          <section className="rules"><h3>Antes de publicar</h3><ul><li>✓ Añade un título y un instrumento.</li><li>✓ No superes los 1.000 caracteres.</li><li>✓ Usa saltos de línea para facilitar la lectura.</li></ul></section>
+          <section className="tip-card"><span aria-hidden="true"><Icon name="sparkles" size={20} /></span><div><strong>Una pequeña idea puede llegar lejos.</strong><p>Comparte una melodía, un ejercicio o un boceto. Tu partitura puede inspirar a alguien.</p></div></section>
+          <section className="rules"><h3>Antes de publicar</h3><ul><li><Icon name="check" size={14} /> Añade un título y un instrumento.</li><li><Icon name="check" size={14} /> No superes los 1.000 caracteres.</li><li><Icon name="check" size={14} /> Usa saltos de línea para facilitar la lectura.</li></ul></section>
         </aside>
       </form>
     </>

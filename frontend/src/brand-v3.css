@@ -1,0 +1,83 @@
+/* Violet-led refresh (2026-11-10): reference dashboard look, white "Así de fácil",
+   auth side panel as the global community chat. Loaded last (see main.tsx). */
+
+:root { --canvas: #f7f6fb; --gradient-brand: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 40%, #6d28d9 100%); }
+body, .app-shell, .app-loading { background: var(--canvas); }
+
+/* Buttons */
+.button.primary { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); box-shadow: 0 10px 24px rgba(124,58,237,.32); }
+.button.primary:hover { background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); box-shadow: 0 12px 28px rgba(124,58,237,.4); }
+.button.secondary:hover, .button.ghost:hover { background: #f3f0fd; border-color: #ddd6fe; }
+
+/* Hero */
+.home-page { background: radial-gradient(900px 520px at 85% 8%, rgba(167,139,250,.22), transparent 60%), radial-gradient(700px 480px at 0% 40%, rgba(236,72,153,.07), transparent 60%), var(--canvas); }
+.hero-copy h1 em { background: linear-gradient(90deg, #7c3aed 0%, #a855f7 55%, #ec4899 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.floating-note { background: var(--gradient-brand); box-shadow: 0 12px 28px rgba(124,58,237,.35); }
+.note-two { background: linear-gradient(135deg, #f472b6, #db2777); box-shadow: 0 12px 28px rgba(219,39,119,.3); }
+
+/* Sidebar like the reference: deep indigo, white active pill */
+.sidebar { background: linear-gradient(180deg, #221a48 0%, #1a1438 100%); }
+.sidebar .logo-mark { background: transparent; box-shadow: none; transform: none; color: #c4b5fd; width: 30px; }
+.sidebar .logo-mark .icon { transform: none; width: 26px; height: 26px; }
+.sidebar-user { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.1); border-radius: 14px; }
+.sidebar-user .avatar { background: var(--gradient-brand); color: #fff; }
+.sidebar nav a { color: #cfc8ea; border-radius: 12px; }
+.sidebar nav a:hover { background: rgba(255,255,255,.07); color: #fff; }
+.sidebar nav a.active { background: #f4f1ff; color: #1e1838; box-shadow: none; font-weight: 700; }
+.sidebar nav a.active .icon { color: #6d28d9; }
+.sidebar-note { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); }
+.sidebar-note > .icon { color: #c4b5fd; }
+.sidebar-note p, .sidebar-user span { color: #b7aedb; }
+
+/* Dashboard and cards */
+.eyebrow { color: #6e6680; }
+.eyebrow .dot { background: #8b5cf6; box-shadow: none; }
+.feed-header h1, .page-heading h1 { color: #1e1838; }
+.post-card, .form-card, .settings-card, .detail-card, .comments-card, .profile-summary, .empty-state { border-color: #ebe8f3; box-shadow: 0 2px 10px rgba(30,24,56,.03); }
+.post-card:hover { border-color: #ddd6fe; box-shadow: 0 14px 34px rgba(124,58,237,.1); }
+.instrument { background: #f3f0fd; color: #6d28d9; }
+.format.abc { color: #6d28d9; background: #ede9fe; }
+.format.text { color: #9d174d; background: #fce7f3; }
+.abc-preview { background: #f4f3f8; border-left-color: #c4b5fd; color: #3f3a55; }
+.avatar.tone-1 { background: var(--gradient-brand); }
+.bottom-nav a.create-mobile, .bottom-nav .create-mobile { background: var(--gradient-brand); box-shadow: 0 8px 20px rgba(124,58,237,.38); }
+.listening-panel { background: linear-gradient(160deg, #f5f3ff 0%, #fdf2f8 100%); border-color: #e4dcfb; }
+.voice-panel { background: #f8f7fd; border-color: #e4dcfb; }
+.tip-card { background: linear-gradient(150deg, #f5f3ff, #fdf2f8); border-color: #e4dcfb; }
+
+/* "Así de fácil" on white */
+.how { background: #ffffff; color: var(--ink); }
+.how .streamer::after { display: none; }
+.how .streamer-ribbons { opacity: .22; }
+.how .floater { color: #8b5cf6; opacity: .55; filter: none; }
+.how .floater:nth-of-type(3n) { color: #ec4899; }
+.how > .eyebrow { color: #7c3aed; }
+.how > h2 { color: var(--ink); text-shadow: none; }
+.how > p { color: var(--muted); }
+.steps > div { background: #fff; border: 1px solid #ebe8f3; box-shadow: 0 14px 34px rgba(30,24,56,.06); }
+.steps > div > span { color: #ede9fe; }
+.steps > div:hover { box-shadow: 0 22px 44px rgba(124,58,237,.16); border-color: #ddd6fe; }
+
+/* ---------- Auth: global chat panel ---------- */
+.auth-intro { background: linear-gradient(150deg, #241a52 0%, #3b1f8a 55%, #6d28d9 100%); padding: 48px max(40px, 5vw); justify-content: center; }
+.streamer-auth .streamer-ribbons { top: 0; height: 100%; opacity: .28; }
+.streamer-auth::after { background: radial-gradient(80% 60% at 30% 30%, rgba(26,20,56,.55), transparent 80%); }
+.chat-panel { position: relative; z-index: 2; display: grid; gap: 26px; max-width: 520px; width: 100%; }
+.chat-intro .eyebrow { color: #ddd6fe; }
+.chat-intro .eyebrow .dot { background: #f0abfc; box-shadow: 0 0 0 4px rgba(240,171,252,.2); }
+.chat-intro h1 { color: #fff; font-size: clamp(40px, 4.4vw, 62px); line-height: 1.06; font-weight: 900; margin: 14px 0 12px; text-shadow: 0 4px 18px rgba(16,10,40,.45); }
+.chat-intro h1 em { font-style: normal; background: linear-gradient(90deg, #f0abfc, #c4b5fd); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.chat-intro p { color: #ece8ff; font-size: 15px; line-height: 1.6; margin: 0; text-shadow: 0 2px 10px rgba(16,10,40,.4); }
+
+/* Auth card in violet */
+.auth-card-wave { background: linear-gradient(120deg, #a78bfa 0%, #7c3aed 45%, #c026d3 80%, #ec4899 100%); }
+.auth-heading .mini-icon { box-shadow: 0 10px 24px rgba(124,58,237,.3); }
+.auth-form .button.primary { background: linear-gradient(120deg, #8b5cf6 0%, #6d28d9 55%, #a21caf 100%); box-shadow: 0 12px 26px rgba(124,58,237,.3); }
+.auth-form .button.primary:hover { background: linear-gradient(120deg, #7c3aed 0%, #5b21b6 55%, #86198f 100%); }
+.input-wrap { background: #faf9fd; border-color: #e4e0f0; }
+
+@media (max-width: 650px) {
+  .auth-intro { padding: 36px 18px 70px; }
+  .chat-intro h1 { font-size: 34px; }
+}
+.auth-intro .floater { opacity: .3; }

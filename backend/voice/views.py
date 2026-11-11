@@ -11,6 +11,7 @@ from django.http.multipartparser import MultiPartParserError
 from .adapters import get_stt_adapter
 from .audio import AudioTooLarge, InvalidAudio, validate_audio_upload
 from .dictation import DICTATION_PROMPT, Uninterpretable, compose_document, parse
+from .normalizer import NormalizerError, get_normalizer
 from .errors import error_response
 from .inference import inference_slot
 from .quota import reserve_daily_inference
@@ -82,7 +83,7 @@ def stt_view(request):
         if not admitted:
             return error_response(
                 "STT_DAILY_LIMIT_REACHED",
-                "Alcanzaste el límite diario de transcripciones.",
+                f"Alcanzaste el límite diario de {settings.STT_DAILY_LIMIT} transcripciones.",
                 429,
             )
 
@@ -91,21 +92,59 @@ def stt_view(request):
         except (av.error.FFmpegError, OSError, RuntimeError, ValueError) as exc:
             logger.error("STT inference failed (%s).", type(exc).__name__)
             return _service_unavailable()
-        try:
-            result = parse(transcript)
-        except Uninterpretable:
+    finally:
+        inference_slot.release()
+
+    # Parsing and the optional AI interpretation run after the inference slot is released.
+    ai_interpreted = False
+    try:
+        result = parse(transcript)
+    except Uninterpretable:
+        result = interpret_with_ai(transcript)
+        if result is None:
             return error_response(
                 "DICTATION_UNINTERPRETABLE",
                 "No se pudo interpretar el dictado musical.",
                 422,
             )
-        return JsonResponse(
-            {
-                "transcript": transcript,
-                "meter": result.meter,
-                "abc_line": result.abc_line,
-                "abc_document": compose_document(result, title),
-            }
-        )
-    finally:
-        inference_slot.release()
+        ai_interpreted = True
+    return JsonResponse(
+        {
+            "transcript": transcript,
+            "meter": result.meter,
+            "abc_line": result.abc_line,
+            "abc_document": compose_document(result, title),
+            "ai_interpreted": ai_interpreted,
+        }
+    )
+
+
+def _music_tokens(abc_line: str) -> int:
+    return sum(1 for token in abc_line.split() if token != "|")
+
+
+def interpret_with_ai(transcript: str):
+    """CR-006 / BR-032: let Gemini fix the transcript wording, then parse it again.
+
+    Returns a DictationResult or None. Never raises: provider problems mean M-01.
+    """
+    normalizer = get_normalizer()
+    if normalizer is None or not transcript.strip():
+        return None
+    try:
+        normalized = normalizer.normalize(transcript)
+    except NormalizerError as exc:
+        logger.warning("dictation_ai_unavailable reason=%s", exc)
+        return None
+    if not normalized:
+        return None
+    try:
+        result = parse(normalized)
+    except Uninterpretable:
+        return None
+    # Safety check: the AI may split or fix words but must not create notes.
+    if _music_tokens(result.abc_line) > len(transcript.replace(",", " ").split()):
+        logger.warning("dictation_ai_rejected reason=more_notes_than_words")
+        return None
+    logger.info("dictation_ai_used")
+    return result

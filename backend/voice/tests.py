@@ -232,6 +232,10 @@ class SttEndpointTests(TestCase):
         self.adapter_patch = patch("voice.views.get_stt_adapter", return_value=self.adapter)
         self.adapter_patch.start()
         self.addCleanup(self.adapter_patch.stop)
+        # CR-006: no real AI calls in tests; individual tests install a fake normalizer.
+        self.normalizer_patch = patch("voice.views.get_normalizer", return_value=None)
+        self.normalizer_patch.start()
+        self.addCleanup(self.normalizer_patch.stop)
 
     def post_audio(self, audio=None, **extra):
         data = {"audio": uploaded_wav() if audio is None else audio, **extra}
@@ -247,7 +251,7 @@ class SttEndpointTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             set(response.json()),
-            {"transcript", "meter", "abc_line", "abc_document"},
+            {"transcript", "meter", "abc_line", "abc_document", "ai_interpreted"},
         )
         self.assertEqual(response.json()["meter"], "4/4")
         self.assertEqual(response.json()["abc_line"], "C D/2 E/2")
@@ -366,3 +370,72 @@ class SttEndpointTests(TestCase):
         self.assertEqual(response.status_code, 503)
         self.assertEqual(response.json()["code"], "STT_UNAVAILABLE")
         self.assertEqual(STTInferenceQuota.objects.count(), 0)
+
+
+class FakeNormalizer:
+    def __init__(self, answer=None, error=None):
+        self.answer = answer
+        self.error = error
+        self.calls = []
+
+    def normalize(self, transcript):
+        self.calls.append(transcript)
+        if self.error:
+            raise self.error
+        return self.answer
+
+
+class DictationAiTests(SttEndpointTests):
+    """CR-006 / BR-032: Gemini interpretation of uninterpretable transcripts."""
+
+    def use_normalizer(self, normalizer):
+        self.normalizer_patch.stop()
+        patcher = patch("voice.views.get_normalizer", return_value=normalizer)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        return normalizer
+
+    def test_misspelled_dictation_is_interpreted_with_ai(self):
+        self.adapter.transcript = "Donegra, recorcea, mi corcea"
+        normalizer = self.use_normalizer(FakeNormalizer("Do negra, Re corchea, Mi corchea"))
+        response = self.post_audio()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["abc_line"], "C D/2 E/2")
+        self.assertTrue(response.json()["ai_interpreted"])
+        self.assertEqual(normalizer.calls, ["Donegra, recorcea, mi corcea"])
+
+    def test_ai_not_called_when_parser_succeeds(self):
+        normalizer = self.use_normalizer(FakeNormalizer("Sol negra"))
+        response = self.post_audio()
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.json()["ai_interpreted"])
+        self.assertEqual(normalizer.calls, [])
+
+    def test_unintelligible_answer_keeps_m01(self):
+        self.adapter.transcript = "hola qué tal"
+        self.use_normalizer(FakeNormalizer(None))
+        response = self.post_audio()
+        self.assertEqual(response.status_code, 422)
+        self.assertEqual(response.json()["code"], "DICTATION_UNINTERPRETABLE")
+
+    def test_provider_failure_keeps_m01_without_server_error(self):
+        from voice.normalizer import NormalizerError
+
+        self.adapter.transcript = "Donegra"
+        self.use_normalizer(FakeNormalizer(error=NormalizerError("HTTP 503")))
+        with self.assertLogs("voice.views", level="WARNING"):
+            response = self.post_audio()
+        self.assertEqual(response.status_code, 422)
+
+    def test_ai_cannot_add_notes(self):
+        self.adapter.transcript = "Donegra"
+        self.use_normalizer(FakeNormalizer("Do negra, Re negra, Mi negra"))
+        with self.assertLogs("voice.views", level="WARNING"):
+            response = self.post_audio()
+        self.assertEqual(response.status_code, 422)
+
+    def test_ai_output_still_validated_by_parser(self):
+        self.adapter.transcript = "Donegra"
+        self.use_normalizer(FakeNormalizer("Do negrísima"))
+        response = self.post_audio()
+        self.assertEqual(response.status_code, 422)

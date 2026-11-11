@@ -114,3 +114,7 @@ PASS_WITH_WARNINGS.
 Simulated-microphone run and synthetic corpus recorded in `MVP2_MANUAL_ACCEPTANCE_CHECKLIST.md` §7: create/edit dictation, 30 s auto-stop, out-of-vocabulary rejection verified through the real UI path; synthetic corpus 21/27 exact (7/9 per voice); memory peak 353 MiB working set on Windows. New findings: temperature fallback can push a 30 s dictation to 19-26 s (AC-071 risk) and an auto-stop cut mid-word loses the whole dictation. IMPL-VAL-011-01/-02 stay open until real speakers and Railway measurements exist.
 
 **DEC-240 (2026-11-10):** temperature fallback disabled for dictation; worst-case 30 s dictation 23.1 s → 5.0 s with identical transcript; synthetic corpus unchanged (21/27). Test `test_dictation_options_disable_temperature_fallback` added.
+
+## Addendum 2026-11-10 — CR-006 / DEC-243 (Gemini interpretation)
+
+Implemented and verified with real Gemini: 4 misheard corpus transcripts recovered, 3 non-dictation/incomplete texts correctly rejected, 1 conservative miss; no invented notes. End-to-end in the app: "Son blanca, La negra, Si negra." → `G2 A B` with label "Interpretado con IA". AC-082 (corpus with/without AI) and real-microphone checks remain pending. Evidence: `00_context/CR-006_GEMINI_DICTATION.md` §8.

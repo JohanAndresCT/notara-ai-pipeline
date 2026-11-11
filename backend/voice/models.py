@@ -57,3 +57,21 @@ class SynthesizedAudio(models.Model):
     file = models.FileField(upload_to="audio_cache/")
     size_bytes = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class TutorUsageQuota(models.Model):
+    """Conversational tutor use per user and UTC day (HU21 / CR-007)."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="tutor_usage_quotas",
+    )
+    day = models.DateField()
+    sessions = models.PositiveIntegerField(default=0)
+    questions = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=("user", "day"), name="unique_tutor_quota_per_user_day"),
+        ]

@@ -165,6 +165,42 @@ class SynthesisEndpointTests(ListeningBase):
         self.assertEqual(response.json()["code"], "AUDIO_UNAVAILABLE")
         self.assertEqual(VoiceSynthesisQuota.objects.get(user=self.user).syntheses, 0)
 
+    @override_settings(VOICE_PRIMARY_ENGINE="elevenlabs", ELEVENLABS_API_KEY="test-key")
+    def test_elevenlabs_primary_serves_audio_without_fallback(self):
+        with patch.object(ElevenLabsTtsAdapter, "synthesize", return_value=b"ID3eleven") as eleven,                 patch.object(EdgeTtsAdapter, "synthesize") as edge:
+            response = self.solfege(self.abc)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"ID3eleven")
+        eleven.assert_called_once()
+        edge.assert_not_called()
+
+    def test_primary_voice_is_not_hidden_by_fallback_cache(self):
+        with override_settings(VOICE_PRIMARY_ENGINE="edge"),                 patch.object(EdgeTtsAdapter, "synthesize", return_value=b"ID3edge"):
+            self.assertEqual(self.solfege(self.abc).content, b"ID3edge")
+        with override_settings(VOICE_PRIMARY_ENGINE="elevenlabs"),                 patch.object(ElevenLabsTtsAdapter, "synthesize", return_value=b"ID3eleven") as eleven:
+            response = self.solfege(self.abc)
+        self.assertEqual(response.content, b"ID3eleven")
+        eleven.assert_called_once()
+
+    def test_fallback_cache_used_when_primary_fails_without_spending_quota(self):
+        with override_settings(VOICE_PRIMARY_ENGINE="edge"),                 patch.object(EdgeTtsAdapter, "synthesize", return_value=b"ID3edge"):
+            self.solfege(self.abc)
+        used = VoiceSynthesisQuota.objects.get(user=self.user).syntheses
+        with override_settings(VOICE_PRIMARY_ENGINE="elevenlabs"),                 patch.object(ElevenLabsTtsAdapter, "synthesize", side_effect=TtsProviderError("HTTP 402")),                 patch.object(EdgeTtsAdapter, "synthesize") as edge,                 self.assertLogs("voice.synthesis", level="WARNING"):
+            response = self.solfege(self.abc)
+        self.assertEqual(response.content, b"ID3edge")
+        edge.assert_not_called()
+        self.assertEqual(VoiceSynthesisQuota.objects.get(user=self.user).syntheses, used)
+
+    @override_settings(ELEVENLABS_MODEL_ID="eleven_multilingual_v2")
+    def test_elevenlabs_payload_omits_language_code_for_multilingual_v2(self):
+        body = ElevenLabsTtsAdapter().payload("Do, Re, Mi.")
+        self.assertEqual(body, {"text": "Do, Re, Mi.", "model_id": "eleven_multilingual_v2"})
+
+    @override_settings(ELEVENLABS_MODEL_ID="eleven_flash_v2_5")
+    def test_elevenlabs_payload_sets_spanish_for_models_that_accept_it(self):
+        self.assertEqual(ElevenLabsTtsAdapter().payload("Do.")["language_code"], "es")
+
     def test_storage_failure_still_returns_audio(self):
         with patch.object(default_storage, "save", side_effect=OSError("disk")), \
                 self.assertLogs("voice.synthesis", level="WARNING"):
@@ -244,3 +280,4 @@ class VoiceCommentTests(ListeningBase):
             HTTP_X_CSRFTOKEN=self.csrf,
         )
         self.assertEqual(response.status_code, 400)
+

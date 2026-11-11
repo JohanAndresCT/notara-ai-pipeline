@@ -2,7 +2,7 @@
 
 - ``fake``: deterministic bytes, no network (automated tests and CI, DEC-230).
 - ``edge``: ``edge-tts`` online voice; default in local development and fallback (DEC-202).
-- ``elevenlabs``: commercial primary voice for demos (DEC-202).
+- ``elevenlabs``: AI voice, primary whenever ``ELEVENLABS_API_KEY`` is set (DEC-202, DEC-241).
 """
 
 import asyncio
@@ -83,14 +83,22 @@ class ElevenLabsTtsAdapter(TtsAdapter):
     def voice_id(self) -> str:
         return settings.ELEVENLABS_VOICE_ID
 
+    # Only these models accept ``language_code``; others (e.g. eleven_multilingual_v2)
+    # reject the request when it is present, so it is sent only where supported.
+    LANGUAGE_CODE_MODELS = {"eleven_turbo_v2_5", "eleven_flash_v2_5"}
+
+    def payload(self, text: str) -> dict:
+        body = {"text": text, "model_id": settings.ELEVENLABS_MODEL_ID}
+        if settings.ELEVENLABS_MODEL_ID in self.LANGUAGE_CODE_MODELS:
+            body["language_code"] = "es"
+        return body
+
     def synthesize(self, text: str) -> bytes:
         if not settings.ELEVENLABS_API_KEY or not settings.ELEVENLABS_VOICE_ID:
             raise TtsProviderError("not configured")
         request = urllib.request.Request(
             self.url.format(voice=self.voice_id),
-            data=json.dumps(
-                {"text": text, "model_id": settings.ELEVENLABS_MODEL_ID, "language_code": "es"}
-            ).encode(),
+            data=json.dumps(self.payload(text)).encode(),
             headers={
                 "xi-api-key": settings.ELEVENLABS_API_KEY,
                 "Content-Type": "application/json",

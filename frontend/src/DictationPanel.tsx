@@ -6,9 +6,10 @@ import { formatCountdown, MAX_RECORDING_BYTES, recorderMessages, useRecorder } f
 // Audio goes to POST /api/v1/audio/stt/; it is not stored after transcription.
 const messages = {
   notice:
-    "El audio se enviará a los servidores de Notara para transcribirlo. No se conservará después de la transcripción. El proveedor de alojamiento procesa esta solicitud.", // M-11
+    "El audio se enviará a los servidores de Notara para transcribirlo. No se conservará después de la transcripción. El proveedor de alojamiento procesa esta solicitud. Si el dictado no se entiende, el texto transcrito (nunca el audio) puede enviarse a Google Gemini para interpretarlo.", // M-11 (CR-006)
   uninterpretable: "No se pudo interpretar el dictado musical", // M-01
   inserted: "Dictado insertado. Revísalo antes de publicar.", // M-12
+  insertedAi: "Dictado interpretado con IA (Gemini). Revísalo antes de publicar.", // CR-006
 };
 
 type Feedback = { kind: "error" | "success"; text: string } | null;
@@ -51,7 +52,7 @@ export default function DictationPanel({
         return;
       }
       const prefix = autoStopped ? `${recorderMessages.autoStopped} ` : "";
-      setFeedback({ kind: "success", text: `${prefix}${messages.inserted}` });
+      setFeedback({ kind: "success", text: `${prefix}${result.ai_interpreted ? messages.insertedAi : messages.inserted}` });
     } catch (error) {
       setFeedback({ kind: "error", text: (error as Error).message });
     } finally {

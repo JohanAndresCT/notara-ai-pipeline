@@ -86,15 +86,27 @@ def synthesize(kind: str, texts: dict[bool, str], user_id: int, context: str) ->
     chain = engine_chain()
     keyed = [(adapter, texts[adapter.supports_pause_markup]) for adapter in chain]
 
-    for adapter, text in keyed:
-        cached = _read_cached(cache_key(kind, text, adapter))
-        if cached is not None:
-            return cached
+    # The primary engine's stored audio wins; fallback copies are used only when the
+    # primary cannot produce new audio (failure or daily limit), so enabling a better
+    # primary voice (DEC-241) is not hidden by audio cached earlier with the fallback.
+    primary, primary_text = keyed[0]
+    cached = _read_cached(cache_key(kind, primary_text, primary))
+    if cached is not None:
+        return cached
 
     if not _reserve(user_id):
+        for adapter, text in keyed[1:]:
+            cached = _read_cached(cache_key(kind, text, adapter))
+            if cached is not None:
+                return cached
         raise SynthesisLimitReached
 
     for position, (adapter, text) in enumerate(keyed):
+        if position > 0:
+            cached = _read_cached(cache_key(kind, text, adapter))
+            if cached is not None:
+                _release(user_id)  # served from storage: no new synthesis consumed
+                return cached
         try:
             audio = adapter.synthesize(text)
         except TtsProviderError as exc:

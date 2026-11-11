@@ -11,6 +11,7 @@
 | 5.0 | MVP 2 | Records requester-reported HU11 approvals: BR-013/025, quality/performance/resource targets, daily STT quota, and security gates; adds FR-045, BR-029 and AC-070-076. Empirical acceptance remains pending; no MVP 1 behavior changed. |
 | 5.2 | MVP 2 | Records requester-approved CR-004 migration from Whisper Tiny to Base. Local implementation and test evidence documented; quality, performance, memory and Railway acceptance remain pending. |
 | 5.3 | MVP 2 | Merge reconciliation with `pipeline/mvp2-p00-context`: applies DEC-230-DEC-238. BR-014 approved as initial version; Q-022, Q-024, Q-025, Q-026 resolved; tutor adds key and tempo; FR-046, BR-030, BR-031, AC-077 added for voice-comment transcripts and storage; AC-029 adds confirmation; AC-063 and NFR-006/NFR-010 use fake engines in CI; NFR-009 records the approved 25 s ceiling. |
+| 5.4 | MVP 2 | Records **proposed** changes pending team approval in section 6.3: CR-005 (US-020 instruments, AI instruments DEC-242), CR-006 (US-011 amendment: Gemini interpretation of dictation), CR-007 (US-021 conversational tutor with Gemini Live). No approved story changes. |
 
 ## 1. Document Metadata
 
@@ -668,6 +669,38 @@ No new functional requirements or API contracts are introduced.
 
 #### Open Questions
 - None
+
+### 6.3 Proposed MVP 2 changes (pending team approval)
+
+These items are **PROPOSED**. They do not change the approved stories above until the team approves the change requests and P02 is re-run for them. IDs are reserved so that later stages can trace them.
+
+#### US-011 amendment — AI interpretation of dictation (CR-006)
+
+- **Status:** IMPLEMENTED 2026-11-10 (approved by the requester; team ratification pending, DEC-243).
+
+- **Change:** when the deterministic parser cannot interpret the Whisper transcript, the backend asks Google Gemini to rewrite the transcript text using only the BR-013 vocabulary and parses it again with the same parser. Audio is never sent to Gemini; the parser remains the only source of ABC.
+- **Proposed rule:** BR-032 (normalisation limits: fix spelling/word splits only, never add, remove or reorder notes; token-count safety check; 8 s timeout; fallback to M-01).
+- **Proposed criteria:** AC-078 (misspelled dictation interpreted and labelled "Interpretado con IA"), AC-079 (non-musical text still gives M-01), AC-080 (provider failure gives M-01, no server error), AC-081 (text only; updated M-11 notice), AC-082 (corpus reported with and without AI).
+- **Source:** `00_context/CR-006_GEMINI_DICTATION.md`.
+
+#### US-020 - Play the score with other instruments (CR-005, DEC-242)
+
+- **Epic:** EPIC-006
+- **User Story:** As a user viewing an ABC score, I want to choose the instrument that plays it, so that I can hear how the melody sounds on my own instrument.
+- **Scope:** MVP_SUPPORTING (proposed)
+- **Status:** PROPOSED — prototype implemented in the working branch.
+- **Proposed criteria:** AC-090 (piano, guitar, violin, flute, trumpet and saxophone play the score; button shows "Detener"; voice options removed 2026-11-10), AC-091 (one audio at a time), AC-092 (score's instrument highlighted), AC-093 (plain-text/unsupported scores disabled with M-02/M-03), AC-094 (violin, flute, trumpet and saxophone played by the Magenta DDSP neural model and marked "IA", Tone.js fallback with notice), AC-095 (MP3 of the selected instrument downloadable; spoken-solfege MP3 of HU18 kept), AC-096 (no rising-icon animation with reduced motion).
+- **Source:** `00_context/CR-005_INSTRUMENTS.md` (local IDs AC-020-01..07 map to AC-090..096).
+
+#### US-021 - Talk to the music tutor about a score (CR-007)
+
+- **Epic:** EPIC-006
+- **User Story:** As a music student, I want to ask the tutor questions by voice about the score I am viewing, so that I can understand it and learn how to play it without leaving the page.
+- **Scope:** MVP_SUPPORTING (proposed)
+- **Status:** IMPLEMENTED 2026-11-10 (requester approval; team ratification pending, DEC-244).
+- **Proposed criteria:** AC-083 (live voice conversation in Spanish with text of each answer), AC-084 (score context and scope limits), AC-085 (2-minute limit, "Terminar", "Reiniciar conversación", microphone released), AC-086 (daily limit), AC-087 (microphone/provider failure with typed-question fallback), AC-088 (API key never in the browser; ephemeral token; audio not stored by Notara), AC-089 (plain-text scores supported).
+- **Proposed requirements:** FR-047..FR-050, BR-033, message M-18 (privacy notice).
+- **Source:** `00_context/CR-007_GEMINI_LIVE_TUTOR.md`.
 
 ## 7. Business Rules
 

@@ -1,5 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import ListeningPanel from "./ListeningPanel";
+import TutorChat from "./TutorChat";
+import Icon from "./Icon";
 import VoiceCommentComposer from "./VoiceCommentComposer";
 import {
   addComment,
@@ -104,7 +106,7 @@ export default function ScoreDetailPage({
   const isOwner = score.author_id === currentUserId;
   return (
     <div className="detail-page">
-      <a className="back" href="/">← Volver al inicio</a>
+      <a className="back" href="/"><Icon name="arrowLeft" size={16} /> Volver al inicio</a>
       <article className="detail-card" aria-labelledby="score-detail-heading">
         <div className="detail-top">
           <span className={`format ${score.format === "ABC" ? "abc" : "text"}`}>{score.format === "ABC" ? "NOTACIÓN ABC" : "PARTITURA EN TEXTO"}</span>
@@ -127,12 +129,13 @@ export default function ScoreDetailPage({
               <pre>{score.content}</pre>
             </section>
             <ListeningPanel score={score} />
+            <TutorChat score={score} />
             <div className="detail-reactions">
               <button className={`detail-reaction-button${score.user_reacted ? " liked" : ""}`} type="button" onClick={handleReaction} aria-pressed={score.user_reacted}>
-                <span className="reaction-emoji" aria-hidden="true">{score.user_reacted ? "❤️" : "🤍"}</span>
+                <Icon name="heart" size={20} filled={Boolean(score.user_reacted)} className="reaction-icon" />
                 {score.user_reacted ? "Te gusta" : "Me gusta"} · {score.reaction_count}
               </button>
-              <span><span className="reaction-emoji comment-emoji" aria-hidden="true">💬</span>{score.comment_count} comentarios</span>
+              <span><Icon name="comment" size={20} className="reaction-icon" />{score.comment_count} comentarios</span>
             </div>
         </>
       </article>

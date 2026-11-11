@@ -52,3 +52,11 @@ Backend suite (SQLite, `.venv` Python 3.13): 134 tests, 133 passed, 1 skipped, 0
 ## Addendum 2026-11-10
 
 Solfege MP3 transcribed back with Whisper matched the expected note order; second request served from cache in 11 ms. Edge reads quickly (9 notes in 4.2 s).
+
+
+## Addendum 2026-11-10 — real ElevenLabs verification (PRE-004)
+
+- Real key configured locally in `.env` (not in the repository). Model `eleven_multilingual_v2`.
+- **Library voices are refused on the free plan** (`402 paid_plan_required`: "Free users cannot use library voices via the API"); premade voices work. `ELEVENLABS_VOICE_ID` set to the premade voice *Sarah* (`EXAVITQu4vr4xnSDxMaL`); the library voice is kept commented for a paid plan.
+- **Defect fixed:** the cache was checked for every engine before calling the primary, so audio cached earlier with Edge kept being served after enabling ElevenLabs. Now the primary's cache is checked first; fallback copies are served only when the primary fails or the daily limit is reached, and serving them releases the reserved quota. Two new tests.
+- Through the running app (score 1): solfege 371 KB / 23.7 s generated in 2.3 s (pauses from SSML breaks applied), tutor 100 KB / 6.4 s in 1.0 s, repeat served from cache in 51 ms; no `voice_fallback` in the backend log.

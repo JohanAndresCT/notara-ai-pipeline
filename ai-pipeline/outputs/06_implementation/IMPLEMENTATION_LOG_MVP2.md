@@ -389,3 +389,33 @@ Backend: 134 tests, 133 passed, 1 skipped (21 new). `tsc --noEmit` and `vite bui
 
 - Simulated-microphone UI run and synthetic corpus: evidence in `MVP2_MANUAL_ACCEPTANCE_CHECKLIST.md` §7.
 - DEC-240: dictation transcribes in one pass at temperature 0 (`voice/adapters.py` `fallback` flag, used by `voice/views.py`); worst-case 30 s dictation 23.1 s → 5.0 s; corpus accuracy unchanged. New unit test in `voice/tests.py`.
+
+## 22. DEC-241 — ElevenLabs as primary voice (2026-11-10)
+
+- `settings.py`: `VOICE_PRIMARY_ENGINE` empty → `elevenlabs` if `ELEVENLABS_API_KEY` is set, else `edge`; default `ELEVENLABS_VOICE_ID`.
+- `voice/tts.py`: `ElevenLabsTtsAdapter.payload()` sends `language_code` only for turbo/flash v2.5 models.
+- 3 new tests in `scores/tests_mvp2.py`. `.env.example` documents the rule.
+
+- **PRE-004 closed (2026-11-10):** ElevenLabs verified with a real key and the premade voice *Sarah*; free plan refuses library voices (402). `voice/synthesis.py` now prefers the primary engine's cache over fallback copies (2 new tests).
+
+## 23. CR-005 instruments and DEC-242 AI instruments (2026-11-10)
+
+- Instrument picker (piano, guitar, violin, flute, trumpet, sax, a cappella voice) with rising-icon animation and per-instrument MP3 download (`@breezystack/lamejs` 1.2.7).
+- DEC-242: violin, flute, trumpet and tenor sax played by Magenta DDSP neural models via `@tensorflow/tfjs` 4.22.0, Tone.js fallback. Evidence in `00_context/CR-005_INSTRUMENTS.md` §8-9.
+
+## 24. CR-006 / DEC-243 — Gemini interpretation of dictation (2026-11-10)
+
+- `voice/normalizer.py`, `voice/views.py` (`interpret_with_ai`, `ai_interpreted`), settings and `.env.example` (`GEMINI_*`), DictationPanel label and M-11 text. 6 new tests. Real-call evidence in CR-006 §8. CR-007 (HU21 conversational tutor) remains proposed.
+
+## 25. CR-007 / DEC-244 — HU21 conversational tutor (2026-11-10)
+
+- Backend: `voice/tutor.py`, `voice/tutor_views.py`, `TutorUsageQuota` + migration `voice.0003`, two endpoints, 8 tests.
+- Frontend: `lib/liveTutor.ts`, `TutorChat.tsx`, API helpers, styles; mobile instrument grid fix.
+- Record: `US-021_TUTOR_CHAT_IMPLEMENTATION.md`; evidence in CR-007 §8.
+
+## 26. Sung voice and visual fixes (2026-11-10)
+
+- "Voz cantada" (CR-005 §11): `/api/v1/audio/syllables/`, `lib/sungVoice.ts` (YIN + GrainPlayer), 2 backend tests.
+- Particles take the instrument colour; a cappella synth removed; tutor "Reiniciar conversación"; Trompeta/Saxofón in instrument lists; cards use `overflow: clip`.
+
+- 2026-11-10: "Voz cantada" and the "Voz" instrument option removed at the requester's request (CR-005 §12). Backend suite 165 tests OK (1 skipped).
