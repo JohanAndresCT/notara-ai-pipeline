@@ -102,3 +102,10 @@ Prompts P04 v2.1. Validación sobre UX v2.1: PASS_WITH_WARNINGS (0 MEDIUM, 1 LOW
 ## Merge `mvp-2` → `pipeline/mvp2-p00-context` (2026-11-09)
 
 Se tomó como base la versión de `mvp-2` (CR-003, CR-004, implementación de HU11) y se reaplicó el segundo lote de decisiones renumerado como DEC-230..DEC-238. Retiradas: antigua DEC-222 (20/día; gana DEC-219 con 30/día) y antigua DEC-226 (aviso con OpenAI; obsoleto tras CR-003). Validaciones re-ejecutadas: PASS_WITH_WARNINGS.
+
+## P04 — Reconciliación de UX pendiente (2026-11-11)
+
+- Actualizados `UX_SPEC.md` a v4.4 y su informe de validación.
+- Los flujos aprobados siguen cubriendo HU01–HU19; no se activó REG-009 ni se certificaron las nuevas interacciones de CR-005/006/007.
+- Se deja constancia de los cambios presentes en código como pendientes de ratificación, accesibilidad y validación de navegador/micrófono.
+- Resultado: `PASS_WITH_WARNINGS`, con UX-VAL-203 y los gates upstream aún abiertos.

@@ -271,3 +271,20 @@ production deployment is authorized by this addendum.
 | Withdrawn decisions | Former DEC-222 (20/day; superseded by DEC-219, 30/day) and former DEC-226 (OpenAI notice; obsolete after CR-003) are not applied |
 
 Remaining findings: REQ-VAL-205 and REQ-VAL-206 (LOW), plus the empirical HU11 acceptance gates recorded by `mvp-2`.
+
+## P02 reconciliation addendum — requirements v5.5 / backlog v5.5
+
+**Date:** 2026-11-11 · **Result:** `PASS_WITH_WARNINGS` · **P03 readiness:** `READY_WITH_ASSUMPTIONS` for US-001–US-019.
+
+| Check | Result |
+|---|---|
+| Canonical story set | P02 Markdown and JSON retain exactly US-001–US-019; no MVP 1 IDs or accepted HU11–HU19 criteria were removed or renumbered. |
+| Pending changes | CR-005, CR-006, and CR-007 are explicitly marked non-active in the requirements section and `backlog_metadata.pending_change_requests`. |
+| CR-005 | Proposed HU20 remains outside the canonical `items` array; its team approval is pending. |
+| CR-006 / CR-007 | The requester-approved implementation status and pending team ratification remain distinct; their candidate ACs/FRs/BRs are not active requirements. |
+| Planning fields | Canonical requirements backlog retains null planning fields and empty developer assignments. |
+| Cross-artifact gate | P02/P03 may proceed only for the already established HU01–HU19 scope; no new candidate is prioritized. |
+
+Q-020 remains open. This addendum does not ratify the changes or assert
+acceptance of their implementations. Existing findings REQ-VAL-205/206 and
+empirical HU11 acceptance gates remain visible.

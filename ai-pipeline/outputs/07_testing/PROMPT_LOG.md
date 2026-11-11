@@ -158,4 +158,11 @@ python backend/manage.py test accounts scores --verbosity 1
 
 Sin commits, ramas, CI ni despliegue.
 
+## Revalidación incremental del estado actual (2026-11-11)
+
+- Se consultaron las rutas reales `ai-pipeline/outputs/07_testing/`; no se creó una copia en `artifacts/`.
+- Sin cambios a pruebas, aplicación, manifiestos o lockfiles. Los proveedores externos de voz/tutor están sustituidos por fakes/mocks en sus pruebas.
+- Suite backend actual: 165 descubiertas/ejecutadas, 164 pasaron y 1 PostgreSQL-only se omitió; Django `check` y `makemigrations --check --dry-run` pasaron con SQLite temporal.
+- Typecheck frontend intentado desde `frontend/`; no pudo resolverse por tres paquetes declarados pero ausentes del `node_modules` local. E2E/build actuales no se ejecutaron; se preservó el `dist/` existente y se conservaron las ejecuciones históricas como evidencia histórica.
+- P07 queda `PASS_WITH_WARNINGS`, no como validación completa de release: PostgreSQL y la verificación frontend/E2E actual siguen pendientes. No hubo CI, deploy, servicios de pago, commit ni push.
 

@@ -190,3 +190,11 @@ Siguen abiertos: Q-009 (Railway), Q-010, Q-011, Q-012, Q-020 y la aprobación de
 ## Merge `mvp-2` → `pipeline/mvp2-p00-context` (2026-11-09)
 
 Se tomó como base la versión de `mvp-2` (CR-003, CR-004, implementación de HU11) y se reaplicó el segundo lote de decisiones renumerado como DEC-230..DEC-238. Retiradas: antigua DEC-222 (20/día; gana DEC-219 con 30/día) y antigua DEC-226 (aviso con OpenAI; obsoleto tras CR-003). Validaciones re-ejecutadas: PASS_WITH_WARNINGS.
+
+## P00 — Reconciliación incremental (2026-11-11)
+
+- Actualizado `PROJECT_CONTEXT.md` a v2.4 y `CONTEXT_VALIDATION.md` run 5.
+- Revisados `DECISIONS_MVP2.md`, CR-005/006/007 y el código de `ScoreCreatePage.tsx`.
+- CR-005 permanece propuesto; CR-006/007 constan implementados con aprobación del solicitante y ratificación del equipo pendiente. No se promovieron a alcance aprobado.
+- DEFECT-001 se marca resuelto en el código actual (revisión estática; aceptación de UI pendiente).
+- La base activa conserva MVP 1 y HU11–HU19; no se inventaron aprobadores, fechas ni resultados.

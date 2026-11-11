@@ -1,6 +1,6 @@
 # Guía de usuario
 
-Flujo principal de Notara según las pantallas del código (`frontend/src`). La interfaz está en español. Producción: <https://notara-production.up.railway.app>.
+Flujos disponibles según las pantallas actuales de `frontend/src`. La interfaz está en español. La URL pública y su estado actual no se verificaron en esta revalidación; la evidencia histórica se documenta en [SETUP.md](./SETUP.md).
 
 ## 1. Crear una cuenta
 
@@ -35,7 +35,7 @@ Flujo principal de Notara según las pantallas del código (`frontend/src`). La 
 
 ## 6. Editar y eliminar
 
-- `/scores/<id>/edit` permite cambiar **título, instrumento y descripción**. La pantalla no permite editar el contenido ni el formato aunque la API sí lo admite (`P09-DISC-004`).
+- `/scores/<id>/edit` permite cambiar **título, instrumento, descripción, formato y contenido**. También ofrece dictado (HU11) y carga local de `.abc` (HU19).
 - Eliminar quita la partitura y vuelve al feed.
 - Solo el propietario puede editar o eliminar; otros usuarios reciben 403 desde la API.
 
@@ -46,6 +46,17 @@ Flujo principal de Notara según las pantallas del código (`frontend/src`). La 
 - Se muestran el número de partituras y las reacciones recibidas.
 - **Foto de perfil:** la API la admite, pero no se encontró ningún control para subirla en `frontend/src` (`P09-DISC-003`).
 
-## Qué no existe en esta versión
+## 8. Funciones de voz y audio (MVP 2)
 
-Audio, imágenes en partituras, roles, recuperación de cuenta y edición de comentarios (ver [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md)).
+- **Dictar una partitura (HU11):** desde los formularios de creación o edición, permite grabar audio en español y devuelve una propuesta ABC que el usuario puede revisar antes de guardar. Se necesita permiso de micrófono, navegador compatible y contexto seguro. Audio máximo: 30 segundos y 2 MiB.
+- **Comentar con voz (HU12):** en partituras de otra persona, graba un comentario, permite previsualizarlo y lo envía para transcripción. Se publica el texto junto con el audio; el límite del texto transcrito es 1.000 caracteres.
+- **Escuchar (HU13–HU14):** en partituras ABC compatibles se puede generar solfeo hablado o un resumen hablado; el audio se devuelve como MP3.
+- **Reproducir (HU15):** reproduce en el navegador las partituras ABC que el lector puede interpretar. Otros formatos o elementos no soportados muestran un mensaje.
+- **Descargar (HU18):** el MP3 de solfeo generado se puede descargar desde la interfaz.
+- **Cargar un archivo (HU19):** desde los formularios de creación o edición, al elegir un archivo `.abc`, el navegador lee su texto localmente y lo coloca en el editor; el archivo no se carga al servidor solo por seleccionarlo.
+
+El código también contiene Gemini para normalizar dictados no interpretables (CR-006) y un tutor conversacional de voz/texto (CR-007). Ambos cambios están implementados con aprobación del solicitante, pero pendientes de ratificación del equipo y no son historias canónicas añadidas. Las opciones de instrumentos adicionales asociadas a CR-005 siguen propuestas; su presencia en el código no significa aprobación. No se afirma aceptación empírica de precisión, latencia, memoria o calidad de audio.
+
+## 9. Límites de esta versión
+
+OMR, recuperación de cuenta y gestión diferenciada de roles no están implementados en este alcance. Las limitaciones de verificación y los cambios pendientes se describen en [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md).

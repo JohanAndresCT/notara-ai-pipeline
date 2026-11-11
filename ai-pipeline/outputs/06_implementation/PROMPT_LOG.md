@@ -168,3 +168,11 @@ implementation-log evidence requirements.
 - Prompt de vocabulario para Whisper en el dictado.
 - Registros retroactivos US-007 y US-008; validaciones de US-005..US-010 (`P06_code_review.md` v2.0).
 - Lista de pruebas manuales: `MVP2_MANUAL_ACCEPTANCE_CHECKLIST.md`.
+
+## P06 — Revisión incremental del estado actual (2026-11-11)
+
+- Alcance: revisión/validación read-only; no se modificaron código, pruebas, dependencias ni configuración.
+- Confirmados registros y validaciones P06 para todas las historias canónicas US-001–US-019. US-020/HU20 sigue propuesta; CR-006 y CR-007/HU21 siguen requester-approved con ratificación de equipo pendiente, fuera del backlog canónico. No existen prompts ni validaciones de historia P06 para esos cambios pendientes.
+- Entorno: Python 3.11.9, Django 5.2.18, DRF 3.15.2. `accounts scores voice`: 165 tests ejecutados, 164 PASS, 1 omitido por requerir PostgreSQL; `manage.py check` y `makemigrations --check --dry-run`: PASS. SQLite de prueba aislada en `%TEMP%`.
+- `npm.cmd run typecheck` desde `frontend/`: no reproducible por dependencias ausentes en `node_modules` (`@tensorflow/tfjs`, `tone`, `@breezystack/lamejs`), aunque declaradas en `package.json` y `pnpm-lock.yaml`. No se reinstalaron paquetes ni se sobrescribió `frontend/dist`.
+- Resultado P06: `PASS_WITH_WARNINGS`, ejecución `PARTIAL`; se conservan gates de aceptación manual, PostgreSQL y dependencias locales del frontend. La implementación de CR-005/006/007 no se presenta como aceptación ni ratificación.

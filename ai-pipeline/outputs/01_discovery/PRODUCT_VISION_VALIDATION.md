@@ -172,3 +172,18 @@ None blocking. Recommended: DISC-VAL-202 when adapting P02; ratify the decisions
 | Scope | No need, JTBD, indicator or classification changed. |
 | MVP 1 identifiers | All present (automated check). |
 | P02 readiness | Unchanged: `READY_WITH_ASSUMPTIONS`. |
+
+## Addendum — Run 4 (vision version 2.3)
+
+**Date:** 2026-11-11 · **Result:** `PASS_WITH_WARNINGS` · **P02 readiness:** `READY_WITH_ASSUMPTIONS` for the approved HU01–HU19 baseline.
+
+| Check | Result |
+|---|---|
+| Approved scope and existing identifiers | HU01–HU19, MVP 1 identifiers, 31-SP source total, and existing vision IDs are preserved. |
+| CR-005 / HU20 | Kept as proposed; no team approval or P03 estimate is inferred. |
+| CR-006 / US-011 | Kept as a requester-approved implementation amendment with team ratification pending; not applied as an approved requirement. |
+| CR-007 / HU21 | Kept as a requester-approved implementation with team ratification pending; not added to active vision scope. |
+| Change-source accuracy | The CR and decision records are cited; code presence is not treated as approval or user acceptance. |
+
+No new user need or success target is added. Re-run P01 for these changes only
+after the recorded team-ratification gate is resolved.

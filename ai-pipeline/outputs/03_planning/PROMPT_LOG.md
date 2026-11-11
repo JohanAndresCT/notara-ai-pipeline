@@ -164,3 +164,17 @@ Prompts P03 v2.1: totales y provisionales se recalculan desde las fuentes. Valid
 ## Merge `mvp-2` → `pipeline/mvp2-p00-context` (2026-11-09)
 
 Se tomó como base la versión de `mvp-2` (CR-003, CR-004, implementación de HU11) y se reaplicó el segundo lote de decisiones renumerado como DEC-230..DEC-238. Retiradas: antigua DEC-222 (20/día; gana DEC-219 con 30/día) y antigua DEC-226 (aviso con OpenAI; obsoleto tras CR-003). Validaciones re-ejecutadas: PASS_WITH_WARNINGS.
+
+## P03 — Reconciliación de cambios pendientes (2026-11-11)
+
+- Actualizados `PRIORITIZATION.md` y el índice planificado a v4.4.
+- Se recalculó y conservó el plan canónico de 19 historias: 31 SP (P0 21, P1 8, P2 2), sin asignaciones.
+- CR-005/006/007 quedan listados en metadatos como `planned: false`; no se asignó prioridad ni estimación.
+- Resultado: `PASS_WITH_WARNINGS`; el plan no es compromiso de sprint mientras sigan abiertas sus precondiciones.
+
+## P03 — Nota de evidencia de implementación (2026-11-11)
+
+- Se actualizó `backlog_metadata.notes` en `product_backlog.json` y se añadió una nota en `PRIORITIZATION.md` sobre los registros P06 y la cobertura del código actual para US-001–US-019.
+- Se mantuvieron sin cambios los 19 ítems, prioridades, dependencias, estimaciones, capacidad, asignaciones y `delivery_status` de MVP 2. La evidencia de código no se convirtió en aceptación ni en entrega/release.
+- CR-005 continúa propuesta; CR-006/007 siguen con aprobación del solicitante y ratificación del equipo pendiente.
+- Verificación focalizada: JSON válido, 19 historias, referencias P02 intactas y plan/valores sin cambios.

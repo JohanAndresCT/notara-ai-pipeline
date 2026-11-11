@@ -220,3 +220,36 @@ sprint commitment approval or production deployment authorization.
 | Developers assigned | None |
 
 PLAN-VAL-201 (MEDIUM) remains: the plan is not a sprint commitment until ratification, TTS keys, storage, dates and owners are settled.
+
+## P03 reconciliation addendum — planning v4.4 / backlog v4.4
+
+**Date:** 2026-11-11 · **Result:** `PASS_WITH_WARNINGS` · **P04 readiness:** `WITH CONSTRAINTS` for the established HU01–HU19 plan.
+
+| Check | Result |
+|---|---|
+| Canonical story set | Planned JSON retains US-001–US-019; every active story remains traceable to P02. |
+| Capacity | 31 SP total; P0/P1/P2 = 21/8/2. The pending requests are excluded from these totals. |
+| Pending changes | CR-005/006/007 appear only in backlog metadata with `planned: false`; no priority, Story Points, release assignment, sprint assignment, or developer is inferred. |
+| P02 alignment | P02 v5.5 preserves the same 19 canonical stories and declares the pending candidates non-active. |
+| Scope and approval | HU20 and HU21 are not silently promoted; requester approval and team ratification remain distinct. |
+
+PLAN-VAL-201 and existing preconditions remain open. P04 may proceed on
+US-001–US-019 only; proposed UI changes for CR-005/006/007 are not approved
+design requirements.
+
+## P03 focused delta validation — planning v4.5 / backlog v4.5
+
+**Date:** 2026-11-11 · **Scope:** as-built evidence note only · **Result:** `PASS_WITH_WARNINGS`
+
+| Check | Result |
+|---|---|
+| JSON integrity and version | Valid JSON; metadata version `4.5` matches `PRIORITIZATION.md`. |
+| Canonical story set | Exactly US-001–US-019; canonical P02 story source unchanged. |
+| Priorities and capacity | P0/P1/P2 remain 21/8/2 SP (31 total); no estimate, priority, sequence, dependency, assignment, or cut-line change. |
+| Delivery evidence | US-001–US-010 remain `DELIVERED` in `v1.0.0`; US-011–US-019 remain `PLANNED` because no release of the inspected current tree was confirmed. |
+| Pending changes | CR-005 remains proposed; CR-006/007 remain requester-approved with team ratification pending and are not planned. |
+| Scope of addendum | The P06 evidence note distinguishes implementation records from acceptance and release. No approval or story was inferred. |
+
+This focused check does not replace the earlier full P03 validation. It confirms
+the 4.5 delta only; `READY_WITH_ASSUMPTIONS` and existing planning preconditions
+remain unchanged.

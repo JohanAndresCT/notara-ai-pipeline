@@ -227,3 +227,10 @@ Se tomó como base la versión de `mvp-2` (CR-003, CR-004, implementación de HU
 ## MVP 2 — Proposed changes recorded (2026-11-10)
 
 - REQUIREMENTS.md v5.4: section 6.3 lists **proposed** CR-005 (US-020 instruments; DEC-242 AI instruments), CR-006 (US-011 amendment, Gemini interpretation of dictation) and CR-007 (US-021 conversational tutor, Gemini Live). Reserved IDs: AC-078..AC-096, BR-032, BR-033, FR-047..FR-050, M-18. Pending team approval before re-running P02-P05 for them.
+
+## P02 — Reconciliación de backlog y estados pendientes (2026-11-11)
+
+- Reconciliados los metadatos de `REQUIREMENTS.md` y `product_backlog.json` a v5.5; P00 v2.4 y P01 v2.3 quedan como fuentes vigentes.
+- El arreglo canónico conserva los 19 elementos US-001–US-019. Se agregan CR-005/006/007 únicamente a `backlog_metadata.pending_change_requests`, fuera de `items`.
+- AC-078–AC-096 y FR-047–FR-050 siguen propuestos; requester approval y team ratification se mantienen separados.
+- Resultado: `PASS_WITH_WARNINGS` para el alcance aprobado; Q-020 y las evidencias empíricas siguen pendientes.

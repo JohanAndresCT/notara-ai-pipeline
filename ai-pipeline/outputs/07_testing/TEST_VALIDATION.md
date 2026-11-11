@@ -30,3 +30,20 @@
 
 - `Status`: `PASS_WITH_WARNINGS`
 - Motivo: 88/88 backend y 5/5 E2E pasan en SQLite aislado. PostgreSQL sigue `NOT_RUN`
+
+## Revalidación incremental (2026-11-11)
+
+Esta ejecución revalida el código actual sin añadir ni modificar pruebas.
+
+| Check / Test ID | Command and working directory | Database/runtime | Exit code | Discovered/executed count | Result | Evidence |
+|---|---|---|---:|---:|---|---|
+| `DJK-CURRENT-01` | Root: `.\.venv\Scripts\python.exe backend\manage.py test accounts scores voice --verbosity 1`; `DJANGO_DB_ENGINE=sqlite`, `SQLITE_DB_PATH` temporal en `%TEMP%` | Python 3.11.9, Django 5.2.18, DRF 3.15.2; SQLite test DB | 0 | 165/165 (164 passed, 1 skipped) | PASS_WITH_WARNINGS | `Ran 165 tests in 121.227s`; `OK (skipped=1)`. El único skip es la prueba de concurrencia que requiere PostgreSQL. |
+| `DJK-CURRENT-CHECK` | Root: `.\.venv\Scripts\python.exe backend\manage.py check` | Mismo entorno/SQLite | 0 | Django system check | PASS | `System check identified no issues (0 silenced).` |
+| `DJK-CURRENT-MIGRATIONS` | Root: `.\.venv\Scripts\python.exe backend\manage.py makemigrations --check --dry-run` | Mismo entorno/SQLite | 0 | Migration drift check | PASS | `No changes detected`. |
+| `FE-CURRENT-TYPECHECK` | `frontend/`: `npm.cmd run typecheck` | Node 24.21.0; instalación local incompleta | 2 | TypeScript project | BLOCKED (environment) | No resuelve `@tensorflow/tfjs`, `tone` ni `@breezystack/lamejs`, aunque constan en `package.json` y `pnpm-lock.yaml`. No se instalaron paquetes ni se modificó el lockfile. |
+| `E2E-CURRENT` | No ejecutado | Requiere restaurar dependencias frontend y arrancar frontend/backend aislados | N/A | N/A | NOT_RUN | Se conserva evidencia histórica E2E `5/5 PASS`; esta revalidación no la presenta como ejecución actual. |
+| `FE-BUILD-CURRENT` | No ejecutado | `frontend/dist/` preexistente e ignorado por Git | N/A | N/A | NOT_RUN | No se sobrescribió la salida local existente. |
+
+Resultado de la revalidación: `PASS_WITH_WARNINGS` para las pruebas backend y
+checks de Django ejecutados; la validación frontend/E2E actual queda parcial
+por dependencias locales ausentes. PostgreSQL continúa `NOT_RUN`.

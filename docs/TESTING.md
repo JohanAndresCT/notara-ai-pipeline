@@ -1,53 +1,54 @@
 # Pruebas
 
-## Resumen
+## Evidencia local más reciente
 
-| Capa | Herramienta | Cantidad | Último resultado verificado |
-|---|---|---:|---|
-| Backend | Django `manage.py test` (`accounts/tests.py`, `scores/tests.py`, `voice/tests.py`) | 110 (HU11 branch) | HU11 branch: 110 total, 109 passed and 1 PostgreSQL-only concurrency test skipped; SQLite, Python 3.11.9, Django 5.2.18 (2026-11-08, 74.8 s). Previous baseline: 91 OK, SQLite, Python 3.12.3, Django 5.2.18 (2026-10-24, 49 s); P09 had 88 tests with Django 5.2.1 |
-| E2E | Playwright (`frontend/e2e/notara-e2e.spec.ts`) | 5 | 5/5 en SQLite en P07 (22.9 s); **no se reejecutó en P09** |
-| Tipos | `tsc --noEmit` | n/a | Exit 0 (P09) |
-| Build | `vite build` | n/a | Exit 0 (P09); advierte sobre `@tailwind utilities` en CSS |
-| Chequeos Django | `check` y `makemigrations --check --dry-run` | n/a | Sin problemas ni cambios pendientes (P09) |
+| Capa | Comando / evidencia | Entorno | Resultado |
+|---|---|---|---|
+| Backend | `.\.venv\Scripts\python.exe backend\manage.py test accounts scores voice --verbosity 1` | Python 3.11.9, Django 5.2.18, DRF 3.15.2, SQLite temporal | 165 detectadas: 164 pasaron, 1 omitida; 0 fallos |
+| Chequeo Django | `.\.venv\Scripts\python.exe backend\manage.py check` | Mismo entorno | Sin incidencias |
+| Migraciones | `.\.venv\Scripts\python.exe backend\manage.py makemigrations --check --dry-run` | Mismo entorno | No se detectaron cambios |
+| Frontend | `npm.cmd run typecheck` desde `frontend/` | Node 24.21.0; instalación local incompleta | Bloqueado: no resuelve `@tensorflow/tfjs`, `tone` y `@breezystack/lamejs`, aunque están declarados en los manifiestos |
+| Playwright E2E | No ejecutado en esta revalidación | Requiere dependencias frontend | `NOT_RUN`; se conserva evidencia histórica P07 de 5/5 |
+| Build frontend | No ejecutado en esta revalidación | `frontend/dist/` preexistente | `NOT_RUN`; se preservó el artefacto existente |
+| PostgreSQL local | No ejecutado | PostgreSQL no disponible en esta ejecución | `NOT_RUN`; no se infiere equivalencia con SQLite |
 
-PostgreSQL local: `NOT_RUN` en P07 y en la validación local de HU11. En CI el job `e2e` usa PostgreSQL 16 y salió exitoso en las ejecuciones #7 y #16 según los metadatos de GitHub Actions; no se auditaron sus logs ni se verificó el número de escenarios. Python 3.12 no está instalado en el entorno de esta validación; la disponibilidad de wheels manylinux para Python 3.12 se comprobó sin ejecutar el backend en ese intérprete.
+El test omitido requiere PostgreSQL para validar concurrencia de cuota STT. No se instalaron dependencias ni se alteraron lockfiles. Los comandos de backend usan una base de pruebas administrada por Django; para una base de desarrollo persistente, elige una ruta `SQLITE_DB_PATH` nueva y verifica que no exista antes de migrar.
 
-## Cómo ejecutarlas
+## Cómo ejecutar
+
+Desde la raíz del repositorio, con el entorno virtual y dependencias backend preparados:
 
 ```powershell
-# Backend (raíz del repositorio)
 $env:DJANGO_DB_ENGINE = "sqlite"
-$env:SQLITE_DB_PATH = "$env:TEMP\notara-test.sqlite3"
-python backend\manage.py test accounts scores voice
-
-# Frontend (desde frontend/)
-pnpm typecheck
-pnpm build
-pnpm test:e2e
+$env:SQLITE_DB_PATH = "$env:TEMP\notara-test-unique.sqlite3"
+if (Test-Path $env:SQLITE_DB_PATH) { throw "Choose a new SQLite path; the target already exists." }
+.\.venv\Scripts\python.exe backend\manage.py test accounts scores voice
+.\.venv\Scripts\python.exe backend\manage.py check
+.\.venv\Scripts\python.exe backend\manage.py makemigrations --check --dry-run
 ```
 
-La configuración E2E (`frontend/playwright.config.ts`) inicia Django en el puerto 18237 y Vite en 15173, usa SQLite temporal por defecto (o PostgreSQL), `retries: 0` y la variable `DJANGO_PYTHON` para elegir el intérprete.
+Desde `frontend/`, una vez restauradas las dependencias conforme al lockfile:
 
-## Escenarios E2E
+```powershell
+corepack pnpm typecheck
+corepack pnpm build
+corepack pnpm test:e2e
+```
 
-1. Registro, login, logout y acceso anónimo.
-2. Publicación, detalle y feed.
-3. Edición.
-4. Eliminación.
-5. Publicación y acceso anónimo a ruta protegida.
+No ejecutar `pnpm install` sobre una instalación local que se quiera preservar sin revisar primero su estado; esta documentación no indica que se haya instalado nada durante P06–P09.
 
-Las pruebas usan UI y backend reales, sin mocks (`TEST_VALIDATION.md`).
+## Cobertura E2E histórica
+
+P07 registró 5/5 escenarios Playwright en SQLite: registro/login/logout y acceso anónimo; publicación/detalle/reacción; edición; eliminación; y protección de rutas. Esa evidencia no se volvió a ejecutar en la validación actual.
 
 ## CI
 
-`.github/workflows/ci.yml` define los jobs `backend`, `frontend`, `e2e` y `deploy-railway`. Estado observado (metadatos de GitHub Actions, sin logs):
-
-- Ejecuciones #7 (`430dfad`) y #16 (`3ce012f`) en `pruebas-despliegue`: 4/4 jobs exitosos.
-- Ejecución #14 (push, `54a26f5`): exitosa. Ejecución #15 (pull request, mismo SHA): **el job E2E falló**. La causa es `UNKNOWN`; podría ser intermitente (`P08-VAL-005`).
+`.github/workflows/ci.yml` contiene los jobs `backend`, `frontend`, `e2e` y `deploy-railway`. Los resultados de runs #7, #14, #15 y #16 son metadatos históricos registrados en P08; los logs no fueron auditados en esta ejecución y no se consultó GitHub.
 
 ## Brechas
 
-- Sin pruebas de rendimiento ni accesibilidad automatizadas.
-- Sin pruebas unitarias del frontend.
-- El comportamiento sobre PostgreSQL local no se ejecutó en P07 ni P09.
-- Registros de P07: `ai-pipeline/artifacts/07_testing/`.
+- La ejecución local actual no valida PostgreSQL; un test de concurrencia quedó omitido.
+- No se reejecutaron E2E, build, pruebas cross-browser, accesibilidad ni rendimiento.
+- La validación no mide precisión real de dictado, latencia p95, uso máximo de memoria ni calidad auditiva.
+- El historial E2E de CI incluye un fallo con causa desconocida en run #15, aunque #14 pasó con el mismo SHA según los metadatos históricos.
+- El registro de P07 y la revalidación de P06 están en `ai-pipeline/outputs/07_testing/` y `ai-pipeline/outputs/06_implementation/`.

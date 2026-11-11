@@ -1,170 +1,150 @@
-# MVP Evaluation - Notara
+# Notara MVP Evaluation
 
-- Stage: P10 - Evaluation
-- Evaluation date: 2026-10-14
-- Verdict: `NEEDS_ITERATION`
-- Machine-readable companion: [eval_metrics.json](./eval_metrics.json)
+- **Stage:** P10 - Evaluation
+- **Evaluation date:** 2026-11-11
+- **Verdict:** `NEEDS_ITERATION`
+- **Maturity:** `PARTIALLY_VERIFIED`
+- **Machine-readable metrics:** [eval_metrics.json](./eval_metrics.json)
 
 ## 1. Executive Summary
 
-**Verdict: `NEEDS_ITERATION`.** Notara is a working, deployed MVP whose core flow (register, log in, publish, browse, view detail, react, comment, edit, delete) is implemented and backed by 88 passing backend tests and 5 end-to-end scenarios. The evidence does not yet support moving on without a first improvement round: one security concern, several implementation-versus-requirement deviations that need a team decision, and verification gaps remain.
+**Verdict: `NEEDS_ITERATION`.** The current repository contains implementation evidence for all 19 canonical stories and a current SQLite backend run with 164 passing tests. That evidence is not equivalent to Product Owner acceptance, team ratification, a release of the current tree, or complete verification of the voice, browser, frontend, and operational gates.
 
-**Maturity:** a deployed prototype with partial verification (`PARTIALLY_VERIFIED`). There are no user, adoption or business data.
+The approved baseline contains 46 functional requirements and 10 non-functional requirements. Of these 56 requirements, 19 are verified, 36 partially verified, and 1 is not verified. The 18 approved qualitative success indicators comprise 7 met, 9 partially met, and 2 unmeasured. No user adoption, engagement, or business-impact data are available.
 
-**Demonstrated strengths**
-- 13 of 20 requirements are `VERIFIED`; none is `NOT_IMPLEMENTED`.
-- Backend: 88 tests passed (P07 reported 88/88; the P09 stage re-executed them on SQLite). Frontend: 5 end-to-end scenarios passed in P07 (SQLite).
-- A real defect (`BUG-P07-204-01`, DELETE answered 204 with a body) was found by an E2E test, fixed and covered by a regression test.
-- The application answers on its public Railway URL and a CI workflow tests and deploys it.
-- Documentation (README, 8 documents in `docs/`, published MkDocs site) was audited against the code with `PASS_WITH_WARNINGS`.
+MVP 1 remains the delivered `v1.0.0` baseline. MVP 2 work is present, but P03 still marks US-011–US-019 `PLANNED`; P06 records open acceptance and execution gates. CR-005 remains proposed. CR-006 and CR-007 have requester-approved implementations but team ratification remains pending; neither is added to the canonical baseline.
 
-**Material limitations and risks**
-- Several `scores` write endpoints use `@csrf_exempt` (`EVAL-001`).
-- Reacting to and commenting on one's own score is allowed, and `Reaction` and `Like` duplicate each other (`EVAL-002`).
-- Profile photo exists in the API but is excluded by `OOS-003` (`EVAL-003`).
-- The UI edit form omits content and format (`EVAL-004`).
-- No browser or viewport evidence for `NFR-002` beyond Chromium (`EVAL-005`).
-- No PostgreSQL local run; one E2E CI run failed with an unknown cause (`EVAL-006`).
+This verdict does not mean the product is unusable, and it does not establish production readiness or business viability. It means the evidence supports continuing evaluation and closing the identified acceptance and verification gaps before claiming MVP 2 delivery.
 
-**What the verdict does and does not establish.** It states that the MVP is a demonstrable, documented and deployed prototype. It does not establish production readiness, adoption, reliability under load, security assurance or business value.
+## 2. Scope and Evidence
 
-## 2. Evaluation Scope and Evidence
+### Baseline and counting method
 
-**Baseline.** Approved requirements `FR-001..FR-017`, `NFR-001..NFR-003`, 28 acceptance criteria (`AC-*`), `MVP-001..010` (`HU01..HU10`), and `SUCCESS-001..009` from `PRODUCT_VISION.md` §11. Out-of-scope items (`FUT-001..003`, `OOS-001..005`) are excluded from completion counts.
+- P02 v5.5 defines canonical stories US-001–US-019, FR-001–FR-046, NFR-001–NFR-010, and 77 acceptance-criteria entries. AC-028 is explicitly superseded by AC-029. Requirement metrics count each approved FR and NFR once (56 total); stories are the traceability layer and are not double-counted.
+- P01 preserves MVP 1 `SUCCESS-001`–`SUCCESS-009` and defines MVP 2 `IND-201`–`IND-209`. The P00/P01 `SUCCESS-*` collision is kept explicit; this report uses `IND-*` for MVP 2.
+- CR-001/002 scope is reflected in the approved MVP 2 baseline. CR-003/004 are recorded in the upstream decisions; CR-004 implementation acceptance remains open. CR-005/006/007 candidate additions are excluded from the approved counts. HU19 is in US-019; HU21 is not in the canonical backlog.
+- P03 v4.5 retains the 31-SP plan (P0 21, P1 8, P2 2), with no confirmed release of the inspected tree. No approval or acceptance is inferred from code presence.
 
-**Sources inspected** (all under `ai-pipeline/artifacts/` unless noted):
-`00_context/PROJECT_CONTEXT.md`; `01_discovery/PRODUCT_VISION.md`; `02_requirements/REQUIREMENTS.md`; `03_planning/PRIORITIZATION.md`; `04_ux/UX_SPEC.md`; `05_architecture/ARCHITECTURE.md`; `06_implementation/` (log and validations); `07_testing/` (`TEST_VALIDATION.md`, `BUG_FIX_REPORT.md`); `08_cicd/` (`CICD_VALIDATION.md`); `09_documentation/` (`DOCUMENTATION_REPORT.md`, `DOCUMENTATION_VALIDATION.md`, `PROMPT_LOG.md`); `README.md`; `docs/*.md`; `backend/scores/{views,tests}.py`; `backend/accounts/tests.py`; `.github/workflows/ci.yml`; `frontend/playwright.config.ts`; `frontend/e2e/notara-e2e.spec.ts`.
+### P09 gate
 
-**Provenance classes used.** Local execution (P09: 88 backend tests, `check`, `tsc`, `vite build`); P07 reported execution (E2E 5/5); public GitHub Actions metadata (job conclusions, no logs); public HTTP checks; static review; user-reported results.
+P09 is complete. The current [DOCUMENTATION_VALIDATION.md](../09_documentation/DOCUMENTATION_VALIDATION.md), section 20, records `PASS_WITH_WARNINGS` on 2026-11-11. The report and validation use the repository's current `ai-pipeline/outputs/` layout. P09's MkDocs build was not run; this is disclosed, not treated as a documentation failure.
 
-**P09 status.** Complete and validated: `DOCUMENTATION_VALIDATION.md` is `PASS_WITH_WARNINGS`. The real filenames are `DOCUMENTATION_REPORT.md`, `DOCUMENTATION_VALIDATION.md` and `PROMPT_LOG.md`. The P09 gate passed.
+### Sources and provenance
 
-**Missing or conflicting inputs**
-- `ai-pipeline/outputs/` does not exist; `ai-pipeline/artifacts/` is authoritative.
-- Historical P08 records said `NOT_DEPLOYED`; they were reconciled to `DEPLOYED_AND_VERIFIED` (limited scope) after deployment evidence was supplied.
-- No `LICENSE` file.
-- The P09 validation was produced in the same working session as the P09 generation, so it is not fully independent (see §9).
+Reviewed current P00/P01 decisions and vision; P02 requirements, backlog, and validation; P03 prioritization and backlog; P04/P05 validation records; P06 story validations and [IMPLEMENTATION_VALIDATION_MVP2.md](../06_implementation/IMPLEMENTATION_VALIDATION_MVP2.md); P07 [TEST_VALIDATION.md](../07_testing/TEST_VALIDATION.md); P08 [CICD_VALIDATION.md](../08_cicd/CICD_VALIDATION.md); P09 report, validation, README, [KNOWN_LIMITATIONS.md](../../../docs/KNOWN_LIMITATIONS.md), and other `docs/`; and targeted source, test, workflow, and configuration files.
 
-**Limits of this evaluation.** No new test, build or deployment was run for P10; it relies on static reads and earlier executions. Acceptance criteria were assessed at the requirement level, not one by one.
+Provenance is distinguished as current local execution, static/code review, P06 browser checks, historical P07 E2E execution, historical P08 remote metadata/public checks, and unrun measurements. P10 itself ran no tests, build, deployment, network call, or service integration.
 
 ## 3. Requirements and Feature Assessment
 
-Status rule: `VERIFIED` requires suitable tests (backend tests or E2E) with passing results; behavior exposed only through code or documentation is not enough.
+Status counts are derived from the approved requirement IDs and their linked US-level P06 evidence. `VERIFIED` means suitable evidence supports the specific behavior; it does not imply product acceptance. Partial statuses preserve the known gaps and deviations.
 
-| ID | Requirement (short) | Implementation | Status | Evidence and limitation |
-|---|---|---|---|---|
-| FR-001 | Register | Implemented | VERIFIED | `RegistrationTests` (8); E2E 1 |
-| FR-002 | Log in and out | Implemented | VERIFIED | `AuthenticationTests` (4); E2E 1 |
-| FR-003 | Profile view and edit | Implemented, plus photo in API | PARTIALLY_VERIFIED | `ProfileManagementTests` (13); no UI test; photo conflicts with `OOS-003` |
-| FR-004 | Change password | Implemented | VERIFIED | `ProfileManagementTests`; API-level evidence only |
-| FR-005 | Create publication | Implemented | VERIFIED | `ScorePublicationTests` (11); E2E 2 |
-| FR-006 | Accept `.abc` and plain text | Implemented | VERIFIED | `test_authenticated_abc_publication_passes_minimal_checks`; publication tests |
-| FR-007 | Reject empty or over 1,000 characters | Implemented | VERIFIED | `test_content_over_1000_characters_is_rejected` |
-| FR-008 | Basic `.abc` validation | Implemented | VERIFIED | `test_abc_requires_headers_and_a_musical_line` |
-| FR-009 | Publish and view valid score | Implemented | VERIFIED | Tests; E2E 2 |
-| FR-010 | Edit own publication | Implemented in API; UI edits title, instrument, description only | PARTIALLY_VERIFIED | `ScoreEditTests` (15); E2E 3; UI omits content and format (`P09-DISC-004`) |
-| FR-011 | Delete own publication | Implemented | VERIFIED | `ScoreDeleteTests` (7); E2E 4; bug fixed and retested |
-| FR-012 | Newest-first feed, 10 per page | Implemented | VERIFIED | `test_feed_filters_by_instrument_and_paginates_ten_results` |
-| FR-013 | Filter by instrument | Implemented | VERIFIED | Same test; own-scores filter test |
-| FR-014 | Score detail with comments | Implemented | VERIFIED | `test_detail_returns_comments_and_like_state`; E2E 2 |
-| FR-015 | Like another user's score; remove like | Implemented, but own score also likable; `Reaction` and `Like` coexist | PARTIALLY_VERIFIED | `ScoreReactionTests` (10); one E2E click; deviation `P09-DISC-002/006` |
-| FR-016 | Comment on another user's score | Implemented, but own score also commentable; comment deletion added | PARTIALLY_VERIFIED | `ScoreCommentTests` (13); no E2E for comments; `P09-DISC-006/010` |
-| FR-017 | Authentication required for protected actions | Implemented | VERIFIED | Anonymous-access tests; E2E 1 and 5 |
-| NFR-001 | Readable presentation | Implemented | PARTIALLY_VERIFIED | No usability or rendering test beyond E2E navigation |
-| NFR-002 | Chrome/Edge/Firefox at 360, 768 and 1280 px | Responsive layout present | NOT_VERIFIED | Playwright config has only `chromium`; no viewport tests |
-| NFR-003 | Security: auth and owner-only changes | Auth and ownership enforced | PARTIALLY_VERIFIED | `test_only_owner_can_update_or_delete_score`; CSRF weakened by `@csrf_exempt` |
+### Functional requirements
 
-Totals: 20 requirements; 13 `VERIFIED`; 6 `PARTIALLY_VERIFIED`; 1 `NOT_VERIFIED`; 0 `NOT_IMPLEMENTED`.
+| Status | Requirement IDs | Count | Evidence and limitations |
+|---|---|---:|---|
+| `VERIFIED` | FR-001, FR-002, FR-004–FR-014, FR-017, FR-038–FR-041 | 18 | P06 validations and current backend tests support the MVP 1 account, publication, edit/delete, feed, detail, cache, and fallback behaviors. FR-010 content/format editing is now present and P06 reports a browser check; its content-edit E2E remains absent. US-016 and US-017 validations report cache/fallback tests, including no-provider cache hits and simulated provider failures. |
+| `PARTIALLY_VERIFIED` | FR-003, FR-015–FR-016, FR-018–FR-037, FR-042–FR-046 | 28 | Code and story-level evidence exist, but voice/manual acceptance, frontend revalidation, edge cases, or behavior alignment remain incomplete. Notable gaps include self-reaction/self-comment behavior, profile-photo scope mismatch, HU11 corpus/resource acceptance, and the lack of current frontend/E2E execution. |
+| `NOT_VERIFIED` / `NOT_IMPLEMENTED` | None | 0 | All canonical stories have implementation records and current code review; this is not proof of acceptance or release. |
 
-Excluded from counts: voice input, OMR, audio, images, roles, account recovery (`FUT-001..003`, `OOS-001..005`). The profile photo is outside the approved scope but present in the API.
+### Non-functional requirements
+
+| ID | Status | Evidence and limitation |
+|---|---|---|
+| NFR-001 | `PARTIALLY_VERIFIED` | Readability/line-break behavior is documented and exercised in limited flows; no usability study or full rendering evaluation. |
+| NFR-002 | `NOT_VERIFIED` | Chrome/Edge/Firefox at 360/768/1280 px is not covered by the current validation evidence. Historical E2E uses Chromium. |
+| NFR-003 | `PARTIALLY_VERIFIED` | Authentication, owner checks, and CSRF middleware are present and tested in relevant flows. No independent security assessment was performed; coverage is not a security certification. |
+| NFR-004 | `PARTIALLY_VERIFIED` | Code and tests cover audio lifecycle behavior, but complete real-device and operational privacy verification is not established. |
+| NFR-005 | `PARTIALLY_VERIFIED` | Error/fallback paths have test evidence; full browser, provider, and production failure behavior is not currently verified. |
+| NFR-006 | `PARTIALLY_VERIFIED` | Cache, quota, and configurable providers have implementation/test evidence; production storage and external-provider operation were not revalidated. |
+| NFR-007 | `PARTIALLY_VERIFIED` | Spanish is the configured product language; real-speaker transcription and human audio quality acceptance remain open. |
+| NFR-008 | `PARTIALLY_VERIFIED` | Recording and local browser checks exist, but validation across the required browsers, widths, and deployed secure context is incomplete. |
+| NFR-009 | `PARTIALLY_VERIFIED` | Synthetic corpus and local memory/timing observations exist, but the approved human corpus, p95/target-environment measurements, TTS targets, and Railway capacity gates are not closed. |
+| NFR-010 | `VERIFIED` | The current automated suite uses fake/provider-independent engines; the local backend suite passed apart from the PostgreSQL-only skip. |
+
+The canonical P02 backlog is not amended by this evaluation. The 77 acceptance-criteria entries are assessed through their story-level validations and test evidence, not by a new P10 execution of every criterion. No claim is made that every criterion has been independently re-run.
 
 ## 4. Functional and Technical Quality
 
-| Check | Environment | Result | Provenance |
-|---|---|---|---|
-| Backend tests (88: 25 accounts, 63 scores) | SQLite, Python 3.13.14 | 88 passed | Local execution in P09; P07 reported the same |
-| `manage.py check`, `makemigrations --check` | SQLite | No issues, no changes | Local execution in P09 |
-| `tsc --noEmit`, `vite build` | Node 22, `npx` | Exit 0; CSS warning on `@tailwind utilities` | Local execution in P09 |
-| E2E (5 scenarios) | SQLite, Chromium | 5/5 | P07 report; not re-run in P09 or P10 |
-| E2E history | SQLite | 4/5 before the fix of `BUG-P07-204-01`, 5/5 after | `BUG_FIX_REPORT.md`, `TEST_VALIDATION.md` |
-| CI jobs (`backend`, `frontend`, `e2e`) | GitHub-hosted, PostgreSQL 16 | Run #7 and #16 succeeded; #14 passed and #15 failed in E2E on the same SHA (cause `UNKNOWN`) | Public Actions metadata, no logs |
+| Check | Result | Provenance / limitation |
+|---|---|---|
+| Backend `accounts scores voice` tests | 165 discovered; 164 passed, 1 PostgreSQL-only test skipped, 0 failures | Current local run, Python 3.11.9, Django 5.2.18, SQLite. |
+| Django system check | PASS | Current local execution. |
+| Migration drift check | PASS; no changes detected | Current local execution. |
+| Frontend typecheck | BLOCKED | Current local dependencies do not resolve `@tensorflow/tfjs`, `tone`, and `@breezystack/lamejs`; packages are declared in the manifest/lockfile. No installation was performed. |
+| Frontend build | NOT_RUN | Current revalidation preserved the pre-existing ignored `frontend/dist/`. |
+| E2E | Historical 5/5 PASS; current run NOT_RUN | P07 historical Chromium run; not evidence of a current run. |
+| PostgreSQL | NOT_RUN locally | The skipped concurrency test is not verified by SQLite. |
+| Coverage, accessibility, load/performance, and cross-browser | NOT_MEASURED or incomplete | No approved measurement is inferred. |
 
-**Defects.** `BUG-P07-204-01` is `FIXED_AND_VERIFIED`. No unresolved `BLOCKER` or `CRITICAL` defect is recorded in the inspected P07 records. P07 decision: `PASS_WITH_WARNINGS`.
-
-**Measurement gaps.** Not performed: code coverage; PostgreSQL local run; performance or load tests; accessibility; security testing; cross-browser and viewport testing; frontend unit tests.
+The P07/P06 records report no unresolved `BLOCKER` or `CRITICAL` defects. `BUG-P07-204-01` was fixed and regression-tested in the historical P07 run. These counts describe inspected records only; they do not prove defect-free software.
 
 ## 5. CI/CD, Deployment, and Operational Readiness
 
-- **Status:** deployed and operation partially verified. The application answers at `https://notara-production.up.railway.app`. On 2026-10-14, `/api/health/`, `/api/v1/health/`, `/`, `/login` and `/admin/login/` returned 200; `/api/me/` and `/api/v1/scores/` returned 401 without a session. Runs #7 and #16 on `pruebas-despliegue` completed all four jobs, including `deploy-railway`.
-- **Evidence types.** Remote-verified metadata (job conclusions), independent public HTTP checks, and a user-reported manual verification of registration, login and scores in production (`USER_REPORTED`).
-- **Automation.** `.github/workflows/ci.yml` runs backend tests, frontend typecheck and build, and E2E, then deploys only when `RAILWAY_DEPLOY_ENABLED` is true and the branch matches `RAILWAY_PRODUCTION_BRANCH`.
-- **Not verified:** the exact commit deployed (differs from the inspected tree); persistence of the photo volume; backups; rollback; protection of the `production` environment; HTTP-to-HTTPS redirection; log contents of the CI runs.
-- **Observation:** the Django admin login is publicly reachable (`P08-VAL-006`).
-- **Docs pipeline.** A separate workflow builds the MkDocs site and publishes it to GitHub Pages (HTTP 200 observed).
+P08 records a deployment and limited runtime checks on 2026-10-14, including successful historical CI/deploy metadata. Therefore deployment is recorded as historically completed (`DEPLOYED_VERIFIED`), while operational verification is only `PARTIALLY_VERIFIED`. Current availability and the deployed state of the inspected working tree were not checked.
+
+P08 also preserves an E2E CI failure (run #15, cause unknown) and a passing run #14 on the same SHA; the logs were not audited. This is historical evidence, not a current CI result. P08 does not establish current volume persistence, backups, rollback, protection of the production environment, HTTPS redirect behavior, or reviewed CI logs. The recorded deployment SHA predates the inspected tree; no deployment of the current tree or MVP 2 release was confirmed. No remote services were contacted for P10.
 
 ## 6. Documentation and Traceability
 
-- **Deliverables:** `README.md`, `docs/{SETUP,ARCHITECTURE,API,DATA_MODEL,USER_GUIDE,TESTING,REQUIREMENTS_COVERAGE,KNOWN_LIMITATIONS}.md`, `docs/index.md`, `mkdocs.yml`, `.github/workflows/docs.yml`, `DOCUMENTATION_REPORT.md`.
-- **Accuracy.** The P09 validation found no inconsistent or fabricated statements and no sensitive data. This evaluation corroborated the test counts, the E2E scenario names and the CSRF and feed behavior with the code.
-- **Gaps:** the README does not follow the required 15-section order (`VAL-001`); the MkDocs and Pages files were added at the user's request but are not logged in `PROMPT_LOG.md` (`VAL-002`); development tool versions disagree across `.mise.toml`, CI, Dockerfile and Compose (`P09-DISC-005`).
-- **Traceability.** `REQUIREMENTS_COVERAGE.md` maps MVP-001..010 to code and tests. Acceptance criteria are not traced one by one.
-- **Automation.** Documentation publishing is automated; its content is generated by running the P09 prompt, so it can become outdated when the code changes (`P09-RISK-001`).
+P09 documentation validation is `PASS_WITH_WARNINGS`; it found the current documentation consistent with reviewed code and records, and no remaining required documentation correction. The current report distinguishes MVP 1/MVP 2, preserves CR approval states, documents the current API and UI behavior, and states the limits of P06–P08 evidence.
 
-## 7. Success Criteria and Outcome Assessment
+The MkDocs build was not run because MkDocs is unavailable in the local environment. This is a verification limitation, not evidence that the site build fails. The current frontend typecheck/build and deployment were likewise not claimed as P09 results.
 
-Targets are the approved qualitative indicators of `PRODUCT_VISION.md` §11. No numeric target was approved for adoption, performance, usability, learning or community activity.
+## 7. Success Criteria and Outcomes
 
-| ID | Original target | Result and evidence | Status |
+The targets below retain P01 identifiers and qualitative wording. `MET` reflects suitable available functional evidence; it does not mean release acceptance. MVP 2 targets are cited only as `IND-*`, avoiding the P00/P01 `SUCCESS-*` collision.
+
+| ID | Approved indicator | Evidence / result | Status |
 |---|---|---|---|
-| SUCCESS-001 | A visitor can register; a user can log in and out | Tests and E2E 1 | MET |
-| SUCCESS-002 | Manage profile fields and change password | Backend tests; no UI test; photo deviation | PARTIALLY_MET |
-| SUCCESS-003 | Publish `.abc` or plain text up to 1,000 characters with metadata | Tests; E2E 2 | MET |
-| SUCCESS-004 | Basic `.abc` validation; plain text free | Validation tests | MET |
-| SUCCESS-005 | Readable content, line breaks preserved, format identified | Detail view exists and is exercised by E2E; no test of line breaks or format label | PARTIALLY_MET |
-| SUCCESS-006 | Edit and delete only own publications | Ownership tests; E2E 3 and 4 | MET |
-| SUCCESS-007 | View recent personal and community scores; filter by instrument | Feed and filter tests; E2E 2 | MET |
-| SUCCESS-008 | View detail, comment and react on others' scores | Backend tests for both; E2E covers like only; self-interaction deviation | PARTIALLY_MET |
-| SUCCESS-009 | Demonstrate MVP 1 scope within the two-week sprint | A deployed, demonstrable MVP exists; the sprint timing was not evidenced | UNMEASURED |
+| SUCCESS-001 | A visitor can register and a registered user can log in and log out. | Current backend tests; historical E2E. | `MET` |
+| SUCCESS-002 | A user can manage the approved profile fields and change their password. | Backend/profile tests; UI coverage and photo scope remain limited. | `PARTIALLY_MET` |
+| SUCCESS-003 | An authenticated user can publish non-empty `.abc` or plain-text content up to 1,000 characters with title, instrument, and description. | Current backend publication tests; historical E2E. | `MET` |
+| SUCCESS-004 | `.abc` content receives basic syntax validation and plain text is accepted as free format. | Current backend validation tests. | `MET` |
+| SUCCESS-005 | Published content is readable, preserves line breaks, and identifies its format. | Detail flow exists; line-break/format-label coverage is incomplete. | `PARTIALLY_MET` |
+| SUCCESS-006 | A user can edit and delete only their own publications. | Ownership tests, P06 edit browser check, historical E2E. | `MET` |
+| SUCCESS-007 | Users can view recent personal and community scores and filter them by instrument. | Current backend feed/filter tests; historical E2E. | `MET` |
+| SUCCESS-008 | Users can view score details and comment on or react to other users' scores. | Backend coverage exists; self-interaction behavior differs from the story. | `PARTIALLY_MET` |
+| SUCCESS-009 | The team can demonstrate the defined MVP 1 scope within the two-week sprint. | MVP 1 has a delivered v1.0.0 baseline; this evaluation has no sprint-timing evidence. | `UNMEASURED` |
+| IND-201 | A user can dictate a score and obtain ABC in the content field, or a clear message when the dictation cannot be interpreted. | Parser/UI checks exist; real-speaker corpus and acceptance gates remain open. | `PARTIALLY_MET` |
+| IND-202 | A user can leave a voice comment of up to 30 seconds that is stored as text with its audio. | Implementation/tests exist; real microphone and human acceptance are incomplete. | `PARTIALLY_MET` |
+| IND-203 | A user can listen to the spoken solfège and the audio summary of a valid ABC score. | Synthesis paths exist; human listening/quality and current UI verification are incomplete. | `PARTIALLY_MET` |
+| IND-204 | A user can play a valid ABC score with an instrument sound without an external API call. | Browser implementation exists; no current frontend typecheck/E2E playback run. | `PARTIALLY_MET` |
+| IND-205 | A repeated request for the same audio is served from the cache without calling the provider. | US-016 validation reports the cache-hit/provider-call test passing. | `MET` |
+| IND-206 | When the commercial voice provider fails, the user still receives audio and no server error. | US-017 tests exercise simulated provider failures and fallback; no external provider call was made. | `MET` |
+| IND-207 | A user can download the synthesized solfège as an MP3 file. | Implementation/story evidence exists; current frontend validation and E2E were not run. | `PARTIALLY_MET` |
+| IND-208 | The team can demonstrate MVP 2 within the Sprint 2 timeline. | Sprint dates and a release of the current tree were not established. | `UNMEASURED` |
+| IND-209 | A user can load an `.abc` file and see its text, with line breaks, in the editor before publishing; invalid files are rejected with a clear message. | P06 browser checks cover the create flow; edit-flow and release-level E2E verification remain incomplete. | `PARTIALLY_MET` |
 
-Totals: 9 criteria; 5 met; 3 partially met; 0 not met; 1 unmeasured.
+**Counts:** 18 indicators; 7 `MET`, 9 `PARTIALLY_MET`, 0 `NOT_MET`, 2 `UNMEASURED`, 0 `NOT_APPLICABLE`.
 
-**Outcomes by type**
-- Technical (demonstrated): tests passing, application deployed, documentation published.
-- Operational: deployment verified at a basic level; reliability, backups and rollback not verified.
-- User and business: `DATA_UNAVAILABLE`. There are no users, adoption, engagement or impact data. Measuring them would require real usage over time and approved targets.
+**Outcomes:** technical outcomes are partially demonstrated by current backend tests and P06 review. Historical deployment evidence is limited and not a current operational check. User adoption, engagement, learning outcomes, and business impact are `DATA_UNAVAILABLE`; no approved numeric targets or usage dataset exist.
 
 ## 8. Risks and Prioritized Recommendations
 
-| ID | Priority | Finding and evidence | Expected benefit | Next action | Related |
-|---|---|---|---|---|---|
-| EVAL-001 | HIGH | `@csrf_exempt` on several `scores` write views (`scores/views.py`) weakens the session-based security model | Reduces cross-site request risk | Team decides whether to remove the exemptions and adapt the frontend and tests | NFR-003, `P09-DISC-007` |
-| EVAL-002 | MEDIUM | Authors can react to and comment on their own scores; `Reaction` and `Like` duplicate each other | Aligns behavior with the stories and simplifies data | Decide whether to block self-interaction and which model to keep | FR-015, FR-016, `P09-DISC-002/006` |
-| EVAL-003 | MEDIUM | Profile photo exists in the API but `OOS-003` excludes images and the UI has no control | Removes a scope conflict | Decide to keep it in the MVP or remove it | FR-003, `P09-DISC-003` |
-| EVAL-004 | MEDIUM | The UI edit form cannot change score content or format although the API can | Completes the edit story | Add the fields to the form or document the restriction as an accepted decision | FR-010, `P09-DISC-004` |
-| EVAL-005 | MEDIUM | `NFR-002` has no evidence: only Chromium is configured and no 360/768/1280 px checks exist | Verifies a stated requirement | Run a manual or automated check across the named browsers and widths | NFR-002 |
-| EVAL-006 | MEDIUM | No local PostgreSQL run; E2E CI run #15 failed with unknown cause while #14 passed | Confirms parity with production and rules out flakiness | Run tests on PostgreSQL and inspect the failed run logs | `P08-VAL-005`, P07 |
-| EVAL-007 | MEDIUM | Deployed commit unknown; volume persistence, backups, rollback, environment protection and HTTPS redirect unverified | Operational confidence | Record the deployed SHA and verify each prerequisite | P08, `P09-DISC-009` |
-| EVAL-008 | LOW | `/admin/login/` is publicly reachable | Smaller attack surface | Decide whether to restrict it | `P08-VAL-006` |
-| EVAL-009 | LOW | README order deviates from the template; MkDocs additions not logged | Documentation conformance | Reorder README and log the MkDocs addition; re-run P09 validation | `VAL-001`, `VAL-002` |
-| EVAL-010 | LOW | `/api` and `/api/v1` coexist; Node and pnpm versions differ across files; two lockfiles tracked | Less confusion for contributors | Choose one route prefix and one toolchain version | `P09-DISC-001/005` |
-| EVAL-011 | INFO | No `LICENSE`; the CSS build warning on `@tailwind utilities` | Clarity for reuse | Decide on a license; review the CSS directive | `P09-GAP-003` |
+Recommendations are not implementation or approval decisions. No code, tests, backlog, configuration, or infrastructure should be changed without the applicable authorization.
 
-Counts: 0 blocker, 1 high, 6 medium, 3 low, 1 info.
+| ID | Priority | Finding and evidence | Next action | Related |
+|---|---|---|---|---|
+| EVAL-001 | MEDIUM | HU11 quality and resource acceptance is incomplete: human corpus, target-environment latency/memory, and real-device gates remain open in P02/P06. | Collect the already approved acceptance evidence before claiming HU11 acceptance; keep synthetic results distinct. | US-011; NFR-009; PRE-011; DEC-240 |
+| EVAL-002 | MEDIUM | Current frontend verification is incomplete and one PostgreSQL-only test was skipped; current E2E/build were not run. | Restore the existing declared dependencies when authorized, then run typecheck/build/E2E and the PostgreSQL-specific test in an approved environment. | P06-REV-001/002; P07 |
+| EVAL-003 | MEDIUM | P06 DoD/Product Owner review and MVP 2 release status remain open; P03 keeps US-011–US-019 `PLANNED`. | Obtain the documented product/team acceptance and release decision without treating implementation presence as approval. | US-011–US-019; P03 v4.5 |
+| EVAL-004 | MEDIUM | NFR-002 browser/viewport coverage and broader usability/accessibility evidence are incomplete. | Validate the approved browsers and widths and record relevant usability/accessibility evidence without adding unapproved thresholds. | NFR-001/002/008 |
+| EVAL-005 | MEDIUM | P08 operational evidence is historical and limited; persistence, backup, rollback, environment protection, and current availability are unchecked. | Verify these operational items only through an authorized operational review; do not infer them from CI configuration. | P08; Q-009 |
+| EVAL-006 | MEDIUM | Some current behavior differs from the approved baseline: users can react to/comment on their own scores, `Reaction` and `Like` coexist, and the profile-photo API conflicts with OOS-003. | Record the product/team disposition before claiming full scope conformance; this report does not select or implement a resolution. | FR-003, FR-015/016; OOS-003; P09-DISC-002/003/006 |
+| EVAL-007 | LOW | The documentation-site build was not executed because MkDocs is unavailable locally. | Run the documented build when the tool is available and authorized; P09 content validation remains `PASS_WITH_WARNINGS`. | P09 |
+| EVAL-008 | LOW | P08 historically observed that `/admin/login/` is publicly reachable; this observation alone is not a finding of unauthorized access. | Decide whether an additional access policy is required for the deployment. | P08-VAL-006 |
 
 ## 9. Next Evaluation Steps
 
-1. Resolve the pending team decisions (`P09-QUESTION-001..005`) and record them.
-2. Fix or consciously accept `EVAL-001..004`, then re-run the P07 tests and the P09 validation.
-3. Collect the missing evidence: PostgreSQL test run, CI log review, deployed SHA, cross-browser and viewport checks, code coverage (if the team wants it).
-4. Re-run this evaluation with an independent reviewer; the P09 validation was done in the same session as generation.
-5. For user and business outcomes, define approved targets and gather usage data after real use begins.
-
-**Conditions to reassess:** any change to application code, any new CI or deployment evidence, or a change in the approved scope.
-
-**Incomplete in this evaluation:** acceptance-criterion-level tracing; any new execution of tests; PostgreSQL and remote-log evidence (unavailable in this environment).
+1. Close the applicable P06 human acceptance, P07 test, and product-review gates; retain the current approval state of CR-005/006/007.
+2. Obtain authorized frontend/PostgreSQL evidence without installing packages or contacting external services as part of this evaluation.
+3. If MVP 2 release or deployment is later approved, evaluate that specific release and current operational evidence separately.
+4. Reassess NFR-002 and the approved NFR-009 targets using their stated scope and targets; do not add thresholds.
+5. Gather user/business data only after real use begins and targets are approved.
 
 ## 10. Final Verdict
 
 **`NEEDS_ITERATION`**
 
-Justification: no unresolved blocker or critical defect and no failed essential gate, so the verdict is not `BLOCKED`. The core MVP is implemented, deployed and documented. But 6 of 20 requirements are only partially verified and 1 is not verified. One security concern (`EVAL-001`) and several decisions about deviations from the approved baseline remain open. Moving to a next stage without those would overstate the evidence. This verdict does not mean the MVP is unusable; it identifies the improvements to make first.
+The P09 gate passed with warnings, the current backend suite passed with one PostgreSQL-only skip, and no unresolved blocker/critical defect is recorded in the inspected P06/P07 evidence. However, a substantial portion of the approved requirements is only partially verified; current frontend and PostgreSQL evidence is incomplete; key voice acceptance gates are open; P06 DoD and MVP 2 release status remain unconfirmed; and operational verification is historical and limited. These gaps justify iteration, but do not prevent a meaningful evaluation and do not imply that missing measurements failed.

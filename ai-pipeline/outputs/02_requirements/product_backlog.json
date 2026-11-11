@@ -1,27 +1,56 @@
 {
   "backlog_metadata": {
     "project": "Notara",
-    "version": "5.3",
+    "version": "5.5",
     "stage": "P02",
     "status": "READY_WITH_ASSUMPTIONS",
-    "source": "ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md (v2.1)",
+    "source": "ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md (v2.3)",
     "validation_source": "ai-pipeline/outputs/01_discovery/PRODUCT_VISION_VALIDATION.md",
     "release": "MVP 2 - Sprint 2",
     "additional_sources": [
       "ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md",
       "ai-pipeline/outputs/00_context/DECISIONS_MVP2.md",
-      "ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md (v2.2)",
+      "ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md (v2.4)",
       "ai-pipeline/outputs/00_context/CR-003_WHISPER_TINY.md",
-      "ai-pipeline/outputs/00_context/CR-004_WHISPER_BASE.md"
+      "ai-pipeline/outputs/00_context/CR-004_WHISPER_BASE.md",
+      "ai-pipeline/outputs/00_context/CR-005_INSTRUMENTS.md",
+      "ai-pipeline/outputs/00_context/CR-006_GEMINI_DICTATION.md",
+      "ai-pipeline/outputs/00_context/CR-007_GEMINI_LIVE_TUTOR.md"
     ],
     "change_requests": [
       "CR-001",
       "CR-002",
       "CR-003",
-      "CR-004"
+      "CR-004",
+      "CR-005",
+      "CR-006",
+      "CR-007"
     ],
-    "notes": "MVP 1 items US-001-US-010 preserved; US-010 amended by DEC-211 (AC-028 superseded by AC-029). CR-003 amends DEC-201/DEC-214 for local STT and updated notice. HU11 authorization resolves BR-013/025 and approves quality/performance/resource targets and a configurable 30/day STT quota (DEC-219); empirical acceptance and Railway evidence remain pending. Planning fields stay null; team MoSCoW and Story Points remain source data. CR-004 supersedes the CR-003 Tiny model selection with Systran/faster-whisper-base for HU11/HU12. The requester approved implementation on 2026-11-09; approval by other team members is not established. Corpus-based quality testing, latency/memory verification and Railway validation remain pending. Historical CR-003 is preserved; the AC-071 model reference is reconciled without changing its latency threshold.",
-    "merge_note": "v5.3: merge reconciliation with pipeline/mvp2-p00-context; DEC-230-DEC-238 applied (AC-029, AC-049, AC-063 reworded; AC-077, FR-046, BR-030, BR-031 added)."
+    "pending_change_requests": [
+      {
+        "change_request": "CR-005",
+        "candidate_story": "US-020 / HU20",
+        "decision": "DEC-242",
+        "status": "PROPOSED_PENDING_TEAM_APPROVAL",
+        "canonical_backlog_item": false
+      },
+      {
+        "change_request": "CR-006",
+        "candidate_story": "US-011 amendment",
+        "decision": "DEC-243",
+        "status": "IMPLEMENTED_REQUESTER_APPROVED_TEAM_RATIFICATION_PENDING",
+        "canonical_backlog_item": false
+      },
+      {
+        "change_request": "CR-007",
+        "candidate_story": "US-021 / HU21",
+        "decision": "DEC-244",
+        "status": "IMPLEMENTED_REQUESTER_APPROVED_TEAM_RATIFICATION_PENDING",
+        "canonical_backlog_item": false
+      }
+    ],
+    "notes": "Canonical active items remain US-001-US-019; the pending_change_requests register is separate from items and does not add approved stories or acceptance criteria. MVP 1 items US-001-US-010 are preserved; US-010 is amended by DEC-211 (AC-028 superseded by AC-029). CR-003 amends DEC-201/DEC-214 for local STT and updated notice. HU11 authorization resolves BR-013/025 and approves quality/performance/resource targets and a configurable 30/day STT quota (DEC-219); empirical acceptance and Railway evidence remain pending. Planning fields stay null; team MoSCoW and Story Points remain source data. CR-004 supersedes the CR-003 Tiny model selection with Systran/faster-whisper-base for HU11/HU12. Requester approval for CR-004 implementation does not establish approval by other team members. CR-005 remains proposed; CR-006/007 are implemented with requester approval and team ratification pending. No approval, estimate, priority, or acceptance is inferred.",
+    "merge_note": "v5.3: merge reconciliation with pipeline/mvp2-p00-context; DEC-230-DEC-238 applied (AC-029, AC-049, AC-063 reworded; AC-077, FR-046, BR-030, BR-031 added). v5.5 reconciles P00/P01 metadata and records pending CR-005/006/007 separately."
   },
   "epics": [
     {

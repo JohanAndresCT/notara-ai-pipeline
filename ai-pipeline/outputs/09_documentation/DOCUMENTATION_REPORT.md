@@ -1,167 +1,148 @@
-# Documentation Report
+# Reporte de documentación — P09
 
-## 1. Document Metadata
+## 1. Metadatos de documentación (Document Metadata)
 
-- Version: 1.0
-- Stage: P09 — Documentation
-- Status: READY_WITH_ASSUMPTIONS
-- Generated From: código de `backend/` y `frontend/`, `Dockerfile`, `deploy/`, `docker/`, `.github/workflows/ci.yml`, `.env.example`, artefactos P00–P08 en `ai-pipeline/artifacts/` (ubicación usada; la carpeta `ai-pipeline/outputs/` no existe) y verificaciones locales de esta etapa.
-- Validation Dependency: P00 PASS_WITH_WARNINGS, P01–P04 PASS, P05 PASS_WITH_WARNINGS, P06 `IMPLEMENTATION_VALIDATION` READY_WITH_ASSUMPTIONS, P07 `TEST_VALIDATION` PASS_WITH_WARNINGS, P08 `CICD_VALIDATION` actualizado a `DEPLOYED_AND_VERIFIED` con alcance limitado.
-- Implementation Reference: commit `54a26f5` ("Fixes to front") en la rama `Arch-Front-end`, con árbol de trabajo modificado (prompts P08/P09 y artefactos P08). El despliegue en Railway se realizó desde otros commits de `pruebas-despliegue` (`430dfad`, `3ce012f`), por lo que el código desplegado puede diferir del inspeccionado (`UNKNOWN`).
+- Proyecto: Notara
+- Etapa: P09 — Documentación
+- Fecha de reconciliación: 2026-11-11
+- Estado: `READY_WITH_ASSUMPTIONS`
+- Evidencia: árbol de trabajo actual y registros vigentes en `ai-pipeline/outputs/`
+- Ubicación vigente: `ai-pipeline/outputs/`; no se creó ni duplicó `ai-pipeline/artifacts/`
+- Alcance: documentación raíz y `docs/`; sin cambios en aplicación, pruebas, dependencias, CI/CD o infraestructura.
 
-## 2. Documentation Summary
+## 2. Resumen de documentación (Documentation Summary)
 
-Se generaron `README.md` (reescrito) y ocho documentos en `docs/`, en español, basados en el código inspeccionado. Setup y uso principal quedan documentados con evidencia. Las pruebas backend (88/88), `check`, `makemigrations --check`, `tsc --noEmit` y `vite build` se ejecutaron en esta etapa con SQLite y Python 3.13.14. No se ejecutaron Playwright, Docker ni Compose; sus resultados se citan de P07 y de metadatos de CI. El despliegue figura como `DEPLOYED` por evidencia: URL pública con `/api/health/` 200 observado el 2026-10-14, y jobs de despliegue exitosos en CI. Se registran 12 discrepancias, varias con decisión pendiente.
+Se actualizaron los documentos para cubrir la línea base MVP 1 y las historias canónicas MVP 2 US-011–US-019, reflejando el código actual y las limitaciones de verificación. CR-005/HU20 se mantiene como propuesta pendiente de aprobación; CR-006/enmienda US-011 y CR-007/HU21 siguen implementados con aprobación del solicitante, pero pendientes de ratificación del equipo. No se promovieron a historias canónicas ni se infirió aceptación.
 
-## 3. Documentation Inventory
+La documentación distingue la evidencia local actual de pruebas y los datos históricos de CI/despliegue. En la revisión de consistencia P09 se precisaron en `docs/API.md` los campos de los comentarios y la variación de idioma/formato de errores de voz. La configuración MkDocs (`mkdocs.yml`, `requirements-docs.txt` y `.github/workflows/docs.yml`) ya existía por una solicitud anterior; se inventarió y preservó sin cambios. No se hicieron llamadas a Railway, GitHub, Hugging Face, proveedores de audio ni servicios de pago. No se instalaron dependencias ni se hicieron commits, push o despliegues.
 
-| ID | File | Purpose | Primary Sources | Status |
-|---|---|---|---|---|
-| P09-DOC-001 | `README.md` | Punto de entrada | Todas | COMPLETE |
-| P09-DOC-002 | `docs/SETUP.md` | Instalación, variables, despliegue | `settings.py`, `.env.example`, `Dockerfile`, `ci.yml`, `package.json` | PARTIAL |
-| P09-DOC-003 | `docs/ARCHITECTURE.md` | Arquitectura real | `urls.py`, `Dockerfile`, `nginx.conf.template`, `App.tsx` | COMPLETE |
-| P09-DOC-004 | `docs/API.md` | Endpoints | `urls.py`, `views.py` de ambas apps | COMPLETE |
-| P09-DOC-005 | `docs/DATA_MODEL.md` | Modelos y migraciones | `models.py`, `migrations/` | COMPLETE |
-| P09-DOC-006 | `docs/USER_GUIDE.md` | Flujo de uso | Páginas de `frontend/src` | COMPLETE |
-| P09-DOC-007 | `docs/TESTING.md` | Pruebas y CI | `tests.py`, E2E, `playwright.config.ts`, P07, metadatos de CI | PARTIAL |
-| P09-DOC-008 | `docs/REQUIREMENTS_COVERAGE.md` | Trazabilidad | P00, P02, P06, código | COMPLETE |
-| P09-DOC-009 | `docs/KNOWN_LIMITATIONS.md` | Límites y discrepancias | P03, P08, código | COMPLETE |
+## 3. Inventario documental (Documentation Inventory)
 
-`SETUP.md` y `TESTING.md` son PARTIAL porque Compose, `pnpm install` local y Playwright no se ejecutaron en P09.
-
-## 4. Implementation Evidence Summary
-
-| Area | Evidence Examined | Notes |
+| Archivo | Propósito | Estado |
 |---|---|---|
-| Backend | `settings.py`, `urls.py`, `accounts/{models,views}.py`, `scores/{models,views}.py`, migraciones | Las vistas usan `JsonResponse`; DRF solo está configurado en settings |
-| Frontend | `App.tsx`, `HomePage`, `ScoreDetailPage`, `ScoreEditPage`, `ProfilePage`, `RegistrationPage`, `AppShell`, `lib/api.ts` | Enrutado propio; no se encontró subida de foto en la interfaz |
-| Pruebas | `accounts/tests.py` (25), `scores/tests.py` (63), `e2e/notara-e2e.spec.ts` (5) | Backend ejecutado en P09 |
-| Despliegue | `Dockerfile`, `entrypoint.sh`, `nginx.conf.template`, `ci.yml`, `.railwayignore` | URL pública consultada con GET de solo lectura |
-| Artefactos | P00–P08 | P08 reconciliado antes de P09 |
+| `README.md` | Entrada, funcionalidades, configuración breve, estado y trazabilidad | Actualizado; 15 secciones ordenadas |
+| `docs/SETUP.md` | Requisitos, variables, instalación local, STT y evidencia histórica de despliegue | Actualizado; distingue verificación actual e histórica |
+| `docs/USER_GUIDE.md` | Recorridos MVP 1 y funciones MVP 2 | Actualizado |
+| `docs/API.md` | API de cuentas, partituras, voz y rutas heredadas | Actualizado desde URLs/vistas; contrato GET de comentarios y formatos/idiomas de error contrastados |
+| `docs/API_STT_HU11.md` | Contrato de dictado | Corregido para DEC-232 y el estado de CR-006 |
+| `docs/ARCHITECTURE.md` | Arquitectura backend, frontend y voz | Actualizado; inventario P00–P10 y errores por endpoint |
+| `docs/DATA_MODEL.md` | Modelos de cuentas, partituras, voz y migraciones | Actualizado |
+| `docs/TESTING.md` | Resultado actual, comandos y límites | Reescrito con datos de la revalidación |
+| `docs/REQUIREMENTS_COVERAGE.md` | Trazabilidad MVP 1/MVP 2 y cambios separados | Actualizado para US-001–US-019 |
+| `docs/KNOWN_LIMITATIONS.md` | Alcance excluido, cambios pendientes y brechas | Actualizado |
+| `docs/index.md` | Índice de documentación | Actualizado |
+| `mkdocs.yml` | Navegación del sitio documental | Preexistente; preservado sin cambios |
+| `requirements-docs.txt` | Dependencia MkDocs Material | Preexistente; preservado sin cambios |
+| `.github/workflows/docs.yml` | Build de documentación y publicación en GitHub Pages | Preexistente; no ejecutado ni modificado |
 
-## 5. Capability Coverage
+## 4. Resumen de evidencia de implementación (Implementation Evidence Summary)
 
-| ID | Capability | Source | Implementation Status | Evidence | Documented In |
-|---|---|---|---|---|---|
-| P09-COV-001 | Registro | MVP-001 | IMPLEMENTED | `register_view`, tests, E2E | `REQUIREMENTS_COVERAGE.md`, `API.md`, `USER_GUIDE.md` |
-| P09-COV-002 | Login y logout | MVP-002 | IMPLEMENTED | `login_view`, `logout_view` | ídem |
-| P09-COV-003 | Perfil y contraseña | MVP-003 | PARTIAL | `ProfilePage.tsx`, `current_user_view`; foto solo en API | ídem |
-| P09-COV-004 | Publicar | MVP-004 | IMPLEMENTED | `scores_view`, tests | ídem |
-| P09-COV-005 | Editar | MVP-005 | PARTIAL | UI sin contenido ni formato | ídem |
-| P09-COV-006 | Eliminar | MVP-006 | IMPLEMENTED | DELETE, E2E 4 | ídem |
-| P09-COV-007 | Panel y filtro | MVP-007 | IMPLEMENTED | `HomePage.tsx`, tests de feed | ídem |
-| P09-COV-008 | Feed y detalle | MVP-008 | IMPLEMENTED | `ScoreDetailPage.tsx` | ídem |
-| P09-COV-009 | Reacciones | MVP-009 | PARTIAL | permite reaccionar a lo propio | ídem |
-| P09-COV-010 | Comentarios | MVP-010 | PARTIAL | permite comentar lo propio; borrado propio | ídem |
+Se contrastaron rutas y vistas de Django, modelos y migraciones `accounts`, `scores` y `voice`, configuración y manifiestos, formularios/páginas frontend, llamadas API, grabación de audio, lectura de ABC, reproducción y configuración de despliegue. Los hallazgos de código se describen como implementación; no se usan como sustituto de pruebas o aceptación.
 
-## 6. Verification Log
+## 5. Cobertura de capacidades (Capability Coverage)
 
-| ID | Statement or Instruction | Location | Method | Level | Result |
-|---|---|---|---|---|---|
-| P09-VERIFY-001 | 88 pruebas backend pasan | `TESTING.md`, `README.md` | `python backend\manage.py test accounts scores` con SQLite | VERIFIED_BY_EXECUTION | OK, 81 s, Python 3.13.14 |
-| P09-VERIFY-002 | `check` sin problemas | `TESTING.md` | `manage.py check` | VERIFIED_BY_EXECUTION | OK |
-| P09-VERIFY-003 | Sin migraciones pendientes | `DATA_MODEL.md` | `makemigrations --check --dry-run` | VERIFIED_BY_EXECUTION | Sin cambios |
-| P09-VERIFY-004 | `pnpm typecheck` equivale a `tsc --noEmit` | `SETUP.md` | Script leído; `npx tsc --noEmit` ejecutado | VERIFIED_BY_EXECUTION | Exit 0 (con npx, no con pnpm) |
-| P09-VERIFY-005 | `pnpm build` equivale a `vite build` | `SETUP.md` | Script leído; `npx vite build` ejecutado | VERIFIED_BY_EXECUTION | Exit 0, advertencia CSS |
-| P09-VERIFY-006 | Playwright 5/5 | `TESTING.md` | Cita de `TEST_VALIDATION.md` | VERIFIED_BY_INSPECTION | No reejecutado en P09 |
-| P09-VERIFY-007 | `pnpm install`, `pnpm dev`, `pnpm test:e2e` | `SETUP.md` | Scripts leídos en `package.json`; pnpm no está instalado localmente | VERIFIED_BY_INSPECTION | No ejecutados |
-| P09-VERIFY-008 | `docker compose up` | `SETUP.md` | `docker-compose.yml` leído | VERIFIED_BY_INSPECTION | No ejecutado |
-| P09-VERIFY-009 | Variables de entorno | `SETUP.md` | Lectura de `settings.py`, `.env.example`, `entrypoint.sh` | VERIFIED_BY_INSPECTION | Solo nombres |
-| P09-VERIFY-010 | Rutas y métodos HTTP | `API.md` | Lectura de `urls.py` y vistas | VERIFIED_BY_INSPECTION | Coincide |
-| P09-VERIFY-011 | Despliegue activo en la URL pública | `README.md`, `SETUP.md` | GET `/api/health/` y `/api/v1/health/` (2026-10-14) | VERIFIED_BY_EXECUTION | 200 en ambos |
-| P09-VERIFY-012 | Jobs de CI y despliegue exitosos | `TESTING.md`, `SETUP.md` | API pública de GitHub Actions (solo metadatos) | VERIFIED_BY_EXECUTION | Runs #7 y #16 exitosos; #15 con E2E fallido |
-| P09-VERIFY-013 | Volumen, backups, rollback, redirección HTTP→HTTPS | `SETUP.md`, `KNOWN_LIMITATIONS.md` | — | UNVERIFIED | Marcados como pendientes |
-| P09-VERIFY-014 | Verificación manual de registro, login, partituras y foto en producción | — | Reporte del equipo | UNVERIFIED | `USER_REPORTED`; la foto no tiene UI (`P09-DISC-003`) |
+| Grupo | Cobertura documentada | Estado |
+|---|---|---|
+| MVP 1 / US-001–US-010 | Cuenta, perfil, publicación/edición/eliminación, feed, detalle, reacciones y comentarios | Conservado; diferencias de requisitos explícitas |
+| US-011 / HU11 | Dictado STT local y parser determinista | Implementado; evaluación humana y mediciones pendientes |
+| US-012 / HU12 | Comentario de voz transcrito con audio | Implementado; aceptación de micrófono pendiente |
+| US-013–US-014 / HU13–HU14 | Solfeo y resumen hablado | Implementados para ABC compatible; calidad/latencia no medidas |
+| US-015 / HU15 | Reproducción instrumental web | Implementada para el subconjunto ABC; aceptación auditiva pendiente |
+| US-016–US-017 / HU16–HU17 | Caché y fallback TTS | Implementados; disponibilidad y persistencia de producción no verificadas |
+| US-018 / HU18 | Descarga MP3 de solfeo | Implementada en cliente; no revalidada en navegador |
+| US-019 / HU19 | Lectura local de archivo `.abc` | Implementada; E2E/typecheck actuales incompletos |
 
-## 7. Discrepancies
+Los detalles de trazabilidad y los estados de verificación se encuentran en `docs/REQUIREMENTS_COVERAGE.md`.
 
-| ID | Type | Description | Artifact Source | Code Evidence | Documentation Treatment | Decision Required |
-|---|---|---|---|---|---|---|
-| P09-DISC-001 | ARTIFACT_CONFLICT | Rutas `/api/` y `/api/v1/` coexisten y el frontend usa ambas | `IMPLEMENTATION_VALIDATION`: todas usan `/api/v1/` | `urls.py`, `lib/api.ts` | Ambas documentadas en `API.md` | Sí |
-| P09-DISC-002 | IMPLEMENTATION_DEVIATION | `Reaction` y `Like` duplican la función | P02 FR-015 (un solo like) | `scores/models.py` | `DATA_MODEL.md` | Sí |
-| P09-DISC-003 | UNSPECIFIED_BEHAVIOR | La API admite foto de perfil; OOS-003 excluye imágenes; la UI no la expone | P03 OOS-003, `US-003_*` | `accounts/views.py`, `ProfilePage.tsx` | Documentada como solo API | Sí |
-| P09-DISC-004 | PARTIAL_IMPLEMENTATION | La edición de UI omite contenido y formato | FR-010 | `ScoreEditPage.tsx` vs PATCH | `USER_GUIDE.md` | Sí |
-| P09-DISC-005 | ARTIFACT_CONFLICT | Versiones de Node y pnpm discrepan; Compose usa npm; ambos lockfiles versionados | — | `.mise.toml`, `package.json`, `Dockerfile`, `docker-compose.yml` | `SETUP.md` | Sí |
-| P09-DISC-006 | IMPLEMENTATION_DEVIATION | Se puede reaccionar y comentar la propia partitura | FR-015, FR-016 | test `test_author_can_react_to_own_score` | `REQUIREMENTS_COVERAGE.md` | Sí |
-| P09-DISC-007 | IMPLEMENTATION_DEVIATION | Vistas de `scores` con `@csrf_exempt` y sesión | NFR-003 | `scores/views.py` | `API.md`, `KNOWN_LIMITATIONS.md` | Sí |
-| P09-DISC-008 | ARTIFACT_CONFLICT | P08 decía `NOT_DEPLOYED` y hay evidencia de despliegue | `CICD_VALIDATION.md` (histórico) | Health 200, CI | Resuelto en P08; README usa `DEPLOYED` | No |
-| P09-DISC-009 | UNKNOWN | Artefactos citan `ai-pipeline/outputs/` y la carpeta no existe | Artefactos P00–P08 | `ai-pipeline/` | No se citó `outputs/` | No |
-| P09-DISC-010 | IMPLEMENTATION_DEVIATION | Existe borrado de comentarios | `AC-028` | `score_comment_detail_view` | `KNOWN_LIMITATIONS.md` | Sí |
-| P09-DISC-011 | UNKNOWN | US-005, 006, 009, 010 sin validación individual | P06 | `06_implementation/` | `REQUIREMENTS_COVERAGE.md` | No |
-| P09-DISC-012 | UNKNOWN | `VITE_API_BASE_URL` sin uso en el código | `.env.example` | búsqueda en `frontend/src` | `SETUP.md` | No |
+## 6. Registro de verificaciones (Verification Log)
 
-## 8. Known Limitations
+| Verificación | Método | Resultado |
+|---|---|---|
+| Backend | `.venv` Python 3.11.9, Django 5.2.18, SQLite temporal: `manage.py test accounts scores voice --verbosity 1` | 165 ejecutadas: 164 pasaron, 1 prueba PostgreSQL-only omitida |
+| Django system check | `manage.py check` | Sin problemas |
+| Deriva de migraciones | `makemigrations --check --dry-run` | Sin cambios detectados |
+| Typecheck frontend | `npm.cmd run typecheck`, Node 24.21.0 | Bloqueado por `@tensorflow/tfjs`, `tone` y `@breezystack/lamejs` ausentes del `node_modules` local |
+| Build frontend | No se ejecutó | `NOT_RUN`; se preservó `frontend/dist/` existente |
+| Playwright E2E | No se ejecutó | `NOT_RUN`; P07 histórico registra 5/5 |
+| PostgreSQL local | No se ejecutó | `NOT_RUN`; SQLite no se considera equivalente |
+| Despliegue/servicios remotos | No se consultaron | Sin verificación actual |
+| Quick Start backend/frontend | Inspección de manifiestos, scripts, settings y rutas | `VERIFIED_BY_INSPECTION`; no se ejecutó una instalación limpia ni `runserver` para evitar cambios en dependencias/base local |
+| Contrato de rutas y variables | Inspección de `urls.py`, vistas, `.env.example`, settings y configuración Vite | `VERIFIED_BY_INSPECTION`; inventario de 45 nombres en `.env.example`, sin valores |
+| Contrato de comentarios y errores | Contraste de `score_comments_view`, `_comment_data`, `VOICE_COMMENT_MESSAGES` y `error_response` | `VERIFIED_BY_INSPECTION`; campos `kind`/`audio_url` y mensajes de error de voz documentados |
+| Consistencia de arquitectura y alcance del pipeline | Contraste de `docs/ARCHITECTURE.md` con el sistema de errores y los prompts P00–P10 | `VERIFIED_BY_INSPECTION`; sin afirmar idioma uniforme de errores ni detener el inventario en P09 |
+| Navegación MkDocs | Contraste de `mkdocs.yml` con los archivos del `nav` | `VERIFIED_BY_INSPECTION`; todos los destinos existen; `mkdocs build --strict` no ejecutado porque MkDocs no está instalado |
 
-| ID | Limitation | Origin | Documented In |
-|---|---|---|---|
-| P09-LIMIT-001 | Voz, OMR, imágenes, audio y roles fuera del MVP | P00/P03 | `KNOWN_LIMITATIONS.md` |
-| P09-LIMIT-002 | Sin renderizado de notación | P05 / código | `README.md`, `KNOWN_LIMITATIONS.md` |
-| P09-LIMIT-003 | Pendientes de despliegue (volumen, backup, rollback, environment, HTTPS) | P08 | `KNOWN_LIMITATIONS.md`, `SETUP.md` |
-| P09-LIMIT-004 | E2E intermitente o inestable (`P08-VAL-005`) | CI | `TESTING.md` |
-| P09-LIMIT-005 | Sin PostgreSQL local, rendimiento, accesibilidad ni pruebas unitarias del frontend | P07 | `TESTING.md` |
+No se instalaron paquetes; no se modificaron lockfiles. Los comandos y restricciones están en `docs/TESTING.md`.
 
-## 9. Documentation Gaps
+## 7. Discrepancias (Discrepancies)
 
-| ID | Gap | Reason | Impact |
-|---|---|---|---|
-| P09-GAP-001 | Compose, `pnpm install` y Playwright sin ejecutar | Fuera del alcance seguro de P09 | Comandos solo inspeccionados |
-| P09-GAP-002 | Código exacto desplegado desconocido | Commits desplegados distintos del inspeccionado | La URL pública puede diferir del código documentado |
-| P09-GAP-003 | Sin documento de contribución ni licencia | No existen `CONTRIBUTING` ni `LICENSE` | README indica licencia no definida |
-| P09-GAP-004 | NFR-002 sin evidencia de navegadores | Sin validación automática | Cobertura `UNKNOWN` |
+| Elemento | Tratamiento documental |
+|---|---|
+| Rutas `/api/` y `/api/v1/` heredadas | Ambas se documentan; no se cambió código |
+| `Reaction` y `Like` | Se documentan como modelos y conteos separados |
+| Foto de perfil | Se reconoce el endpoint, la ausencia de UI y la diferencia de alcance |
+| Edición | La discrepancia P09-DISC-004 se marca resuelta: la UI actual permite editar contenido y formato |
+| `P09-DISC-005` — Node/npm en Compose frente a Node/pnpm en manifiesto y CI | Se documentan las versiones y la diferencia; Compose no se ejecutó |
+| `P09-DISC-006` — reacción/comentario propio y comentario de voz | Se documenta que la UI permite los dos primeros y que el endpoint de voz rechaza partituras propias |
+| CSRF | Se actualiza a la configuración vigente descrita por el middleware; no se modificó código |
+| `P09-DISC-008` — estado P08 frente a evidencia histórica de despliegue | Se conserva como evidencia histórica; no se afirma disponibilidad actual |
+| Rutas de artefactos | Se corrigen referencias al directorio vigente `ai-pipeline/outputs/` |
+| `P09-DISC-010` — borrado de comentarios y AC-028 | Se registra DEC-211 como resolución previa, sin volver a decidirla |
+| `P09-DISC-011` — validaciones individuales | Se registra la existencia de informes US-001–US-019 sin inferir aceptación |
+| `VITE_API_BASE_URL` | Se conserva como variable sin uso frontend observado |
 
-## 10. Documentation Assumptions
+## 8. Limitaciones conocidas (Known Limitations)
 
-| ID | Assumption | Impact | Validation Needed |
-|---|---|---|---|
-| P09-ASSUMPTION-001 | `backend/requirements.txt` instala las dependencias correctas con Python 3.12 | Setup local | Ejecutar instalación limpia |
-| P09-ASSUMPTION-002 | El estado de despliegue se aplica a la URL indicada | README | Confirmar commit desplegado |
-| P09-ASSUMPTION-003 | Los resultados de CI de los metadatos reflejan los pasos descritos | `TESTING.md` | Auditar logs |
+- Typecheck frontend bloqueado; build y E2E no reejecutados.
+- Una prueba de concurrencia requiere PostgreSQL y quedó omitida.
+- Faltan aceptación manual y mediciones aprobadas de precisión, p95, memoria y calidad auditiva.
+- El despliegue, su commit, persistencia de archivos, rollback, backups y protecciones de entorno no se verificaron en esta ejecución.
+- `mkdocs build --strict` no se ejecutó: el comando no está instalado; no se instalaron dependencias.
+- No existen métricas de adopción, uso ni resultados de negocio.
 
-## 11. Open Questions
+## 9. Brechas documentales (Documentation Gaps)
 
-| ID | Question | Affected Area | Priority |
-|---|---|---|---|
-| P09-QUESTION-001 | ¿Se mantiene la foto de perfil dentro del MVP? | MVP-003, `OOS-003` | Alta |
-| P09-QUESTION-002 | ¿Se retiran las rutas `/api/` heredadas y el modelo `Like`? | API, datos | Media |
-| P09-QUESTION-003 | ¿Debe bloquearse reaccionar o comentar la propia partitura? | MVP-009, MVP-010 | Media |
-| P09-QUESTION-004 | ¿Se eliminan los `@csrf_exempt` de `scores`? | Seguridad | Alta |
-| P09-QUESTION-005 | ¿Cuál es el commit desplegado y la versión oficial de Node y pnpm? | Despliegue, tooling | Media |
+No se identificó un gap que impida describir las capacidades implementadas. La documentación no certifica el estado actual de producción ni la aceptación de todos los criterios manuales; estos límites se destacan donde corresponde. La lista detallada está en `docs/KNOWN_LIMITATIONS.md`.
 
-## 12. Documentation Risks
+## 10. Supuestos de documentación (Documentation Assumptions)
 
-| ID | Risk | Impact | Mitigation Consideration |
-|---|---|---|---|
-| P09-RISK-001 | La documentación se desactualiza al cambiar el código | Lectores siguen datos viejos | Revalidar con `P09_validation.md` y automatizar tras cada cambio |
-| P09-RISK-002 | El despliegue refleja un commit distinto del documentado | Descripción incorrecta de la app pública | Confirmar el SHA desplegado |
-| P09-RISK-003 | Falta de CSRF en rutas de escritura | Riesgo de seguridad | Decisión del equipo (`P09-DISC-007`) |
+| Supuesto | Tratamiento |
+|---|---|
+| La documentación se refiere al árbol actual, no necesariamente al código desplegado | Se indica que el commit servido es desconocido |
+| Los comandos de instalación reflejan manifiestos y scripts | Se citan como instrucciones; no se afirma que la instalación limpia se ejecutó en esta etapa |
+| Variables en `docs/SETUP.md` describen nombres, no valores secretos | `.env.example` se inspeccionó solo por nombres |
 
-## 13. Scope Summary
+## 11. Preguntas abiertas (Open Questions)
 
-### Do
-Registro, login/logout, perfil (nombre, usuario, descripción, instrumento, contraseña), publicar ABC/texto, feed con filtro y paginación, detalle, editar (título, instrumento, descripción), eliminar, reacciones y comentarios.
+- Ratificación de equipo pendiente para CR-006 y CR-007; aprobación pendiente para CR-005.
+- Evidencia empírica de HU11/HU12 y objetivos de rendimiento/capacidad aún pendiente.
+- Persistencia, rollback y configuración operativa del despliegue siguen sin verificar.
+- Se conservan en los artefactos las preguntas de planificación y operación que requieren decisión del equipo.
 
-### Documented as Partial
-MVP-003 (foto sin UI y fuera de alcance), MVP-005 (UI), MVP-009 y MVP-010 (propia partitura, borrado de comentarios).
+## 12. Riesgos de documentación (Documentation Risks)
 
-### Documented as Not Implemented
-Renderizado de notación; edición de contenido y formato desde la UI; subida de foto desde la UI.
+| Riesgo | Mitigación aplicada |
+|---|---|
+| Documentación de MVP 1 presentada como alcance completo | Se añadieron US-011–US-019 y se mantuvo el historial como baseline |
+| Cambios pendientes confundidos con historias aprobadas | Se separaron CR-005/006/007 y sus estados |
+| Evidencia histórica presentada como estado actual | Se fechó y marcó como no revalidada |
+| Pruebas parciales descritas como aceptación | Se distinguen ejecución, implementación y gates manuales |
 
-### Future and Out of Scope
-FUT-001..003 y OOS-001..005.
+## 13. Resumen de alcance (Scope Summary)
 
-### Pending Decisions
-`P09-QUESTION-001..005`.
+P09 modifica solo documentación del producto y artefactos P09. Preserva MVP 1, el backlog canónico de 19 historias MVP 2 y los cambios de MVP2 existentes. No añade funcionalidades ni requisitos, no modifica código, y no resuelve decisiones abiertas.
 
-## 14. Traceability Summary
+## 14. Resumen de trazabilidad (Traceability Summary)
 
-MVP-001..010 se trazan a código, pruebas y documentos en `REQUIREMENTS_COVERAGE.md`. Los FR-001..017 y NFR-001..003 se agrupan por historia. Las 12 discrepancias de la sección 7 están referenciadas en `docs/`.
+La documentación enlaza a los backlogs P02/P03, contexto y decisiones MVP2, validación de implementación P06, pruebas P07 y CI/CD P08 bajo `ai-pipeline/outputs/`. `README.md` es la entrada; `docs/REQUIREMENTS_COVERAGE.md` mapea las historias a código y sus límites.
 
-## 15. Documentation Status
+## 15. Estado de documentación (Documentation Status)
 
-READY_WITH_ASSUMPTIONS
+`READY_WITH_ASSUMPTIONS`. P09 está listo para su gate de validación con advertencias explícitas por la ejecución frontend parcial y la ausencia de verificación remota/operativa actual.
 
-## Generation Metadata
+## Metadatos de generación (Generation Metadata)
 
-Generated by: P09 — Documentation Prompt
-Prompt Version: 1.0
-Status: READY_WITH_ASSUMPTIONS
+- Prompt: `ai-pipeline/prompts/09_documentation/P09_documentation.md`
+- Generación: P09 incremental, 2026-11-11
+- Validador relacionado: `ai-pipeline/prompts/09_documentation/P09_validation.md`
+- Estado de validación: ver `DOCUMENTATION_VALIDATION.md`

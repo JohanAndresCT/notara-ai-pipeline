@@ -79,3 +79,10 @@ La validación P06 conservada afirma que backend/PostgreSQL no existen, en contr
 - Actualizados: `CICD_VALIDATION.md` (sección 14 nueva; secciones 7/10 marcadas como históricas), `CICD_IMPLEMENTATION.md`, `DEPLOYMENT_GUIDE.md`, `README.md`. Las secciones 12-13 de la validación siguen siendo `USER_REPORTED`.
 - Runtime: `DEPLOYED_AND_VERIFIED` con alcance limitado. Sin verificar: persistencia de medios, backups, rollback, protección del Environment `production`, redirección HTTP→HTTPS, ID de deployment de Railway.
 - No se modificó código, tests, dependencias ni workflow; no hubo commit, push ni redeploy; no se crearon datos en producción ni se expusieron secretos.
+
+## Reconciliación incremental P08 (2026-11-11)
+
+- Revisadas las fuentes vigentes en `ai-pipeline/outputs/` y el historial de `CICD_VALIDATION.md`; no se creó una réplica bajo `artifacts/`.
+- Se incorporó el resultado de la revalidación P07 actual: 165 backend tests en SQLite, un skip PostgreSQL-only y typecheck frontend no reproducible por dependencias locales ausentes.
+- Se preservan los runs remotos y verificaciones HTTP del 2026-10-14 como evidencia histórica, sin afirmar disponibilidad actual.
+- No se consultaron servicios externos ni se cambiaron workflows, configuración, código o documentación de despliegue. No hubo deploy, pago, commit ni push.

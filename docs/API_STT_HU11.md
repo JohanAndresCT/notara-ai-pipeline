@@ -1,32 +1,32 @@
-# HU11 STT API
+# API STT de HU11
 
 ## Endpoint
 
 `POST /api/v1/audio/stt/`
 
-Same-origin, session-authenticated endpoint. It does not accept bearer tokens. The browser must send its existing Django session cookie and a CSRF token.
+Endpoint del mismo origen con autenticación por sesión. No acepta bearer tokens. El navegador envía la cookie de sesión Django y un token CSRF.
 
-### Request
+### Solicitud
 
-Use `multipart/form-data`:
+Usa `multipart/form-data`:
 
-| Field | Required | Value |
+| Campo | Obligatorio | Valor |
 |---|---:|---|
-| `audio` | Yes | One audio file. Allowed declared media types: `audio/webm`, `audio/ogg`, `audio/wav`, `audio/mp4`. |
-| `title` | No | Score title used for the ABC `T:` header. If omitted or blank, the header uses `Dictado`. |
+| `audio` | Sí | Un archivo. Tipos MIME declarados permitidos: `audio/webm`, `audio/ogg`, `audio/wav`, `audio/mp4`. |
+| `title` | No | Título usado en la cabecera ABC `T:`. Si se omite o está vacío, se usa `Dictado`. |
 
-Limits are 2 MiB (`AUDIO_MAX_BYTES`) and 30 seconds (`AUDIO_MAX_SECONDS`). The server validates the declared media type, decoded container/signature, audio stream and duration. It does not trust a client-side file size or duration check.
+Límites: 2 MiB (`AUDIO_MAX_BYTES`) y 30 segundos (`AUDIO_MAX_SECONDS`). El servidor valida el tipo declarado, el contenedor/firma decodificados, la pista de audio y la duración; no confía en la comprobación de tamaño o duración del cliente.
 
-The endpoint returns a complete new ABC document and the bare musical line (`abc_line`, written for `L:1/4`). It does not accept the existing score content. For a populated field the frontend combines them (`frontend/src/lib/dictationMerge.ts`, DEC-239 / BR-025): it keeps the existing ABC, adds only absent required headers, keeps an existing `M:`, rescales durations to the existing `L:` and appends the line. Plain text, header-less ABC and present-but-empty required headers are refused. The model receives the BR-013 vocabulary as an initial prompt and decodes in a single pass at temperature 0 (no temperature fallback, DEC-240), for dictation only.
+El endpoint devuelve un documento ABC nuevo y la línea musical (`abc_line`, escrita para `L:1/4`). No recibe el contenido de una partitura existente. Si el campo ya está poblado, el frontend combina la respuesta (`frontend/src/lib/dictationMerge.ts`, DEC-239 / BR-025): conserva el ABC, añade solo las cabeceras requeridas ausentes, respeta un `M:` existente, reescala duraciones a la `L:` existente y añade la línea al final. Se rechazan texto libre, ABC sin cabeceras y cabeceras requeridas presentes pero vacías. Whisper recibe el vocabulario BR-013 como prompt y hace una sola pasada a temperatura 0, sin fallback de temperatura (DEC-240), solo para dictado.
 
-### Authentication and CSRF
+### Autenticación y CSRF
 
-1. `GET /api/v1/csrf/` to obtain a token and set the CSRF cookie. Use it on the existing `POST /api/v1/auth/login/` or registration request.
-2. Authenticate through the existing session flow. Then fetch `/api/v1/csrf/` again so the token corresponds to the authenticated session.
-3. Send both the session cookie and `X-CSRFToken: <csrfToken>` on the STT POST. Keep the request same-origin and include credentials.
-4. Build `FormData` with `audio` and optional `title`. Do not set `Content-Type` manually; the browser supplies the multipart boundary.
+1. Solicita `GET /api/v1/csrf/` para obtener un token y fijar la cookie CSRF. Úsalo en el flujo de login o registro existente.
+2. Autentícate mediante la sesión y vuelve a solicitar `GET /api/v1/csrf/` para obtener un token de la sesión autenticada.
+3. Envía la cookie de sesión y `X-CSRFToken: <csrfToken>` en el POST STT. Mantén el mismo origen e incluye credenciales.
+4. Construye `FormData` con `audio` y `title` opcional. No establezcas `Content-Type` manualmente; el navegador añade el límite multipart.
 
-Example:
+Ejemplo:
 
 ```js
 const csrfResponse = await fetch("/api/v1/csrf/", {
@@ -35,7 +35,7 @@ const csrfResponse = await fetch("/api/v1/csrf/", {
 const { csrfToken } = await csrfResponse.json();
 
 const body = new FormData();
-body.append("audio", audioBlob, "dictation.webm");
+body.append("audio", audioBlob, "dictado.webm");
 body.append("title", scoreTitle);
 
 const response = await fetch("/api/v1/audio/stt/", {
@@ -47,46 +47,49 @@ const response = await fetch("/api/v1/audio/stt/", {
 const result = await response.json();
 ```
 
-### Success
+### Respuesta correcta
 
-HTTP `200`, JSON with exactly these fields:
+HTTP `200`, JSON con los campos:
 
 ```json
 {
   "transcript": "Compás cuatro cuartos, Do negra, Re corchea, Mi corchea",
   "meter": "4/4",
   "abc_line": "C D/2 E/2",
-  "abc_document": "X:1\nT:Mi partitura\nM:4/4\nL:1/4\nK:C\nC D/2 E/2"
+  "abc_document": "X:1\nT:Mi partitura\nM:4/4\nL:1/4\nK:C\nC D/2 E/2",
+  "ai_interpreted": false
 }
 ```
 
-The document applies BR-025 defaults for an empty field: `X:1`, `T:` from `title` or `Dictado`, the dictated meter or `4/4`, `L:1/4`, and `K:C`. `abc_line` and `abc_document` are not published or persisted by this endpoint. The frontend should keep the existing field unchanged on any non-2xx response and should let the user review the returned document before publication.
+Para un campo vacío, el documento usa los valores predeterminados BR-025: `X:1`, `T:` del campo `title` o `Dictado`, el compás dictado o `4/4`, `L:1/4` y `K:C`. Este endpoint no publica ni persiste `abc_line` ni `abc_document`. Ante cualquier respuesta no-2xx, el frontend conserva el campo existente; el usuario puede revisar el resultado antes de publicarlo.
 
-### Errors
+`ai_interpreted` indica si se utilizó el normalizador Gemini de CR-006. Esa enmienda está implementada con aprobación del solicitante, pero pendiente de ratificación del equipo; no se integra al contrato canónico US-011 mientras no se ratifique.
 
-All endpoint JSON errors use `{"code": "...", "message": "...", "errors": {}}`.
+### Errores
 
-| HTTP | `code` | Meaning |
+Los errores JSON usan `{"code": "...", "message": "...", "errors": {}}`.
+
+| HTTP | `code` | Significado |
 |---:|---|---|
-| 400 | `AUDIO_INVALID` | Missing/unsupported audio, invalid signature/container, invalid stream or duration over 30 s. |
-| 401 | `AUTHENTICATION_REQUIRED` | No authenticated session. |
-| 403 | `CSRF_FAILED` | Missing or invalid CSRF token. |
-| 413 | `AUDIO_TOO_LARGE` | Upload exceeds 2 MiB. |
-| 422 | `DICTATION_UNINTERPRETABLE` | Transcript is empty, unintelligible or outside the approved closed vocabulary. |
-| 429 | `STT_DAILY_LIMIT_REACHED` | User has reached the configured daily limit (default 30 admitted attempts per UTC day). |
-| 503 | `STT_UNAVAILABLE` | Model is not enabled/available, the process inference slot is busy, quota storage failed, or inference failed. |
+| 400 | `AUDIO_INVALID` | Falta el audio, el tipo no está admitido, la firma/contenedor o pista no son válidos, o supera 30 s. |
+| 401 | `AUTHENTICATION_REQUIRED` | No hay sesión autenticada. |
+| 403 | `CSRF_FAILED` | Falta el token CSRF o no es válido. |
+| 413 | `AUDIO_TOO_LARGE` | El archivo supera 2 MiB. |
+| 422 | `DICTATION_UNINTERPRETABLE` | La transcripción está vacía, es ininteligible o no corresponde al vocabulario cerrado aprobado. |
+| 429 | `STT_DAILY_LIMIT_REACHED` | Se alcanzó el límite diario configurado (30 intentos admitidos por usuario y día UTC, por defecto). |
+| 503 | `STT_UNAVAILABLE` | El modelo no está habilitado/disponible, el proceso está ocupado, falló la reserva de cuota o falló la inferencia. |
 
-P05 records the names of the authentication and CSRF codes as implementation proposals pending team confirmation. The other codes and status codes follow the approved P05 endpoint contract. Unsupported methods receive Django's standard `405` response.
+Los métodos no admitidos reciben la respuesta estándar Django `405`.
 
-### Privacy, quota, and concurrency
+### Privacidad, cuota y concurrencia
 
-- The endpoint does not save dictation audio or transcript to application storage or logs.
-- Authentication, CSRF, file validation, model availability, and process-slot admission happen before quota reservation.
-- One STT inference can run per process. Saturated requests return `STT_UNAVAILABLE` without quota use.
-- Once admitted, the attempt counts even when transcription or parsing fails. Excess requests return `STT_DAILY_LIMIT_REACHED` before inference.
-- The model must already be staged and SHA-256 verified before the web process starts. The HTTP request path does not download weights.
-- The approved p95 target is 15 s for a 30 s recording with the model loaded, but it has not been measured on the integrated backend. There is no current per-request 25 s completion guarantee; that proposed ceiling remains pending approval.
+- El endpoint no guarda el audio del dictado ni la transcripción en el almacenamiento o los logs de la aplicación.
+- Autenticación, CSRF, validación de archivo, disponibilidad del modelo y admisión al espacio de inferencia ocurren antes de reservar cuota.
+- Solo puede correr una inferencia STT por proceso. Si el proceso está ocupado, responde `STT_UNAVAILABLE` sin consumir cuota.
+- Una vez admitido, el intento cuenta aunque falle la transcripción o el análisis. Al exceder la cuota, responde `STT_DAILY_LIMIT_REACHED` antes de inferir.
+- El modelo debe estar aprovisionado y verificado por SHA-256 antes de que el proceso web lo cargue. La solicitud HTTP no descarga pesos.
+- DEC-232 aprueba un límite inicial de 25 s para completar el STT o devolver un error tipado. DEC-221/DEC-232 registran además un objetivo p95 de 15 s para una grabación de 30 s con el modelo cargado. No se han medido en el backend integrado: son objetivos aprobados, no resultados demostrados.
 
-## Model provisioning
+## Aprovisionamiento del modelo
 
-See [SETUP.md](./SETUP.md#stt-local-hu11) for the pinned model revision, SHA-256 file manifest, Windows/Linux provisioning commands, and local startup procedure.
+Consulta [SETUP.md](./SETUP.md#stt-local-hu11) para la revisión fijada del modelo, el manifiesto SHA-256, los comandos de aprovisionamiento Windows/Linux y el arranque local.

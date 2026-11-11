@@ -11,15 +11,16 @@
 
 | 4.2 | MVP 2 | Records requester-approved CR-004 implementation of Whisper Base for HU11/HU12. Existing UX flows, messages, accessibility rules and MVP 1 remain unchanged. Empirical acceptance and production authorization remain pending. |
 | 4.3 | MVP 2 | Merge reconciliation: UX-PROP-001-007 approved (DEC-235); UX-Q-003 resolved (tutor adds key and tempo, DEC-236); voice-comment transcript shown in full up to 1,000 characters (FR-046, AC-077, DEC-231). M-11 (Notara servers, CR-003) unchanged. |
+| 4.4 | MVP 2 | Reconciles P00–P03 source versions and records CR-005/006/007 as pending changes outside active UX flows. |
 
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 4.3
+- **Version:** 4.4
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P04 - UX/UI
 - **Status:** `READY_WITH_ASSUMPTIONS`
-- **Source Artifacts:** `REQUIREMENTS.md` v5.2 and validation; `PRIORITIZATION.md` v4.2 and validation; `PRODUCT_VISION.md` v2.2; `DECISIONS_MVP2.md` (CR-003 and HU11 authorization); `CR-003_WHISPER_TINY.md`; `UX_SPEC.md` v1.0.
+- **Source Artifacts:** `REQUIREMENTS.md` v5.5 and validation; `PRIORITIZATION.md` v4.4 and validation; `PRODUCT_VISION.md` v2.3; `DECISIONS_MVP2.md` (DEC-201–DEC-244 with approval states retained); `CR-003_WHISPER_TINY.md`; `CR-005_INSTRUMENTS.md`; `CR-006_GEMINI_DICTATION.md`; `CR-007_GEMINI_LIVE_TUTOR.md`; `UX_SPEC.md` v1.0.
 - **Upstream Validation Statuses:** P00 `PASS_WITH_WARNINGS`; P01 `PASS_WITH_WARNINGS`; P02 `PASS_WITH_WARNINGS`; P03 `PASS_WITH_WARNINGS` (P04 readiness: WITH CONSTRAINTS).
 - **Labels:** FACT / DECISION (approved source), UX-PROP (interaction detail proposed by P04, pending approval), ASSUMED.
 
@@ -508,3 +509,19 @@ Production deployment is not authorized.
 - **Status:** `READY_WITH_ASSUMPTIONS`. Seven UX-PROP items and UX-Q-003/UX-Q-004 remain; UX-Q-001 is resolved for HU11 and UX-Q-002 by CR-003. UX-Q-004 blocks only the populated-field malformed/present-empty header path.
 - **Next stage:** P05 - Architecture.
 - **Next actions:** validate with `P04_validation.md` v2.0; take UX-PROP-001-007 and UX-Q-001-003 to the team together with PRE-001-PRE-003.
+
+## Addendum — Pending changes (2026-11-11)
+
+The approved UX scope remains HU01–HU19. The following code/product changes
+remain outside the approved interaction specification until their recorded
+approval gates close:
+
+| Change | UX treatment |
+|---|---|
+| CR-005 / HU20 | The instrument picker and related playback/MP3 behavior are proposed; no approved REG/FLOW or acceptance mapping is added. |
+| CR-006 / US-011 | The Gemini label and revised M-11 notice are implemented per the requester-approved change, but remain unratified by the team; the approved baseline messages are unchanged. |
+| CR-007 / HU21 | The conversational tutor panel, live stream, and typed fallback are candidate UI behavior; REG-009 and AC-083–089 are not active UX requirements. |
+
+The source CR records and DEC-242–DEC-244 remain the authoritative approval
+state. The existence of UI code is not an approval or accessibility/browser
+acceptance result.

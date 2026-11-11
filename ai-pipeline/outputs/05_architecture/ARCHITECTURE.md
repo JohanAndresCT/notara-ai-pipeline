@@ -14,17 +14,19 @@
 
 | 4.3 | MVP 2 | Reconciles requester-approved CR-004 implementation, active Whisper Base architecture, ADR-006 and upstream versions. Production acceptance remains pending. |
 | 4.4 | MVP 2 | Merge reconciliation: CONFLICT-ARCH-201-203 resolved (DEC-230, DEC-231, DEC-233); `Comment.body` 1,000 for `VOICE`; tutor adds key (DEC-236) and keeps the header transport (DEC-234); 25 s STT ceiling and 20 s TTS attempts approved as initial values (DEC-232). HU11 runtime profile unchanged. |
+| 4.5 | MVP 2 | Reconciles P00–P04 source versions and records current CR-005/006/007 code as pending-scope implementation, not as approved architecture. |
 
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 4.4
+- **Version:** 4.5
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P05 - Architecture
 - **Status:** `READY_WITH_WARNINGS`
 - **Sources:**
-  - `REQUIREMENTS.md` v5.2, `PRIORITIZATION.md` v4.2, `UX_SPEC.md` v4.2 and their validations
-  - `DECISIONS_MVP2.md` (CR-003 amendment and HU11 authorization), `CR-003_WHISPER_TINY.md`, `CR-004_WHISPER_BASE.md` (approved by requester for implementation)
+  - `REQUIREMENTS.md` v5.5, `PRIORITIZATION.md` v4.4, `UX_SPEC.md` v4.4 and their validations
+  - `PRODUCT_VISION.md` v2.3 and `PROJECT_CONTEXT.md` v2.4
+  - `DECISIONS_MVP2.md` (DEC-201–DEC-244 with approval states retained), `CR-003_WHISPER_TINY.md`, `CR-004_WHISPER_BASE.md`, `CR-005_INSTRUMENTS.md`, `CR-006_GEMINI_DICTATION.md`, `CR-007_GEMINI_LIVE_TUTOR.md`
   - `ARCHITECTURE.md` v1.0
   - The repository on 2026-11-08: `backend/`, `frontend/`, `Dockerfile`, `docker/nginx.conf.template`, `deploy/entrypoint.sh`, `.github/workflows/ci.yml`
 - **Upstream validation:** P02 `PASS_WITH_WARNINGS`; P03 `PASS_WITH_WARNINGS`; P04 `PASS_WITH_WARNINGS` (P05 readiness WITH CONSTRAINTS)
@@ -498,3 +500,20 @@ documented. MVP 1 remains unchanged.
   3. Test Python 3.12 dependency/build compatibility and model pinning locally; the reported Windows spike used Python 3.11.9.
   4. Measure the approved quality, p95, memory, concurrency and quota gates before acceptance; obtain explicit approval for any 25 s service-level ceiling.
   5. Run the separate TTS spike to confirm pause markup support (ARCH-ASSUM-201).
+
+## Addendum — As-built code outside the approved architecture baseline (2026-11-11)
+
+The architecture baseline and P06 handoff remain scoped to the approved
+US-001–US-019 requirements. Current source inspection identifies later code
+associated with pending changes:
+
+| Change | Current source evidence | Architecture status |
+|---|---|---|
+| CR-005 / HU20 | `frontend/src/lib/ddsp.ts`, `frontend/src/lib/instruments.ts`, `frontend/src/ListeningPanel.tsx`, `frontend/src/lib/renderInstrument.ts` | Implemented prototype in working tree; team approval pending. No approved ADR or requirement mapping is inferred. |
+| CR-006 / US-011 amendment | `backend/voice/normalizer.py`, `backend/voice/views.py`, `frontend/src/DictationPanel.tsx` | Requester-approved implementation; team ratification pending. Existing approved US-011 contracts remain the baseline. |
+| CR-007 / HU21 | `backend/voice/tutor.py`, `backend/voice/tutor_views.py`, `frontend/src/lib/liveTutor.ts`, `frontend/src/TutorChat.tsx`, `backend/voice/models.py` | Requester-approved implementation; team ratification pending. No approved ADR or US-021 requirement mapping is inferred. |
+
+These are source-presence observations, not an architecture approval, security
+certification, or end-to-end acceptance result. P06 may inspect them as
+implemented code but must distinguish them from approved scope. No deployment
+or paid-provider call is authorized by this addendum.

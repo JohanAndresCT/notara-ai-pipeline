@@ -70,7 +70,7 @@ La documentación confirma que Config as Code (`railway.json`/`railway.toml`) es
 - P07 local (`TEST_VALIDATION.md`): SQLite, 88 backend y 5 E2E; CI define explícitamente PostgreSQL 16.
 - Architecture P05: origen único, sesiones, DB privada. Nginx/Django reflejan ese diseño a nivel estático.
 - P06 `IMPLEMENTATION_VALIDATION.md` está desfasado: dice que no hay Django/PostgreSQL, aunque el source actual sí contiene backend/tests/settings. Se prioriza source activo y se conserva el artefacto histórico.
-- No se encontró `ai-pipeline/outputs/` aplicable; se usó `ai-pipeline/artifacts/`.
+- Los registros vigentes consultados para esta reconciliación están en `ai-pipeline/outputs/`. Se conservan las referencias históricas a `ai-pipeline/artifacts/`; no se crearon copias paralelas.
 
 ## 9. Pendientes
 
@@ -165,3 +165,11 @@ Nota: las secciones 12 y 13 son declaraciones de la usuaria (`USER_REPORTED`) a�
 ### 14.5 Acción mínima siguiente
 
 Revisar los logs del run #15 para explicar el E2E intermitente; configurar y verificar la protección del Environment `production`; probar persistencia de medios con redeploy; registrar el ID de deployment de Railway junto con el SHA. Esta revalidación no modificó código ni configuración y no desplegó.
+
+## 15. Reconciliación incremental del estado actual (2026-11-11)
+
+- Alcance: revisión documental/estática de P08 y del P07 actualizado. No se consultaron GitHub Actions, Railway ni la URL pública; no hubo llamadas de red, despliegue ni cambios a workflows o infraestructura.
+- P07 local actual: 165 pruebas backend en SQLite (164 pasaron, 1 PostgreSQL-only omitida); Django `check` y migraciones sin drift. El resultado no sustituye los runs remotos históricos ni prueba PostgreSQL en el entorno local.
+- El typecheck frontend actual no pudo reproducirse porque faltan tres dependencias en el `node_modules` local. El manifiesto y lockfile las declaran; no se instalaron paquetes ni se modificó el lockfile.
+- Última evidencia remota documentada: runs `38481851856` y `38610251114`, con despliegue y verificaciones limitadas observadas el 2026-10-14. No se comprobó su disponibilidad actual ni se inspeccionaron los logs, Environment protection, volumen, backup o rollback en esta ejecución.
+- Estado de configuración CI: `READY_WITH_WARNINGS` según la revisión estática previa. Ejecución actual local: `PASS_WITH_WARNINGS`; PostgreSQL/CI remotos no reejecutados. Último estado de runtime registrado: `DEPLOYED_AND_VERIFIED` al 2026-10-14, alcance limitado; estado operativo actual `NOT_RECHECKED`.

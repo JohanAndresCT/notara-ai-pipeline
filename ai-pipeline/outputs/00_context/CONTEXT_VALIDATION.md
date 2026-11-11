@@ -160,3 +160,24 @@ None blocking. Recommended: VAL-212 when adapting P02/P03; VAL-213 before P03.
 | Scope | No feature, decision or SP changed. |
 | MVP 1 identifiers | All 37 present (automated check). |
 | Change log / metadata | Version 2.3 recorded with reason. |
+
+## Addendum — Run 5 (context version 2.4)
+
+**Date:** 2026-11-11 · **Trigger:** CR-005/006/007 records and current source state · **Result:** `PASS_WITH_WARNINGS`
+
+| Check | Result |
+|---|---|
+| MVP 1 and approved MVP 2 baseline | Preserved; canonical scope remains HU01–HU19. No identifiers, estimates, or acceptance criteria were changed. |
+| Change-request status | CR-005 remains proposed. CR-006 and CR-007 are recorded as requester-approved implementations with team ratification pending (DEC-243/244). No approval is inferred. |
+| Candidate scope | HU20 and HU21, and the CR-006 amendment to US-011, are explicitly non-active until the recorded approval gate closes. |
+| Current-source correction | DEFECT-001 is fixed in `ScoreCreatePage.tsx` (`&#10;` absent; newline placeholder present). Static inspection only; P06 must validate behavior. |
+| Traceability | Source records are `CR-005_INSTRUMENTS.md`, `CR-006_GEMINI_DICTATION.md`, `CR-007_GEMINI_LIVE_TUTOR.md`, and `DECISIONS_MVP2.md` (DEC-242–DEC-244). |
+| Prompt coverage | P00/P01 prompt versions predate these requests; their active-scope rules are preserved and the scope limitation is disclosed. |
+
+**Finding VAL-214 — LOW:** the requester-approved implementation records and the
+team-ratification gate are not the same approval. Keep the candidate changes
+separate from the canonical backlog and do not claim team acceptance.
+
+**Context status:** `READY_WITH_ASSUMPTIONS` for the established HU01–HU19
+baseline. CR-005/006/007 remain pending scope changes; P06 review must assess
+their implementation only as current code, not as approved acceptance.

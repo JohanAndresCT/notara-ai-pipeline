@@ -183,3 +183,10 @@ P02 readiness: READY_WITH_ASSUMPTIONS.
 Tras P02 (REQ-VAL-202, REQ-VAL-203): USER-002, NEED-010 y JTBD-008 dicen clef; Q-002 y Q-006 como resueltas en el MVP 1; entrada P00 v2.3. Sin cambio de alcance.
 
 ## MVP 2 V2.2 Result (run 3): PASS_WITH_WARNINGS (2 LOW sin cambios)
+
+## P01 — Reconciliación de cambios pendientes (2026-11-11)
+
+- Actualizada `PRODUCT_VISION.md` a v2.3 y añadida la validación run 4.
+- La visión aprobada mantiene HU01–HU19 y todos los identificadores existentes.
+- CR-005/HU20, CR-006 como enmienda de US-011, y CR-007/HU21 se conservan como cambios pendientes; no se agregaron necesidades, indicadores ni criterios activos.
+- P02 readiness: `READY_WITH_ASSUMPTIONS` sólo para el backlog vigente; la ratificación sigue pendiente.

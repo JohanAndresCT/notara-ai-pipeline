@@ -4,11 +4,11 @@ Referencia de los endpoints existentes en `backend/notara_backend/urls.py`, con 
 
 ## Convenciones
 
-- Formato JSON. Los errores usan `{"message": "..."}` o `{"errors": {"campo": ["..."]}}`. Los mensajes están en inglés.
+- Formato JSON. Los errores no tienen un formato ni un idioma único: las rutas generales suelen responder `{"message": "..."}` o `{"errors": {"campo": ["..."]}}` en inglés; algunos errores de voz incluyen `code`, `message` y `errors`, y sus mensajes pueden estar en español.
 - Autenticación por sesión (cookie). Sin sesión, los endpoints protegidos responden **401** `{"message": "Authentication is required."}`.
 - CSRF: `GET /api/v1/csrf/` devuelve `{"csrfToken": "..."}` y fija la cookie. `CsrfViewMiddleware` está activo para todas las vistas: las peticiones que modifican datos deben enviar la cabecera `X-CSRFToken`; sin ella la respuesta es 403.
 - Existen **dos prefijos**: `/api/...` (heredado) y `/api/v1/...`. El frontend usa `/api/v1/` salvo `deleteComment`, que usa `/api/comments/<id>/`. Esta guía usa `/api/v1/` salvo indicación.
-- Probado por el equipo y en producción (2026-10-14): `/api/health/` y `/api/v1/health/` → 200; `/api/me/` y `/api/v1/scores/` sin sesión → 401.
+- Evidencia histórica (2026-10-14): `/api/health/` y `/api/v1/health/` respondieron 200; `/api/me/` y `/api/v1/scores/` sin sesión respondieron 401. No se repitieron estas solicitudes en esta validación.
 
 ## Salud y CSRF
 
@@ -50,9 +50,25 @@ Objeto `score`: `id`, `title`, `instrument`, `description`, `format`, `content`,
 | Método | Ruta | Descripción |
 |---|---|---|
 | POST | `/api/v1/scores/<id>/reactions/` | Alterna la reacción: 201 `{"reacted": true, "reaction_count": n}` al crear; 200 `{"reacted": false, ...}` al quitar |
-| GET | `/api/v1/scores/<id>/comments/` | 200 `{"comments": [{id, body, author, author_id, created_at}]}` |
-| POST | `/api/v1/scores/<id>/comments/` | JSON `body` (≤500). 400 si vacío o largo |
+| GET | `/api/v1/scores/<id>/comments/` | 200 `{"comments": [{id, body, kind, audio_url, author, author_id, created_at}]}`. `audio_url` es `null` para comentarios de texto. |
+| POST | `/api/v1/scores/<id>/comments/` | JSON `body` (≤500) para texto, o multipart `audio` para comentario de voz. 400 si el texto está vacío o es largo |
 | DELETE | `/api/v1/scores/<id>/comments/<cid>/` | Solo el autor del comentario. 204 |
+
+## Voz y audio (MVP 2)
+
+Las rutas nuevas usan `/api/v1/`; requieren sesión y CSRF válido para POST, salvo que se indique lo contrario. La disponibilidad de proveedores, la calidad de audio y el comportamiento en producción no se verificaron en esta etapa.
+
+| Método | Ruta | Entrada / respuesta |
+|---|---|---|
+| POST | `/api/v1/audio/stt/` | Multipart `audio` requerido y `title` opcional. Dictado HU11; responde con `transcript`, `meter`, `abc_line`, `abc_document` y `ai_interpreted`. Errores tipados incluyen 400, 401, 413, 422, 429 y 503. Ver [API_STT_HU11.md](./API_STT_HU11.md). |
+| POST | `/api/v1/scores/<id>/comments/` | Acepta multipart `audio` para comentario de voz HU12; respuesta incluye comentario transcrito y URL del audio. La variante JSON crea comentario de texto. |
+| GET | `/api/v1/comments/<comment_id>/audio/` | Devuelve el audio del comentario de voz si el usuario tiene acceso. |
+| POST | `/api/v1/scores/<id>/audio/solfege/` | Devuelve audio MPEG del solfeo (HU13); requiere partitura ABC compatible. |
+| POST | `/api/v1/scores/<id>/audio/tutor/` | Devuelve audio MPEG del resumen hablado (HU14); el texto también se incluye en `X-Notara-Tutor-Text`. |
+| POST | `/api/v1/scores/<id>/tutor/session/` | Devuelve credenciales de sesión temporales de Gemini Live (CR-007, pendiente de ratificación). |
+| POST | `/api/v1/scores/<id>/tutor/ask/` | Recibe JSON `question` (1–500 caracteres) y devuelve `answer` (CR-007, pendiente de ratificación). |
+
+El cliente genera la reproducción instrumental y el MP3 descargable en el navegador; no se exponen como endpoints de síntesis de servidor. Los endpoints del tutor conversacional son funcionalidades presentes en el código, pero no forman parte del backlog canónico ratificado.
 
 ## Rutas heredadas `/api/...`
 
@@ -68,4 +84,4 @@ Los likes y las reacciones son modelos distintos con conteos separados (`like_co
 
 ## Administración
 
-`/admin/` (Django Admin). En producción `/admin/login/` responde 200 públicamente (hallazgo `P08-VAL-006`). No hay modelos registrados en `admin.py` (los archivos no existen).
+`/admin/` (Django Admin). El hallazgo histórico `P08-VAL-006` registró un 200 público en `/admin/login/`; no se repitió la comprobación en esta revalidación. No hay modelos de la aplicación registrados en Django Admin.

@@ -263,3 +263,20 @@ acceptance, Railway readiness or production deployment.
 | Code on the merged branch | Identical to `mvp-2` (the merge adds no code changes); backend tests were not re-run in this environment because `av`/`faster-whisper` are not installed |
 
 Remaining: ADR approvals outside HU11, Railway storage verification (ARCH-VAL-202), and the empirical HU11 gates (corpus, p95, memory, Railway).
+
+## P05 reconciliation addendum — architecture v4.5
+
+**Date:** 2026-11-11 · **Result:** `PASS_WITH_WARNINGS` for the approved
+US-001–US-019 baseline · **P06 readiness:** `YES_WITH_REVIEW_GATES` for that
+baseline only.
+
+| Check | Result |
+|---|---|
+| Current upstream versions | P00 v2.4, P01 v2.3, P02 v5.5, P03 v4.4, and P04 v4.4 are cited. |
+| Approved design baseline | Existing requirements and ADRs remain unchanged; no unapproved provider, requirement, endpoint, or scope is silently accepted. |
+| CR-005/006/007 | Implementation code is noted as pending-scope source evidence. P05 does not claim that its architecture design or validation covers these changes. |
+| Runtime/deployment | No production deployment, paid-provider call, or deployment authorization is claimed. Existing Railway and acceptance gates remain open. |
+
+**Gate:** P06 may review existing code for the approved baseline and report
+pending-scope deviations. Any source-code correction or implementation of a
+pending feature requires a separate plan and confirmation.

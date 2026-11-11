@@ -405,13 +405,14 @@ Backend: 134 tests, 133 passed, 1 skipped (21 new). `tsc --noEmit` and `vite bui
 
 ## 24. CR-006 / DEC-243 — Gemini interpretation of dictation (2026-11-10)
 
-- `voice/normalizer.py`, `voice/views.py` (`interpret_with_ai`, `ai_interpreted`), settings and `.env.example` (`GEMINI_*`), DictationPanel label and M-11 text. 6 new tests. Real-call evidence in CR-006 §8. CR-007 (HU21 conversational tutor) remains proposed.
+- `voice/normalizer.py`, `voice/views.py` (`interpret_with_ai`, `ai_interpreted`), settings and `.env.example` (`GEMINI_*`), DictationPanel label and M-11 text. 6 new tests. Real-call evidence in CR-006 §8. CR-006 is requester-approved as implemented; team ratification remains pending. CR-007/HU21 implementation is recorded in §25 with the same ratification boundary.
 
 ## 25. CR-007 / DEC-244 — HU21 conversational tutor (2026-11-10)
 
 - Backend: `voice/tutor.py`, `voice/tutor_views.py`, `TutorUsageQuota` + migration `voice.0003`, two endpoints, 8 tests.
 - Frontend: `lib/liveTutor.ts`, `TutorChat.tsx`, API helpers, styles; mobile instrument grid fix.
 - Record: `US-021_TUTOR_CHAT_IMPLEMENTATION.md`; evidence in CR-007 §8.
+- Approval boundary: implementation is requester-approved under DEC-244; team ratification is pending. This record does not activate HU21 in the canonical backlog or substitute for an approved P06 story prompt/validation.
 
 ## 26. Sung voice and visual fixes (2026-11-10)
 

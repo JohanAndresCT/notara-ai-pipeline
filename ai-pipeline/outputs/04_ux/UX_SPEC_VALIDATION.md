@@ -220,3 +220,18 @@ empirical model acceptance or production readiness.
 | Open UX questions | UX-Q-004 (populated-field dictation edge case, P02 Q-029) |
 
 UX-VAL-203 (LOW, no "Cancelar" during processing) remains.
+
+## P04 reconciliation addendum — UX v4.4
+
+**Date:** 2026-11-11 · **Result:** `PASS_WITH_WARNINGS` for the approved HU01–HU19 scope · **P05 readiness:** `YES_WITH_REVIEW_GATES`.
+
+| Check | Result |
+|---|---|
+| Approved UX flows | HU01–HU19 and existing MVP 1 interactions remain the canonical UX scope. |
+| CR-005 | Proposed instrument behavior is documented as not yet approved; no new UX flow is added. |
+| CR-006 | The implemented label and notice are recorded as requester-approved but team-ratification-pending, not silently merged into the accepted message catalogue. |
+| CR-007 | HU21's live tutor panel and typed fallback remain a candidate, not an accepted REG-009. |
+| Coverage limits | The existing UX validation does not certify the new UI against accessibility, responsive, or real-microphone acceptance criteria. |
+
+Existing finding UX-VAL-203 remains open. Re-run P04 against CR-005–CR-007
+only after their recorded approval gate closes.

@@ -12,18 +12,19 @@
 | 5.2 | MVP 2 | Records requester-approved CR-004 migration from Whisper Tiny to Base. Local implementation and test evidence documented; quality, performance, memory and Railway acceptance remain pending. |
 | 5.3 | MVP 2 | Merge reconciliation with `pipeline/mvp2-p00-context`: applies DEC-230-DEC-238. BR-014 approved as initial version; Q-022, Q-024, Q-025, Q-026 resolved; tutor adds key and tempo; FR-046, BR-030, BR-031, AC-077 added for voice-comment transcripts and storage; AC-029 adds confirmation; AC-063 and NFR-006/NFR-010 use fake engines in CI; NFR-009 records the approved 25 s ceiling. |
 | 5.4 | MVP 2 | Records **proposed** changes pending team approval in section 6.3: CR-005 (US-020 instruments, AI instruments DEC-242), CR-006 (US-011 amendment: Gemini interpretation of dictation), CR-007 (US-021 conversational tutor with Gemini Live). No approved story changes. |
+| 5.5 | MVP 2 | Reconciles source metadata and pending-change tracking with P00/P01 v2.4/2.3. Canonical requirements remain US-001–US-019; CR-005/006/007 remain separate proposals pending the documented approvals. |
 
 ## 1. Document Metadata
 
 - **Project:** Notara
-- **Version:** 5.3
+- **Version:** 5.5
 - **Release:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT)
 - **Stage:** P02 - Requirements Engineering
 - **Status:** READY_WITH_ASSUMPTIONS
-- **Generated From:** `ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md` (v2.1; wording updated in v2.2)
-- **Additional Sources:** `PROJECT_CONTEXT.md` (v2.2; wording updated in v2.3), `SPRINT_2_BACKLOG_INPUT.md` (HU11-HU19), `DECISIONS_MVP2.md` (DEC-201-DEC-219, CR-003 and HU11 authorization), `CR-003_WHISPER_TINY.md`, requirements v2.0 (MVP 1)
+- **Generated From:** `ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md` (v2.3)
+- **Additional Sources:** `PROJECT_CONTEXT.md` (v2.4), `SPRINT_2_BACKLOG_INPUT.md` (HU11-HU19), `DECISIONS_MVP2.md` (DEC-201-DEC-244; approval states retained), `CR-003_WHISPER_TINY.md`, `CR-004_WHISPER_BASE.md`, `CR-005_INSTRUMENTS.md`, `CR-006_GEMINI_DICTATION.md`, `CR-007_GEMINI_LIVE_TUTOR.md`, requirements v2.0 (MVP 1)
 - **P01 Validation:** PASS_WITH_WARNINGS (run 2; DISC-VAL-202 and DISC-VAL-203 carried)
-- **Change Requests:** CR-001, CR-002, CR-003 (approved per requester authorization); CR-004 (approved by requester for implementation; acceptance pending).
+- **Change Requests:** CR-001–CR-003 (as recorded in prior versions); CR-004 (requester-approved for implementation; acceptance pending); CR-005 (proposed); CR-006/CR-007 (requester-approved implementations; team ratification pending).
 
 > Evidence labels: FACT, DECISION (`DEC-2NN`), ASSUMPTION, PROPOSAL, UNKNOWN, CONFLICT. MVP 2 indicators are cited as `IND-2NN` (P01 CONFLICT-001 / DISC-VAL-203).
 
@@ -833,7 +834,7 @@ These items are **PROPOSED**. They do not change the approved stories above unti
 | ID | Conflict | Sources | Treatment |
 |---|---|---|---|
 | CONFLICT-201 | The AC-011-02 example output (`M:4/4`, `C D/2 E/2`) lacks the `X:`, `T:`, `L:`, `K:` fields that BR-005 requires, so it would fail publication validation. | Backlog AC-011-02; BR-005; DEC-218 | Resolved for the normal dictation path by approved BR-025, which adds absent headers without overwriting existing ones; Q-029 tracks malformed/present-empty populated-field edge cases. |
-| CONFLICT-202 | P00 and P01 translate HU14 "clave" as "key", but the backlog example "clave de Sol" refers to the clef. | Backlog HU14, AC-014-01; P00 MVP-014; P01 NEED-010 | Requirements use clef (BR-028). **Corrected upstream** in P00 v2.3 and P01 v2.2. Q-025 (key and tempo) stays open. |
+| CONFLICT-202 | P00 and P01 translated HU14 "clave" as "key", but the backlog example "clave de Sol" refers to the clef. | Backlog HU14, AC-014-01; P00 MVP-014; P01 NEED-010 | Requirements use clef (BR-028). **Corrected upstream** in P00 v2.3 and P01 v2.2. Q-025 (key and tempo) was later resolved by DEC-236. |
 | CONFLICT-203 | DEC-214 refers to account deletion, which does not exist in Notara. | DEC-214; MVP 1 scope | Resolved by DEC-237. |
 | CONFLICT-204 | P00 v2.2 lists Q-002 and Q-006 as open, but MVP 1 requirements v2.0 resolved them. | P00 section 11; requirements v2.0 | Keep the MVP 1 resolution here. **Synced** in P00 v2.3 and P01 v2.2. |
 | CONFLICT-205 | AC-018-01 says the MP3 contains "Voz TTS + Instrumento". | Backlog AC-018-01; DEC-204 | Resolved by decision: voice only (BR-016). |
@@ -877,4 +878,21 @@ These items are **PROPOSED**. They do not change the approved stories above unti
 
 `READY_WITH_ASSUMPTIONS`
 
-The requirements cover HU01-HU19 with testable criteria and full traceability. HU11 rules and target thresholds are approved for implementation/planning; quality, latency, memory, concurrency, pinned-model and Railway evidence are not yet available. Q-020 remains open for decisions outside the approved HU11 scope; Q-012 is partially resolved (STT p95 target approved, 25-second ceiling and TTS targets open); Q-026 remains open for HU12. BR-013/BR-025 are approved, with the populated-field malformed/present-empty header edge case flagged before implementing that append path. CR-003 and the new authorization do not establish model accuracy or production readiness.
+The requirements cover HU01-HU19 with testable criteria and full traceability. HU11 rules and target thresholds are approved for implementation/planning; quality, latency, memory, concurrency, pinned-model and Railway evidence are not yet available. Q-020 remains open for decisions outside the approved HU11 scope; Q-012 is partially resolved (STT p95 target and initial 25-second ceiling approved; TTS targets open); Q-026 is resolved for HU12 by DEC-231. BR-013/BR-025 are approved, with the populated-field malformed/present-empty header edge case flagged before implementing that append path. CR-003 and the new authorization do not establish model accuracy or production readiness.
+
+### P02 addendum — pending-change reconciliation (2026-11-11)
+
+The canonical requirements and backlog remain US-001–US-019 / HU01–HU19.
+Section 6.3 is a non-normative candidate register:
+
+| Change | Status retained | Canonical backlog effect |
+|---|---|---|
+| CR-005 / US-020 / HU20 | Proposed; code present; team approval pending. | No active story, estimate, or priority. |
+| CR-006 / US-011 amendment | Requester-approved implementation; team ratification pending. | AC-078–AC-082 and BR-032 remain proposed, not additions to US-011. |
+| CR-007 / US-021 / HU21 | Requester-approved implementation; team ratification pending. | AC-083–AC-089, FR-047–FR-050, BR-033, and M-18 remain proposed, not active requirements. |
+
+This distinction follows Q-020 and the recorded P02 gate. Existing 19 story
+records, MVP 1 requirements, and approved HU11–HU19 acceptance criteria are
+preserved. The pending candidates are also recorded in the P02 backlog
+metadata, separate from `items`; no approval, team ratification, estimate,
+priority, or acceptance is inferred.
