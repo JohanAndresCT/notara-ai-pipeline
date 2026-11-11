@@ -1,5 +1,5 @@
 site_name: Notara
-site_description: Documentación de Notara, comunidad y gestor básico de partituras en texto
+site_description: Documentación de Notara, comunidad y gestor de partituras con dictado, escucha y tutor con IA
 site_url: https://johanandresct.github.io/notara-ai-pipeline/
 repo_url: https://github.com/JohanAndresCT/notara-ai-pipeline
 docs_dir: docs
@@ -14,6 +14,7 @@ nav:
   - Instalación: SETUP.md
   - Arquitectura: ARCHITECTURE.md
   - API: API.md
+  - Contrato de dictado (HU11): API_STT_HU11.md
   - Modelo de datos: DATA_MODEL.md
   - Guía de usuario: USER_GUIDE.md
   - Pruebas: TESTING.md

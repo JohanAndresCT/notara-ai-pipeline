@@ -22,7 +22,7 @@ El inventario P00/P03 de MVP 1 marcaba voz y audio como futuro/no incluido. CR-0
 | CR-006 / enmienda a US-011 | Aprobación del equipo reportada por el responsable; fecha/acta formal pendiente de documentación | AC-078–AC-082 canónicas; Gemini procesa texto transcrito, nunca audio; AC-082 requiere medición |
 | CR-007 / US-021 / HU21 | Aprobación del equipo reportada por el responsable; fecha/acta formal pendiente de documentación; sin plan P03 | Historia canónica; implementación registrada; falta validación P06 individual y aceptación por criterio |
 
-La fecha 2026-11-11 corresponde a la recepción de la confirmación, no a la fecha de aprobación. La aprobación de alcance no equivale a aceptación de implementación, pruebas ni lanzamiento. Ver [DECISIONS_MVP2.md](../ai-pipeline/outputs/00_context/DECISIONS_MVP2.md) y Q-030 en P02.
+La fecha 2026-11-11 corresponde a la recepción de la confirmación, no a la fecha de aprobación. La aprobación de alcance no equivale a aceptación de implementación, pruebas ni lanzamiento. Ver [DECISIONS_MVP2.md](https://github.com/JohanAndresCT/notara-ai-pipeline/blob/main/ai-pipeline/outputs/00_context/DECISIONS_MVP2.md) y Q-030 en P02.
 
 ## Discrepancias de implementación y requisitos
 
@@ -56,7 +56,7 @@ La fecha 2026-11-11 corresponde a la recepción de la confirmación, no a la fec
 
 ## Referencias de origen
 
-- Decisiones y cambios: [DECISIONS_MVP2.md](../ai-pipeline/outputs/00_context/DECISIONS_MVP2.md).
+- Decisiones y cambios: [DECISIONS_MVP2.md](https://github.com/JohanAndresCT/notara-ai-pipeline/blob/main/ai-pipeline/outputs/00_context/DECISIONS_MVP2.md).
 - Backlogs canónicos: `ai-pipeline/outputs/02_requirements/product_backlog.json` y `ai-pipeline/outputs/03_planning/product_backlog.json`.
 - Revalidación de implementación: `ai-pipeline/outputs/06_implementation/IMPLEMENTATION_VALIDATION_MVP2.md`.
 - Revalidación de pruebas: `ai-pipeline/outputs/07_testing/TEST_VALIDATION.md`.
