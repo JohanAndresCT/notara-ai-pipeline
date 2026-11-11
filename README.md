@@ -6,7 +6,7 @@ Comunidad web responsiva y gestor básico de partituras para estudiantes de mús
 
 ## 2. Propósito y problema
 
-Notara ofrece un espacio sencillo para crear, publicar, encontrar y comentar partituras breves sin depender de software profesional de notación. MVP 1 admite partituras en ABC y texto libre; MVP 2 añade entrada por voz, comentarios de voz, reproducción de audio y carga de archivos `.abc`.
+Notara ofrece un espacio sencillo para crear, publicar, encontrar y comentar partituras breves sin depender de software profesional de notación. MVP 1 admite partituras en ABC y texto libre; MVP 2 añade dictado por voz (con interpretación por IA), comentarios de voz, solfeo y tutor hablados, reproducción con piano, guitarra e instrumentos generados por IA, descarga MP3, carga de archivos `.abc` y un tutor conversacional por voz.
 
 ## 3. Funcionalidades implementadas
 
@@ -138,16 +138,33 @@ Backend: 175 pruebas en SQLite (173 pasaron, 2 omitidas por ser exclusivas de Po
 
 | Dimensión | Estado y evidencia |
 |---|---|
+| Release | MVP 2 — Sprint 2, del 28 de octubre al 11 de noviembre de 2026 (HU11–HU21, 44 SP). Plan en [RELEASE_PLAN.md](./ai-pipeline/prompts/system/RELEASE_PLAN.md); responsables y SP de HU20/HU21 son propuesta pendiente de confirmar. |
+| Evaluación (P10) | `NEEDS_ITERATION`: 62 requisitos (19 verificados, 42 parciales, 1 sin verificar); 20 indicadores (7 cumplidos, 11 parciales, 2 sin medir). Falta la aceptación manual (micrófono real, escucha, corpus HU11) y el acta de aprobación de CR-005/006/007. |
+| Seguridad | Una clave de ElevenLabs quedó en el commit `12c5e85`; se retiró de `.env.example` y **debe revocarse** en ElevenLabs. Las claves van solo en `.env` o en las variables de Railway. |
 | Implementación | MVP 1 es la línea base entregada. P06 informa implementación para US-001–US-019 y código para CR-005/006/007; esto no equivale a aceptación. US-020/US-021 tienen validación P06 (`PASS_WITH_WARNINGS`); falta la medición AC-082 y la aceptación manual. |
 | Pruebas | Backend: 175 pruebas en SQLite (173 pasaron, 2 omitidas por ser exclusivas de PostgreSQL) y 175/175 en PostgreSQL 16, Python 3.13.14; `tsc` y `vite build` pasan; Playwright 9/9 (6 MVP 1 + 3 MVP 2). Ejecución P07 Run 2 del 2026-11-11. |
 | CI | El workflow está en `.github/`; desde P08 Run 2 el job backend ejecuta todas las apps (incluida `voice`). Resultados remotos no consultados en esta ejecución. |
 | Despliegue | Health check público observado el 2026-10-14; disponibilidad y commit actualmente desplegado no verificados. No se realizó despliegue. |
 
-La evidencia formal de aprobación de CR-005/006/007 (fecha/acta) sigue pendiente de documentación; la confirmación de alcance ya fue reportada por el responsable. US-020/US-021 no tienen prioridad ni estimación asignadas.
+La evidencia formal de aprobación de CR-005/006/007 (fecha/acta) sigue pendiente de documentación; la confirmación de alcance ya fue reportada por el responsable. P03 aún no asigna prioridad ni estimación a US-020/US-021; el plan de release propone HU20 = 5 SP y HU21 = 8 SP (Could) a la espera de confirmación del equipo.
 
 ## 14. Trazabilidad del pipeline
 
-Los registros actuales del pipeline están en `ai-pipeline/outputs/` (no en `ai-pipeline/artifacts/`). Los prompts P00–P10 están en `ai-pipeline/prompts/`. P02 incluye US-001–US-021; P03 mantiene el plan de 31 SP para US-001–US-019 y deja US-020/US-021 sin planificar. Véanse el [reporte P09](./ai-pipeline/outputs/09_documentation/DOCUMENTATION_REPORT.md) y la [evaluación P10](./ai-pipeline/outputs/10_evaluation/MVP_EVALUATION.md).
+Los registros actuales del pipeline están en `ai-pipeline/outputs/` (no en `ai-pipeline/artifacts/`). Los prompts están en `ai-pipeline/prompts/`, adaptados al MVP 2 en modo incremental: P00–P01 v2.0, P02–P05 v2.1, P06 v2.0 (más P06.20 y P06.21), P07–P10 v2.0 y el prompt global [SYSTEM_PROMPT.md](./ai-pipeline/prompts/system/SYSTEM_PROMPT.md) v2.0. P02 incluye US-001–US-021; P03 mantiene el plan de 31 SP para US-011–US-019 y el [plan de release](./ai-pipeline/prompts/system/RELEASE_PLAN.md) añade el Sprint 2 con HU20/HU21 como propuesta.
+
+| Etapa | Output más reciente |
+|---|---|
+| P00 Contexto | `outputs/00_context/PROJECT_CONTEXT.md` v2.5 |
+| P01 Visión | `outputs/01_discovery/PRODUCT_VISION.md` v2.4 |
+| P02 Requisitos | `outputs/02_requirements/REQUIREMENTS.md` v5.6 |
+| P03 Planificación | `outputs/03_planning/PRIORITIZATION.md` v4.6 |
+| P04 UX | `outputs/04_ux/UX_SPEC.md` v4.5 |
+| P05 Arquitectura | `outputs/05_architecture/ARCHITECTURE.md` v4.6 |
+| P06 Implementación | Registros `US-0XX_*` (US-001–US-021) e `IMPLEMENTATION_VALIDATION_MVP2.md` |
+| P07 Pruebas | `outputs/07_testing/` — Run 2 (2026-11-11) |
+| P08 CI/CD | `outputs/08_cicd/` — Run 2 |
+| P09 Documentación | `outputs/09_documentation/` — Run 2 |
+| P10 Evaluación | `outputs/10_evaluation/` — Run 2, `eval_metrics.json` v2.0 | Véanse el [reporte P09](./ai-pipeline/outputs/09_documentation/DOCUMENTATION_REPORT.md) y la [evaluación P10](./ai-pipeline/outputs/10_evaluation/MVP_EVALUATION.md).
 
 ## 15. Equipo
 
