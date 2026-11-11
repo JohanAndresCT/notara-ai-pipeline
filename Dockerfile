@@ -1,7 +1,7 @@
 FROM node:24-bookworm-slim AS frontend-build
 WORKDIR /workspace
 RUN corepack enable && corepack prepare pnpm@12.11.2 --activate
-COPY frontend/package.json frontend/pnpm-lock.yaml ./frontend/
+COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml ./frontend/
 COPY .figma/make/site.json ./.figma/make/site.json
 WORKDIR /workspace/frontend
 RUN pnpm install --frozen-lockfile
@@ -52,3 +52,4 @@ RUN mkdir -p "$STT_MODEL_DIR" \
     && mkdir -p /data/media \
     && chown -R app:app /app /data
 ENTRYPOINT ["/usr/local/bin/notara-entrypoint"]
+
