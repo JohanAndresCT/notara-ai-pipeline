@@ -1,6 +1,6 @@
 # Modelo de datos
 
-Modelos definidos en `backend/accounts/models.py` y `backend/scores/models.py`. Motor: PostgreSQL en producción y CI; SQLite para pruebas locales.
+Modelos definidos en `backend/accounts/models.py` y `backend/scores/models.py`. Compose y CI usan PostgreSQL 16; las pruebas locales recientes usaron SQLite. El motor configurado en el despliegue actual no se revalidó.
 
 ## Diagrama
 
@@ -38,20 +38,32 @@ Modelo de usuario personalizado con `email` como `USERNAME_FIELD`.
 
 ## `scores.Comment`
 
-Texto `body` (máx. 500), autor (FK a `User`) y partitura (FK a `Score`), con `created_at`.
+`body`, autor (FK a `User`), partitura (FK a `Score`) y `created_at`. Los comentarios de texto están limitados a 500 caracteres; los comentarios de voz pueden tener transcripción de hasta 1.000, y guardan `kind`, audio y tipo MIME.
 
 ## `scores.Reaction` y `scores.Like`
 
 Ambos relacionan `Score` con `User` y tienen una restricción de unicidad por par score + usuario. Conviven como tablas separadas con conteos separados (`reaction_count`, `like_count`). La interfaz usa **reacciones**; el contador `likes_received` del perfil cuenta reacciones. Ver `P09-DISC-002`.
+
+## App `voice`
+
+| Modelo | Datos principales | Uso |
+|---|---|---|
+| `STTInferenceQuota` | Usuario, día UTC, inferencias admitidas | Cuota compartida de dictado y comentarios de voz |
+| `VoiceSynthesisQuota` | Usuario, día UTC, síntesis nuevas | Limita síntesis TTS; caché servida no consume una síntesis nueva |
+| `SynthesizedAudio` | Clave de caché, tipo, motor, voz, idioma, archivo y tamaño | Guarda audio sintetizado, no audio personal |
+| `TutorUsageQuota` | Usuario, día UTC, sesiones y preguntas | Usado por el tutor conversacional CR-007, aprobado para alcance según el responsable; aceptación P06 pendiente |
+
+Los archivos de comentarios de voz se guardan bajo `MEDIA_ROOT`; la caché TTS usa el almacenamiento Django configurado. La persistencia de dichos archivos en producción no se ha verificado.
 
 ## Migraciones
 
 | App | Archivos |
 |---|---|
 | `accounts` | `0001_initial`, `0002_user_main_instrument_user_photo`, `0003_user_profile_identity` |
-| `scores` | `0001_initial`, `0002_alter_score_description_alter_score_instrument_and_more`, `0003_comment_like_like_unique_score_like_per_user`, `0003_reaction`, `0004_comment`, `0005_merge_community_models` |
+| `scores` | `0001_initial`, `0002_alter_score_description_alter_score_instrument_and_more`, `0003_comment_like_like_unique_score_like_per_user`, `0003_reaction`, `0004_comment`, `0005_merge_community_models`, `0006_comment_audio_comment_audio_mime_comment_kind_and_more` |
+| `voice` | `0001_stt_inference_quota`, `0002_synthesizedaudio_voicesynthesisquota`, `0003_tutorusagequota` |
 
-`python backend\manage.py makemigrations --check --dry-run` no detectó cambios pendientes (verificado en P09). `migrate` se ejecuta al iniciar el contenedor de producción; no hay rollback automático de esquema.
+`makemigrations --check --dry-run` no detectó cambios pendientes en la revalidación local actual. `migrate` se ejecuta al iniciar el contenedor de producción; no hay rollback automático de esquema.
 
 ## Archivos
 

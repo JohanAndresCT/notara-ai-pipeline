@@ -11,6 +11,8 @@ Navegador ──HTTPS──► Nginx (:$PORT)
                        └─ /api/        → Gunicorn/Django (127.0.0.1:8000)
                                              └─► PostgreSQL (servicio separado)
 Fotos de perfil: disco (MEDIA_ROOT=/data/media), solo vía GET /api/v1/me/photo/
+Voz: Django `voice` comparte STT/TTS y límites; el navegador gestiona grabación,
+reproducción instrumental y composición/descarga MP3.
 ```
 
 En desarrollo, Vite sirve la SPA y hace proxy de `/api` al servidor de Django.
@@ -22,20 +24,21 @@ En desarrollo, Vite sirve la SPA y hace proxy de `/api` al servidor de Django.
 | `backend/notara_backend/` | Configuración (`settings.py`) y rutas (`urls.py`) |
 | `backend/accounts/` | Modelo `User` personalizado, registro, login, perfil, foto, contraseña |
 | `backend/scores/` | Partituras, comentarios, reacciones y likes |
+| `backend/voice/` | Validación de audio, STT local, cuotas, síntesis TTS y endpoints de voz |
 | `frontend/src/` | SPA React 19 + TypeScript + Tailwind 4 |
 | `frontend/e2e/` | Pruebas Playwright |
 | `Dockerfile`, `deploy/entrypoint.sh`, `docker/nginx.conf.template` | Imagen de producción |
 | `docker-compose.yml` | Entorno local con PostgreSQL |
 | `.github/workflows/ci.yml` | CI y despliegue a Railway |
-| `ai-pipeline/` | Prompts y artefactos del pipeline de IA (P00–P09) |
+| `ai-pipeline/` | Prompts y artefactos del pipeline de IA (P00–P10) |
 
 ## Backend
 
-- Django 5.2.1 y Django REST Framework 3.15.2 en `INSTALLED_APPS`. Las vistas de `accounts` y `scores` devuelven `JsonResponse`.
+- Django 5.2.18 y Django REST Framework 3.15.2 en `INSTALLED_APPS`. Las vistas de `accounts` y `scores` devuelven `JsonResponse`.
 - Autenticación por sesión y CSRF de Django. Cookies `SameSite=Lax`.
 - Base de datos seleccionada con `DJANGO_DB_ENGINE` (`sqlite` o PostgreSQL).
 - Rutas duplicadas bajo `/api/` y `/api/v1/` (ver [API.md](./API.md) y `P09-DISC-001`).
-- Idioma `en-us`, zona horaria UTC. Los mensajes de error de la API están en inglés; el frontend los traduce.
+- Idioma `en-us`, zona horaria UTC. El idioma y el formato de los errores dependen del endpoint; algunas respuestas de voz incluyen mensajes en español.
 
 ## Frontend
 
@@ -43,6 +46,10 @@ En desarrollo, Vite sirve la SPA y hace proxy de `/api` al servidor de Django.
 - Las rutas protegidas muestran el login a usuarios anónimos.
 - `src/lib/api.ts` centraliza las llamadas a la API y usa mayormente `/api/v1/*`.
 - Configuración de Vite con plugins de Figma Make (`vite.config.ts`) además de React y Tailwind.
+- HU11/HU12 envían grabaciones al backend; STT usa un modelo faster-whisper local previamente provisionado. El alcance aprobado CR-006 permite normalización Gemini opcional del texto transcrito tras un fallo del parser determinista; el audio no se envía a Gemini.
+- HU13/HU14 generan audio mediante la cadena TTS configurada, con caché/cuota. HU21/CR-007 usa Gemini Live con credenciales temporales emitidas por el servidor; aceptación de seguridad y de historia sigue pendiente.
+- HU20/CR-005 genera reproducción instrumental/MP3 en el navegador; los instrumentos DDSP obtienen sus modelos del host documentado y cuentan con fallback Tone.js.
+- La reproducción instrumental, el uso del modelo de instrumento, la composición de solfeo MP3 y la lectura del archivo `.abc` ocurren en el navegador.
 
 ## Decisiones visibles en el código
 
@@ -54,3 +61,5 @@ En desarrollo, Vite sirve la SPA y hace proxy de `/api` al servidor de Django.
 
 - Persistencia real del volumen `/data` en Railway.
 - Comportamiento bajo carga o concurrencia (no hay pruebas de rendimiento).
+- Precisión, p95, uso máximo de memoria, compatibilidad de grabación por navegador y calidad auditiva no tienen aceptación manual/operativa completa.
+- Disponibilidad actual del despliegue o correspondencia del código desplegado con este árbol.

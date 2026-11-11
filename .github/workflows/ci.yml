@@ -55,11 +55,13 @@ jobs:
         run: python backend/manage.py makemigrations --check --dry-run
       - name: Apply migrations
         run: python backend/manage.py migrate --noinput
-      - name: Run all account and score tests
+      - name: Run all backend tests (accounts, scores, voice; providers faked)
         shell: bash
+        env:
+          STT_MODEL_REQUIRED: "false"
         run: |
           set -o pipefail
-          python backend/manage.py test accounts scores --verbosity 1 2>&1 | tee "$RUNNER_TEMP/backend-tests.log"
+          python backend/manage.py test --verbosity 1 2>&1 | tee "$RUNNER_TEMP/backend-tests.log"
           grep -Eq 'Ran [1-9][0-9]* tests?' "$RUNNER_TEMP/backend-tests.log"
 
   frontend:

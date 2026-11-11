@@ -2,17 +2,78 @@ import json
 import re
 from json import JSONDecodeError
 
-from django.http import HttpResponse, JsonResponse
-from django.middleware.csrf import CsrfViewMiddleware
-from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from django.core.exceptions import RequestDataTooBig
+from django.core.files.storage import default_storage
+from django.db.models import Count, Exists, IntegerField, OuterRef, Subquery
+from django.db.models.functions import Coalesce
+from django.http import FileResponse, HttpResponse, JsonResponse
+from django.http.multipartparser import MultiPartParserError
 from django.views.decorators.http import require_http_methods
 
+from voice.errors import error_response
+from voice.transcription import TranscriptionError, transcribe_upload
+
+from .abc_reader import playback_data
 from .models import Comment, Like, Reaction, Score
+
+VOICE_COMMENT_MESSAGES = {
+    "AUDIO_TOO_LARGE": "La grabación es demasiado grande (máximo 2 MB).",
+    "AUDIO_INVALID": "El formato, la duración o el contenido del audio no son válidos.",
+    "STT_UNAVAILABLE": "No se pudo transcribir tu comentario. Puedes intentarlo de nuevo o escribirlo.",
+    "STT_DAILY_LIMIT_REACHED": "Alcanzaste el límite diario de transcripciones.",
+    "TRANSCRIPTION_FAILED": "No se pudo transcribir tu comentario. Puedes intentarlo de nuevo o escribirlo.",
+    "TRANSCRIPTION_TOO_LONG": "La transcripción supera los 1.000 caracteres. Graba un comentario más corto.",
+}
 
 ABC_REQUIRED_FIELDS = ("X", "T", "M", "L", "K")
 ABC_NOTE_PATTERN = re.compile(r"(?<![A-Za-z])[A-Ga-gzZ](?:[,']*)(?:\d+|/\d+)?")
 ABC_MUSIC_LINE_PATTERN = re.compile(r"^[A-Ga-gzZ0-9|:\[\](){}<>^_=,'/.\-\s]+$")
-_csrf_middleware = CsrfViewMiddleware(lambda request: None)
+
+
+def _count_subquery(model):
+    """Cuenta los registros de `model` ligados a cada partitura, sin multiplicar filas."""
+    return Coalesce(
+        Subquery(
+            model.objects.filter(score=OuterRef("pk"))
+            .order_by()
+            .values("score")
+            .annotate(total=Count("pk"))
+            .values("total"),
+            output_field=IntegerField(),
+        ),
+        0,
+    )
+
+
+def _scores_with_stats(user):
+    """Partituras con conteos y estado del usuario calculados en la misma consulta."""
+    return Score.objects.select_related("owner").annotate(
+        reaction_total=_count_subquery(Reaction),
+        like_total=_count_subquery(Like),
+        comment_total=_count_subquery(Comment),
+        user_reacted_flag=Exists(Reaction.objects.filter(score=OuterRef("pk"), user=user)),
+        is_liked_flag=Exists(Like.objects.filter(score=OuterRef("pk"), user=user)),
+    )
+
+
+def _score_stats(score, user):
+    if hasattr(score, "reaction_total"):
+        return {
+            "reaction_count": score.reaction_total,
+            "user_reacted": score.user_reacted_flag,
+            "like_count": score.like_total,
+            "is_liked": score.is_liked_flag,
+            "comment_count": score.comment_total,
+        }
+    # Partitura recién creada o sin anotar: se calculan los conteos con consultas sueltas.
+    return {
+        "reaction_count": score.reactions.count(),
+        "user_reacted": score.reactions.filter(user=user).exists() if user else False,
+        "like_count": score.likes.count(),
+        "is_liked": score.likes.filter(user=user).exists() if user else False,
+        "comment_count": score.comments.count(),
+    }
 
 
 def _score_data(score, user=None):
@@ -26,11 +87,7 @@ def _score_data(score, user=None):
         "author": score.owner.name,
         "author_id": score.owner_id,
         "created_at": score.created_at.isoformat(),
-        "reaction_count": score.reactions.count(),
-        "user_reacted": score.reactions.filter(user=user).exists() if user else False,
-        "like_count": score.likes.count(),
-        "is_liked": score.likes.filter(user=user).exists() if user else False,
-        "comment_count": score.comments.count(),
+        **_score_stats(score, user),
         "is_owner": user is not None and score.owner_id == user.pk,
     }
 
@@ -39,6 +96,8 @@ def _comment_data(comment):
     return {
         "id": comment.pk,
         "body": comment.body,
+        "kind": comment.kind,
+        "audio_url": f"/api/v1/comments/{comment.pk}/audio/" if comment.audio else None,
         "author": comment.author.name,
         "author_id": comment.author_id,
         "created_at": comment.created_at.isoformat(),
@@ -112,7 +171,7 @@ def scores_view(request):
                 raise ValueError
         except (TypeError, ValueError):
             return JsonResponse({"message": "Page must be a positive integer."}, status=400)
-        scores = Score.objects.select_related("owner").all()
+        scores = _scores_with_stats(request.user)
         instrument = request.GET.get("instrument", "").strip()
         if instrument:
             scores = scores.filter(instrument__iexact=instrument)
@@ -151,13 +210,12 @@ def scores_view(request):
     return JsonResponse({"score": _score_data(score, request.user)}, status=201)
 
 
-@csrf_exempt
 @require_http_methods(["GET", "PATCH", "DELETE"])
 def score_detail_view(request, score_id):
     if not request.user.is_authenticated:
         return JsonResponse({"message": "Authentication is required."}, status=401)
     try:
-        score = Score.objects.select_related("owner").get(pk=score_id)
+        score = _scores_with_stats(request.user).get(pk=score_id)
     except Score.DoesNotExist:
         return JsonResponse({"message": "Score not found."}, status=404)
 
@@ -167,11 +225,9 @@ def score_detail_view(request, score_id):
             _comment_data(comment)
             for comment in score.comments.select_related("author").all()
         ]
+        data["playback"] = playback_data(score.content, score.score_format)  # HU15, ADR-010
         return JsonResponse({"score": data})
 
-    csrf_failure = _csrf_middleware.process_view(request, None, (), {})
-    if csrf_failure is not None:
-        return csrf_failure
     if score.owner_id != request.user.pk:
         return JsonResponse({"message": "You do not have permission to edit this score."}, status=403)
     if request.method == "DELETE":
@@ -216,14 +272,10 @@ def score_detail_view(request, score_id):
     return JsonResponse({"score": _score_data(score, request.user)})
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def score_reaction_view(request, score_id):
     if not request.user.is_authenticated:
         return JsonResponse({"message": "Authentication is required."}, status=401)
-    csrf_failure = _csrf_middleware.process_view(request, None, (), {})
-    if csrf_failure is not None:
-        return csrf_failure
     try:
         score = Score.objects.get(pk=score_id)
     except Score.DoesNotExist:
@@ -238,15 +290,10 @@ def score_reaction_view(request, score_id):
     )
 
 
-@csrf_exempt
 @require_http_methods(["GET", "POST"])
 def score_comments_view(request, score_id):
     if not request.user.is_authenticated:
         return JsonResponse({"message": "Authentication is required."}, status=401)
-    if request.method == "POST":
-        csrf_failure = _csrf_middleware.process_view(request, None, (), {})
-        if csrf_failure is not None:
-            return csrf_failure
     try:
         score = Score.objects.get(pk=score_id)
     except Score.DoesNotExist:
@@ -254,6 +301,8 @@ def score_comments_view(request, score_id):
     if request.method == "GET":
         comments = score.comments.select_related("author").all()
         return JsonResponse({"comments": [_comment_data(comment) for comment in comments]})
+    if (request.content_type or "").startswith("multipart/form-data"):
+        return _create_voice_comment(request, score)
     payload, payload_error = _json_payload(request)
     if payload_error:
         return JsonResponse(payload_error, status=400)
@@ -269,14 +318,65 @@ def score_comments_view(request, score_id):
     return JsonResponse({"comment": _comment_data(comment)}, status=201)
 
 
-@csrf_exempt
+def _voice_comment_error(code, status):
+    return error_response(code, VOICE_COMMENT_MESSAGES.get(code, VOICE_COMMENT_MESSAGES["STT_UNAVAILABLE"]), status)
+
+
+def _create_voice_comment(request, score):
+    """HU12: transcribe a recorded note and store it with its audio as one comment."""
+    if score.owner_id == request.user.pk:
+        return error_response("OWN_SCORE", "No puedes comentar en tu propia partitura.", 403)
+    try:
+        upload = request.FILES.get("audio")
+    except (RequestDataTooBig, MultiPartParserError):
+        return _voice_comment_error("AUDIO_TOO_LARGE", 413)
+    if upload is None:
+        return _voice_comment_error("AUDIO_INVALID", 400)
+    try:
+        transcript = transcribe_upload(request.user.pk, upload)
+    except TranscriptionError as exc:
+        return _voice_comment_error(exc.code, exc.status)
+    if not transcript:
+        return _voice_comment_error("TRANSCRIPTION_FAILED", 422)
+    if len(transcript) > settings.VOICE_COMMENT_MAX_CHARS:
+        return _voice_comment_error("TRANSCRIPTION_TOO_LONG", 422)
+    upload.seek(0)
+    comment = Comment.objects.create(
+        score=score,
+        author=request.user,
+        body=transcript,
+        kind=Comment.Kind.VOICE,
+        audio=upload,
+        audio_mime=(upload.content_type or "").split(";", 1)[0].strip().lower(),
+    )
+    return JsonResponse({"comment": _comment_data(comment)}, status=201)
+
+
+@require_http_methods(["GET"])
+def comment_audio_view(request, comment_id):
+    """Serve a voice comment's audio to authenticated users only (DEC-214)."""
+    if not request.user.is_authenticated:
+        return JsonResponse({"message": "Authentication is required."}, status=401)
+    try:
+        comment = Comment.objects.get(pk=comment_id)
+    except Comment.DoesNotExist:
+        return JsonResponse({"message": "Comment not found."}, status=404)
+    if not comment.audio:
+        return JsonResponse({"message": "Comment not found."}, status=404)
+    try:
+        stored = default_storage.open(comment.audio.name, "rb")
+    except OSError:
+        return JsonResponse({"message": "Comment not found."}, status=404)
+    response = FileResponse(stored, content_type=comment.audio_mime or "application/octet-stream")
+    response["X-Content-Type-Options"] = "nosniff"
+    response["Cache-Control"] = "private, no-store"
+    return response
+
+
 @require_http_methods(["DELETE"])
 def score_comment_detail_view(request, score_id, comment_id):
     if not request.user.is_authenticated:
         return JsonResponse({"message": "Authentication is required."}, status=401)
-    csrf_failure = _csrf_middleware.process_view(request, None, (), {})
-    if csrf_failure is not None:
-        return csrf_failure
     try:
         comment = Comment.objects.get(pk=comment_id, score_id=score_id)
     except Comment.DoesNotExist:

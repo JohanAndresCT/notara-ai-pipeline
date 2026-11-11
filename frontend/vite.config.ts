@@ -39,7 +39,7 @@ react(),
         },
       },
       host: process.env.FIGMA_DEV_SERVER_HOST || '0.0.0.0',
-      port: parseInt(process.env.PORT || '8443'),
+      port: parseInt(process.env.PORT || '5173'),
       strictPort: true,
       watch: {
         ignored: [
@@ -49,7 +49,7 @@ react(),
     },
     preview: {
       host: process.env.FIGMA_DEV_SERVER_HOST || '0.0.0.0',
-      port: parseInt(process.env.PORT || '8443'),
+      port: parseInt(process.env.PORT || '4173'),
     },
   }
 })

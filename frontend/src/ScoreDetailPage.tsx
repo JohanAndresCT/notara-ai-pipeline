@@ -1,4 +1,8 @@
 import { useEffect, useState, type FormEvent } from "react";
+import ListeningPanel from "./ListeningPanel";
+import TutorChat from "./TutorChat";
+import Icon from "./Icon";
+import VoiceCommentComposer from "./VoiceCommentComposer";
 import {
   addComment,
   deleteComment,
@@ -72,8 +76,19 @@ export default function ScoreDetailPage({
     }
   }
 
-  async function handleCommentDelete(commentId: number) {
+  function handleVoiceComment(created: ScoreComment) {
     if (!score) return;
+    setComments([...comments, created]);
+    setScore({ ...score, comment_count: score.comment_count + 1 });
+  }
+
+  async function handleCommentDelete(commentId: number, hasAudio: boolean) {
+    if (!score) return;
+    // UX-PROP-006 (DEC-235): confirm before deleting; voice-comment audio cannot be recovered.
+    const question = hasAudio
+      ? "¿Eliminar tu comentario? También se eliminará su audio y no se podrá recuperar."
+      : "¿Eliminar tu comentario?";
+    if (!window.confirm(question)) return;
     try {
       await deleteComment(commentId);
       setComments(comments.filter((item) => item.id !== commentId));
@@ -91,7 +106,7 @@ export default function ScoreDetailPage({
   const isOwner = score.author_id === currentUserId;
   return (
     <div className="detail-page">
-      <a className="back" href="/">← Volver al inicio</a>
+      <a className="back" href="/"><Icon name="arrowLeft" size={16} /> Volver al inicio</a>
       <article className="detail-card" aria-labelledby="score-detail-heading">
         <div className="detail-top">
           <span className={`format ${score.format === "ABC" ? "abc" : "text"}`}>{score.format === "ABC" ? "NOTACIÓN ABC" : "PARTITURA EN TEXTO"}</span>
@@ -113,12 +128,14 @@ export default function ScoreDetailPage({
               <div className="score-bar"><span>{score.format === "ABC" ? "NOTACIÓN ABC" : "TEXTO SIN FORMATO"}</span><span>{score.content.length} caracteres</span></div>
               <pre>{score.content}</pre>
             </section>
+            <ListeningPanel score={score} />
+            <TutorChat score={score} />
             <div className="detail-reactions">
               <button className={`detail-reaction-button${score.user_reacted ? " liked" : ""}`} type="button" onClick={handleReaction} aria-pressed={score.user_reacted}>
-                <span className="reaction-emoji" aria-hidden="true">{score.user_reacted ? "❤️" : "🤍"}</span>
+                <Icon name="heart" size={20} filled={Boolean(score.user_reacted)} className="reaction-icon" />
                 {score.user_reacted ? "Te gusta" : "Me gusta"} · {score.reaction_count}
               </button>
-              <span><span className="reaction-emoji comment-emoji" aria-hidden="true">💬</span>{score.comment_count} comentarios</span>
+              <span><Icon name="comment" size={20} className="reaction-icon" />{score.comment_count} comentarios</span>
             </div>
         </>
       </article>
@@ -129,12 +146,17 @@ export default function ScoreDetailPage({
           <span className="avatar tone-1" aria-hidden="true">{getInitials(currentUserName) || "N"}</span>
           <div><textarea id="score-comment" aria-label="Añadir un comentario" placeholder="Escribe un comentario..." value={comment} maxLength={500} onChange={(event) => setComment(event.target.value)} rows={3} required /><button className="button primary small" type="submit" disabled={isSubmitting}>{isSubmitting ? "Enviando..." : "Comentar"}</button></div>
         </form>
+        {!isOwner ? <VoiceCommentComposer scoreId={score.id} onCreated={handleVoiceComment} /> : null}
         {comments.length === 0 ? <p className="comments-empty">Todavía no hay comentarios. Inicia la conversación.</p> : null}
         {comments.map((item) => (
           <article className="comment" key={item.id}>
             <span className="avatar tone-2" aria-hidden="true">{getInitials(item.author) || "N"}</span>
-            <div><p><strong>{item.author}</strong><span>{new Date(item.created_at).toLocaleString("es-ES")}</span></p><div>{item.body}</div></div>
-            {item.author_id === currentUserId ? <button className="comment-delete" type="button" onClick={() => handleCommentDelete(item.id)}>Eliminar</button> : null}
+            <div>
+              <p><strong>{item.author}</strong><span>{new Date(item.created_at).toLocaleString("es-ES")}</span>{item.kind === "VOICE" ? <span className="voice-badge">Comentario de voz</span> : null}</p>
+              <div>{item.body}</div>
+              {item.audio_url ? <audio className="comment-audio" controls preload="none" src={item.audio_url} aria-label={`Audio del comentario de ${item.author}`} /> : null}
+            </div>
+            {item.author_id === currentUserId ? <button className="comment-delete" type="button" onClick={() => handleCommentDelete(item.id, Boolean(item.audio_url))}>Eliminar</button> : null}
           </article>
         ))}
       </section>

@@ -1,6 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { registerAccount } from "./lib/api";
 import PublicHeader from "./PublicHeader";
+import Icon from "./Icon";
+import CommunityChat from "./CommunityChat";
+import StreamerBackground from "./StreamerBackground";
 
 const emptyErrors: Record<string, string[]> = {};
 
@@ -9,6 +12,7 @@ export default function RegistrationPage({ onRegistered }: { onRegistered: () =>
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -59,19 +63,13 @@ export default function RegistrationPage({ onRegistered }: { onRegistered: () =>
       <PublicHeader current="register" />
       <main className="auth-main">
         <section className="auth-intro" aria-labelledby="register-intro-heading">
-          <div className="auth-circles" aria-hidden="true">
-            <span /><span /><span /><span /><span />
-          </div>
-          <p className="eyebrow"><span className="dot" /> COMPARTE TU MÚSICA. DESCUBRE LA DE OTROS.</p>
-          <h1 id="register-intro-heading">Comparte tus ideas.<br /><em>Encuentra tu sonido.</em></h1>
-          <p>Un lugar para las melodías, los bocetos y las ideas musicales que quieras compartir.</p>
-          <div className="staff-lines" aria-hidden="true">
-            <i /><i /><i /><i /><i /><span>♫</span>
-          </div>
+          <StreamerBackground variant="auth" />
+          <CommunityChat headingId="register-intro-heading" title="Comparte tus ideas." highlight="Encuentra tu sonido." lead="Un lugar para las melodías, los bocetos y las ideas musicales que quieras compartir." />
         </section>
         <section className="auth-card" aria-labelledby="register-heading">
+          <div className="auth-card-wave" aria-hidden="true" />
           <div className="auth-heading">
-            <span className="mini-icon" aria-hidden="true">♫</span>
+            <span className="mini-icon" aria-hidden="true"><Icon name="music" size={22} /></span>
             <div>
               <h2 id="register-heading">Crea tu cuenta</h2>
               <p>Únete a Notara para compartir y descubrir ideas musicales.</p>
@@ -80,7 +78,8 @@ export default function RegistrationPage({ onRegistered }: { onRegistered: () =>
           <form className="auth-form" onSubmit={handleSubmit} noValidate>
             <div className="field">
               <label htmlFor="name">Nombre <b>*</b></label>
-              <div className="input-wrap">
+              <div className="input-wrap with-icon">
+                <Icon name="user" size={18} />
                 <input
                   id="name"
                   name="name"
@@ -96,7 +95,8 @@ export default function RegistrationPage({ onRegistered }: { onRegistered: () =>
             </div>
             <div className="field">
               <label htmlFor="email">Correo electrónico <b>*</b></label>
-              <div className="input-wrap">
+              <div className="input-wrap with-icon">
+                <Icon name="mail" size={18} />
                 <input
                   id="email"
                   name="email"
@@ -112,11 +112,12 @@ export default function RegistrationPage({ onRegistered }: { onRegistered: () =>
             </div>
             <div className="field">
               <label htmlFor="password">Contraseña <b>*</b></label>
-              <div className="input-wrap">
+              <div className="input-wrap with-icon">
+                <Icon name="lock" size={18} />
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
                   minLength={8}
                   required
@@ -125,6 +126,9 @@ export default function RegistrationPage({ onRegistered }: { onRegistered: () =>
                   aria-invalid={Boolean(fieldErrors.password?.length)}
                   aria-describedby={fieldErrors.password?.length ? "password-error" : undefined}
                 />
+                <button type="button" className="password-toggle" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"} aria-pressed={showPassword}>
+                  <Icon name={showPassword ? "eyeOff" : "eye"} size={18} />
+                </button>
               </div>
               {fieldErrors.password?.length ? (
                 <FieldError id="password-error" text={fieldErrors.password[0]} />

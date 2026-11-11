@@ -1,509 +1,124 @@
 # P02 - Requirements Engineering
 
-**Version:** 1.0
+**Version:** 2.1
 **Stage:** P02 - Requirements Engineering
 **Type:** Generation Prompt
 **Project:** Notara
+**Release covered:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT), incremental update of MVP 1
 **Previous Stage:** P01 - Product Discovery
 **Next Stage:** P03 - Planning
 
+## Change Log
+
+| Version | Change |
+|---|---|
+| 1.0 | Requirements for MVP 1 (HU01-HU10). Audio, voice, OMR excluded. |
+| 2.0 | Incremental mode for MVP 2. HU11-HU19 in scope (CR-001, CR-002). Adds the Sprint 2 backlog and the MVP 2 decision log as inputs (P01 warning DISC-VAL-202). Exclusions on audio and voice apply only to MVP 1 content; OMR and image uploads stay excluded. Team-provided MoSCoW and Story Points are recorded as source data, not as P02 planning. |
+| 2.1 | Removed state that belonged to a specific run (decision ranges, ID ranges, provisional estimates, open rules). The prompt now refers to the current content of its inputs (`DECISIONS_MVP2.md`, the latest upstream artifacts) so it stays valid when decisions are added. |
+
 ## 1. Purpose
 
-Transform the validated Notara product vision into a complete, traceable, testable,
-and planning-ready requirements specification and product backlog.
+Transform the validated product vision into a complete, traceable, testable and planning-ready requirements specification and product backlog for the current release, preserving the delivered MVP 1 requirements.
 
-This stage defines **what Notara must do and under which conditions**. It does not
-define how Notara will be implemented. The output must cover the MVP capability to
-create, publish, discover, read, and discuss short textual musical scores.
-
-The requirements must preserve the approved MVP boundary:
-
-- MVP 1 supports `.abc` and plain-text scores.
-- Score content is non-empty and has a maximum of 1,000 characters.
-- `.abc` content requires basic syntax validation.
-- Plain text is free format subject to the common content rules.
-- Display preserves line breaks and distinguishes the score format.
-- MVP 1 does not include audio playback or sharing, image uploads, voice input,
-  OMR, or differentiated roles.
-
-Do not turn this prompt into an implementation specification.
+This stage defines **what Notara must do and under which conditions**, not how it is implemented.
 
 ## 2. Inputs and Source of Truth
 
-Read all of the following before generating the output:
+Read before generating:
 
 ```text
-ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md
+ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md            (latest version)
 ai-pipeline/outputs/01_discovery/PRODUCT_VISION_VALIDATION.md
+ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md             (latest version)
+ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md      (HU11-HU19, AC-0NN-0N)
+ai-pipeline/outputs/00_context/DECISIONS_MVP2.md              (all DEC-2NN, every batch)
+ai-pipeline/outputs/02_requirements/REQUIREMENTS.md           (previous version, MVP 1)
+ai-pipeline/outputs/02_requirements/product_backlog.json      (previous version, MVP 1)
 ai-pipeline/prompts/system/SYSTEM_PROMPT.md
 ```
 
-`PRODUCT_VISION.md` is the primary source for product scope, users, needs, and
-the intended experience. `PRODUCT_VISION_VALIDATION.md` determines whether P02
-may proceed and identifies warnings, assumptions, conflicts, and missing
-decisions. `SYSTEM_PROMPT.md` supplies the global source-of-truth, traceability,
-MVP, uncertainty, and human-approval rules.
+Apply the P01 validation result: `PASS` / `PASS_WITH_WARNINGS` -> proceed and preserve warnings; `FAIL` / `BLOCKED` -> produce a blocked result.
 
-The repository is authoritative. Do not use information from an earlier
-conversation if it is not present in the input artifacts.
-
-Apply the P01 validation result as follows:
-
-- `PASS`: proceed normally.
-- `PASS_WITH_WARNINGS`: proceed and preserve all relevant warnings and
-  assumptions.
-- `FAIL` or `BLOCKED`: do not fabricate requirements; produce a blocked result
-  explaining the missing or contradictory information.
-
-If a required input is unavailable, record the stage as `BLOCKED` unless the
-missing information is demonstrably non-essential.
+The backlog acceptance criteria (`AC-011-01`, ...) are the team's statement of each story. Decisions (`DEC-2NN`) refine them. When a backlog criterion and a decision differ, the decision wins and the requirement cites both.
 
 ## 3. Role
 
-Act as a **Senior Requirements Engineer and Product Analyst** for the Notara
-academic MVP.
-
-You must:
-
-- Translate product needs into atomic, observable, and testable requirements.
-- Preserve traceability to P01 and the original MVP capabilities `HU01` through
-  `HU10` when those identifiers are present.
-- Distinguish facts, assumptions, unknowns, proposals, and decisions requiring
-  human approval.
-- Keep requirements understandable to product, UX, architecture, development,
-  and testing participants.
-- Keep the scope feasible for the stated five-person team and one two-week
-  sprint without assigning implementation work.
+Act as a **Senior Requirements Engineer and Product Analyst**.
 
-You must not:
+You must translate needs into atomic, observable, testable requirements; preserve traceability to P01, HU01-HU19 and DEC-2NN; distinguish FACT, ASSUMPTION, PROPOSAL, UNKNOWN, CONFLICT and DECISION; keep the scope feasible.
 
-- Invent musical rules, ABC grammar beyond what the sources define, roles,
-  moderation policies, account-recovery behavior, feed ordering, pagination,
-  measurable success targets, or legal requirements.
-- Treat a useful or common social feature as approved scope without a source.
-- Silently resolve open questions from P00 or P01.
+You must not invent musical rules, roles, moderation, account recovery, performance targets or legal requirements; treat a common feature as approved without a source; silently resolve conflicts between the backlog, decisions and MVP 1 rules. When P01 or a decision delegates a definition to P02 (for example the difficulty rule of DEC-212 or the dictation vocabulary of DEC-205), write it as a concrete rule labeled `PROPOSAL` with an open question for team approval.
 
-## 4. Notara Domain Guardrails
+## 4. Incremental rules
 
-Use these approved facts as constraints, not as permission to add extra features:
+1. Preserve every MVP 1 identifier: `EPIC-001`-`EPIC-004`, `FR-001`-`FR-017`, `NFR-001`-`NFR-003`, `US-001`-`US-010`, `AC-001`-`AC-028`, `BR-001`-`BR-012`, `EDGE-001`-`EDGE-013`, `DEP-001`-`DEP-003`, `Q-001`-`Q-006`, `ASM-001`-`ASM-003`. Never renumber.
+2. Supersede, do not delete. When a decision changes an MVP 1 rule (for example DEC-211 on comment deletion), keep the old item, mark it `SUPERSEDED by <ID> (DEC-2NN)`, and add the new item.
+3. Continue sequences for new items (`FR-018`..., `US-011`..., `AC-029`..., `BR-013`...).
+4. User stories for MVP 2 use the backlog IDs: `US-011` for HU11 ... `US-019` for HU19. Requirement AC IDs continue the P02 sequence and cite the backlog AC they refine.
+5. New epics are allowed when the MVP 2 capabilities do not fit existing ones; extending an MVP 1 epic is allowed when the capability is an extension of it (for example voice comments within Community Interaction).
+6. Enabler stories (HU16, HU17) are written from the operator perspective stated by the backlog, without introducing a role.
 
-### Users
+## 5. Domain guardrails
 
-The product serves music students, hobbyist musicians, and music teachers.
-MVP 1 has no differentiated role management: registered users share the same
-general capabilities and manage their own publications.
+- **Users:** USER-001-USER-003; no differentiated roles.
+- **MVP 1 content rules** (unchanged): `.abc` and plain text; non-empty; at most 1,000 characters; basic ABC validation (`X:`, `T:`, `M:`, `L:`, `K:` and a musical line); free plain text; line breaks and format shown; title, instrument, description and content required.
+- **MVP 2 capabilities:** HU11 dictation, HU12 voice comments, HU13 spoken solfege, HU14 audio tutor, HU15 instrument playback, HU16 audio cache, HU17 voice fallback, HU18 MP3 download, HU19 `.abc` file loading, as refined by every decision in `DECISIONS_MVP2.md`.
+- **Excluded:** OMR, image uploads, differentiated roles, sung solfege, mixed voice+instrument MP3, server-side instrument synthesis, storing loaded files, languages other than Spanish.
 
-### Score content
+## 6. Classification
 
-A publication contains a title, instrument, description, and textual score
-content. The supported formats are `.abc` and plain text. Content must be
-non-empty and no longer than 1,000 characters. Basic ABC syntax validation is
-required, but the exact accepted ABC subset remains an open question unless P01
-explicitly resolves it.
+Scope labels: `MVP_CORE`, `MVP_SUPPORTING`, `FUTURE`, `OUT_OF_SCOPE`, `REQUIRES_DECISION`. Use P01's Core/Supporting classification.
+Evidence labels: `FACT`, `DECISION`, `ASSUMPTION`, `PROPOSAL`, `UNKNOWN`, `CONFLICT`.
+Final status: `READY`, `READY_WITH_ASSUMPTIONS`, `BLOCKED`.
 
-### Approved MVP capabilities
+## 7. Process
 
-Preserve the following capability mapping when creating traceability:
+1. Record P01 status, warnings and the decisions that affect requirements.
+2. Define or extend epics with traceability.
+3. Write functional requirements (`FR-*`) for every MVP 2 capability, including its validation, failure and authorization behavior.
+4. Write non-functional requirements (`NFR-*`) only when supported (privacy, reliability, cost control, language, platform). Unspecified targets (for example latency) -> `REQUIRES_DECISION` + question.
+5. Write user stories US-011-US-019 with "As a ..., I want ..., so that ..." from the backlog.
+6. Write Given/When/Then acceptance criteria covering happy path, validation, failure, limits and authorization. Cite the backlog AC and the decisions.
+7. Business rules (`BR-*`) for decisions and delegated definitions.
+8. Edge cases (`EDGE-*`) and dependencies (`DEP-*`), including external-provider and storage dependencies as product dependencies (no technology design).
+9. Assumptions and open questions: carry those from P00/P01 that affect requirements; add new ones found while writing.
+10. Backlog: planning fields stay `null` / `[]`. Team-provided MoSCoW and Story Points go in `traceability.team_backlog` as source data.
 
-| Capability | Source ID | Scope |
-|---|---|---|
-| Registration | `HU01` / `MVP-001` | `MVP_CORE` |
-| Login and logout | `HU02` / `MVP-002` | `MVP_CORE` |
-| View and edit profile information and change password | `HU03` / `MVP-003` | `MVP_SUPPORTING` |
-| Publish an `.abc` or plain-text score | `HU04` / `MVP-004` | `MVP_CORE` |
-| Edit an owned publication | `HU05` / `MVP-005` | `MVP_SUPPORTING` |
-| Delete an owned publication | `HU06` / `MVP-006` | `MVP_SUPPORTING` |
-| View personal/community scores and filter by instrument | `HU07` / `MVP-007` | `MVP_CORE` |
-| Explore scores and view detail, format, metadata, and comments | `HU08` / `MVP-008` | `MVP_CORE` |
-| Like and remove a like from another user's score | `HU09` / `MVP-009` | `MVP_CORE` |
-| Comment on another user's score | `HU10` / `MVP-010` | `MVP_CORE` |
+## 8. Boundary
 
-The capability table is a traceability aid. Read P01 first and do not expand a
-capability beyond what P01 supports.
+Do not specify languages, frameworks, endpoints, schemas, storage layout, infrastructure, screen layouts or test automation. Decisions that name a provider may be cited as constraints, not designed.
 
-### Explicit exclusions
+## 9. Outputs
 
-Do not create MVP requirements for:
+### `ai-pipeline/outputs/02_requirements/REQUIREMENTS.md`
 
-- Voice-based input (reserved for MVP 2).
-- Image recognition or OMR (reserved for MVP 3).
-- Image uploads.
-- Audio playback or audio sharing.
-- Differentiated user roles.
-- Technical services, integrations, or moderation workflows not defined by P01.
+Same section structure as version 1.0 (Metadata; Overview with scope, exclusions, assumptions; Epics; Functional Requirements; Non-Functional Requirements; User Stories; Business Rules; Edge Cases; Dependencies; Assumptions and Open Questions; Traceability; Status), plus a Change Log and a "Superseded items" table.
 
-If a future capability is relevant, record it as `FUTURE` or
-`REQUIRES_DECISION`; do not include it as an MVP backlog item.
+### `ai-pipeline/outputs/02_requirements/product_backlog.json`
 
-## 5. Classification and Status
-
-Use these scope labels on every applicable item:
-
-```text
-MVP_CORE
-MVP_SUPPORTING
-FUTURE
-OUT_OF_SCOPE
-REQUIRES_DECISION
-```
-
-Use these evidence labels when documenting uncertainty:
-
-```text
-FACT
-ASSUMPTION
-PROPOSAL
-UNKNOWN
-CONFLICT
-```
-
-Use exactly one final requirements status:
-
-- `READY`: sufficiently complete and traceable for validation and planning.
-- `READY_WITH_ASSUMPTIONS`: usable for planning, but with documented
-  non-blocking assumptions or unresolved decisions.
-- `BLOCKED`: essential product information is missing, contradictory, or
-  requires a decision before reliable requirements can be written.
-
-## 6. Requirements Process
-
-### Step 1 - Validate the P01 foundation
-
-Record the P01 validation status, warnings, assumptions, unknowns, and conflicts
-that affect requirements. Confirm the users, MVP boundary, score rules, and
-capability mapping before creating IDs.
-
-### Step 2 - Define epics
-
-Group related capabilities into a small number of product-oriented epics. Every
-epic must be justified by P01. A reasonable grouping may include identity and
-profile, score publication and ownership, discovery and viewing, and community
-interaction, but use a different grouping if P01 supports it.
-
-Each epic requires:
-
-- A unique ID: `EPIC-001`, `EPIC-002`, ...
-- Name and description.
-- Product objective.
-- Scope.
-- Traceability to P01 elements and, where applicable, `HU01`-`HU10`.
-
-### Step 3 - Define functional requirements
-
-Create atomic requirements using IDs `FR-001`, `FR-002`, ... . Each requirement
-must describe one product capability, be testable, and identify its epic, scope,
-priority status, and source traceability.
-
-Requirements should cover the approved capabilities and their relevant rules,
-including:
-
-- Registration, authentication, and logout.
-- Profile data and password change.
-- Publication fields, supported formats, content length, non-empty validation,
-  and ABC validation.
-- Readable display with preserved line breaks and visible format.
-- Ownership checks for editing and deleting publications.
-- Dashboard/feed discovery and instrument filtering.
-- Score detail, comments, likes, and removing a like.
-
-Split a requirement when it contains independent user goals or acceptance
-outcomes. Do not create a requirement merely for a screen, database table,
-endpoint, or framework.
-
-### Step 4 - Define non-functional requirements
-
-Create `NFR-*` items only when supported by P00/P01 or by an explicit product
-constraint. Relevant categories may include usability, responsive behavior,
-security, privacy, reliability, accessibility, and maintainability.
-
-Do not invent performance, availability, browser, accessibility, password,
-pagination, or retention targets. When a target is needed but unspecified,
-write `REQUIRES_DECISION` and add an open question.
-
-### Step 5 - Create atomic user stories
-
-Create `US-001`, `US-002`, ... for meaningful user goals within scope. Use:
-
-> As a [user role], I want [action or capability], so that [benefit].
-
-Use the concrete Notara roles only when supported by P01. Split stories such as
-creating a score, publishing it, editing it, and deleting it when they have
-different goals or rules. Each story must trace to one or more requirements,
-an epic, a scope label, and relevant P01 elements.
-
-Do not create separate stories for excluded future functionality.
-
-### Step 6 - Define acceptance criteria
-
-Every user story must have observable and testable criteria. Prefer
-Given/When/Then:
-
-```text
-Given [initial condition]
-When [user action]
-Then [observable result]
-```
-
-Cover applicable happy paths, validation, authorization/ownership, alternative
-flows, and relevant errors. For Notara, ensure criteria explicitly verify the
-1,000-character limit, non-empty content, ABC validation, plain-text support,
-format distinction, and line-break preservation where relevant. Do not add
-irrelevant criteria or implementation-level assertions.
-
-Assign unique IDs `AC-001`, `AC-002`, ... and ensure every referenced ID exists.
-
-### Step 7 - Identify business rules
-
-Document only rules supported by P01, such as supported formats, score length,
-non-empty content, basic ABC validation, ownership of publications, and the
-defined interaction boundary. Use `BR-001`, `BR-002`, ... .
-
-If a necessary rule is undefined, mark it `REQUIRES_DECISION` and add a
-question. Do not invent rules for comment editing, moderation, feed ordering,
-account recovery, or ABC grammar.
-
-### Step 8 - Identify edge cases and dependencies
-
-Use `EDGE-*` for product-relevant cases such as empty content, content over the
-limit, invalid ABC syntax, unsupported format, missing publication fields,
-editing/deleting a publication not owned by the user, duplicate like actions,
-and unavailable content. Include only cases supported or implied by the
-requirements.
-
-Use `DEP-*` for dependencies between requirements, stories, or unresolved
-decisions. Do not use this section for technical implementation dependencies.
-
-### Step 9 - Document assumptions and open questions
-
-Carry forward at least the P01 questions that affect P02, including:
-
-- The exact ABC syntax subset for "basic validation".
-- Supported browsers and viewport sizes.
-- Feed ordering and pagination behavior.
-- Whether users can edit or delete comments.
-- Account recovery behavior.
-- MVP success criteria, if requirements depend on them.
-
-Do not mark a question resolved without evidence in an approved source.
-
-### Step 10 - Prepare the backlog
-
-Create a planning-ready backlog from the stories. Include scope, traceability,
-requirements, acceptance criteria, rules, edge cases, dependencies, and status.
-Leave planning decisions unset:
-
-```text
-priority: null
-story_points: null
-release: null
-sprint: null
-assigned_developers: []
-```
-
-P02 must not assign releases, sprints, points, developers, or workload.
-
-## 7. Requirements Boundary
-
-Do not specify:
-
-- Programming languages, frameworks, libraries, or database engines.
-- API routes, DTOs, schemas, repositories, or internal software patterns.
-- Authentication implementation, hashing algorithms, tokens, or session
-  mechanisms.
-- Deployment infrastructure, containers, hosting, or cloud services.
-- Screen layouts, component trees, or detailed interaction design.
-- Test automation implementation.
-
-A product requirement may say that protected account functionality requires an
-authenticated user. It must not prescribe how authentication is implemented.
-
-## 8. Required Outputs
-
-Generate both artifacts below. They must use the same IDs and contain
-consistent information.
-
-### Output 1 - `ai-pipeline/outputs/02_requirements/REQUIREMENTS.md`
-
-Use this structure:
-
-```markdown
-# Requirements Specification
-
-## 1. Document Metadata
-- Project:
-- Version:
-- Stage:
-- Status:
-- Generated From:
-- P01 Validation:
-
-## 2. Requirements Overview
-### 2.1 Notara MVP Scope
-### 2.2 Scope Exclusions and Future Items
-### 2.3 Assumptions and Unresolved Decisions
-
-## 3. Epics
-| Epic ID | Name | Description | Product Objective | Scope | Traceability |
-|---|---|---|---|---|---|
-
-## 4. Functional Requirements
-| ID | Requirement | Epic | Scope | Priority Status | Traceability |
-|---|---|---|---|---|---|
-
-## 5. Non-Functional Requirements
-| ID | Category | Requirement | Scope | Evidence / Traceability | Status |
-|---|---|---|---|---|---|
-
-## 6. User Stories
-### US-001 - [Title]
-- **Epic:**
-- **Requirement(s):**
-- **User Story:** As a ..., I want ..., so that ...
-- **Scope:**
-- **Traceability:**
-
-#### Acceptance Criteria
-- **AC-001:**
-  - Given ...
-  - When ...
-  - Then ...
-
-#### Business Rules
-- BR-XXX
-
-#### Edge Cases
-- EDGE-XXX
-
-#### Dependencies
-- DEP-XXX
-
-#### Open Questions
-- Q-XXX
-
-## 7. Business Rules
-| ID | Rule | Related Requirements / Stories | Evidence | Status |
-|---|---|---|---|---|
-
-## 8. Edge Cases
-| ID | Description | Related Story | Expected Behavior | Status |
-|---|---|---|---|---|
-
-## 9. Dependencies
-| ID | Dependency | Related Items | Status |
-|---|---|---|---|
-
-## 10. Assumptions and Open Questions
-### Assumptions
-| ID | Assumption | Impact | Source | Status |
-|---|---|---|---|---|
-### Open Questions
-| ID | Question | Affected Items | Decision Required | Status |
-|---|---|---|---|---|
-
-## 11. Requirements Traceability
-| P01 Element / HU ID | Epic | Requirement | User Story | Acceptance Criteria |
-|---|---|---|---|---|
-
-## 12. Requirements Status
-READY / READY_WITH_ASSUMPTIONS / BLOCKED
-```
-
-### Output 2 - `ai-pipeline/outputs/02_requirements/product_backlog.json`
-
-The file must be valid JSON. Use this shape:
+Valid JSON with the version 1.0 shape (`backlog_metadata`, `epics`, `items`). Each item keeps `priority`, `story_points`, `release`, `sprint` = `null` and `assigned_developers` = `[]`. MVP 2 items add:
 
 ```json
-{
-  "backlog_metadata": {
-    "project": "Notara",
-    "version": "1.0",
-    "stage": "P02",
-    "status": "READY_WITH_ASSUMPTIONS",
-    "source": "ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md"
-  },
-  "epics": [
-    {
-      "id": "EPIC-001",
-      "name": "",
-      "description": "",
-      "scope": "MVP_CORE",
-      "traceability": ["HU08"]
-    }
-  ],
-  "items": [
-    {
-      "id": "US-001",
-      "title": "",
-      "epic_id": "EPIC-001",
-      "requirement_ids": ["FR-001"],
-      "user_story": {
-        "as_a": "",
-        "i_want": "",
-        "so_that": ""
-      },
-      "scope": "MVP_CORE",
-      "acceptance_criteria": [
-        {
-          "id": "AC-001",
-          "given": "",
-          "when": "",
-          "then": ""
-        }
-      ],
-      "business_rule_ids": [],
-      "edge_case_ids": [],
-      "dependency_ids": [],
-      "open_question_ids": [],
-      "priority": null,
-      "story_points": null,
-      "release": null,
-      "sprint": null,
-      "assigned_developers": [],
-      "status": "DEFINED",
-      "traceability": {
-        "p01_elements": [],
-        "hu_ids": []
-      }
-    }
-  ]
+"traceability": {
+  "p01_elements": ["NEED-007", "JTBD-005", "IND-201"],
+  "hu_ids": ["HU11"],
+  "backlog_ac_ids": ["AC-011-01"],
+  "decision_ids": ["DEC-205"],
+  "team_backlog": {"moscow": "Must", "story_points": 5, "adjusted_by": ["DEC-208"], "adjusted_story_points": 8}
 }
 ```
 
-Do not add planning values to fields reserved for P03. If the final status is
-`BLOCKED`, preserve the same valid JSON shape and explain the blocking reasons
-in the metadata and the Markdown artifact.
+## 10. Self-validation
 
-## 9. Self-Validation Before Completion
+- Inputs read; P01 status respected.
+- MVP 1 IDs preserved; superseded items marked.
+- HU11-HU19 each covered by at least one FR, one US and testable ACs.
+- Every decision in `DECISIONS_MVP2.md` that affects behavior is reflected in an FR, NFR or BR.
+- Conflicts between backlog ACs, decisions and MVP 1 rules are reported.
+- Delegated definitions written as PROPOSAL with a question.
+- No technology design or planning values.
+- Unique IDs; all references resolve; Markdown and JSON consistent; JSON parses.
 
-Verify all of the following:
+## 11. Failure conditions and transition
 
-- Required inputs were read and their validation status was respected.
-- Every epic, requirement, story, criterion, rule, edge case, and dependency
-  has a unique ID.
-- Every approved `HU01`-`HU10` capability is covered or explicitly explained as
-  deferred, excluded, or blocked.
-- Every MVP item is classified as `MVP_CORE` or `MVP_SUPPORTING`.
-- Every story is atomic, uses the requested structure, and has testable
-  criteria.
-- Score rules are represented accurately: `.abc`, plain text, non-empty
-  content, 1,000-character maximum, ABC validation, line breaks, and format.
-- Ownership is represented for editing and deleting publications.
-- No audio, image, voice, OMR, differentiated roles, or unsupported feature was
-  silently added to MVP 1.
-- P01 assumptions, unknowns, and open questions remain visible.
-- No architecture, implementation, technology, or planning decision was added.
-- All references point to existing IDs.
-- `REQUIREMENTS.md` and `product_backlog.json` are consistent.
-- The JSON parses as valid machine-readable JSON.
-- The final status reflects actual completeness rather than artifact existence.
-
-## 10. Failure Conditions and Transition
-
-Set the status to `BLOCKED` when the Product Vision is unavailable, the P01
-validation is blocking, the users or MVP boundary are undefined, or a major
-contradiction prevents reliable requirements.
-
-When the status is `READY` or `READY_WITH_ASSUMPTIONS`, the artifacts are ready
-for `P02 Requirements Validation`. After successful validation they become the
-inputs to P03, which alone determines prioritization, estimation, releases,
-sprints, and work allocation.
+`BLOCKED` if the vision is unavailable, P01 is blocking, or a contradiction prevents reliable requirements. Otherwise the artifacts go to P02 validation; after it, P03 alone decides priority, points, releases, sprints and assignments.

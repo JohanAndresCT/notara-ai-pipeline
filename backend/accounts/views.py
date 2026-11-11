@@ -20,7 +20,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 
 from .models import User
 
-PROFILE_INSTRUMENTS = {"Piano", "Guitarra", "Violín", "Flauta", "Voz", "Otro"}
+PROFILE_INSTRUMENTS = {"Piano", "Guitarra", "Violín", "Flauta", "Trompeta", "Saxofón", "Otro"}
 
 
 @ensure_csrf_cookie

@@ -1,0 +1,256 @@
+{
+  "evaluation_version": "2.0",
+  "overall_verdict": "NEEDS_ITERATION",
+  "evaluation_date": "2026-11-11",
+  "mvp_maturity": "PARTIALLY_VERIFIED",
+  "p09_status": "PASS_WITH_WARNINGS",
+  "requirements": {
+    "total": 62,
+    "verified": 19,
+    "partially_verified": 42,
+    "not_verified": 1,
+    "not_implemented": 0,
+    "data_unavailable": 0,
+    "not_applicable": 0
+  },
+  "testing": {
+    "execution_status": "PASS_WITH_WARNINGS",
+    "tests_passed": 175,
+    "tests_failed": 0,
+    "tests_skipped_sqlite": 2,
+    "backend_sqlite": "175 run, OK (2 PostgreSQL-only skipped)",
+    "backend_postgresql": "175/175 OK (PostgreSQL 16, local container)",
+    "frontend_typecheck": "PASS",
+    "frontend_build": "PASS",
+    "e2e": "9/9 PASS (6 MVP 1 + 3 MVP 2)",
+    "coverage_percent": null,
+    "unresolved_blocker_defects": 0,
+    "unresolved_critical_defects": 0
+  },
+  "deployment": {
+    "status": "DEPLOYED_VERIFIED",
+    "operational_verification": "PARTIALLY_VERIFIED"
+  },
+  "documentation": {
+    "status": "PARTIALLY_VERIFIED",
+    "major_gaps": 0
+  },
+  "success_criteria": {
+    "total": 20,
+    "met": 7,
+    "partially_met": 11,
+    "not_met": 0,
+    "unmeasured": 2,
+    "not_applicable": 0
+  },
+  "user_and_business_outcomes": {
+    "status": "DATA_UNAVAILABLE",
+    "notes": [
+      "No usage, adoption, engagement, learning-outcome, or business-impact dataset was available.",
+      "No numeric targets were approved for adoption, performance, usability, learning, or community activity."
+    ]
+  },
+  "findings": {
+    "blocker": 0,
+    "high": 0,
+    "medium": 7,
+    "low": 2,
+    "info": 0
+  },
+  "limitations": [
+    "Requirement metrics count 52 approved functional requirements and 10 approved non-functional requirements; 21 canonical stories are the traceability layer, not additional requirements.",
+    "P02 defines 96 acceptance-criteria records (95 active; AC-028 is superseded by AC-029). P10 assessed them through story-level evidence and did not rerun every criterion.",
+    "The current SQLite suite discovered 165 tests: 164 passed, one PostgreSQL-only concurrency test was skipped, and none failed.",
+    "Current frontend typecheck is blocked by locally unresolved manifest-declared packages; current frontend build and E2E were not run.",
+    "Historical P07 E2E evidence is 5/5 in Chromium and is not a current execution.",
+    "P08 records an E2E CI failure in run #15 with unknown cause and a passing run #14 on the same SHA; logs were not audited.",
+    "Deployment/runtime evidence is historical and limited to 2026-10-14; current availability and operations were not checked.",
+    "Human voice acceptance, approved corpus/target-environment measurements, cross-browser testing, accessibility, performance/load, and code coverage remain incomplete or unmeasured.",
+    "P03 keeps the known 31-SP plan for US-001-US-019; approved-scope US-020/US-021 are unplanned and have incomplete story-level acceptance evidence.",
+    "The project lead reported team approval of CR-005/006/007 in the request received 2026-11-11; formal approval record/date remains pending documentation."
+  ],
+  "evidence_sources": [
+    "ai-pipeline/outputs/00_context/DECISIONS_MVP2.md",
+    "ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md",
+    "ai-pipeline/outputs/02_requirements/REQUIREMENTS.md",
+    "ai-pipeline/outputs/02_requirements/REQUIREMENTS_VALIDATION.md",
+    "ai-pipeline/outputs/02_requirements/product_backlog.json",
+    "ai-pipeline/outputs/03_planning/PRIORITIZATION.md",
+    "ai-pipeline/outputs/03_planning/PRIORITIZATION_VALIDATION.md",
+    "ai-pipeline/outputs/03_planning/product_backlog.json",
+    "ai-pipeline/outputs/04_ux/UX_SPEC.md",
+    "ai-pipeline/outputs/05_architecture/ARCHITECTURE.md",
+    "ai-pipeline/outputs/06_implementation/IMPLEMENTATION_VALIDATION_MVP2.md",
+    "ai-pipeline/outputs/06_implementation/US-016_AUDIO_CACHE_VALIDATION.md",
+    "ai-pipeline/outputs/06_implementation/US-017_VOICE_FALLBACK_VALIDATION.md",
+    "ai-pipeline/outputs/07_testing/TEST_VALIDATION.md",
+    "ai-pipeline/outputs/07_testing/TEST_PLAN.md",
+    "ai-pipeline/outputs/08_cicd/CICD_VALIDATION.md",
+    "ai-pipeline/outputs/09_documentation/DOCUMENTATION_REPORT.md",
+    "ai-pipeline/outputs/09_documentation/DOCUMENTATION_VALIDATION.md",
+    "README.md",
+    "docs/KNOWN_LIMITATIONS.md",
+    "docs/REQUIREMENTS_COVERAGE.md"
+  ],
+  "history": [
+    {
+      "evaluation_version": "1.0",
+      "overall_verdict": "NEEDS_ITERATION",
+      "evaluation_date": "2026-11-11",
+      "testing": {
+        "execution_status": "PASS_WITH_WARNINGS",
+        "tests_passed": 164,
+        "tests_failed": 0,
+        "coverage_percent": null,
+        "unresolved_blocker_defects": 0,
+        "unresolved_critical_defects": 0
+      },
+      "success_criteria": {
+        "total": 20,
+        "met": 7,
+        "partially_met": 9,
+        "not_met": 0,
+        "unmeasured": 4,
+        "not_applicable": 0
+      }
+    }
+  ],
+  "mvp2": {
+    "approved_requirements": {
+      "total": 62,
+      "fr": 52,
+      "nfr": 10,
+      "user_stories": 21,
+      "acceptance_criteria": 96,
+      "cr_linked_with_formal_record_pending": {
+        "crs": [
+          "CR-005",
+          "CR-006",
+          "CR-007"
+        ],
+        "fr": "FR-047–FR-052",
+        "stories": [
+          "US-020",
+          "US-021"
+        ],
+        "ac": "AC-078–AC-096"
+      },
+      "verified": 19,
+      "partially_verified": 42,
+      "not_verified": 1
+    },
+    "proposed_requirements": {
+      "total": 0,
+      "note": "CR-005/006/007 approval reported by the project lead (Q-030 formal record pending); no item remains only proposed"
+    },
+    "decisions": {
+      "range": "DEC-201–DEC-244",
+      "status": "Recorded in DECISIONS_MVP2.md; DEC-230–DEC-239 team ratification pending (Q-020); DEC-242–DEC-244 approval reported, formal record pending"
+    },
+    "ai_components": [
+      {
+        "component": "Whisper Base (faster-whisper, local)",
+        "stories": [
+          "US-011",
+          "US-012"
+        ],
+        "evidence_class": "AUTOMATED_EXECUTED (fake adapter) + SIMULATED (synthetic speech)",
+        "quality": "Synthetic corpus only (21/27 before AI normalisation); human corpus AC-070 NOT_RUN",
+        "latency": "Not measured on target environment (AC-071 open)",
+        "risks": [
+          "CPU/memory in 1 GiB container (AC-072)",
+          "Model provisioned at build time; pinned revision and SHA-256 manifest"
+        ]
+      },
+      {
+        "component": "ElevenLabs (primary TTS) / edge-tts (fallback)",
+        "stories": [
+          "US-013",
+          "US-014",
+          "US-016",
+          "US-017",
+          "US-018"
+        ],
+        "evidence_class": "AUTOMATED_EXECUTED (FakeTts, mocked payloads) + USER_REPORTED (real key, local)",
+        "quality": "Human listening NOT_RUN",
+        "latency": "Not measured",
+        "risks": [
+          "Free plan: premade voices only (402 for library voices)",
+          "Credits/quota",
+          "Committed key in 12c5e85 must be revoked (EVAL-010)"
+        ]
+      },
+      {
+        "component": "Google Gemini (generateContent)",
+        "stories": [
+          "US-011 (CR-006)",
+          "US-021 typed answers"
+        ],
+        "evidence_class": "AUTOMATED_EXECUTED (mocked) + SIMULATED (real provider, local)",
+        "quality": "CR-006 local check: 7/8 transcripts as expected, no invented notes; AC-082 corpus NOT_RUN",
+        "latency": "0.9–7.0 s per normalisation call (local, real provider)",
+        "risks": [
+          "Model retirement for new keys (2.5 → 3.5 flash-lite)",
+          "8 s timeout keeps M-01 path",
+          "LLM answers may be wrong (disclaimer M-19)"
+        ]
+      },
+      {
+        "component": "Gemini Live (native audio)",
+        "stories": [
+          "US-021"
+        ],
+        "evidence_class": "AUTOMATED_EXECUTED (token endpoint mocked) + SIMULATED (synthetic microphone)",
+        "quality": "Correct spoken answer in simulated session; real microphone NOT_RUN",
+        "latency": "Session live in 1.9 s; first audio ~4.1 s (local)",
+        "risks": [
+          "v1alpha endpoint and alias model (ARCH-RISK-212)",
+          "Requires HTTPS",
+          "Free-tier limits; per-user daily quota BR-033"
+        ]
+      },
+      {
+        "component": "Magenta DDSP (TensorFlow.js)",
+        "stories": [
+          "US-020"
+        ],
+        "evidence_class": "SIMULATED (embedded browser, WebGL) + AUTOMATED_EXECUTED (UI E2E)",
+        "quality": "Pitch check: flute 13/13, violin 11/13 (estimator octave errors); listening NOT_RUN",
+        "latency": "First use 4.4 s (model download); 1.2–1.6 s afterwards",
+        "risks": [
+          "Checkpoints hosted on Google Cloud Storage (ARCH-RISK-211)",
+          "16 kHz output",
+          "Tone.js fallback with notice M-20"
+        ]
+      },
+      {
+        "component": "Tone.js (non-AI synthesis)",
+        "stories": [
+          "US-015",
+          "US-020"
+        ],
+        "evidence_class": "AUTOMATED_EXECUTED (build, UI E2E) + SIMULATED (MP3 render)",
+        "quality": "Valid MP3 for all instruments; listening NOT_RUN",
+        "latency": "MP3 render 4.5–10 s for 42 events",
+        "risks": [
+          "Synthesised timbres, not samples"
+        ]
+      }
+    ],
+    "manual_acceptance_pending": [
+      "Real microphone HU11/HU12 (checklist #1–#7)",
+      "Human listening HU13–HU16, HU18, HU20 (#8–#12)",
+      "HU11 corpus AC-070–AC-072 and AC-082",
+      "ElevenLabs invalid-key fallback in production (#13)",
+      "Railway /data persistence and MVP 2 migrations (#14–#15)",
+      "Tutor conversation with real microphone"
+    ],
+    "new_findings": [
+      "EVAL-010",
+      "EVAL-011"
+    ],
+    "resolved_findings": [
+      "EVAL-002"
+    ]
+  }
+}

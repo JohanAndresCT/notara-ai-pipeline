@@ -1,0 +1,933 @@
+{
+  "backlog_metadata": {
+    "project": "Notara",
+    "version": "4.6",
+    "stage": "P03",
+    "release": "MVP 2 - Sprint 2",
+    "status": "READY_WITH_ASSUMPTIONS",
+    "purpose": "Prioritized planning index for MVP 2, with MVP 1 kept as delivered baseline.",
+    "source_artifacts": [
+      "ai-pipeline/outputs/03_planning/PRIORITIZATION.md",
+      "ai-pipeline/outputs/02_requirements/REQUIREMENTS.md (v5.6)",
+      "ai-pipeline/outputs/02_requirements/product_backlog.json",
+      "ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md",
+      "ai-pipeline/outputs/00_context/DECISIONS_MVP2.md",
+      "ai-pipeline/outputs/00_context/CR-003_WHISPER_TINY.md",
+      "ai-pipeline/outputs/00_context/CR-004_WHISPER_BASE.md",
+      "ai-pipeline/outputs/00_context/CR-005_INSTRUMENTS.md",
+      "ai-pipeline/outputs/00_context/CR-006_GEMINI_DICTATION.md",
+      "ai-pipeline/outputs/00_context/CR-007_GEMINI_LIVE_TUTOR.md"
+    ],
+    "canonical_story_source": "ai-pipeline/outputs/02_requirements/product_backlog.json",
+    "capacity": {
+      "total_story_points": 31,
+      "committed_p0": 21,
+      "target_p1": 8,
+      "stretch_p2": 2,
+      "provisional_story_points": 8,
+      "reference_mvp1_story_points": 31,
+      "approved_unplanned_items": 2
+    },
+    "preconditions": [
+      "PRE-001",
+      "PRE-002",
+      "PRE-003",
+      "PRE-004",
+      "PRE-005",
+      "PRE-006",
+      "PRE-007",
+      "PRE-008",
+      "PRE-009",
+      "PRE-010",
+      "PRE-011"
+    ],
+    "assignment_note": "assigned_developers stays empty until the team provides owners (Q-010 / PRE-006).",
+    "previous_version": "1.0 (MVP 1; source paths updated from artifacts/ to ai-pipeline/outputs/)",
+    "approval_documentation_pending": [
+      {
+        "change_request": "CR-005",
+        "canonical_story": "US-020 / HU20",
+        "status": "TEAM_APPROVAL_REPORTED_BY_PROJECT_LEAD; FORMAL_RECORD_AND_DATE_PENDING",
+        "planned": false
+      },
+      {
+        "change_request": "CR-006",
+        "canonical_story": "US-011 amendment",
+        "status": "TEAM_APPROVAL_REPORTED_BY_PROJECT_LEAD; FORMAL_RECORD_AND_DATE_PENDING",
+        "planned": false
+      },
+      {
+        "change_request": "CR-007",
+        "canonical_story": "US-021 / HU21",
+        "status": "TEAM_APPROVAL_REPORTED_BY_PROJECT_LEAD; FORMAL_RECORD_AND_DATE_PENDING",
+        "planned": false
+      }
+    ],
+    "notes": "The approved scope contains US-001-US-021, with US-020 and US-021 canonical but unplanned. The explicit priority/capacity plan remains for US-001-US-019 only (31 SP: P0 21, P1 8, P2 2); the two added stories have no supplied priority, Story Points, delivery order, release, sprint, or assignment, and are not included in the 31-SP total. CR-003 changes only the STT engine; HU11-specific decisions and applicable ADRs are ratified for planning; PRE-002 is satisfied and PRE-011 is approved for planning, with empirical acceptance verification pending. PRE-001 remains open for other MVP 2 decisions; HU11 no longer depends on a paid STT key. CR-004 approves Whisper Base for HU11/HU12 implementation per requester authorization on 2026-11-09. Project lead reported team approval of CR-005/006/007 in the request received 2026-11-11; formal approval record/date remains pending documentation. P06/P07 implementation and test evidence does not imply acceptance or release. No current-tree MVP 2 release was confirmed; US-011-US-019 delivery_status remains PLANNED; US-020/US-021 remain UNPLANNED_APPROVED_SCOPE.",
+    "merge_note": "v4.6 reconciles the reported scope approvals with P02 v5.6; existing 31-SP plan and all assigned values remain unchanged."
+  },
+  "items": [
+    {
+      "id": "US-001",
+      "title": "Register an account",
+      "hu_ids": [
+        "HU01"
+      ],
+      "mvp_ids": [
+        "MVP-001"
+      ],
+      "priority": "P0",
+      "scope": "MVP_CORE",
+      "delivery_group_order": 1,
+      "depends_on_hu_ids": [],
+      "requirement_ids": [
+        "FR-001"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-001",
+        "AC-002"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-001",
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "PRIORITIZED",
+      "delivery_status": "DELIVERED",
+      "delivered_in": "v1.0.0"
+    },
+    {
+      "id": "US-002",
+      "title": "Authenticate and leave the account",
+      "hu_ids": [
+        "HU02"
+      ],
+      "mvp_ids": [
+        "MVP-002"
+      ],
+      "priority": "P0",
+      "scope": "MVP_CORE",
+      "delivery_group_order": 1,
+      "depends_on_hu_ids": [],
+      "requirement_ids": [
+        "FR-002",
+        "FR-017"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-003",
+        "AC-004",
+        "AC-005"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-002",
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "PRIORITIZED",
+      "delivery_status": "DELIVERED",
+      "delivered_in": "v1.0.0"
+    },
+    {
+      "id": "US-003",
+      "title": "Manage profile information",
+      "hu_ids": [
+        "HU03"
+      ],
+      "mvp_ids": [
+        "MVP-003"
+      ],
+      "priority": "P1",
+      "scope": "MVP_SUPPORTING",
+      "delivery_group_order": 2,
+      "depends_on_hu_ids": [
+        "HU01",
+        "HU02"
+      ],
+      "requirement_ids": [
+        "FR-003",
+        "FR-004"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-006",
+        "AC-007",
+        "AC-008"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-003",
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "PRIORITIZED",
+      "delivery_status": "DELIVERED",
+      "delivered_in": "v1.0.0"
+    },
+    {
+      "id": "US-004",
+      "title": "Publish a textual score",
+      "hu_ids": [
+        "HU04"
+      ],
+      "mvp_ids": [
+        "MVP-004"
+      ],
+      "priority": "P0",
+      "scope": "MVP_CORE",
+      "delivery_group_order": 3,
+      "depends_on_hu_ids": [
+        "HU02"
+      ],
+      "requirement_ids": [
+        "FR-005",
+        "FR-006",
+        "FR-007",
+        "FR-008",
+        "FR-009",
+        "FR-017"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-009",
+        "AC-010",
+        "AC-011",
+        "AC-012"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-004",
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "PRIORITIZED",
+      "delivery_status": "DELIVERED",
+      "delivered_in": "v1.0.0"
+    },
+    {
+      "id": "US-005",
+      "title": "Edit an owned score",
+      "hu_ids": [
+        "HU05"
+      ],
+      "mvp_ids": [
+        "MVP-005"
+      ],
+      "priority": "P1",
+      "scope": "MVP_SUPPORTING",
+      "delivery_group_order": 6,
+      "depends_on_hu_ids": [
+        "HU02",
+        "HU04"
+      ],
+      "requirement_ids": [
+        "FR-010",
+        "FR-017"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-013",
+        "AC-014"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-005",
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "PRIORITIZED",
+      "delivery_status": "DELIVERED",
+      "delivered_in": "v1.0.0"
+    },
+    {
+      "id": "US-006",
+      "title": "Delete an owned score",
+      "hu_ids": [
+        "HU06"
+      ],
+      "mvp_ids": [
+        "MVP-006"
+      ],
+      "priority": "P1",
+      "scope": "MVP_SUPPORTING",
+      "delivery_group_order": 6,
+      "depends_on_hu_ids": [
+        "HU02",
+        "HU04"
+      ],
+      "requirement_ids": [
+        "FR-011",
+        "FR-017"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-015",
+        "AC-016"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-006",
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "PRIORITIZED",
+      "delivery_status": "DELIVERED",
+      "delivered_in": "v1.0.0"
+    },
+    {
+      "id": "US-007",
+      "title": "Discover scores",
+      "hu_ids": [
+        "HU07"
+      ],
+      "mvp_ids": [
+        "MVP-007"
+      ],
+      "priority": "P0",
+      "scope": "MVP_CORE",
+      "delivery_group_order": 4,
+      "depends_on_hu_ids": [
+        "HU04"
+      ],
+      "requirement_ids": [
+        "FR-012",
+        "FR-013"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-017",
+        "AC-018",
+        "AC-019"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-007",
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "PRIORITIZED",
+      "delivery_status": "DELIVERED",
+      "delivered_in": "v1.0.0"
+    },
+    {
+      "id": "US-008",
+      "title": "Read score details",
+      "hu_ids": [
+        "HU08"
+      ],
+      "mvp_ids": [
+        "MVP-008"
+      ],
+      "priority": "P0",
+      "scope": "MVP_CORE",
+      "delivery_group_order": 4,
+      "depends_on_hu_ids": [
+        "HU04"
+      ],
+      "requirement_ids": [
+        "FR-014"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-020",
+        "AC-021",
+        "AC-022"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-008",
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "PRIORITIZED",
+      "delivery_status": "DELIVERED",
+      "delivered_in": "v1.0.0"
+    },
+    {
+      "id": "US-009",
+      "title": "React to another user's score",
+      "hu_ids": [
+        "HU09"
+      ],
+      "mvp_ids": [
+        "MVP-009"
+      ],
+      "priority": "P0",
+      "scope": "MVP_CORE",
+      "delivery_group_order": 5,
+      "depends_on_hu_ids": [
+        "HU02",
+        "HU08"
+      ],
+      "requirement_ids": [
+        "FR-015",
+        "FR-017"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-023",
+        "AC-024",
+        "AC-025"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-009",
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "PRIORITIZED",
+      "delivery_status": "DELIVERED",
+      "delivered_in": "v1.0.0"
+    },
+    {
+      "id": "US-010",
+      "title": "Comment on another user's score",
+      "hu_ids": [
+        "HU10"
+      ],
+      "mvp_ids": [
+        "MVP-010"
+      ],
+      "priority": "P0",
+      "scope": "MVP_CORE",
+      "delivery_group_order": 5,
+      "depends_on_hu_ids": [
+        "HU02",
+        "HU08"
+      ],
+      "requirement_ids": [
+        "FR-016",
+        "FR-017",
+        "FR-028"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-026",
+        "AC-027",
+        "AC-028",
+        "AC-029"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-010",
+      "story_points": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "status": "PRIORITIZED",
+      "delivery_status": "DELIVERED",
+      "delivered_in": "v1.0.0",
+      "notes": "Amended in MVP 2 by DEC-211 (AC-028 superseded by AC-029); deletion already delivered in v1.0.0."
+    },
+    {
+      "id": "US-011",
+      "title": "Dictate a score by voice",
+      "hu_ids": [
+        "HU11"
+      ],
+      "mvp_ids": [
+        "MVP-011"
+      ],
+      "priority": "P0",
+      "scope": "MVP_CORE",
+      "delivery_group_order": "3",
+      "depends_on": [
+        "US-004",
+        "US-005",
+        "PRE-007",
+        "PRE-002",
+        "PRE-011"
+      ],
+      "requirement_ids": [
+        "FR-018",
+        "FR-019",
+        "FR-020",
+        "FR-021",
+        "FR-025",
+        "FR-029",
+        "FR-030",
+        "FR-043",
+        "FR-045"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-030",
+        "AC-031",
+        "AC-032",
+        "AC-033",
+        "AC-034",
+        "AC-035",
+        "AC-036",
+        "AC-070",
+        "AC-071",
+        "AC-072",
+        "AC-073",
+        "AC-074",
+        "AC-075"
+      ],
+      "decision_ids": [
+        "DEC-201",
+        "DEC-205",
+        "DEC-208",
+        "DEC-213",
+        "DEC-214",
+        "DEC-215",
+        "DEC-218",
+        "DEC-219"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-011",
+      "story_points": 8,
+      "estimate_status": "PROVISIONAL",
+      "estimate_source": "SPRINT_2_BACKLOG_INPUT.md + DEC-208",
+      "moscow": "Must",
+      "capacity_band": "COMMITTED",
+      "drop_order": null,
+      "release": "MVP 2",
+      "sprint": "Sprint 2",
+      "assigned_developers": [],
+      "delivery_status": "PLANNED",
+      "status": "PRIORITIZED",
+      "change_request_ids": [
+        "CR-003"
+      ]
+    },
+    {
+      "id": "US-012",
+      "title": "Leave a voice comment",
+      "hu_ids": [
+        "HU12"
+      ],
+      "mvp_ids": [
+        "MVP-012"
+      ],
+      "priority": "P1",
+      "scope": "MVP_SUPPORTING",
+      "delivery_group_order": "4b",
+      "depends_on": [
+        "US-010",
+        "US-011",
+        "PRE-005"
+      ],
+      "requirement_ids": [
+        "FR-026",
+        "FR-027",
+        "FR-028",
+        "FR-029",
+        "FR-030",
+        "FR-043",
+        "FR-045",
+        "FR-046"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-037",
+        "AC-038",
+        "AC-039",
+        "AC-040",
+        "AC-041",
+        "AC-042",
+        "AC-076",
+        "AC-077"
+      ],
+      "decision_ids": [
+        "DEC-201",
+        "DEC-211",
+        "DEC-213",
+        "DEC-214",
+        "DEC-215"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-012",
+      "story_points": 3,
+      "estimate_status": "TEAM",
+      "estimate_source": "SPRINT_2_BACKLOG_INPUT.md",
+      "moscow": "Should",
+      "capacity_band": "TARGET",
+      "drop_order": 2,
+      "release": "MVP 2",
+      "sprint": "Sprint 2",
+      "assigned_developers": [],
+      "delivery_status": "PLANNED",
+      "status": "PRIORITIZED"
+    },
+    {
+      "id": "US-013",
+      "title": "Listen to the spoken solfege",
+      "hu_ids": [
+        "HU13"
+      ],
+      "mvp_ids": [
+        "MVP-013"
+      ],
+      "priority": "P0",
+      "scope": "MVP_CORE",
+      "delivery_group_order": "2c",
+      "depends_on": [
+        "US-016",
+        "US-017"
+      ],
+      "requirement_ids": [
+        "FR-031",
+        "FR-032",
+        "FR-033",
+        "FR-036",
+        "FR-037",
+        "FR-043",
+        "FR-044"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-043",
+        "AC-044",
+        "AC-045",
+        "AC-046",
+        "AC-047",
+        "AC-048"
+      ],
+      "decision_ids": [
+        "DEC-202",
+        "DEC-206",
+        "DEC-207",
+        "DEC-213",
+        "DEC-215"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-013",
+      "story_points": 5,
+      "estimate_status": "TEAM",
+      "estimate_source": "SPRINT_2_BACKLOG_INPUT.md",
+      "moscow": "Must",
+      "capacity_band": "COMMITTED",
+      "drop_order": null,
+      "release": "MVP 2",
+      "sprint": "Sprint 2",
+      "assigned_developers": [],
+      "delivery_status": "PLANNED",
+      "status": "PRIORITIZED"
+    },
+    {
+      "id": "US-014",
+      "title": "Listen to the audio tutor",
+      "hu_ids": [
+        "HU14"
+      ],
+      "mvp_ids": [
+        "MVP-014"
+      ],
+      "priority": "P1",
+      "scope": "MVP_SUPPORTING",
+      "delivery_group_order": "4a",
+      "depends_on": [
+        "US-016",
+        "US-017"
+      ],
+      "requirement_ids": [
+        "FR-033",
+        "FR-034",
+        "FR-036",
+        "FR-037",
+        "FR-043",
+        "FR-044"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-049",
+        "AC-050",
+        "AC-051"
+      ],
+      "decision_ids": [
+        "DEC-202",
+        "DEC-207",
+        "DEC-212",
+        "DEC-213",
+        "DEC-215"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-014",
+      "story_points": 3,
+      "estimate_status": "TEAM",
+      "estimate_source": "SPRINT_2_BACKLOG_INPUT.md",
+      "moscow": "Should",
+      "capacity_band": "TARGET",
+      "drop_order": 3,
+      "release": "MVP 2",
+      "sprint": "Sprint 2",
+      "assigned_developers": [],
+      "delivery_status": "PLANNED",
+      "status": "PRIORITIZED"
+    },
+    {
+      "id": "US-015",
+      "title": "Play the score with an instrument",
+      "hu_ids": [
+        "HU15"
+      ],
+      "mvp_ids": [
+        "MVP-015"
+      ],
+      "priority": "P0",
+      "scope": "MVP_CORE",
+      "delivery_group_order": "1a",
+      "depends_on": [
+        "US-004",
+        "US-008"
+      ],
+      "requirement_ids": [
+        "FR-035",
+        "FR-036",
+        "FR-037"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-052",
+        "AC-053",
+        "AC-054"
+      ],
+      "decision_ids": [
+        "DEC-203",
+        "DEC-207"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-015",
+      "story_points": 3,
+      "estimate_status": "TEAM",
+      "estimate_source": "SPRINT_2_BACKLOG_INPUT.md",
+      "moscow": "Must",
+      "capacity_band": "COMMITTED",
+      "drop_order": null,
+      "release": "MVP 2",
+      "sprint": "Sprint 2",
+      "assigned_developers": [],
+      "delivery_status": "PLANNED",
+      "status": "PRIORITIZED"
+    },
+    {
+      "id": "US-016",
+      "title": "Reuse synthesized audio",
+      "hu_ids": [
+        "HU16"
+      ],
+      "mvp_ids": [
+        "MVP-016"
+      ],
+      "priority": "P0",
+      "scope": "MVP_SUPPORTING",
+      "delivery_group_order": "2b",
+      "depends_on": [
+        "US-017",
+        "PRE-005"
+      ],
+      "requirement_ids": [
+        "FR-038",
+        "FR-039"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-055",
+        "AC-056",
+        "AC-057",
+        "AC-058"
+      ],
+      "decision_ids": [
+        "DEC-210",
+        "DEC-214"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-016",
+      "story_points": 3,
+      "estimate_status": "TEAM",
+      "estimate_source": "SPRINT_2_BACKLOG_INPUT.md",
+      "moscow": "Must",
+      "capacity_band": "COMMITTED",
+      "drop_order": null,
+      "release": "MVP 2",
+      "sprint": "Sprint 2",
+      "assigned_developers": [],
+      "delivery_status": "PLANNED",
+      "status": "PRIORITIZED"
+    },
+    {
+      "id": "US-017",
+      "title": "Fall back to a free voice",
+      "hu_ids": [
+        "HU17"
+      ],
+      "mvp_ids": [
+        "MVP-017"
+      ],
+      "priority": "P0",
+      "scope": "MVP_SUPPORTING",
+      "delivery_group_order": "2a",
+      "depends_on": [],
+      "requirement_ids": [
+        "FR-040",
+        "FR-041"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-059",
+        "AC-060",
+        "AC-061",
+        "AC-062",
+        "AC-063"
+      ],
+      "decision_ids": [
+        "DEC-202",
+        "DEC-209",
+        "DEC-216"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-017",
+      "story_points": 2,
+      "estimate_status": "TEAM",
+      "estimate_source": "SPRINT_2_BACKLOG_INPUT.md",
+      "moscow": "Must",
+      "capacity_band": "COMMITTED",
+      "drop_order": null,
+      "release": "MVP 2",
+      "sprint": "Sprint 2",
+      "assigned_developers": [],
+      "delivery_status": "PLANNED",
+      "status": "PRIORITIZED"
+    },
+    {
+      "id": "US-018",
+      "title": "Download the solfege as MP3",
+      "hu_ids": [
+        "HU18"
+      ],
+      "mvp_ids": [
+        "MVP-018"
+      ],
+      "priority": "P2",
+      "scope": "MVP_SUPPORTING",
+      "delivery_group_order": "5",
+      "depends_on": [
+        "US-013"
+      ],
+      "requirement_ids": [
+        "FR-036",
+        "FR-042",
+        "FR-044"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-064",
+        "AC-065"
+      ],
+      "decision_ids": [
+        "DEC-204",
+        "DEC-207"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-018",
+      "story_points": 2,
+      "estimate_status": "TEAM",
+      "estimate_source": "SPRINT_2_BACKLOG_INPUT.md",
+      "moscow": "Could",
+      "capacity_band": "STRETCH",
+      "drop_order": 1,
+      "release": "MVP 2",
+      "sprint": "Sprint 2",
+      "assigned_developers": [],
+      "delivery_status": "PLANNED",
+      "status": "PRIORITIZED"
+    },
+    {
+      "id": "US-019",
+      "title": "Load a score from an .abc file",
+      "hu_ids": [
+        "HU19"
+      ],
+      "mvp_ids": [
+        "MVP-019"
+      ],
+      "priority": "P1",
+      "scope": "MVP_SUPPORTING",
+      "delivery_group_order": "1b",
+      "depends_on": [
+        "US-004",
+        "US-005"
+      ],
+      "requirement_ids": [
+        "FR-022",
+        "FR-023",
+        "FR-024",
+        "FR-025"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-066",
+        "AC-067",
+        "AC-068",
+        "AC-069"
+      ],
+      "decision_ids": [
+        "DEC-217",
+        "DEC-218"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-019",
+      "story_points": 2,
+      "estimate_status": "TEAM",
+      "estimate_source": "SPRINT_2_BACKLOG_INPUT.md",
+      "moscow": "Should",
+      "capacity_band": "TARGET",
+      "drop_order": 4,
+      "release": "MVP 2",
+      "sprint": "Sprint 2",
+      "assigned_developers": [],
+      "delivery_status": "PLANNED",
+      "status": "PRIORITIZED"
+    },
+    {
+      "id": "US-020",
+      "title": "Play the score with other instruments",
+      "hu_ids": [
+        "HU20"
+      ],
+      "mvp_ids": [
+        "MVP-020"
+      ],
+      "priority": null,
+      "scope": "MVP_SUPPORTING",
+      "delivery_group_order": null,
+      "depends_on": [],
+      "requirement_ids": [
+        "FR-051",
+        "FR-052"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-090",
+        "AC-091",
+        "AC-092",
+        "AC-093",
+        "AC-094",
+        "AC-095",
+        "AC-096"
+      ],
+      "decision_ids": [
+        "DEC-242"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-020",
+      "story_points": null,
+      "estimate_status": "UNASSIGNED",
+      "moscow": null,
+      "capacity_band": null,
+      "drop_order": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "delivery_status": "UNPLANNED_APPROVED_SCOPE",
+      "status": "UNPLANNED"
+    },
+    {
+      "id": "US-021",
+      "title": "Talk to the music tutor about a score",
+      "hu_ids": [
+        "HU21"
+      ],
+      "mvp_ids": [
+        "MVP-021"
+      ],
+      "priority": null,
+      "scope": "MVP_SUPPORTING",
+      "delivery_group_order": null,
+      "depends_on": [],
+      "requirement_ids": [
+        "FR-047",
+        "FR-048",
+        "FR-049",
+        "FR-050"
+      ],
+      "acceptance_criteria_source_ids": [
+        "AC-083",
+        "AC-084",
+        "AC-085",
+        "AC-086",
+        "AC-087",
+        "AC-088",
+        "AC-089"
+      ],
+      "decision_ids": [
+        "DEC-244"
+      ],
+      "canonical_story_ref": "ai-pipeline/outputs/02_requirements/product_backlog.json#US-021",
+      "story_points": null,
+      "estimate_status": "UNASSIGNED",
+      "moscow": null,
+      "capacity_band": null,
+      "drop_order": null,
+      "release": null,
+      "sprint": null,
+      "assigned_developers": [],
+      "delivery_status": "UNPLANNED_APPROVED_SCOPE",
+      "status": "UNPLANNED"
+    }
+  ]
+}

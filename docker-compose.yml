@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:16-alpine
@@ -9,7 +7,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-notara}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-notara}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - notara_postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -44,15 +42,16 @@ services:
         condition: service_healthy
 
   frontend:
-    image: node:20-alpine
+    image: node:24-alpine
     container_name: notara-frontend
     working_dir: /app
     command: >
-      sh -lc "npm install && npm run dev -- --host 0.0.0.0"
+      sh -lc "corepack enable && pnpm install --frozen-lockfile && pnpm dev --host 0.0.0.0"
     environment:
       VITE_API_PROXY_TARGET: http://backend:8000
     volumes:
       - ./frontend:/app
+      - ./.figma:/.figma:ro
     ports:
       - "5173:5173"
     depends_on:
@@ -60,3 +59,4 @@ services:
 
 volumes:
   notara_postgres_data:
+    

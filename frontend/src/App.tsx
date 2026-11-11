@@ -8,6 +8,7 @@ import ScoreDetailPage from "./ScoreDetailPage";
 import ScoreEditPage from "./ScoreEditPage";
 import AppShell from "./AppShell";
 import { getCurrentUser, type NotaraUser } from "./lib/api";
+import Icon from "./Icon";
 
 export default function App() {
   const [user, setUser] = useState<NotaraUser | null>(null);
@@ -27,7 +28,7 @@ export default function App() {
   if (isCheckingSession) {
     return (
       <main className="app-loading" role="status">
-        <span className="logo-mark" aria-hidden="true">♫</span>
+        <span className="logo-mark" aria-hidden="true"><Icon name="music" size={18} /></span>
         <p>Buscando tu espacio en la comunidad...</p>
       </main>
     );

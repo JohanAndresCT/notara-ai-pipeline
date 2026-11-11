@@ -1,3 +1,5 @@
+import Icon from "./Icon";
+
 type PublicPage = "home" | "login" | "register";
 
 export default function PublicHeader({ current }: { current: PublicPage }) {
@@ -15,7 +17,7 @@ export default function PublicHeader({ current }: { current: PublicPage }) {
     <header className="public-header">
       <nav className="public-nav" aria-label="Navegación principal">
         <a className="logo" href="/" aria-label="Inicio de Notara">
-          <span className="logo-mark" aria-hidden="true">♫</span>
+          <span className="logo-mark" aria-hidden="true"><Icon name="music" size={18} /></span>
           <span>Notara</span>
         </a>
         <div className="public-actions">

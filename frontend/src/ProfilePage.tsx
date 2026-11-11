@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import type { NotaraUser } from "./lib/api";
 import { changePassword, instrumentOptions, updateProfile } from "./lib/api";
+import Icon from "./Icon";
 
 type ProfileTab = "profile" | "password";
 
@@ -90,7 +91,7 @@ export default function ProfilePage({
           <h1>Mi perfil</h1>
           <p>Administra tu información y la seguridad de tu cuenta.</p>
         </div>
-        <a className="button secondary small" href="/">← Volver al inicio</a>
+        <a className="button secondary small" href="/"><Icon name="arrowLeft" size={16} /> Volver al inicio</a>
       </header>
       <div className="profile-layout">
         <aside className="profile-summary">

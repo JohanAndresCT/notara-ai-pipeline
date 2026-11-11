@@ -1,408 +1,94 @@
 # P03 - Prioritization and Delivery Planning
 
-**Version:** 1.0
+**Version:** 2.1
 **Stage:** P03 - Planning
 **Type:** Generation Prompt
 **Project:** Notara
+**Release covered:** MVP 2 - Sprint 2 (Audio, Voice and TTS/STT), incremental update of MVP 1
 **Previous Stage:** P02 - Requirements
 **Next Stage:** P04 - UX/UI
 
+## Change Log
+
+| Version | Change |
+|---|---|
+| 1.0 | Prioritization of MVP 1 (HU01-HU10); no points, sprints or developers. |
+| 2.0 | Incremental mode for MVP 2 (HU11-HU19). Team-provided Story Points, MoSCoW, release and sprint from the Sprint 2 backlog and the decision log are approved sources and may be used; provisional estimates must be flagged. Developers stay unassigned until the team provides them (Q-010). Planned backlog paths updated from `artifacts/` to `outputs/`. |
+| 2.1 | Removed state that belonged to a specific run (decision ranges, ID ranges, provisional estimates, open rules). The prompt now refers to the current content of its inputs (`DECISIONS_MVP2.md`, the latest upstream artifacts) so it stays valid when decisions are added. |
+
 ## 1. Purpose
 
-Transform the validated Notara product vision and requirements into a
-traceable, risk-aware, and feasible prioritization and delivery plan for MVP 1.
+Transform the validated vision and requirements into a traceable, risk-aware and feasible prioritization and delivery plan for the current release, preserving MVP 1 as the delivered baseline.
 
-P03 decides **what should be delivered first, what can be delayed, and what is
-outside the current release**. It does not define screen designs, architecture,
-implementation details, or test automation.
+P03 decides what is delivered first, what can be dropped under pressure and what stays out. It does not design screens, architecture or implementation.
 
-The plan must focus on the smallest coherent product that demonstrates
-Notara's central value: authenticated users can publish short textual scores,
-discover and read them, filter by instrument, and receive lightweight community
-feedback through likes and comments.
-
-## 2. Inputs and Source of Truth
-
-Read all of these artifacts before planning:
+## 2. Inputs
 
 ```text
-ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md
-ai-pipeline/outputs/00_context/CONTEXT_VALIDATION.md
-ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md
-ai-pipeline/outputs/01_discovery/PRODUCT_VISION_VALIDATION.md
-ai-pipeline/outputs/02_requirements/REQUIREMENTS.md
-ai-pipeline/outputs/02_requirements/REQUIREMENTS_VALIDATION.md
+ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md and CONTEXT_VALIDATION.md
+ai-pipeline/outputs/00_context/SPRINT_2_BACKLOG_INPUT.md      (SP, MoSCoW, HU11-HU19)
+ai-pipeline/outputs/00_context/DECISIONS_MVP2.md              (all DEC-2NN)
+ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md and PRODUCT_VISION_VALIDATION.md
+ai-pipeline/outputs/02_requirements/REQUIREMENTS.md, product_backlog.json, REQUIREMENTS_VALIDATION.md
+ai-pipeline/outputs/03_planning/PRIORITIZATION.md and product_backlog.json (previous version, MVP 1)
+ai-pipeline/prompts/system/RELEASE_PLAN.md                    (MVP 1 load reference)
 ai-pipeline/prompts/system/SYSTEM_PROMPT.md
 ```
 
-Use the repository as the source of truth. Do not rely on undocumented
-conversation context.
-
-The required P02 inputs must be validated before proceeding:
-
-- `REQUIREMENTS.md` must be available and internally consistent.
-- `product_backlog.json` must be available through the requirements process.
-- `REQUIREMENTS_VALIDATION.md` must report `PASS` or
-  `PASS_WITH_WARNINGS`.
-
-If a required artifact is unavailable, malformed, contradictory, or blocked,
-do not invent a plan. Set the output status to `BLOCKED` and identify the
-blocking evidence.
+P02 validation must be `PASS` or `PASS_WITH_WARNINGS`; otherwise `BLOCKED`. Carry the P02 findings that affect planning (for example estimates that depend on PROPOSAL rules).
 
 ## 3. Role
 
-Act as a **Senior Product Strategy and Delivery Prioritization Analyst** for
-the Notara academic MVP.
-
-You must:
-
-- Prioritize validated requirements using user value, MVP strategy,
-  dependencies, feasibility, risk, and opportunity cost.
-- Preserve the approved Notara scope and traceability.
-- Make sequencing logic and trade-offs explicit.
-- Keep the plan feasible for the five-person team and one two-week sprint.
-- Distinguish product decisions from technical implementation decisions.
-- Preserve the approved decisions Q-001 through Q-006 from P02.
-
-You must not:
-
-- Add product features or invent requirements.
-- Reprioritize future functionality into MVP 1.
-- Assign developers, workload percentages, technologies, architecture, or
-  implementation tasks.
-- Invent Story Points, sprint commitments, estimates, or release dates unless
-  they are explicitly defined by an approved source.
-- Treat assumptions as facts.
-- Hide risks or dependencies to make the plan appear complete.
-
-## 4. Notara Planning Baseline
-
-### 4.1 Approved users
-
-Use only the users supported by P01:
-
-```text
-USER-001 - Music student
-USER-002 - Hobbyist musician
-USER-003 - Music teacher
-```
-
-MVP 1 has no differentiated roles. All registered users share the same general
-capabilities and manage their own publications.
-
-### 4.2 MVP capabilities
-
-Maintain this scope mapping:
-
-| Capability | IDs | Scope |
-|---|---|---|
-| Registration | HU01 / MVP-001 / FR-001 | MVP_CORE |
-| Login and logout | HU02 / MVP-002 / FR-002 | MVP_CORE |
-| Profile and password change | HU03 / MVP-003 / FR-003..FR-004 | MVP_SUPPORTING |
-| Publish `.abc` or plain-text score | HU04 / MVP-004 / FR-005..FR-009 | MVP_CORE |
-| Edit own publication | HU05 / MVP-005 / FR-010 | MVP_SUPPORTING |
-| Delete own publication | HU06 / MVP-006 / FR-011 | MVP_SUPPORTING |
-| Dashboard and instrument filtering | HU07 / MVP-007 / FR-012..FR-013 | MVP_CORE |
-| Feed and score detail | HU08 / MVP-008 / FR-014 | MVP_CORE |
-| Reactions | HU09 / MVP-009 / FR-015 | MVP_CORE |
-| Comments | HU10 / MVP-010 / FR-016 | MVP_CORE |
-
-FR-017 provides the authentication boundary for protected actions. NFR-001
-through NFR-003 provide the relevant display, responsive, and security
-constraints.
-
-### 4.3 Approved product decisions
-
-P02 resolved the following decisions and P03 must plan with them:
-
-- **Q-001:** MVP ABC validation requires non-empty content with `X:`, `T:`,
-  `M:`, `L:`, and `K:` fields plus a valid musical line. Advanced ABC features
-  are deferred.
-- **Q-002:** Validate current Chrome, Edge, and Firefox at 360 px, 768 px, and
-  1280 px widths. Safari is outside the initial validation scope.
-- **Q-003:** Show newest publications first, using simple pagination of 10
-  publications per page, with no additional ordering options.
-- **Q-004:** Comment editing and deletion are excluded from MVP 1.
-- **Q-005:** Account recovery is excluded from MVP 1; authenticated users can
-  change their password from the profile.
-- **Q-006:** MVP success is demonstrated by covering HU01-HU10, passing the
-  main acceptance criteria, and completing the flow from registration through
-  publication, discovery, comments, and reactions without out-of-scope
-  features.
-
-Do not reopen these decisions during P03 unless an explicit conflict is found
-in an approved source. If a conflict is found, report it rather than choosing
-silently.
-
-### 4.4 Explicitly deferred or excluded
-
-Classify these as `FUTURE`, `DEFERRED`, or `OUT_OF_SCOPE`; never as MVP Core:
-
-- Voice input, reserved for MVP 2.
-- Image recognition / OMR, reserved for MVP 3.
-- Image uploads.
-- Audio playback or audio sharing.
-- Differentiated roles or administration.
-- Comment editing or deletion.
-- Account recovery.
-- Additional feed sorting beyond newest-first.
-- Advanced ABC features beyond the approved minimal subset.
-
-## 5. Priority Model
-
-Use the following priority levels:
-
-```text
-P0 - Critical / required for the coherent MVP slice
-P1 - High / strongly recommended for MVP completion
-P2 - Medium / supporting or deferrable
-P3 - Low / future or optional
-BLOCKED - Cannot be prioritized without a required decision
-```
+Act as a **Senior Product Strategy and Delivery Prioritization Analyst**. Prioritize with user value, release strategy, dependencies, feasibility, risk and opportunity cost. Make trade-offs explicit.
 
-Evaluate each major capability or requirement using:
+You must not add features, move OMR or other exclusions into scope, invent estimates, dates or assignments, or choose technologies beyond decided constraints.
 
-1. **User value:** contribution to solving Notara's core problem.
-2. **MVP strategic value:** contribution to demonstrating the product promise.
-3. **Dependency position:** whether it unlocks other work.
-4. **Feasibility:** fit with the five-person team and one two-week sprint.
-5. **Delivery risk:** uncertainty, validation complexity, or rework risk.
-6. **Opportunity cost:** impact of delaying the item.
+## 4. Planning baseline
 
-Priority must be justified in plain language. Technical ease alone is not a
-reason to assign P0.
+- **MVP 1 (HU01-HU10):** delivered (tag `v1.0.0`); keep its priorities as the baseline and mark it delivered. MVP 1 decisions Q-001-Q-006 remain, except comment deletion, now governed by DEC-211 (supersedes P03 DEC-002).
+- **MVP 2:** the MVP 2 stories, FRs and NFRs in the latest `REQUIREMENTS.md`, as refined by every decision in `DECISIONS_MVP2.md`.
+- **Team estimates (approved source):** Story Points and MoSCoW from `SPRINT_2_BACKLOG_INPUT.md`, adjusted only by decisions in `DECISIONS_MVP2.md`. Compute totals per priority from those values; do not copy totals from a previous run.
+- **Provisional estimates:** an estimate is provisional only while a rule it depends on is still PROPOSAL in the latest `REQUIREMENTS.md`; otherwise it is a team estimate.
+- **Reference load:** MVP 1 delivered 31 SP in one two-week sprint with a five-person team (RELEASE_PLAN.md), evaluated `NEEDS_ITERATION`.
 
-## 6. Planning Process
+## 5. Priority model
 
-### Step 1 - Review upstream evidence
+`P0` required for the coherent release slice; `P1` strongly recommended; `P2` deferrable / stretch; `P3` future or excluded; `BLOCKED` cannot be planned without a decision. Map MoSCoW as a starting point (Must -> P0, Should -> P1, Could -> P2) and justify any deviation.
 
-Summarize the validated problem, target users, product value, MVP boundary,
-requirements status, P02 validation result, constraints, assumptions, and risks.
+## 6. Process
 
-### Step 2 - Define the MVP slice
+1. Summarize upstream evidence and the P02 warnings that affect planning.
+2. Define the release slice that demonstrates the value "dictate -> publish -> listen".
+3. Prioritize each US with rationale.
+4. Sequence delivery groups by dependency (DEP-004-DEP-010), external-dependency risk (keys, budget, storage) and risk discovery (high-uncertainty work early). Identify work that can start without external dependencies.
+5. Define a capacity cut line: committed (P0), target (P1), stretch (P2), and the drop order if capacity is insufficient.
+6. List preconditions (team decisions and verifications) with the stage that needs them.
+7. Record MVP 1 debt and defects that affect MVP 2 sequencing as dependencies for P05/P06, without designing their fix.
 
-Identify the minimum coherent sequence that demonstrates textual score sharing
-and community feedback. The slice should normally preserve this dependency
-logic:
+## 7. Boundaries
 
-```text
-Registration and authentication
-        ->
-Score publication and validation
-        ->
-Score discovery, filtering, and detail viewing
-        ->
-Reactions and comments
-        ->
-Ownership and supporting profile flows
-```
+P03 may decide priority, sequence, release slice, cut line and drop order, and may record team-provided SP, release and sprint. P03 must not decide technologies, architecture, implementation tasks, screen layouts, developer assignments, workload percentages or dates not given by the team.
 
-Do not assume that every supporting capability has higher priority than a core
-community capability. Explain trade-offs.
+## 8. Outputs
 
-### Step 3 - Prioritize capabilities and requirements
+### `ai-pipeline/outputs/03_planning/PRIORITIZATION.md`
 
-Assign a priority and rationale to each approved capability. Use existing IDs
-(`HU-*`, `MVP-*`, `FR-*`, `NFR-*`, `US-*`) exactly as defined in P02.
+Same high-level structure as version 1.0 (Metadata; Executive Summary; Priorities at a Glance; MVP Focus with Core, Supporting, Future/Deferred, Out of Scope; Delivery Sequence; Dependencies, Decisions and Risks; Requirements-to-Priority Traceability; Assumptions and Unknowns; Key Constraints; Final Recommendation; Status and Next Actions), plus a Change Log, a Capacity and Cut Line section and a Preconditions section.
 
-Do not invent requirement IDs. New planning-only IDs may use:
+### `ai-pipeline/outputs/03_planning/product_backlog.json`
 
-```text
-PRIOR-XXX
-PHASE-XXX
-DEP-XXX
-RISK-XXX
-ASSUM-XXX
-```
+Planned index: MVP 1 items kept with `delivery_status: "DELIVERED"`; MVP 2 items with `priority`, `delivery_group_order`, `depends_on`, `story_points` (team source), `estimate_status` (`TEAM` or `PROVISIONAL`), `release: "MVP 2"`, `sprint: "Sprint 2"`, `assigned_developers: []`, `status: "PRIORITIZED"`, and canonical references to `outputs/02_requirements/product_backlog.json`.
 
-### Step 4 - Sequence delivery
+## 9. Status
 
-Create an incremental delivery sequence that reflects:
+`READY`, `READY_WITH_ASSUMPTIONS` or `BLOCKED`. Use `READY_WITH_ASSUMPTIONS` when plan-relevant team decisions (dates, owners, budget, ratification, PROPOSAL rules) are still open.
 
-- Foundation before dependent community actions.
-- Score validation before publication.
-- Publication before discovery and interaction.
-- Core value before supporting profile polish.
-- Risk discovery before optional expansion.
+## 10. Self-review
 
-Because the project has a one-sprint constraint, distinguish work needed to
-demonstrate MVP value from work that should be deferred if capacity is
-insufficient. Do not assign individual developers or exact time estimates.
-
-### Step 5 - Identify dependencies, risks, and decisions
-
-For each major phase, document relevant dependencies and risks. Include:
-
-- Authentication before protected actions.
-- Valid publication before discovery and interaction.
-- ABC validation ambiguity as resolved scope that still carries implementation
-  risk.
-- Responsive validation across the approved browser and viewport matrix.
-- One-sprint scope pressure.
-- Ownership rules for editing and deleting publications.
-
-Do not turn technical design concerns into architecture decisions.
-
-### Step 6 - Define deferred work
-
-Separate MVP Core, MVP Supporting, Future/Deferred, and Out of Scope. Explain
-why an item is delayed or excluded and what evidence would justify revisiting
-it.
-
-## 7. Planning Boundaries
-
-P03 may decide:
-
-- Relative priority.
-- Product delivery sequence.
-- MVP slice.
-- Phase grouping.
-- Product-level dependency and risk order.
-- Whether an approved capability is deferred within the current plan.
-
-P03 must not decide:
-
-- Programming languages, frameworks, libraries, databases, APIs, or
-  architecture.
-- Source-code tasks or detailed implementation design.
-- Screen layouts or detailed UX behavior.
-- Developer assignments or workload percentages.
-- Story Points or precise effort estimates.
-- Sprint dates, release dates, or staffing commitments not provided by an
-  approved source.
-
-If P03 uses a phase or sequence, it is a product delivery grouping, not a
-technical sprint assignment.
-
-## 8. Required Output
-
-Generate:
-
-```text
-ai-pipeline/outputs/03_planning/PRIORITIZATION.md
-```
-
-Use this exact high-level structure:
-
-```markdown
-# Prioritization and Delivery Plan
-
-## 1. Document Metadata
-- Project:
-- Version:
-- Stage:
-- Status:
-- Source Artifacts:
-- Validation Statuses:
-
-## 2. Executive Summary
-
-## 3. Product Priorities at a Glance
-| Priority | Item / Capability | Why It Matters | Source / Requirement | Status |
-|---|---|---|---|---|
-
-## 4. MVP Focus
-### MVP Core
-| ID | Capability | User Value | Priority | Rationale |
-|---|---|---|---|---|
-
-### MVP Supporting
-| ID | Capability | User Value | Priority | Rationale |
-|---|---|---|---|---|
-
-### Future / Deferred
-| ID | Capability | Reason for Deferral | Priority |
-|---|---|---|---|
-
-### Out of Scope
-| ID | Excluded Item | Reason |
-|---|---|---|
-
-## 5. Delivery Sequence
-### Phase 1 - Foundation / MVP Validation
-| Order | Work Item | Depends On | Value Delivered |
-|---|---|---|---|
-
-### Phase 2 - Expansion / Post-MVP
-| Order | Work Item | Depends On | Value Delivered |
-|---|---|---|---|
-
-## 6. Dependencies, Decisions, and Risks
-| ID | Dependency / Risk / Decision Needed | Impact | Owner / Source | Status |
-|---|---|---|---|---|
-
-## 7. Requirements-to-Priority Traceability
-| Requirement | Priority / Phase | Decision Basis | Notes |
-|---|---|---|---|
-
-## 8. Assumptions and Unknowns
-| ID | Item | Classification | Why It Affects Prioritization |
-|---|---|---|---|
-
-## 9. Key Constraints
-
-## 10. Final Recommendation
-
-## 11. Status and Next Actions
-```
-
-The generated plan must include all approved MVP capabilities or explicitly
-explain their priority and phase. It must include traceability to requirements
-and must not assign developers, points, releases, or sprints.
-
-## 9. Status Rules
-
-Use exactly one status:
-
-- `READY`: upstream artifacts are validated, scope is clear, and the plan is
-  sufficiently traceable for P04.
-- `READY_WITH_ASSUMPTIONS`: the plan is usable but contains bounded
-  prioritization assumptions or unresolved decisions.
-- `BLOCKED`: missing or contradictory upstream evidence prevents reliable
-  prioritization.
-
-With the current P02 artifacts (`REQUIREMENTS.md` version 2.0 and validation
-result `PASS`), P03 should use `READY` unless new evidence reveals a blocker.
-
-## 10. Failure Conditions
-
-The plan is invalid if it:
-
-- Adds unsupported Notara functionality.
-- Promotes voice, OMR, image, audio, roles, account recovery, or comment
-  editing/deletion into MVP 1.
-- Omits rationale for priority order.
-- Ignores dependencies, risks, or the two-week constraint.
-- Treats assumptions as confirmed facts.
-- Introduces architecture or implementation decisions.
-- Assigns developers, points, sprints, releases, or workload.
-- Cannot be traced to P01 or P02.
-
-## 11. Self-Review Checklist
-
-Before producing `PRIORITIZATION.md`, verify:
-
-- [ ] P00 through P02 inputs were read.
-- [ ] P02 validation is `PASS` or an explicit non-blocking
-      `PASS_WITH_WARNINGS`.
-- [ ] All `HU01`-`HU10` capabilities have a priority and phase.
-- [ ] MVP Core and MVP Supporting are distinguished.
-- [ ] Deferred and out-of-scope capabilities are explicit.
-- [ ] Q-001 through Q-006 decisions are preserved.
-- [ ] ABC, score length, required fields, display, browser, and feed rules are
-      reflected where they affect sequencing.
-- [ ] Dependencies and risks are documented.
-- [ ] Traceability uses existing identifiers.
-- [ ] No implementation, architecture, developer, sprint, release, or point
-      decisions were added.
-- [ ] The status accurately reflects the evidence.
-
-## 12. Final Response
-
-After generating the artifact, report:
-
-1. The final planning status.
-2. The MVP Core and MVP Supporting focus.
-3. The delivery sequence.
-4. The main dependencies and risks.
-5. Whether P04 can proceed.
+- All HU01-HU19 have priority and phase; MVP 1 marked delivered.
+- Sum of SP and per-priority totals recomputed from the sources; provisional estimates flagged only when their rules are still PROPOSAL.
+- Dependencies respected; external-dependency risk considered.
+- Cut line and drop order explicit; P0 never dropped.
+- Preconditions listed with owner stage.
+- No technology, assignment or date invented.
+- Markdown and JSON consistent; JSON valid.

@@ -1,14 +1,50 @@
 # P10 - Notara MVP Evaluation
 
-- **Version:** 1.0
+- **Version:** 2.0
 - **Stage:** P10 - Evaluation
 - **Type:** Evaluation Prompt
 - **Project:** Notara
+- **Release covered:** MVP 2 — Sprint 2 (incremental over MVP 1)  
 - **Input Artifacts:** Approved P00-P05 records; P06 implementation evidence; P07 test evidence; P08 CI/CD and deployment evidence; completed P09 documentation outputs; current repository
-- **Output Artifacts:** `ai-pipeline/artifacts/10_evaluation/MVP_EVALUATION.md`, `eval_metrics.json`
+- **Output Artifacts:** `ai-pipeline/outputs/10_evaluation/MVP_EVALUATION.md`, `eval_metrics.json`
 - **Validator / Related Prompt:** `P10_validation.md`
 - **Previous Stage:** P09 - Documentation
 - **Advance Condition:** P09 documentation work and its applicable validation are complete; evaluate the actual evidence and disclose any remaining gaps.
+
+---
+
+## Change Log
+
+| Version | Change |
+|---|---|
+| 1.0 | MVP 1 prompt (October 2026). |
+| 2.0 | 2026-11-11: incremental mode for MVP 2 (section 0); output paths moved to `ai-pipeline/outputs/`; MVP 2 scope, change requests CR-005-CR-007, AI/voice providers, evidence classes and append-only runs. |
+
+---
+
+## 0. Incremental Mode (MVP 2)
+
+Apply this section on top of the rest of the prompt. Where it conflicts with an MVP 1 instruction below, this section prevails.
+
+### 0.1 Common rules (all P07-P10 prompts)
+
+1. **Scope baseline.** MVP 1 (US-001-US-010) is the delivered baseline (tag `v1.0.0`). MVP 2 covers US-011-US-019 and, **only with the approval status recorded in the latest P02/P03 outputs**, the change requests CR-005 (US-020, other and AI instruments), CR-006 (US-011 amendment, AI interpretation of dictation) and CR-007 (US-021, conversational tutor). Never decide or change an approval; report the status the artifacts record (approved, proposed, rejected).
+2. **Latest inputs.** Read the latest versions under `ai-pipeline/outputs/` (P00 `PROJECT_CONTEXT.md`, P02 `REQUIREMENTS.md` and `product_backlog.json`, P03 `PRIORITIZATION.md`, P04 `UX_SPEC.md`, P05 `ARCHITECTURE.md`, P06 story records `US-0XX_*_IMPLEMENTATION.md` / `_VALIDATION.md`, `IMPLEMENTATION_LOG_MVP2.md`, `IMPLEMENTATION_VALIDATION_MVP2.md`, `MVP2_MANUAL_ACCEPTANCE_CHECKLIST.md`) and `00_context/DECISIONS_MVP2.md` plus `CR-00X_*.md`. If two versions conflict, report the conflict and its impact; do not pick one silently.
+3. **Incremental, append-only.** Keep every earlier run and result. Add a new dated run section (`Run N — MVP 2, <date>`) and, where the output has a change log, a new version row. Mark statements that a new run supersedes; never delete or rewrite earlier evidence. Preserve all existing identifiers (`AC-*`, `FR-*`, `TC-*`, `EVAL-*`, `P08-VAL-*`, …) and continue numbering for new ones.
+4. **Evidence classes.** Label every check: `AUTOMATED_EXECUTED`, `MANUAL_EXECUTED`, `SIMULATED` (for example synthetic speech injected as a microphone stream, or a mocked provider), `USER_REPORTED`, `NOT_RUN` or `BLOCKED`. A simulated check is never reported as real-device or real-user evidence; a blocked environment is never reported as a pass.
+5. **AI and voice providers.** Notara MVP 2 uses: Whisper Base locally via `faster-whisper` (STT), ElevenLabs (primary TTS) with `edge-tts` fallback, Google Gemini (dictation interpretation and typed tutor answers), Gemini Live (spoken tutor, single-use ephemeral tokens), Magenta DDSP models with TensorFlow.js (AI instruments) and Tone.js (browser synthesis). Automated tests and CI must use fakes/mocks (DEC-230, NFR-010). Real-provider checks are optional, must be labelled, must not consume paid credits without the team's authorization, and must never print, store or commit keys, tokens or provider responses containing personal data.
+6. **Environment disclosure.** State Python and Node versions, package manager (pnpm, from `frontend/`), database (SQLite or PostgreSQL), whether frontend dependencies were installed and whether the Whisper model was available. Differences between local, CI and Railway must be stated, not assumed away.
+7. **Removed or excluded items** (sung voice, "Voz" as an instrument, synthetic a cappella; OMR; mixed voice+instrument MP3 per DEC-204) must not be tested, documented or evaluated as delivered features.
+8. **Language.** Reports may be written in Spanish or English, consistently within a document; final responses to the team are in Spanish.
+
+### 0.2 Stage-specific rules (P10 evaluation, MVP 2)
+
+- Evaluate MVP 2 against its own success indicators (P01 `IND-201`-`IND-212`, P00 `SUCCESS-008`-`SUCCESS-019`) and compare with the MVP 1 verdict; state what improved, what regressed and what remains unmeasured.
+- Add an **AI components** assessment: for each provider (Whisper, ElevenLabs/edge-tts, Gemini, Gemini Live, Magenta DDSP) state the stories it serves, evidence class, measured quality/latency where available and its risks (quotas, model retirement, third-party hosting).
+- Count requirements by approval status separately (approved vs proposed) so proposed CR items do not inflate or deflate the approved-scope result.
+- Record ratification status of DEC-201-DEC-244 and of CR-005-CR-007 as an evaluation input, not as an assumption.
+- `eval_metrics.json`: keep the existing schema and add an `mvp2` object (`approved_requirements`, `proposed_requirements`, `ai_components`, `manual_acceptance_pending`).
+- Output: append an MVP 2 evaluation to `MVP_EVALUATION.md` and update `eval_metrics.json` with a new `evaluation_version`.
 
 ---
 
@@ -29,7 +65,7 @@ Run this evaluation after P09 documentation and its applicable review have
 finished. Before evaluating:
 
 1. Inspect the actual P09 records and documentation deliverables in
-   `ai-pipeline/artifacts/09_documentation/`, `docs/`, and the repository root.
+   `ai-pipeline/outputs/09_documentation/`, `docs/`, and the repository root.
 2. Establish whether P09 is complete and identify the relevant validation
    decision, if one was produced.
 3. Do not assume P09 produced a file named `DOCUMENTATION_REPORT.md`; use the
@@ -47,30 +83,30 @@ Do not change or complete P09 as part of this prompt.
 Read `ai-pipeline/prompts/system/SYSTEM_PROMPT.md` completely before acting.
 Inspect the current repository and resolve artifacts by their actual paths.
 The project has historical references to both `ai-pipeline/outputs/` and
-`ai-pipeline/artifacts/`; do not assume an old path exists or create duplicate
+`ai-pipeline/outputs/`; do not assume an old path exists or create duplicate
 artifacts to satisfy an outdated reference. If multiple versions exist, compare
 them, identify the authoritative/current version from repository evidence, and
 record unresolved conflicts.
 
 Inspect the following actual sources when present:
 
-* `ai-pipeline/artifacts/00_context/PROJECT_CONTEXT.md` and its validation.
-* `ai-pipeline/artifacts/01_discovery/PRODUCT_VISION.md` and its validation.
-* `ai-pipeline/artifacts/02_requirements/REQUIREMENTS.md`,
+* `ai-pipeline/outputs/00_context/PROJECT_CONTEXT.md` and its validation.
+* `ai-pipeline/outputs/01_discovery/PRODUCT_VISION.md` and its validation.
+* `ai-pipeline/outputs/02_requirements/REQUIREMENTS.md`,
   `REQUIREMENTS_VALIDATION.md`, and the approved `product_backlog.json`.
-* `ai-pipeline/artifacts/03_planning/PRIORITIZATION.md`,
+* `ai-pipeline/outputs/03_planning/PRIORITIZATION.md`,
   `PRIORITIZATION_VALIDATION.md`, and its prioritized `product_backlog.json`.
-* `ai-pipeline/artifacts/04_ux/UX_SPEC.md` and `UX_SPEC_VALIDATION.md`.
-* `ai-pipeline/artifacts/05_architecture/ARCHITECTURE.md` and
+* `ai-pipeline/outputs/04_ux/UX_SPEC.md` and `UX_SPEC_VALIDATION.md`.
+* `ai-pipeline/outputs/05_architecture/ARCHITECTURE.md` and
   `ARCHITECTURE_VALIDATION.md`.
-* Relevant records under `ai-pipeline/artifacts/06_implementation/`, including
+* Relevant records under `ai-pipeline/outputs/06_implementation/`, including
   `IMPLEMENTATION_LOG.md`, `IMPLEMENTATION_VALIDATION.md`,
   `IMPLEMENTATION_FOUNDATION_VALIDATION.md`, and story-specific implementation
   or validation files that actually exist.
-* `ai-pipeline/artifacts/07_testing/TEST_ANALYSIS.md`, `TEST_PLAN.md`,
+* `ai-pipeline/outputs/07_testing/TEST_ANALYSIS.md`, `TEST_PLAN.md`,
   `TEST_IMPLEMENTATION.md`, `TEST_VALIDATION.md`, `BUG_FIX_REPORT.md`, and
   `PROMPT_LOG.md`, as available.
-* `ai-pipeline/artifacts/08_cicd/CICD_IMPLEMENTATION.md`,
+* `ai-pipeline/outputs/08_cicd/CICD_IMPLEMENTATION.md`,
   `CICD_VALIDATION.md`, `DEPLOYMENT_GUIDE.md`, `README.md`, and
   `PROMPT_LOG.md`, as available.
 * Actual P09 outputs and validation, `README.md`, relevant `docs/` files, and
@@ -213,7 +249,7 @@ critical defects or failed essential gates were resolved.
 
 ## 6. Required Output 1 - Evaluation Report
 
-Create `ai-pipeline/artifacts/10_evaluation/MVP_EVALUATION.md` with:
+Create `ai-pipeline/outputs/10_evaluation/MVP_EVALUATION.md` with:
 
 1. **Executive Summary** - verdict, MVP maturity, demonstrated strengths,
    material limitations/risks, and what the verdict does and does not establish.
@@ -240,7 +276,7 @@ Create `ai-pipeline/artifacts/10_evaluation/MVP_EVALUATION.md` with:
 
 ## 7. Required Output 2 - Machine-readable Metrics
 
-Create `ai-pipeline/artifacts/10_evaluation/eval_metrics.json` as valid JSON.
+Create `ai-pipeline/outputs/10_evaluation/eval_metrics.json` as valid JSON.
 Use this schema; replace every example with evidence-based values. Do not use
 the template's example statuses or counts as findings.
 
